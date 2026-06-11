@@ -1,0 +1,13 @@
+# chadworks
+
+> Websites and visibility, built with luxury-grade craft. Chad Lewine custom-builds fast, search-ready websites and helps clients choose how the site gets built (custom-coded, WordPress, ecommerce, or Shopify), then keeps them visible in classic search and AI assistants.
+
+## Services
+
+- [Web Development](https://chadworks.co/web-development/): The technology behind a website -- custom-built, fast, search-ready, and owned by the client. Funnels to four build options: custom-coded/static, WordPress, ecommerce, and Shopify.
+
+## About
+
+- Founder: Chad Lewine. Twenty years custom-building websites.
+- Posture: value-based pricing ($315/hr, $3,200 floor). Not the cheapest option, deliberately.
+- Ownership: clients own their code and hosting outright -- no platform lock-in.
