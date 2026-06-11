@@ -146,9 +146,40 @@ export type Service = {
   paths?: { heading: string; intro?: Writable; items: ServicePath[] };
 
   proof: { heading: string; items: ServiceProof[] };
-  price: { heading: string; body: Writable }; // value-based posture; no fake fixed price
+
+  // --- MADE-BY block (ported from the septic page's "Hi, I'm Chad") -----
+  // The founder section: photo + caption card, manifesto rows, negation
+  // list, close line, signature. Renders before Price.
+  made?: {
+    eyebrow?: string;
+    heading: string;
+    intro: Writable;
+    manifesto: { lead: string; aside: string }[];
+    negation: string[];
+    close: Writable;
+    img: string;
+    imgAlt: string;
+    captionMain: string;
+    captionSub?: string;
+    sig: string;
+    sigMeta?: string;
+  };
+
+  // Price -- value-based posture; no fake fixed price. `figure` + `figureSub`
+  // render the septic glass-panel treatment (gradient numeral + mono sub);
+  // `disclaimer` is the accent-bordered honesty note.
+  price: {
+    heading: string;
+    figure?: string;
+    figureSub?: string;
+    body: Writable;
+    disclaimer?: ReactNode;
+  };
 
   // --- FAQ (checklist 1 + FAQPage schema) ----------------------------
+  // Rendered as the septic-style accordion (sticky intro column + glass
+  // toggle list). `faqLead` is the intro paragraph in the sticky column.
+  faqLead?: Writable;
   faqs: ServiceFaq[];
 
   // --- conversion (checklist 7) --------------------------------------

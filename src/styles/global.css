@@ -583,6 +583,32 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* Hero -- equal top + bottom (see --hero-pad-y). Overrides the .section default. */
 .svc-hero { padding-block: var(--hero-pad-y); position: relative; isolation: isolate; }
 
+/* Hero atmosphere -- the septic hero's lavender washes (industry_hero_bg) +
+   the faint 40px grid substructure, both fading well before the edges. */
+.svc-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, var(--bg-wash) 0%, transparent 65%),
+    radial-gradient(circle at 15% 80%, var(--bg-wash) 0%, transparent 50%),
+    radial-gradient(circle at 85% 20%, var(--bg-wash) 0%, transparent 55%);
+}
+.svc-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(36, 57, 137, 0.025) 40px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(36, 57, 137, 0.025) 40px);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
+}
+
 /* Decorative hero art -- right third, behind the text (z-index -1). Isolated
    chips rise up through this masked column and fade out under the header.
    Hidden on tablet/mobile where the copy needs the full width. */
@@ -943,30 +969,92 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-step__body { color: var(--text-secondary); }
 
 /* Paths -- funnel cards to sub-options (whole card is the link) */
-.svc-paths {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
+/* ASYMMETRIC HOVER LANES -- the septic lane chrome (industry_lane: glass
+   surface, oversized faded numeral, 3px accent left border, staggered
+   indents, baked-in lift + tinted glow) with the CF marketing-site lane
+   hover (the accent wipes from the left border to a full-width glow). */
+.svc-lanes { display: flex; flex-direction: column; gap: 0.6rem; margin-top: var(--space-lg); }
+.svc-lane {
+  position: relative;
+  display: block;
+  padding: 2.6rem 2.4rem 2.6rem 2.6rem;
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--lane-color);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.4);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 18px rgba(128, 84, 188, 0.12);
+  transform: translateY(-2px);
+  overflow: hidden;
+  transition: border-color 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
 }
-.svc-path { padding: 0; overflow: hidden; }
-.svc-path__link {
-  display: grid;
-  gap: var(--space-2xs);
+.svc-lane:nth-child(1) { margin-left: 0; }
+.svc-lane:nth-child(2) { margin-left: 6%; }
+.svc-lane:nth-child(3) { margin-left: 3%; }
+.svc-lane:nth-child(4) { margin-left: 8%; }
+/* CF lane hover: the left accent wipes across the lane as a faint glow field */
+.svc-lane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
   height: 100%;
-  padding: var(--space-md);
-  transition: background var(--duration-fast) var(--ease-smooth);
+  opacity: 0.5;
+  background: var(--lane-color);
+  transition: width 0.4s var(--ease-smooth), opacity 0.4s var(--ease-smooth);
+  pointer-events: none;
 }
-.svc-path__link:hover { background: var(--bg-surface); }
-.svc-path__label { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); }
-.svc-path__detail { color: var(--text-secondary); }
-.svc-path__arrow {
-  margin-top: var(--space-2xs);
+.svc-lane:hover::before { width: 100%; opacity: 0.06; }
+.svc-lane:hover {
+  border-color: var(--lane-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06),
+    0 0 16px color-mix(in srgb, var(--lane-color) 12%, transparent);
+}
+.svc-lane__num {
+  position: absolute;
+  top: 0.4rem;
+  left: 1.1rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 5.2rem;
+  line-height: 1;
+  color: color-mix(in srgb, var(--lane-color) 9%, transparent);
+  pointer-events: none;
+  user-select: none;
+}
+.svc-lane__content { position: relative; display: block; }
+.svc-lane__title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.4rem;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  margin-bottom: 0.7rem;
+}
+.svc-lane__desc {
+  display: block;
+  font-size: 1.05rem;
+  line-height: 1.72;
+  color: var(--text-secondary);
+  max-width: 70ch;
+}
+.svc-lane__arrow {
+  display: inline-block;
+  margin-top: 1rem;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent);
+  transition: transform 0.4s var(--ease-smooth);
+}
+.svc-lane:hover .svc-lane__arrow { transform: translateX(0.4rem); }
+@media (max-width: 900px) {
+  .svc-lane:nth-child(n) { margin-left: 0; }
+  .svc-lane { padding: 2rem 1.6rem; }
 }
 
 /* Portfolio shots -- water-ripple cursor (WaterShot / water-ripple.ts) */
@@ -999,10 +1087,342 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-proof__detail { color: var(--text-secondary); }
 
 /* FAQ */
-.svc-faq { display: grid; gap: var(--space-lg); }
-.svc-faq__item { border-top: 1px solid var(--border-subtle); padding-top: var(--space-md); }
-.svc-faq__q { font-family: var(--font-display); font-weight: 700; font-size: var(--text-lg); margin-bottom: var(--space-2xs); }
-.svc-faq__a { color: var(--text-secondary); }
+/* FAQ -- the septic accordion section (industry_faq): plum -> navy gradient
+   with lavender atmosphere washes, sticky intro column, glass toggle list. */
+.svc-faq-section--dark {
+  background: linear-gradient(135deg, #1f1727 0%, #243989 100%);
+  color: #fff;
+  overflow: clip;
+  position: relative;
+}
+.svc-faq-section--dark::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 88% 20%, rgba(229, 210, 244, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 12% 80%, rgba(128, 84, 188, 0.16) 0%, transparent 50%);
+  pointer-events: none;
+}
+.svc-faq-section--dark .svc-block__heading {
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(36, 57, 137, 0.35);
+}
+.svc-faq__layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+.svc-faq__intro { position: relative; }
+@media (min-width: 901px) {
+  .svc-faq__intro { position: sticky; top: 110px; }
+}
+.svc-faq__lead { margin-top: var(--space-md); color: var(--text-secondary); }
+.svc-faq-section--dark .svc-faq__lead { color: rgba(229, 210, 244, 0.82); }
+
+/* The accordion list (light base; --dark overrides below) */
+.svc-acc {
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+.svc-acc__item { border-bottom: 1px solid var(--border-subtle); }
+.svc-acc__item:last-child { border-bottom: none; }
+.svc-acc__q {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  padding: 1.2rem 1.4rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  transition: background 0.25s ease;
+}
+.svc-acc__q:hover { background: rgba(128, 84, 188, 0.06); }
+.svc-acc__q:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.svc-acc__q::after {
+  content: "+";
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.7rem;
+  line-height: 0.6;
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: transform 0.35s var(--ease-smooth), color 0.25s ease;
+}
+.svc-acc__item.is-open .svc-acc__q::after {
+  content: "\2212";
+  transform: rotate(180deg);
+}
+.svc-acc__a {
+  display: grid;
+  grid-template-rows: 0fr;
+  background: rgba(237, 231, 246, 0.45);
+  transition: grid-template-rows 0.4s var(--ease-smooth);
+}
+.svc-acc__a-inner { overflow: hidden; min-height: 0; }
+.svc-acc__a p {
+  padding: 1.4rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0;
+}
+.svc-acc__item.is-open .svc-acc__a { grid-template-rows: 1fr; }
+@media (prefers-reduced-motion: reduce) {
+  .svc-acc__a { transition: none; }
+}
+
+/* Dark-section accordion overrides (the septic glass-on-dark look) */
+.svc-faq-section--dark .svc-acc {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 210, 244, 0.16);
+}
+.svc-faq-section--dark .svc-acc__item { border-color: rgba(229, 210, 244, 0.12); }
+.svc-faq-section--dark .svc-acc__q { color: #fff; background: rgba(255, 255, 255, 0.02); }
+.svc-faq-section--dark .svc-acc__q:hover { background: rgba(255, 255, 255, 0.07); }
+.svc-faq-section--dark .svc-acc__q::after { color: #e5d2f4; }
+.svc-faq-section--dark .svc-acc__item.is-open .svc-acc__q::after { color: var(--accent); }
+.svc-faq-section--dark .svc-acc__a { background: rgba(31, 23, 39, 0.35); }
+.svc-faq-section--dark .svc-acc__a p { color: rgba(229, 210, 244, 0.88); }
+
+@media (max-width: 900px) {
+  .svc-faq__layout { grid-template-columns: 1fr; }
+}
+
+/* MADE-BY -- the septic "Hi, I'm Chad" founder block (industry_made):
+   cutout photo + caption card, manifesto rows on accent-tinted gradients,
+   negation list with mono x marks, italic signature. */
+.svc-made__grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 3rem;
+  align-items: center;
+  margin-top: 1.8rem;
+}
+.svc-made__photo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.svc-made__photo img {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  height: auto;
+}
+.svc-made__caption {
+  width: 100%;
+  max-width: 420px;
+  margin-top: -3.2rem;
+  background: var(--text-primary);
+  color: #fff;
+  text-align: center;
+  padding: 1rem 1.4rem 1.05rem;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  box-shadow: 0 8px 22px rgba(36, 57, 137, 0.10);
+  position: relative;
+  z-index: 1;
+}
+.svc-made__caption-main {
+  display: block;
+  font-weight: 500;
+  font-size: 1rem;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+}
+.svc-made__caption-sub {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  opacity: 0.78;
+  margin-top: 0.25rem;
+}
+.svc-made__copy { max-width: 58ch; }
+.svc-made__intro {
+  font-size: 1.08rem;
+  line-height: 1.55;
+  margin-top: 1.2rem;
+  color: var(--text-primary);
+}
+.svc-made__manifesto {
+  list-style: none;
+  padding: 0;
+  margin: 1.8rem 0 1.6rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.svc-made__manifesto li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.55rem;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(90deg, rgba(128, 84, 188, 0.08), rgba(128, 84, 188, 0.015));
+  border-left: 2px solid var(--accent);
+}
+.svc-made__manifesto li:nth-child(1),
+.svc-made__manifesto li:nth-child(2) { margin-bottom: 0.6rem; }
+.svc-made__manifesto li:nth-child(2) {
+  background: linear-gradient(90deg, rgba(128, 84, 188, 0.05), rgba(128, 84, 188, 0.01));
+}
+.svc-made__manifesto li:nth-child(3) {
+  background: linear-gradient(90deg, rgba(128, 84, 188, 0.03), rgba(128, 84, 188, 0));
+}
+.svc-made__aside {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.svc-made__negation {
+  list-style: none;
+  padding: 0;
+  margin: 1.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.svc-made__negation li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  font-size: 0.97rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+.svc-made__x {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-weight: 500;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 1rem;
+  text-align: center;
+  line-height: 1.55;
+}
+.svc-made__close {
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: var(--text-primary);
+  margin: 1.8rem 0 1rem;
+}
+.svc-made__sig {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-style: italic;
+  font-size: 1.45rem;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+.svc-made__sig-meta {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-style: normal;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 0.4rem;
+}
+@media (max-width: 900px) {
+  .svc-made__grid { grid-template-columns: 1fr; gap: 2.2rem; }
+}
+
+/* PRICING -- the septic glass panel (industry_pricing): frosted white panel,
+   gradient price numeral, mono sub-label, accent-bordered disclaimer. Sits
+   on a lavender scheme-alternate band. */
+.svc-pricing__panel {
+  margin-top: var(--space-lg);
+  max-width: 980px; /* component panel, not a page shell -- keeps the glass snug to the copy */
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 14px;
+  padding: 3rem 2.6rem;
+  box-shadow: 0 14px 40px rgba(51, 51, 51, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.svc-pricing__price {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 3.6vw, 2.8rem);
+  line-height: 1;
+  background: linear-gradient(120deg, var(--text-primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+.svc-pricing__price-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 1.2rem;
+}
+.svc-pricing__copy {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  max-width: 760px;
+}
+.svc-pricing__disclaimer {
+  margin: 1.4rem 0 0;
+  padding: 0.9rem 1rem;
+  border-left: 2px solid var(--accent);
+  background: rgba(128, 84, 188, 0.05);
+  border-radius: 0 4px 4px 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+  max-width: 760px;
+}
+.svc-pricing__disclaimer strong {
+  color: var(--text-primary);
+  font-style: normal;
+  font-weight: 600;
+}
+.svc-pricing__panel .svc-btn { margin-top: 1.6rem; }
+@media (max-width: 600px) {
+  .svc-pricing__panel { padding: 2rem 1.4rem; }
+}
+
+/* Problem-section extra visual (e.g. the web-design before/after reveal):
+   sits below the prose, above the ribbon layers. */
+.svc-problem-art {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-xl);
+}
 
 /* Testimonials -- social proof band (lavender) */
 .svc-testimonials-band { background: var(--bg-surface); border-block: 1px solid var(--border-subtle); }
@@ -1787,18 +2207,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--text-tertiary);
 }
 .design-reveal__label--after { color: var(--accent); }
-
-/* Problem-section variant for pages with their own signature visual: normal
-   section rhythm (no ribbon band height, no sticky rail, no knockout). */
-.svc-problem--custom {
-  min-height: 0;
-  padding-block-start: var(--section-pad-y);
-  text-align: center;
-}
-.svc-problem--custom .svc-problem-art {
-  margin-block: var(--space-lg) var(--space-md);
-  text-align: initial;
-}
 
 @media (max-width: 600px) {
   .design-reveal__stage { aspect-ratio: 4 / 3.4; }

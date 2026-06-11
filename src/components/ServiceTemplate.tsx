@@ -21,6 +21,7 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/lib/service";
 import { Prompt } from "@/components/Prompt";
+import { FaqAccordion } from "@/components/FaqAccordion";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
 import { WaterRipple } from "@/components/WaterRipple";
@@ -149,6 +150,10 @@ function statementTone(i: number, total: number, outliers?: number[]) {
   return { bg, onDark: isOnDark(bg) };
 }
 
+// Lane accent colors, in order (deep indigo, brand glow, teal, copper) --
+// the septic per-niche accent trio extended with the copper outlier.
+const LANE_COLORS = ["#243989", "#8054bc", "#4a6b6e", "#d4a574"];
+
 // Every CTA button: label + the default long-arrow-alt-right icon.
 function CtaButton({ href, label }: { href: string; label: string }) {
   return (
@@ -237,27 +242,23 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         );
       })}
 
-      {/* PROBLEM -- full-bleed. Default signature = the web-development ribbon
-          background + heading knockout. A page that supplies `problemArt`
-          renders its OWN signature visual instead (one signature per page). */}
-      <section
-        className={`section full svc-block svc-problem reveal${s.problemArt ? " svc-problem--custom" : ""}`}
-      >
+      {/* PROBLEM -- full-bleed, ribbons + knockout always (the sitewide
+          signature). A page that supplies `problemArt` gets its extra visual
+          rendered BELOW the prose, growing the section downward exactly like
+          the pop-down does (the sticky ribbon rail already handles growth). */}
+      <section className="section full svc-block svc-problem reveal">
         {/* visible colored ribbons (behind) -- sticky band inside a full-height
             rail: stays half-visible at the viewport top while the opened
             pop-down glides over it, until the section is scrolled through. */}
-        {!s.problemArt && (
-          <div className="svc-gradient-pin">
-            <Ribbon className="svc-gradient" />
-          </div>
-        )}
+        <div className="svc-gradient-pin">
+          <Ribbon className="svc-gradient" />
+        </div>
 
         {/* real, accessible text -- dark blue over the page */}
         <h2 className="svc-block__heading">{s.problem.heading}</h2>
         {s.problem.subheading && (
           <h3 className="svc-block__subheading">{s.problem.subheading}</h3>
         )}
-        {s.problemArt && <div className="svc-problem-art">{s.problemArt}</div>}
         {s.problem.more ? (
           // Prose lifted off the ribbons into a frosted pop-down (CTA trigger).
           // The body leads the panel; `more.paragraphs` expand on it.
@@ -271,23 +272,24 @@ export default function ServiceTemplate({ service }: { service: Service }) {
           <p className="svc-block__body measure-prose"><W value={s.problem.body} /></p>
         )}
 
+        {/* Optional page-specific visual, below the prose (grows downward). */}
+        {s.problemArt && <div className="svc-problem-art">{s.problemArt}</div>}
+
         {/* Knockout overlay: a white-on-black coverage pass of the same ribbons,
             multiplied by an aria-hidden white duplicate of the text, then screened
             over the section -> the copy turns white only where a ribbon is under
             it. The duplicate is presentational; the heading above is the only
-            real one in the DOM. Only rendered with the default ribbon visual. */}
-        {!s.problemArt && (
-          <div className="svc-knockout" aria-hidden="true">
-            <Ribbon className="svc-knockout__cov" mask />
-            <div className="svc-knockout__text">
-              <div className="svc-block__heading">{s.problem.heading}</div>
-              {s.problem.subheading && (
-                <div className="svc-block__subheading">{s.problem.subheading}</div>
-              )}
-              <div className="svc-block__body measure-prose"><W value={s.problem.body} /></div>
-            </div>
+            real one in the DOM. */}
+        <div className="svc-knockout" aria-hidden="true">
+          <Ribbon className="svc-knockout__cov" mask />
+          <div className="svc-knockout__text">
+            <div className="svc-block__heading">{s.problem.heading}</div>
+            {s.problem.subheading && (
+              <div className="svc-block__subheading">{s.problem.subheading}</div>
+            )}
+            <div className="svc-block__body measure-prose"><W value={s.problem.body} /></div>
           </div>
-        )}
+        </div>
       </section>
 
       {/* APPROACH -- numbered steps; each title is a liftable claim. Dark anchor. */}
@@ -311,26 +313,35 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         </ol>
       </section>
 
-      {/* PATHS (optional) -- funnel out to sub-options (build options, etc.). */}
+      {/* PATHS (optional) -- funnel out to sub-options, rendered as the
+          ASYMMETRIC HOVER LANES (septic lane chrome: glass surface, oversized
+          faded numeral, 3px accent left border + staggered indents; CF lanes
+          hover: the accent border wipes to a full-width glow). */}
       {s.paths && (
         <section className="section svc-block reveal">
           <h2 className="svc-block__heading">{s.paths.heading}</h2>
           {s.paths.intro && (
             <p className="svc-block__body measure-prose"><W value={s.paths.intro} /></p>
           )}
-          <ul className="svc-paths">
+          <div className="svc-lanes">
             {s.paths.items.map((p, i) => (
-              <li key={i} className="svc-path panel">
-                <Link href={p.href} className="svc-path__link">
-                  <span className="svc-path__label">{p.label}</span>
-                  <span className="svc-path__detail"><W value={p.detail} /></span>
-                  <span className="svc-path__arrow" aria-hidden="true">
-                    Explore -&gt;
-                  </span>
-                </Link>
-              </li>
+              <Link
+                key={i}
+                href={p.href}
+                className="svc-lane"
+                style={{ "--lane-color": LANE_COLORS[i % LANE_COLORS.length] } as React.CSSProperties}
+              >
+                <span className="svc-lane__num" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="svc-lane__content">
+                  <span className="svc-lane__title">{p.label}</span>
+                  <span className="svc-lane__desc"><W value={p.detail} /></span>
+                  <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
+                </span>
+              </Link>
             ))}
-          </ul>
+          </div>
         </section>
       )}
 
@@ -407,10 +418,72 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         </section>
       )}
 
-      {/* PRICE POSTURE -- value-based; never a fake fixed number. */}
-      <section className="section svc-block reveal">
+      {/* MADE-BY (optional) -- the septic "Hi, I'm Chad" founder block: cutout
+          photo + caption card, manifesto rows, negation list, signature. */}
+      {s.made && (
+        <section className="section svc-block svc-made reveal">
+          {s.made.eyebrow && <p className="eyebrow">{s.made.eyebrow}</p>}
+          <h2 className="svc-block__heading svc-made__heading">{s.made.heading}</h2>
+          <div className="svc-made__grid">
+            <div className="svc-made__photo">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
+              <img src={s.made.img} alt={s.made.imgAlt} loading="lazy" />
+              <div className="svc-made__caption">
+                <span className="svc-made__caption-main">{s.made.captionMain}</span>
+                {s.made.captionSub && (
+                  <span className="svc-made__caption-sub">{s.made.captionSub}</span>
+                )}
+              </div>
+            </div>
+            <div className="svc-made__copy">
+              <p className="svc-made__intro"><W value={s.made.intro} /></p>
+              <ul className="svc-made__manifesto">
+                {s.made.manifesto.map((m, i) => (
+                  <li key={i}>
+                    {m.lead} <span className="svc-made__aside">{m.aside}</span>
+                  </li>
+                ))}
+              </ul>
+              <ul className="svc-made__negation">
+                {s.made.negation.map((n, i) => (
+                  <li key={i}>
+                    <span className="svc-made__x" aria-hidden="true">&times;</span>
+                    {n}
+                  </li>
+                ))}
+              </ul>
+              <p className="svc-made__close"><W value={s.made.close} /></p>
+              <p className="svc-made__sig">
+                {s.made.sig}
+                {s.made.sigMeta && (
+                  <span className="svc-made__sig-meta">{s.made.sigMeta}</span>
+                )}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* PRICE POSTURE -- value-based; never a fake fixed number. With a
+          `figure`, renders the septic glass panel: gradient numeral + mono
+          sub + copy + accent-bordered disclaimer. */}
+      <section className="section full scheme-alternate svc-block svc-pricing reveal">
         <h2 className="svc-block__heading">{s.price.heading}</h2>
-        <p className="svc-block__body measure-prose"><W value={s.price.body} /></p>
+        {s.price.figure ? (
+          <div className="svc-pricing__panel">
+            <div className="svc-pricing__price">{s.price.figure}</div>
+            {s.price.figureSub && (
+              <div className="svc-pricing__price-sub">{s.price.figureSub}</div>
+            )}
+            <p className="svc-pricing__copy"><W value={s.price.body} /></p>
+            {s.price.disclaimer && (
+              <p className="svc-pricing__disclaimer">{s.price.disclaimer}</p>
+            )}
+            <CtaButton href={s.cta.href} label="Get an honest read" />
+          </div>
+        ) : (
+          <p className="svc-block__body measure-prose"><W value={s.price.body} /></p>
+        )}
       </section>
 
       {/* QUALIFICATION (optional) -- who it's for / who it isn't. */}
@@ -442,19 +515,27 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         </section>
       )}
 
-      {/* FAQ -- real questions, self-contained answers (feeds FAQPage schema).
-          Dark only when a light section follows before the (dark) CTA -- see
-          faqDark above. Prevents two inverted bands stacking. */}
-      <section className={`section full svc-block reveal${faqDark ? " svc-dark" : ""}`}>
-        <h2 className="svc-block__heading svc-fill">Questions, answered</h2>
-        <dl className="svc-faq">
-          {s.faqs.map((f, i) => (
-            <div key={i} className="svc-faq__item">
-              <dt className="svc-faq__q">{f.q}</dt>
-              <dd className="svc-faq__a measure-prose"><W value={f.a} /></dd>
-            </div>
-          ))}
-        </dl>
+      {/* FAQ -- the septic accordion: plum->navy gradient band with lavender
+          atmosphere washes, sticky intro column left, glass toggle list right.
+          Dark gradient only when a light section follows before the (dark)
+          CTA -- see faqDark above. Prevents two inverted bands stacking. */}
+      <section
+        className={`section full svc-block svc-faq-section reveal${faqDark ? " svc-faq-section--dark" : ""}`}
+      >
+        <div className="svc-faq__layout">
+          <div className="svc-faq__intro">
+            <h2 className="svc-block__heading svc-fill">Questions, answered</h2>
+            {s.faqLead && (
+              <p className="svc-faq__lead"><W value={s.faqLead} /></p>
+            )}
+          </div>
+          <FaqAccordion
+            items={s.faqs.map((f) => ({
+              q: f.q,
+              a: isPrompt(f.a) ? <Prompt label={f.a.label} brief={f.a.brief} /> : f.a,
+            }))}
+          />
+        </div>
       </section>
 
       {/* ASSURANCE (optional) -- risk reversal: reasons it's safe to say yes. */}

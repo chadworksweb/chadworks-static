@@ -63,7 +63,7 @@ export const webDesign: Service = {
     heading: "Why web design actually matters",
     subheading: "You're judged before you're read.",
     body:
-      "Visitors decide how much to trust your business before they read a single word, and the design is what they're deciding on. Drag the line across the browser above and watch the same business make two completely different first impressions.",
+      "Visitors decide how much to trust your business before they read a single word, and the design is what they're deciding on. Drag the line across the browser below and watch the same business make two completely different first impressions.",
     more: {
       trigger: "More on what design decides",
       paragraphs: [
@@ -126,7 +126,7 @@ export const webDesign: Service = {
       {
         label: "Custom Coded / Static",
         detail:
-          "The purest canvas. Custom built around the design with nothing to update or break, and yours completely.",
+          "The purest canvas. Custom built around the design with nothing to update or break, and entirely yours.",
         href: "/custom-coded-static/",
       },
       {
@@ -144,7 +144,7 @@ export const webDesign: Service = {
       {
         label: "Shopify",
         detail:
-          "A custom face on the platform that handles the heavy lifting, so the store looks like you, not like Shopify.",
+          "A custom face on the platform that handles the heavy lifting, so the store looks like you, not Shopify.",
         href: "/shopify/",
       },
     ],
@@ -168,11 +168,50 @@ export const webDesign: Service = {
     ],
   },
 
+  made: {
+    eyebrow: "Who makes it",
+    heading: "Hi, I'm Chad.",
+    intro:
+      "I've been designing websites for 20 years, since the Xanga and MySpace days, and every site that leaves here is custom built by me.",
+    manifesto: [
+      { lead: "I design it.", aside: "(No template.)" },
+      { lead: "I code it.", aside: "(No page builder.)" },
+      { lead: "I maintain it.", aside: "(No ghosting.)" },
+    ],
+    negation: [
+      "No subcontractors.",
+      "No offshore.",
+      "No AI slop.",
+      "No warehouse agency you'll never hear from after the invoice clears.",
+    ],
+    close:
+      "When you email, I answer. When something breaks at 11pm, I'm the one fixing it.",
+    img: "/people/chad-cutout.webp",
+    imgAlt: "Chad Lewine, the designer and developer behind chadworks",
+    captionMain: "Don't worry, I'm a professional.",
+    captionSub: "(Web designer.)",
+    sig: "Chad Lewine",
+    sigMeta: "chadworks -- designing since age 11",
+  },
+
   price: {
     heading: "What it costs, plainly",
+    figure: "$3,200 - $6,200+",
+    figureSub: "Value-based -- most builds land near $6,200",
     body:
-      "Design is priced on what it's worth to your business, not on how fast a font can be picked. Time bills at $315 an hour, projects start at a $3,200 floor, and most land near $6,200 with the development included. There are cheaper designers, plenty of them. The difference is that you're not buying a template with your logo dropped in. You're buying a design that belongs to your business alone, built by the same person who codes it. If the lowest number is the goal, I'll tell you straight that we probably aren't a match.",
+      "Design is priced on what it's worth to your business, not on how fast a font can be picked. Projects start at a $3,200 floor, most land near $6,200 with the development included, and hourly work bills at $315. There are cheaper designers, plenty of them. The difference is that you're not buying a template with your logo dropped in. You're buying a design that belongs to your business alone, built by the same person who codes it.",
+    disclaimer: (
+      <>
+        <strong>Straight up:</strong> if the lowest number is the goal, we
+        probably aren&apos;t a match, and I&apos;d rather say so here than
+        after you&apos;ve spent the money. Real numbers come from a real
+        conversation about scope, not a pricing table.
+      </>
+    ),
   },
+
+  faqLead:
+    "The questions buyers actually ask about web design, answered the way I'd answer them on a call. If yours isn't here, ask me directly.",
 
   faqs: [
     {
