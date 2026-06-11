@@ -178,10 +178,11 @@ export default function ServiceTemplate({ service }: { service: Service }) {
       <JsonLd data={buildFaqJsonLd(s)} />
 
       {/* HERO -- the only H1. Eyebrow, gradient title, answer-first lede, CTA.
-          FULL section so the decorative art's full grid track reaches the true
-          viewport edge (the codefall mechanism); the text children re-anchor
-          to the content rail as always. */}
-      <section className="section full svc-hero">
+          Content-track section ON PURPOSE: the decorative art column anchors
+          absolute right:0 against the section box, so the chips' renderable
+          space is CAPPED at the content rail (the RATES edge) exactly like
+          the web-development hero. Do not make this .full. */}
+      <section className="section svc-hero">
         {s.heroArt && <HeroArtStage>{s.heroArt}</HeroArtStage>}
         <nav className="svc-crumbs" aria-label="Breadcrumb">
           <Link href="/">Home</Link>

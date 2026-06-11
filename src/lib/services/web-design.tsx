@@ -39,8 +39,8 @@ export const webDesign: Service = {
       layout, the color, the type, and the path that turns a stranger into a
       customer. I&apos;m Chad, and I&apos;ve been designing websites for 20
       years. Bring me a brand and I&apos;ll design a site that earns trust on
-      sight, or bring me nothing but the business itself and we&apos;ll find
-      the look together. And when the design is settled, I{" "}
+      sight, or bring me the business alone and we&apos;ll find the look
+      together. When the design is settled, I{" "}
       <Link href="/web-development/" className="svc-inline-link">
         develop
       </Link>{" "}
@@ -103,7 +103,7 @@ export const webDesign: Service = {
       {
         title: "Structure first, decoration second",
         body:
-          "The layout and hierarchy get designed before the styling. Where the eye lands, what feels clickable, how a page hands the reader to the next one. If the bones don't sell, no color will rescue it.",
+          "The layout and hierarchy get designed before the styling. Where the eye lands, what feels clickable, where a page sends the reader next. If the bones don't sell, no color rescues it.",
       },
       {
         title: "A design system, not a lucky page",
@@ -200,7 +200,7 @@ export const webDesign: Service = {
   cta: {
     heading: "Have a vision, or only a hunch?",
     body:
-      "Either works. Tell me about your business and what you want people to feel the moment they land. I'll give you an honest read on what the design needs and what the work would take, before either of us commits to anything.",
+      "Either works. Tell me about your business and what you want people to feel the moment they land. I'll give you an honest read on what the design needs, before anyone commits to anything.",
     buttonLabel: "Tell me about your project",
     href: "/contact/",
   },
@@ -238,12 +238,12 @@ export const webDesign: Service = {
   qualification: {
     heading: "Is this the right fit?",
     fit: [
-      "You want a site that looks like your business and no one else's.",
+      "You want a site that looks like your business, no one else's.",
       "You see design as the thing that wins customers, not a coat of paint at the end.",
     ],
     notFit: [
       "You already bought a theme and want it filled in as-is.",
-      "The lowest bid matters more to you than what the site wins you.",
+      "The lowest bid matters more than what the site wins you.",
     ],
   },
 
@@ -262,19 +262,19 @@ export const webDesign: Service = {
     steps: [
       {
         title: "You reach out",
-        body: "Tell me about your business and the site you have in mind through the contact form or a quick email. I usually reply within a day.",
+        body: "Tell me about your business through the contact form or a quick email. I usually reply within a day.",
       },
       {
         title: "An honest read",
-        body: "I'll tell you straight whether chadworks is the right fit, with a rough shape and cost, and no pressure either way.",
+        body: "I'll tell you straight whether chadworks is the right fit, with a rough shape and cost, no pressure.",
       },
       {
         title: "A scoped plan",
         body: "If it's a fit, you get a clear written scope and timeline before any work or payment starts.",
       },
       {
-        title: "A real direction, early",
-        body: "You see an actual design direction in days, not a surprise after weeks of silence, and we steer it together from there.",
+        title: "Direction, early",
+        body: "You see an actual design direction in days, not a surprise after weeks of silence, and we steer it together.",
       },
     ],
   },

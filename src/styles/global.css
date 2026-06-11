@@ -587,30 +587,17 @@ p, li, dd, figcaption { text-wrap: pretty; }
    chips rise up through this masked column and fade out under the header.
    Hidden on tablet/mobile where the copy needs the full width. */
 .svc-hero__art {
-  /* The codefall mechanism (see .home-hero__codefall): the hero section is
-     .full, this art is a grid child placed on the FULL track, so its grid
-     area (= the containing block for these absolute offsets) spans the whole
-     viewport and right:0 is the TRUE screen edge -- no rail cutoff. */
-  grid-column: full;
   position: absolute;
   top: 0;
   bottom: 0;
-  right: 0;
-  width: clamp(360px, 36vw, 840px);
+  right: 0;                                  /* far right of the full-bleed section */
+  width: clamp(360px, 34%, 600px);           /* ~the far third; scales with screen */
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  /* fade top (under the header) + bottom, AND fade the column's left edge so
-     chips dissolve into the page instead of popping at a hard boundary --
-     same two-gradient composite as the codefall mask */
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0, #000 26%, #000 80%, transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22%, #000 100%);
-  mask-image:
-    linear-gradient(to bottom, transparent 0, #000 26%, #000 80%, transparent 100%),
-    linear-gradient(to right, transparent 0, #000 22%, #000 100%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+  /* fade the top (under the header) and the bottom so chips appear/vanish softly */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26%, #000 80%, transparent 100%);
 }
 .hero-chip {
   position: absolute;
