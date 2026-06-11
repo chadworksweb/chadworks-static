@@ -22,15 +22,18 @@ const H = 52;
 const FRAME_MS = 33; // ~30fps
 
 // Drops: hue (deg), orbit center (cx, cy in 0-1), orbit radii, speed, radius.
-// Hues: indigo 227 / blurple 235 / purple 265 / deep violet 250 / lavender 280
-// / copper 28 (the single warm outlier, small + slow).
+// The letter sits near the PALE end of the H1 ramp (between light blurple and
+// lavender), so the palette lives in that register: light blurples, purples,
+// lavenders (l 0.55-0.78), with one slightly deeper purple for body and one
+// soft copper drop as the warm outlier. Dark/saturated drops broke the ramp
+// (Chad, 2026-06-11: "what's up with the gradient").
 const DROPS = [
-  { hue: 227, cx: 0.3, cy: 0.25, ox: 0.22, oy: 0.18, sp: 0.31, r: 0.42, s: 0.62, l: 0.38 },
-  { hue: 265, cx: 0.7, cy: 0.3, ox: 0.2, oy: 0.24, sp: 0.23, r: 0.4, s: 0.55, l: 0.46 },
-  { hue: 250, cx: 0.5, cy: 0.62, ox: 0.26, oy: 0.2, sp: 0.27, r: 0.44, s: 0.5, l: 0.42 },
-  { hue: 235, cx: 0.25, cy: 0.78, ox: 0.18, oy: 0.16, sp: 0.35, r: 0.38, s: 0.58, l: 0.5 },
-  { hue: 280, cx: 0.78, cy: 0.74, ox: 0.18, oy: 0.2, sp: 0.21, r: 0.4, s: 0.45, l: 0.62 },
-  { hue: 28, cx: 0.55, cy: 0.45, ox: 0.3, oy: 0.26, sp: 0.16, r: 0.3, s: 0.5, l: 0.55 },
+  { hue: 235, cx: 0.3, cy: 0.25, ox: 0.22, oy: 0.18, sp: 0.31, r: 0.42, s: 0.5, l: 0.66 },
+  { hue: 265, cx: 0.7, cy: 0.3, ox: 0.2, oy: 0.24, sp: 0.23, r: 0.4, s: 0.52, l: 0.6 },
+  { hue: 252, cx: 0.5, cy: 0.62, ox: 0.26, oy: 0.2, sp: 0.27, r: 0.44, s: 0.45, l: 0.55 },
+  { hue: 242, cx: 0.25, cy: 0.78, ox: 0.18, oy: 0.16, sp: 0.35, r: 0.38, s: 0.48, l: 0.72 },
+  { hue: 278, cx: 0.78, cy: 0.74, ox: 0.18, oy: 0.2, sp: 0.21, r: 0.4, s: 0.5, l: 0.78 },
+  { hue: 30, cx: 0.55, cy: 0.45, ox: 0.3, oy: 0.26, sp: 0.16, r: 0.28, s: 0.42, l: 0.72 },
 ];
 
 function hslToRgb(h: number, s: number, l: number) {

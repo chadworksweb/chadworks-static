@@ -1494,7 +1494,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
    OWN background to its own glyphs, so the letter overrides cleanly.
    ===================================================================== */
 .chroma-letter {
-  background-image: linear-gradient(160deg, #243989 0%, #5668ad 38%, #8054bc 68%, #e5d2f4 100%);
+  /* Fallback matches the letter's POSITION in the H1 ramp (pale end): light
+     blurple -> soft purple -> lavender. Never darker than its neighbors. */
+  background-image: linear-gradient(160deg, #8a96cf 0%, #9d83cf 45%, #cdb9e8 100%);
   background-size: 100% 100%;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
