@@ -23,7 +23,6 @@ import {
 import { Prompt } from "@/components/Prompt";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
-import { Ambient } from "@/components/Ambient";
 import { WaterRipple } from "@/components/WaterRipple";
 import { Ribbon } from "@/components/Ribbon";
 import { ProblemMore } from "@/components/ProblemMore";
@@ -171,14 +170,18 @@ export default function ServiceTemplate({ service }: { service: Service }) {
 
   return (
     <>
-      <Ambient />
+      {/* NO PARTICLES anywhere on the site (Chad, 2026-06-11). The Ambient
+          drifting-dot island was removed from the template under that rule. */}
       <PageMotion />
       <JsonLd data={buildBreadcrumbJsonLd(s)} />
       <JsonLd data={buildServiceJsonLd(s)} />
       <JsonLd data={buildFaqJsonLd(s)} />
 
-      {/* HERO -- the only H1. Eyebrow, gradient title, answer-first lede, CTA. */}
-      <section className="section svc-hero">
+      {/* HERO -- the only H1. Eyebrow, gradient title, answer-first lede, CTA.
+          FULL section so the decorative art's full grid track reaches the true
+          viewport edge (the codefall mechanism); the text children re-anchor
+          to the content rail as always. */}
+      <section className="section full svc-hero">
         {s.heroArt && <HeroArtStage>{s.heroArt}</HeroArtStage>}
         <nav className="svc-crumbs" aria-label="Breadcrumb">
           <Link href="/">Home</Link>
@@ -190,7 +193,7 @@ export default function ServiceTemplate({ service }: { service: Service }) {
 
         <p className="eyebrow">{s.eyebrow}</p>
         <h1 className="svc-hero__title">
-          <span className="text-gradient">{s.title}</span>
+          <span className="text-gradient">{s.titleNode ?? s.title}</span>
         </h1>
         {/* Answer-first: quotable in the first 100 words. */}
         <p className="svc-lede measure-prose">
@@ -233,21 +236,27 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         );
       })}
 
-      {/* PROBLEM -- full-bleed, with an ambient drifting mesh-gradient behind
-          (Stripe-ish, brand-light colors, reduced-motion-safe). */}
-      <section className="section full svc-block svc-problem reveal">
+      {/* PROBLEM -- full-bleed. Default signature = the web-development ribbon
+          background + heading knockout. A page that supplies `problemArt`
+          renders its OWN signature visual instead (one signature per page). */}
+      <section
+        className={`section full svc-block svc-problem reveal${s.problemArt ? " svc-problem--custom" : ""}`}
+      >
         {/* visible colored ribbons (behind) -- sticky band inside a full-height
             rail: stays half-visible at the viewport top while the opened
             pop-down glides over it, until the section is scrolled through. */}
-        <div className="svc-gradient-pin">
-          <Ribbon className="svc-gradient" />
-        </div>
+        {!s.problemArt && (
+          <div className="svc-gradient-pin">
+            <Ribbon className="svc-gradient" />
+          </div>
+        )}
 
         {/* real, accessible text -- dark blue over the page */}
         <h2 className="svc-block__heading">{s.problem.heading}</h2>
         {s.problem.subheading && (
           <h3 className="svc-block__subheading">{s.problem.subheading}</h3>
         )}
+        {s.problemArt && <div className="svc-problem-art">{s.problemArt}</div>}
         {s.problem.more ? (
           // Prose lifted off the ribbons into a frosted pop-down (CTA trigger).
           // The body leads the panel; `more.paragraphs` expand on it.
@@ -265,17 +274,19 @@ export default function ServiceTemplate({ service }: { service: Service }) {
             multiplied by an aria-hidden white duplicate of the text, then screened
             over the section -> the copy turns white only where a ribbon is under
             it. The duplicate is presentational; the heading above is the only
-            real one in the DOM. */}
-        <div className="svc-knockout" aria-hidden="true">
-          <Ribbon className="svc-knockout__cov" mask />
-          <div className="svc-knockout__text">
-            <div className="svc-block__heading">{s.problem.heading}</div>
-            {s.problem.subheading && (
-              <div className="svc-block__subheading">{s.problem.subheading}</div>
-            )}
-            <div className="svc-block__body measure-prose"><W value={s.problem.body} /></div>
+            real one in the DOM. Only rendered with the default ribbon visual. */}
+        {!s.problemArt && (
+          <div className="svc-knockout" aria-hidden="true">
+            <Ribbon className="svc-knockout__cov" mask />
+            <div className="svc-knockout__text">
+              <div className="svc-block__heading">{s.problem.heading}</div>
+              {s.problem.subheading && (
+                <div className="svc-block__subheading">{s.problem.subheading}</div>
+              )}
+              <div className="svc-block__body measure-prose"><W value={s.problem.body} /></div>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* APPROACH -- numbered steps; each title is a liftable claim. Dark anchor. */}

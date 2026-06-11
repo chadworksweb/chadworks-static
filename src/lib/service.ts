@@ -94,6 +94,11 @@ export type Service = {
   laneLabel: string;       // human label of the lane (breadcrumb)
   eyebrow: string;         // mono kicker
   title: string;           // the H1 -- matches the intent, one per page
+  // OPTIONAL: a rich render of the H1 (e.g. one letter carrying a canvas fill).
+  // `title` stays the plain-string source of truth for schema, breadcrumbs and
+  // metadata; titleNode only changes what the hero PAINTS. Accessible text must
+  // match `title` exactly.
+  titleNode?: ReactNode;
   intent: string;          // one sentence: primary entity + the question answered
 
   // --- answer-first lede (checklist 1): quotable in first 100 words ---
@@ -118,6 +123,11 @@ export type Service = {
   outlierFacts?: number[];
 
   // --- the canonical body sequence -----------------------------------
+  // problemArt: OPTIONAL page-signature visual for the Problem section. When
+  // set, the template renders IT instead of the default ribbon background +
+  // knockout (which stay the web-development signature). One signature canvas/
+  // visual moment per page -- see CWS-CREATIVE-ARSENAL.md.
+  problemArt?: ReactNode;
   problem: {
     heading: string;
     subheading?: string;
