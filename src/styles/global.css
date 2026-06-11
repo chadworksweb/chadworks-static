@@ -367,6 +367,70 @@ h1 { font-weight: 500; }   /* medium -- the one deliberate exception */
   30%           { transform: translateY(-0.32em); }
 }
 
+/* Mobile menu (<=900): hamburger + slide-down panel. Hidden on big screens. */
+.site-nav__toggle {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+.site-nav__toggle-bar {
+  display: block;
+  width: 1.375rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-primary);
+  transition: transform var(--duration-base) var(--ease-smooth),
+    opacity var(--duration-base) var(--ease-smooth);
+}
+.site-nav--open .site-nav__toggle-bar:nth-child(1) { transform: translateY(0.36rem) rotate(45deg); }
+.site-nav--open .site-nav__toggle-bar:nth-child(2) { opacity: 0; }
+.site-nav--open .site-nav__toggle-bar:nth-child(3) { transform: translateY(-0.36rem) rotate(-45deg); }
+
+.site-nav__panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  background: var(--bg-base);
+  border-bottom: 0 solid var(--border-subtle);
+  transition: grid-template-rows var(--duration-base) var(--ease-smooth);
+}
+.site-nav--open .site-nav__panel {
+  grid-template-rows: 1fr;
+  border-bottom-width: 1px;
+  box-shadow: 0 24px 37px -18px rgba(86, 104, 173, 0.25);
+}
+.site-nav__panel-inner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.site-nav__panel-inner a {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.125rem;
+  color: var(--nav-link);
+  text-transform: uppercase;
+  padding: 0.9rem var(--site-edge-min);
+  border-top: 1px solid var(--border-subtle);
+  transition: color var(--duration-base) var(--ease-smooth);
+}
+.site-nav__panel-inner a:hover { color: var(--nav-link-pulse); }
+@media (prefers-reduced-motion: reduce) {
+  .site-nav__panel { transition: none; }
+}
+
 .site-footer {
   display: grid;
   grid-template-columns:
@@ -377,14 +441,64 @@ h1 { font-weight: 500; }   /* medium -- the one deliberate exception */
 }
 .site-footer__inner {
   grid-column: content;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-md);
   padding-block: var(--space-xl);
   color: var(--text-tertiary);
   font-size: var(--text-sm);
 }
+.site-footer__brandrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.site-footer__brand {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+.site-footer__cols {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+  padding-bottom: var(--space-lg);
+}
+.site-footer__heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-sm);
+}
+.site-footer__heading a { color: inherit; }
+.site-footer__heading a:hover { color: var(--text-primary); }
+.site-footer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+.site-footer__list a {
+  color: var(--text-tertiary);
+  transition: color var(--duration-base) var(--ease-smooth);
+}
+.site-footer__list a:hover { color: var(--text-primary); }
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+.site-footer__legal-links { display: inline-flex; gap: var(--space-md); }
+.site-footer__legal a { color: var(--text-tertiary); }
+.site-footer__legal a:hover { color: var(--text-primary); }
 
 /* =====================================================================
    BUTTON PRIMITIVE -- shared CTA. Purple fill on light; lavender on dark.
@@ -1077,13 +1191,17 @@ h1 { font-weight: 500; }   /* medium -- the one deliberate exception */
 
 /* Tablet vertical */
 @media (max-width: 900px) {
-  .site-footer__inner { flex-direction: column; }
+  .site-nav__links { display: none; }
+  .site-nav__toggle { display: flex; }
+  .site-footer__cols { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   :root { --site-edge-min: 1rem; }
-  .site-nav__links { gap: var(--space-sm); }
+  .site-footer__cols { grid-template-columns: 1fr; gap: var(--space-md); }
+  .site-footer__brandrow,
+  .site-footer__legal { flex-direction: column; gap: var(--space-2xs); }
 }
 
 /* =====================================================================
