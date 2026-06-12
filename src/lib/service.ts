@@ -12,6 +12,7 @@
 // =====================================================================
 
 import type { ReactNode } from "react";
+import type { LeadFormConfig } from "@/lib/forms";
 
 export const SITE_URL = "https://chadworks.co";
 
@@ -187,6 +188,10 @@ export type Service = {
 
   // --- conversion (checklist 7) --------------------------------------
   cta: { heading: string; body: Writable; buttonLabel: string; href: string };
+  // The page's own comprehensive lead form, rendered in the RIGHT HALF of
+  // the CTA section (Chad, 2026-06-11). When absent, the CTA keeps its
+  // single-column button layout.
+  form?: LeadFormConfig;
 
   // --- OPTIONAL conversion-support sections (see CWS-SERVICE-PAGE-CHECKLIST.md) ---
   testimonials?: { heading: string; items: Testimonial[] };           // social proof

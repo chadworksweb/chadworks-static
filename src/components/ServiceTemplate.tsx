@@ -22,6 +22,7 @@ import {
 } from "@/lib/service";
 import { Prompt } from "@/components/Prompt";
 import { GrainField } from "@/components/GrainField";
+import { LeadForm } from "@/components/forms/LeadForm";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
@@ -568,12 +569,25 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         </section>
       )}
 
-      {/* CTA -- dark band, funnel target. Content in a scanning-border panel. */}
+      {/* CTA -- dark band, funnel target. Content in a scanning-border panel.
+          With a page form: copy left, THE FORM right (Chad, 2026-06-11). */}
       <section className="section full band-dark svc-cta reveal">
         <div className="svc-cta__panel">
-          <h2 className="svc-cta__heading">{s.cta.heading}</h2>
-          <p className="svc-cta__body measure-prose"><W value={s.cta.body} /></p>
-          <CtaButton href={s.cta.href} label={s.cta.buttonLabel} />
+          {s.form ? (
+            <div className="svc-cta__split">
+              <div>
+                <h2 className="svc-cta__heading">{s.cta.heading}</h2>
+                <p className="svc-cta__body"><W value={s.cta.body} /></p>
+              </div>
+              <LeadForm config={s.form} />
+            </div>
+          ) : (
+            <>
+              <h2 className="svc-cta__heading">{s.cta.heading}</h2>
+              <p className="svc-cta__body measure-prose"><W value={s.cta.body} /></p>
+              <CtaButton href={s.cta.href} label={s.cta.buttonLabel} />
+            </>
+          )}
         </div>
       </section>
     </>

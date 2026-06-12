@@ -248,6 +248,68 @@ export const webDesign: Service = {
     href: "/contact/",
   },
 
+  // The page's own comprehensive form (CTA right half).
+  form: {
+    source: "web-design page",
+    subject: "New Web Design Inquiry -- chadworks",
+    submitLabel: "Send it to Chad",
+    successMessage:
+      "Got it. I read every one of these myself, and you'll hear back from me within a day.",
+    fields: [
+      { kind: "section", label: "About you" },
+      { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
+      { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
+      { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
+      { kind: "text", name: "business", label: "Business Name", required: true, span: "half" },
+      { kind: "section", label: "About the site" },
+      { kind: "url", name: "current_site", label: "Current Site (if you have one)", placeholder: "https://", span: "half" },
+      {
+        kind: "select",
+        name: "site_kind",
+        label: "What kind of site?",
+        span: "half",
+        options: [
+          { value: "new-design", label: "A new design from zero" },
+          { value: "redesign", label: "Redesign of my current site" },
+          { value: "ecommerce", label: "A store / ecommerce" },
+          { value: "unsure", label: "Not sure yet" },
+        ],
+      },
+      {
+        kind: "textarea",
+        name: "vision",
+        label: "The Vision",
+        required: true,
+        rows: 4,
+        placeholder: "What should people feel when they land? What does the site have to win for you? Sites you admire are welcome here too.",
+      },
+      {
+        kind: "select",
+        name: "timeline",
+        label: "Timeline",
+        span: "half",
+        options: [
+          { value: "immediate", label: "As soon as possible" },
+          { value: "1-3-months", label: "1 - 3 months" },
+          { value: "exploring", label: "Just exploring" },
+        ],
+      },
+      {
+        kind: "select",
+        name: "budget_posture",
+        label: "Budget Posture",
+        span: "half",
+        options: [
+          { value: "floor", label: "Around the $3,200 floor" },
+          { value: "typical", label: "Around the $6,200 typical build" },
+          { value: "beyond", label: "Bigger vision, bigger number" },
+          { value: "unsure", label: "Tell me what it takes" },
+        ],
+      },
+      { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
+    ],
+  },
+
   portfolio: {
     heading: "Click into the work",
     intro:
