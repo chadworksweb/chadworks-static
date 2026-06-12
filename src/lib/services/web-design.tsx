@@ -14,8 +14,13 @@
 import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { WebDesignHeroArt } from "@/components/art/WebDesignHeroArt";
-import { ChromaLetter } from "@/components/art/ChromaLetter";
 import { DesignReveal } from "@/components/art/DesignReveal";
+import {
+  CustomCodedViz,
+  WordPressViz,
+  EcommerceViz,
+  ShopifyViz,
+} from "@/components/art/BuildPathViz";
 
 export const webDesign: Service = {
   slug: "web-design",
@@ -23,11 +28,6 @@ export const webDesign: Service = {
   laneLabel: "Websites",
   eyebrow: "The design in front of the code",
   title: "Web Design",
-  titleNode: (
-    <>
-      Web Desi<ChromaLetter>g</ChromaLetter>n
-    </>
-  ),
   intent:
     "chadworks designs custom websites (the visual half of the websites service) and funnels the buyer to how the design gets built.",
 
@@ -128,24 +128,28 @@ export const webDesign: Service = {
         detail:
           "The purest canvas. Custom built around the design with nothing to update or break, and entirely yours.",
         href: "/custom-coded-static/",
+        viz: <CustomCodedViz />,
       },
       {
         label: "WordPress",
         detail:
           "Design on a CMS your team can manage. I design over it so it never reads as a theme.",
         href: "/wordpress/",
+        viz: <WordPressViz />,
       },
       {
         label: "Ecommerce",
         detail:
           "Design in service of the sale. Built around your products and how people actually buy them.",
         href: "/ecommerce/",
+        viz: <EcommerceViz />,
       },
       {
         label: "Shopify",
         detail:
-          "A custom face on the platform that handles the heavy lifting, so the store looks like you, not Shopify.",
+          "A custom face on the platform that does the heavy lifting, so the store reads as yours.",
         href: "/shopify/",
+        viz: <ShopifyViz />,
       },
     ],
   },

@@ -18,8 +18,9 @@ const DAMP = 0.14;
 export function DesignReveal() {
   const frameRef = useRef<HTMLDivElement>(null);
   const rangeRef = useRef<HTMLInputElement>(null);
-  const target = useRef(50);
-  const current = useRef(50);
+  // Rest position favors the DESIGNED side (the sell), not a dead 50/50.
+  const target = useRef(36);
+  const current = useRef(36);
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -61,28 +62,37 @@ export function DesignReveal() {
       }
     }
 
-    function onPointer(e: PointerEvent) {
-      const r = frame!.getBoundingClientRect();
-      setTarget(((e.clientX - r.left) / r.width) * 100);
-    }
+    // CLICK-TO-DRAG only (Chad, 2026-06-11): no hover-follow. The invisible
+    // native range over the stage is the single driver -- press jumps the
+    // divider to the press point, dragging slides it, arrow keys step it.
     function onInput() {
+      frame!.classList.add("is-touched"); // retire the attract pulse
       setTarget(Number(range!.value));
     }
+    function onDown() { frame!.classList.add("is-dragging", "is-touched"); }
+    function onUp() { frame!.classList.remove("is-dragging"); }
 
-    frame.addEventListener("pointermove", onPointer);
-    frame.addEventListener("pointerdown", onPointer);
     range.addEventListener("input", onInput);
+    range.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
     return () => {
       cancelAnimationFrame(raf);
-      frame.removeEventListener("pointermove", onPointer);
-      frame.removeEventListener("pointerdown", onPointer);
       range.removeEventListener("input", onInput);
+      range.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
     };
   }, []);
 
   return (
     <div className="design-reveal">
-      <div ref={frameRef} className="design-reveal__frame" style={{ "--reveal": "50%" } as React.CSSProperties}>
+      <div className="design-reveal__header">
+        <p className="eyebrow">Try it yourself</p>
+        <h2 className="design-reveal__heading">Same business, two first impressions</h2>
+        <p className="design-reveal__lead">
+          Grab the divider and drag. Everything that changes is design.
+        </p>
+      </div>
+      <div ref={frameRef} className="design-reveal__frame" style={{ "--reveal": "36%" } as React.CSSProperties}>
         {/* Browser chrome */}
         <div className="design-reveal__bar" aria-hidden="true">
           <span className="design-reveal__dot" />
@@ -132,8 +142,10 @@ export function DesignReveal() {
             </div>
           </div>
 
-          {/* Divider + handle */}
+          {/* Divider + handle + DRAG tab (UI indicators; the handle pulses
+              until the first interaction) */}
           <div className="design-reveal__divider" aria-hidden="true">
+            <span className="design-reveal__drag-tab">Drag</span>
             <span className="design-reveal__handle">
               <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M8.5 7 4 12l4.5 5M15.5 7 20 12l-4.5 5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -149,7 +161,7 @@ export function DesignReveal() {
           className="design-reveal__range"
           min={2}
           max={98}
-          defaultValue={50}
+          defaultValue={36}
           aria-label="Compare the template version with the designed version"
         />
       </div>

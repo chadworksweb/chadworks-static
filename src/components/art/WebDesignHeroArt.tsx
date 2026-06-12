@@ -147,16 +147,20 @@ function ButtonChip() {
 
 // Same scatter logic as the web-dev chips: varied durations + non-uniform
 // delays for pleasing chaos; lefts span the full column width.
+// HARD CONSTRAINT (the ss15/ss18 slicing bug): left% x 360px + width must
+// stay <= 360px (the column's clamp floor) for EVERY chip, exactly like the
+// web-dev set (its worst case is 356/360). A chip that overhangs the column
+// gets sliced by overflow:hidden at certain window widths.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "layout", svg: <LayoutChip />, style: { left: "6%", width: "164px", animationDelay: "0s", animationDuration: "27.4s" } },
-  { key: "type", svg: <TypeChip />, style: { left: "56%", width: "118px", animationDelay: "4s", animationDuration: "22.6s" } },
-  { key: "palette", svg: <PaletteChip />, style: { left: "30%", width: "126px", animationDelay: "10s", animationDuration: "28.2s" } },
-  { key: "wheel", svg: <WheelChip />, style: { left: "74%", width: "78px", animationDelay: "2s", animationDuration: "24.8s" } },
-  { key: "pen", svg: <PenChip />, style: { left: "16%", width: "100px", animationDelay: "8s", animationDuration: "20.3s" } },
-  { key: "button", svg: <ButtonChip />, style: { left: "48%", width: "112px", animationDelay: "14s", animationDuration: "25.7s" } },
-  { key: "pendark", svg: <PenChipDark />, style: { left: "40%", width: "90px", animationDelay: "18s", animationDuration: "21.4s" } },
-  { key: "typedark", svg: <TypeChipDark />, style: { left: "82%", width: "92px", animationDelay: "12s", animationDuration: "29.6s" } },
-  { key: "palette2", svg: <PaletteChip />, style: { left: "66%", width: "96px", animationDelay: "21s", animationDuration: "23.3s" } },
+  { key: "layout", svg: <LayoutChip />, style: { left: "6%", width: "164px", animationDelay: "0s", animationDuration: "27.4s" } },   // 186/360
+  { key: "type", svg: <TypeChip />, style: { left: "56%", width: "118px", animationDelay: "4s", animationDuration: "22.6s" } },     // 320/360
+  { key: "palette", svg: <PaletteChip />, style: { left: "30%", width: "126px", animationDelay: "10s", animationDuration: "28.2s" } }, // 234/360
+  { key: "wheel", svg: <WheelChip />, style: { left: "74%", width: "78px", animationDelay: "2s", animationDuration: "24.8s" } },    // 344/360
+  { key: "pen", svg: <PenChip />, style: { left: "16%", width: "100px", animationDelay: "8s", animationDuration: "20.3s" } },       // 158/360
+  { key: "button", svg: <ButtonChip />, style: { left: "48%", width: "112px", animationDelay: "14s", animationDuration: "25.7s" } }, // 285/360
+  { key: "pendark", svg: <PenChipDark />, style: { left: "40%", width: "90px", animationDelay: "18s", animationDuration: "21.4s" } }, // 234/360
+  { key: "typedark", svg: <TypeChipDark />, style: { left: "72%", width: "92px", animationDelay: "12s", animationDuration: "29.6s" } }, // 351/360
+  { key: "palette2", svg: <PaletteChip />, style: { left: "66%", width: "96px", animationDelay: "21s", animationDuration: "23.3s" } }, // 334/360
 ];
 
 export function WebDesignHeroArt() {

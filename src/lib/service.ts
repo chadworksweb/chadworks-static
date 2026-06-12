@@ -79,6 +79,9 @@ export type ServicePath = {
   label: string;
   detail: Writable;
   href: string;
+  // Decorative illustration for the lane's right column (the septic
+  // industry_lane_viz pattern). Rendered aria-hidden.
+  viz?: ReactNode;
 };
 
 export type Testimonial = {

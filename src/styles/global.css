@@ -580,34 +580,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-inline-link:hover { color: var(--text-primary); }
 
-/* Hero -- equal top + bottom (see --hero-pad-y). Overrides the .section default. */
+/* Hero -- equal top + bottom (see --hero-pad-y). Overrides the .section default.
+   LINE-FOR-LINE the web-development hero (Chad, 2026-06-11): no atmosphere
+   washes, no substructure, no title experiments. Only the text content and
+   the chip set vary per page. */
 .svc-hero { padding-block: var(--hero-pad-y); position: relative; isolation: isolate; }
-
-/* Hero atmosphere -- the septic hero's lavender washes (industry_hero_bg) +
-   the faint 40px grid substructure, both fading well before the edges. */
-.svc-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 30%, var(--bg-wash) 0%, transparent 65%),
-    radial-gradient(circle at 15% 80%, var(--bg-wash) 0%, transparent 50%),
-    radial-gradient(circle at 85% 20%, var(--bg-wash) 0%, transparent 55%);
-}
-.svc-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background-image:
-    repeating-linear-gradient(0deg, transparent 0, transparent 39px, rgba(36, 57, 137, 0.025) 40px),
-    repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(36, 57, 137, 0.025) 40px);
-  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
-  mask-image: radial-gradient(ellipse at 50% 40%, #000 30%, transparent 75%);
-}
 
 /* Decorative hero art -- right third, behind the text (z-index -1). Isolated
    chips rise up through this masked column and fade out under the header.
@@ -976,7 +953,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-lanes { display: flex; flex-direction: column; gap: 0.6rem; margin-top: var(--space-lg); }
 .svc-lane {
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 2.4rem;
+  align-items: center;
   padding: 2.6rem 2.4rem 2.6rem 2.6rem;
   border: 1px solid var(--border-subtle);
   border-left: 3px solid var(--lane-color);
@@ -1052,9 +1032,25 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: transform 0.4s var(--ease-smooth);
 }
 .svc-lane:hover .svc-lane__arrow { transform: translateX(0.4rem); }
+/* Right-column illustration (the septic industry_lane_viz pattern) */
+.svc-lane__viz {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.svc-lane__viz svg {
+  width: 100%;
+  height: auto;
+  max-width: 290px;
+  display: block;
+  filter: drop-shadow(0 10px 24px rgba(36, 57, 137, 0.08));
+}
 @media (max-width: 900px) {
   .svc-lane:nth-child(n) { margin-left: 0; }
-  .svc-lane { padding: 2rem 1.6rem; }
+  .svc-lane { grid-template-columns: 1fr; gap: 1.4rem; padding: 2rem 1.6rem; }
+  .svc-lane__viz { justify-content: flex-start; }
+  .svc-lane__viz svg { max-width: 320px; }
 }
 
 /* Portfolio shots -- water-ripple cursor (WaterShot / water-ripple.ts) */
@@ -1203,6 +1199,49 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (max-width: 900px) {
   .svc-faq__layout { grid-template-columns: 1fr; }
 }
+
+/* QUALIFICATION -- bold periwinkle band with MOVING GRAIN (Chad's ss17
+   reference: film grain living over a saturated color field). The grain is
+   one SVG feTurbulence tile on an oversized pseudo-element, jumped around in
+   discrete steps -- TV-static jitter, transform-only, one layer. */
+.svc-qual-section {
+  position: relative;
+  background: var(--band-mid, #6470b3);
+  color: #fff;
+  overflow: clip;
+}
+.svc-qual-section .svc-block__heading {
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(36, 57, 137, 0.35);
+}
+.svc-qual-section::before {
+  content: "";
+  position: absolute;
+  inset: -100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  animation: cw-grain 0.85s infinite;
+  animation-timing-function: steps(1, end);
+}
+@keyframes cw-grain {
+  0%    { transform: translate(0, 0); }
+  12.5% { transform: translate(-2.5%, 1.5%); }
+  25%   { transform: translate(1.5%, -2.5%); }
+  37.5% { transform: translate(-1.5%, -1.5%); }
+  50%   { transform: translate(2.5%, 1%); }
+  62.5% { transform: translate(-1%, 2.5%); }
+  75%   { transform: translate(1.5%, 1.5%); }
+  87.5% { transform: translate(-2.5%, -1%); }
+  100%  { transform: translate(0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svc-qual-section::before { animation: none; }
+}
+.svc-qual-section > * { position: relative; z-index: 1; }
 
 /* MADE-BY -- the septic "Hi, I'm Chad" founder block (industry_made):
    cutout photo + caption card, manifesto rows on accent-tinted gradients,
@@ -1416,13 +1455,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .svc-pricing__panel { padding: 2rem 1.4rem; }
 }
 
-/* Problem-section extra visual (e.g. the web-design before/after reveal):
-   sits below the prose, above the ribbon layers. */
-.svc-problem-art {
-  position: relative;
-  z-index: 1;
-  margin-top: var(--space-xl);
+/* Problem art -- the page's interactive demo in its own clean white section,
+   visually severed from the ribbon band above by a solid background and a
+   hairline. */
+.svc-problem-art-section {
+  background: var(--bg-base);
+  border-top: 1px solid var(--border-subtle);
 }
+.svc-problem-art { position: relative; }
 
 /* Testimonials -- social proof band (lavender) */
 .svc-testimonials-band { background: var(--bg-surface); border-block: 1px solid var(--border-subtle); }
@@ -1922,6 +1962,42 @@ p, li, dd, figcaption { text-wrap: pretty; }
   width: min(880px, 100%);
   margin-inline: auto;
 }
+.design-reveal__header { text-align: center; margin-bottom: var(--space-lg); }
+.design-reveal__heading { font-size: var(--text-2xl); margin-top: var(--space-2xs); }
+.design-reveal__lead {
+  margin-top: var(--space-sm);
+  color: var(--text-secondary);
+}
+
+/* DRAG tab riding the divider (UI indicator) */
+.design-reveal__drag-tab {
+  position: absolute;
+  top: calc(50% - 3.4rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  box-shadow: 0 4px 16px rgba(36, 57, 137, 0.18);
+  white-space: nowrap;
+}
+/* Attract pulse on the handle until the first interaction */
+@keyframes dr-attract {
+  0%, 100% { box-shadow: 0 4px 16px rgba(36, 57, 137, 0.25); transform: translate(-50%, -50%) scale(1); }
+  50% { box-shadow: 0 4px 16px rgba(36, 57, 137, 0.25), 0 0 0 10px rgba(128, 84, 188, 0.14); transform: translate(-50%, -50%) scale(1.06); }
+}
+.design-reveal__frame:not(.is-touched) .design-reveal__handle {
+  animation: dr-attract 2.2s var(--ease-smooth) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .design-reveal__frame:not(.is-touched) .design-reveal__handle { animation: none; }
+}
 .design-reveal__frame {
   container-type: inline-size;
   position: relative;
@@ -1930,7 +2006,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: var(--bg-base);
   box-shadow: 0 22px 50px rgba(36, 57, 137, 0.10), 0 6px 16px rgba(36, 57, 137, 0.05);
   overflow: hidden;
-  cursor: ew-resize;
 }
 .design-reveal__frame:focus-within {
   outline: 2px solid var(--accent);
@@ -2189,10 +2264,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   height: 100%;
   margin: 0;
   opacity: 0;
-  cursor: ew-resize;
+  cursor: grab;
   -webkit-appearance: none;
   appearance: none;
 }
+.design-reveal__frame.is-dragging .design-reveal__range { cursor: grabbing; }
 
 .design-reveal__labels {
   display: flex;

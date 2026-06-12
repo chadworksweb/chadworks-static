@@ -272,9 +272,6 @@ export default function ServiceTemplate({ service }: { service: Service }) {
           <p className="svc-block__body measure-prose"><W value={s.problem.body} /></p>
         )}
 
-        {/* Optional page-specific visual, below the prose (grows downward). */}
-        {s.problemArt && <div className="svc-problem-art">{s.problemArt}</div>}
-
         {/* Knockout overlay: a white-on-black coverage pass of the same ribbons,
             multiplied by an aria-hidden white duplicate of the text, then screened
             over the section -> the copy turns white only where a ribbon is under
@@ -291,6 +288,14 @@ export default function ServiceTemplate({ service }: { service: Service }) {
           </div>
         </div>
       </section>
+
+      {/* PROBLEM ART (optional) -- the page's interactive demo in its OWN
+          clean section, clearly separated from the ribbon band above. */}
+      {s.problemArt && (
+        <section className="section full svc-problem-art-section reveal">
+          <div className="svc-problem-art">{s.problemArt}</div>
+        </section>
+      )}
 
       {/* APPROACH -- numbered steps; each title is a liftable claim. Dark anchor. */}
       <section className="section full svc-block svc-dark reveal">
@@ -339,6 +344,9 @@ export default function ServiceTemplate({ service }: { service: Service }) {
                   <span className="svc-lane__desc"><W value={p.detail} /></span>
                   <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
                 </span>
+                {p.viz && (
+                  <span className="svc-lane__viz" aria-hidden="true">{p.viz}</span>
+                )}
               </Link>
             ))}
           </div>
@@ -486,9 +494,10 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         )}
       </section>
 
-      {/* QUALIFICATION (optional) -- who it's for / who it isn't. */}
+      {/* QUALIFICATION (optional) -- who it's for / who it isn't. Bold
+          periwinkle band with the MOVING GRAIN texture (Chad's ss17). */}
       {s.qualification && (
-        <section className="section svc-block reveal">
+        <section className="section full svc-block svc-qual-section reveal">
           <h2 className="svc-block__heading">{s.qualification.heading}</h2>
           <div className="svc-qual">
             <div className="svc-qual__col svc-qual__col--fit panel">
