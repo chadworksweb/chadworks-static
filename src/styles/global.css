@@ -85,6 +85,9 @@
   --btn-hover-to:   #e6cbf4;  /* hover wipe gradient end (bottom-right)  */
   --accent-deep: #333333;     /* near-black accent text                  */
   --accent-teal: #4a6b6e;     /* secondary accent                        */
+  --accent-strong: #361e9c;   /* deep purple (niche brand-purple-deep) -- check-fill gradient ends */
+  --win-green: #1f9d57;       /* the pinned win color (niche compare tables, rank checks) */
+  --alert-red: #c0392b;       /* low-score verdict red (septic rubric)   */
 
   --border-subtle: rgba(36, 57, 137, 0.10);  /* hairline                 */
   --border-medium: rgba(36, 57, 137, 0.18);
@@ -199,6 +202,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
   box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Screen-reader-only text -- visually hidden, present for AT and crawlers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Eyebrow / kicker label -- mono, tracked, uppercase (niche-page signature) */
@@ -2453,4 +2469,465 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (max-width: 600px) {
   .design-reveal__stage { aspect-ratio: 4 / 3.4; }
   .design-reveal__handle { width: 2rem; height: 2rem; }
+}
+
+/* =====================================================================
+   SCORECARD -- the /ai-visibility-audit/ problem-section signature. The
+   septic page's six-row tap audit (industry_score/industry_rubric), ported
+   in its LIGHT GLASS form: frosted card, tap rows, gradient tally that pops,
+   five-tier verdict, CTA flip at max. See src/components/Scorecard.tsx.
+   ===================================================================== */
+.cw-score {
+  width: min(820px, 100%);
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 1.8rem 2rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Header: label + title left, reset button right */
+.cw-score__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.4rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+.cw-score__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.4rem;
+}
+.cw-score__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.cw-score__reset {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.95rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+  align-self: start;
+  white-space: nowrap;
+}
+.cw-score__reset:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+.cw-score__list { display: flex; flex-direction: column; gap: 0.5rem; }
+.cw-score__item {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 1.1rem;
+  align-items: flex-start;
+  padding: 1.05rem 1.2rem 1.05rem 1.1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.5);
+  text-align: left;
+  width: 100%;
+  transition: all 0.22s var(--ease-smooth);
+  box-shadow: 0 1px 0 rgba(36, 57, 137, 0.04);
+}
+.cw-score__item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  border-color: rgba(128, 84, 188, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(128, 84, 188, 0.10);
+}
+.cw-score__item:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(128, 84, 188, 0.12);
+}
+.cw-score__item[data-on="1"] {
+  background: rgba(128, 84, 188, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(128, 84, 188, 0.18);
+}
+
+/* The big check-off box (the septic ::before/::after pair, collapsed onto
+   the real .cw-score__check element + its inline SVG checkmark) */
+.cw-score__check {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 2px solid rgba(36, 57, 137, 0.30);
+  background: var(--bg-base);
+  margin-top: 0.05rem;
+  display: grid;
+  place-items: center;
+  color: transparent;
+  transition: all 0.22s var(--ease-smooth);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.cw-score__check svg { width: 18px; height: 18px; }
+.cw-score__item:hover .cw-score__check { border-color: var(--accent); }
+.cw-score__item[data-on="1"] .cw-score__check {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border-color: var(--accent);
+  color: #ffffff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 4px 14px rgba(128, 84, 188, 0.35);
+}
+
+.cw-score__criterion strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  letter-spacing: -0.005em;
+  display: block;
+  line-height: 1.3;
+  margin-bottom: 0.15rem;
+}
+.cw-score__criterion small {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Score total + verdict -- bottom of the card */
+.cw-score__total {
+  margin-top: 1.5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: baseline;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+.cw-score__total-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.cw-score__total-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.4rem;
+  line-height: 1;
+  background: linear-gradient(120deg, var(--grad-deep), var(--grad-mid));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+  transition: transform 0.3s var(--ease-anticipate);
+}
+.cw-score__total-num.cw-score__pop { transform: scale(1.08); }
+.cw-score__verdict {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+  flex: 1 1 280px;
+  min-width: 200px;
+}
+.cw-score__verdict[data-tier="0"]    { color: var(--text-secondary); }
+.cw-score__verdict[data-tier="low"]  { color: var(--alert-red); }
+.cw-score__verdict[data-tier="mid"]  { color: var(--text-primary); }
+.cw-score__verdict[data-tier="high"] { color: var(--accent); }
+.cw-score__verdict[data-tier="max"]  { color: var(--win-green); font-weight: 600; }
+
+.cw-score__cta { margin-top: 1.6rem; }
+
+@media (max-width: 600px) {
+  .cw-score { padding: 1.5rem 1.2rem; }
+  .cw-score__item { grid-template-columns: 28px 1fr; gap: 0.9rem; padding: 0.95rem 1rem; }
+  .cw-score__check { width: 24px; height: 24px; }
+  .cw-score__check svg { width: 15px; height: 15px; }
+  .cw-score__total-num { font-size: 2rem; }
+}
+
+/* =====================================================================
+   AI CHAT DEMO -- the /ai-viz/ problem-section signature. A chat window
+   (the design-reveal browser-chrome treatment, re-cut as an assistant
+   thread): the buyer's question types out, the assistant thinks, the
+   answer resolves with the recommendation line highlighted. All text is
+   in the served HTML; motion only hides it when scripting is available,
+   so no-JS and crawlers always get the final state.
+   See src/components/art/AiChatDemo.tsx.
+   ===================================================================== */
+.ai-demo {
+  width: min(760px, 100%);
+  margin-inline: auto;
+}
+.ai-demo__window {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--bg-base);
+  box-shadow: 0 22px 50px rgba(36, 57, 137, 0.10), 0 6px 16px rgba(36, 57, 137, 0.05);
+  overflow: hidden;
+}
+
+/* Window chrome bar (the design-reveal bar, verbatim treatment) */
+.ai-demo__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  background: #f3effa;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ai-demo__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #cdc7dd;
+}
+.ai-demo__dot:first-child { background: var(--accent); }
+.ai-demo__title {
+  margin-inline: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+/* The thread. min-height reserves the final conversation's space so the
+   typing sequence never shifts layout below the window (CLS green). */
+.ai-demo__thread {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.4rem 1.5rem 1.6rem;
+  min-height: 21rem;
+}
+.ai-demo__msg {
+  max-width: 85%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 14px;
+  line-height: 1.55;
+}
+.ai-demo__msg--user {
+  align-self: flex-end;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-end-end-radius: 4px;
+  min-height: 2.9rem;
+  min-width: 8rem;
+}
+.ai-demo__msg--ai {
+  position: relative;
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-end-start-radius: 4px;
+}
+
+/* The answer keeps its space from the start (visibility-style hide via
+   opacity only): the bubble is full-size while "thinking", and the text
+   resolves into it. Zero layout shift. */
+.ai-demo__answer {
+  display: block;
+  transition: opacity 0.45s var(--ease-smooth);
+}
+
+/* Motion-hiding ONLY where scripting runs: no-JS UAs and crawlers render
+   the conversation complete. */
+@media (scripting: enabled) {
+  .ai-demo__msg--user { opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth); }
+  .ai-demo__msg--user.is-on { opacity: 1; transform: none; }
+  .ai-demo__msg--ai { opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth); }
+  .ai-demo__msg--ai.is-on { opacity: 1; transform: none; }
+  .ai-demo__answer { opacity: 0; }
+  .ai-demo__answer.is-on { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-demo__msg--user, .ai-demo__msg--ai { opacity: 1; transform: none; transition: none; }
+  .ai-demo__answer { opacity: 1; transition: none; }
+}
+
+/* Typing caret on the question */
+@keyframes ai-demo-blink { 50% { opacity: 0; } }
+.ai-demo__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: ai-demo-blink 0.9s steps(2, start) infinite;
+}
+
+/* Thinking dots -- overlaid in the reserved bubble, no height of their own */
+.ai-demo__thinking {
+  position: absolute;
+  top: 1.05rem;
+  left: 1.1rem;
+  display: flex;
+  gap: 4px;
+}
+@keyframes ai-demo-think {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+.ai-demo__thinking i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  animation: ai-demo-think 1.1s var(--ease-smooth) infinite;
+}
+.ai-demo__thinking i:nth-child(2) { animation-delay: 0.15s; }
+.ai-demo__thinking i:nth-child(3) { animation-delay: 0.3s; }
+@media (prefers-reduced-motion: reduce) {
+  .ai-demo__caret, .ai-demo__thinking i { animation: none; }
+}
+
+/* The recommendation line -- the highlighted pick */
+.ai-demo__pick {
+  display: block;
+  margin-block: 0.45rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(128, 84, 188, 0.12);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ai-demo__caption {
+  margin-top: var(--space-sm);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .ai-demo__thread { padding: 1.1rem 1rem 1.3rem; min-height: 27rem; }
+  .ai-demo__msg { max-width: 94%; }
+}
+
+/* =====================================================================
+   VISIBILITY SPECTRUM -- the /seo/ problem-section signature. The
+   rising-compass charge-spectrum pattern (thin gradient scale + position
+   marker) re-expressed for search standing: Invisible -> Found -> Chosen
+   -> Cited by AI, with a breathing marker where most businesses sit.
+   See src/components/art/VisibilitySpectrum.tsx.
+   ===================================================================== */
+.vis-spectrum {
+  width: min(820px, 100%);
+  margin-inline: auto;
+}
+.vis-spectrum__bar {
+  position: relative;
+  height: 10px;
+  margin-top: 2.6rem; /* room for the marker label riding above the bar */
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    var(--grad-deep) 0%,
+    var(--accent) 36%,
+    var(--grad-peak) 68%,
+    var(--win-green) 100%
+  );
+  box-shadow: 0 6px 24px rgba(128, 84, 188, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* The marker -- sits low on the scale, breathing (most businesses live
+   between Invisible and Found). */
+@keyframes vis-breathe {
+  0%, 100% { box-shadow: 0 2px 10px rgba(36, 57, 137, 0.30), 0 0 0 0 rgba(128, 84, 188, 0.30); }
+  50% { box-shadow: 0 2px 10px rgba(36, 57, 137, 0.30), 0 0 0 9px rgba(128, 84, 188, 0); }
+}
+.vis-spectrum__marker {
+  position: absolute;
+  top: 50%;
+  left: 18%;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--grad-deep);
+  animation: vis-breathe 3s var(--ease-smooth) infinite;
+}
+.vis-spectrum__marker-label {
+  position: absolute;
+  bottom: calc(100% + 0.7rem);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  box-shadow: 0 4px 16px rgba(36, 57, 137, 0.18);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vis-spectrum__marker { animation: none; }
+}
+
+/* The four standings under the scale */
+.vis-spectrum__stops {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+.vis-spectrum__stop strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.005em;
+  color: var(--text-primary);
+}
+.vis-spectrum__stop small {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+/* The standings read as the scale itself: muted -> indigo -> purple -> green */
+.vis-spectrum__stop:nth-child(1) strong { color: var(--text-tertiary); }
+.vis-spectrum__stop:nth-child(3) strong { color: var(--accent); }
+.vis-spectrum__stop:nth-child(4) strong { color: var(--win-green); }
+.vis-spectrum__stop:nth-child(2),
+.vis-spectrum__stop:nth-child(3) { text-align: center; }
+.vis-spectrum__stop:nth-child(4) { text-align: right; }
+
+.vis-spectrum__caption {
+  margin-top: var(--space-md);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .vis-spectrum__stops { grid-template-columns: 1fr 1fr; gap: var(--space-md) var(--space-sm); }
+  .vis-spectrum__stop:nth-child(n) { text-align: left; }
 }

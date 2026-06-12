@@ -1,13 +1,30 @@
 # chadworks
 
-> Websites and visibility, built with luxury-grade craft. Chad Lewine custom-builds fast, search-ready websites and helps clients choose how the site gets built (custom-coded, WordPress, ecommerce, or Shopify), then keeps them visible in classic search and AI assistants.
+> Websites and visibility, built with luxury-grade craft. Chad Lewine custom-builds fast, search-ready websites and helps clients choose how the site gets built (custom-coded, WordPress, ecommerce, or Shopify), then keeps them visible in classic search and AI assistants. Client results include a Pennsylvania criminal-defense firm appearing in Google's AI Overview and a Brooklyn psychologist named in AI answers.
 
-## Services
+## Websites
 
-- [Web Development](https://chadworks.co/web-development/): The technology behind a website -- custom-built, fast, search-ready, and owned by the client. Funnels to four build options: custom-coded/static, WordPress, ecommerce, and Shopify.
+- [Websites](https://chadworks.co/websites/): The lane hub for everything about getting a site built.
+- [Web Development](https://chadworks.co/web-development/): The technology behind a website: custom-built, fast, search-ready, and owned by the client. Funnels to four build options.
+- [Web Design](https://chadworks.co/web-design/): The visual half of the same craft: design that makes a business read as credible at a glance.
+- [Web Design Packages](https://chadworks.co/web-design-packages/): The three engagement postures, built on real numbers ($3,200 floor, most land near $6,200).
+- [WordPress](https://chadworks.co/wordpress/): WordPress builds and real maintenance ($550 every 6 months).
+- [Custom-Coded Static](https://chadworks.co/custom-coded-static/): Custom-coded static sites, the fastest and most durable build route. This site is one.
+- [Ecommerce](https://chadworks.co/ecommerce/): The full store conversation: WooCommerce versus Shopify, costs on the table.
+- [Shopify](https://chadworks.co/shopify/): Custom Shopify stores by someone who has run the platform at multi-million dollar volume.
+
+## Visibility
+
+- [Visibility](https://chadworks.co/visibility/): The lane hub: being found and chosen in Google, in AI assistants, and in the inbox.
+- [AI Visibility](https://chadworks.co/ai-viz/): The umbrella service, retained monthly: SEO, structured data, profiles, and answer-shaped pages that get businesses recommended by ChatGPT and Google's AI. Real precedent: a PA criminal-defense firm in Google's AI Overview, a Brooklyn psychologist named in AI answers.
+- [AI Visibility Audit](https://chadworks.co/ai-visibility-audit/): The one-time measurement: a documented, scored read on standing in AI answers, classic search, schema, and profiles. Flat quote, no retainer inside.
+- [SEO](https://chadworks.co/seo/): Classic SEO as the foundation layer of AI visibility. Page-one results in contested local markets.
+- [Digital Marketing](https://chadworks.co/digital-marketing/): Honest channel triage: which channels a business actually needs, with access to OpenAI's ChatGPT advertising beta.
+- [Email Marketing](https://chadworks.co/email-marketing/): The channel you own: clean lists, real segments, restrained cadence. Mailchimp is free up to 500 contacts, and clients hear when free is all they need.
 
 ## About
 
-- Founder: Chad Lewine. Twenty years custom-building websites.
+- Founder: Chad Lewine. Twenty years custom-building websites; designing since age 11.
+- Track record: 50+ client engagements from 2019 through 2025, on top of the decade before them.
 - Posture: value-based pricing ($315/hr, $3,200 floor). Not the cheapest option, deliberately.
-- Ownership: clients own their code and hosting outright -- no platform lock-in.
+- Ownership: clients own their code and hosting outright. No platform lock-in, no hostage files.

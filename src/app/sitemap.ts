@@ -10,10 +10,27 @@ export const dynamic = "force-static";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "/", // home
+    // Lane hubs
+    "/websites/",
+    "/visibility/",
+    // Websites services
     "/web-development/",
-    "/build-your-vision/", // Situation page (Build Your Vision -- ambitious custom builds)
-    "/switch/leave-wordpress/", // Situation page (Leave WordPress)
-    "/switch/gmail-to-workspace/", // Situation page (Gmail to Google Workspace)
+    "/web-design/",
+    "/web-design-packages/",
+    "/wordpress/",
+    "/custom-coded-static/",
+    "/ecommerce/",
+    "/shopify/",
+    // Visibility services
+    "/ai-viz/",
+    "/ai-visibility-audit/",
+    "/seo/",
+    "/digital-marketing/",
+    "/email-marketing/",
+    // Situation pages
+    "/build-your-vision/", // (Build Your Vision -- ambitious custom builds)
+    "/switch/leave-wordpress/",
+    "/switch/gmail-to-workspace/",
   ];
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,

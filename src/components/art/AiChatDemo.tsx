@@ -72,8 +72,10 @@ export function AiChatDemo() {
         </div>
         <div className="ai-demo__thread">
           <div className={`ai-demo__msg ai-demo__msg--user${phase >= 1 ? " is-on" : ""}`}>
-            {/* Full text always in the DOM (GEO/no-JS); typing is a visual clip. */}
-            <span className="ai-demo__usertext" aria-hidden={phase < 3}>
+            {/* Full text always in the DOM (GEO/no-JS); typing is a visual clip.
+                The sr-only span is the canonical text for AT, so the animated
+                copy stays aria-hidden in every phase. */}
+            <span className="ai-demo__usertext" aria-hidden="true">
               {phase >= 3 ? QUESTION : QUESTION.slice(0, chars)}
               {phase === 1 && <span className="ai-demo__caret" aria-hidden="true" />}
             </span>
@@ -86,8 +88,10 @@ export function AiChatDemo() {
               </span>
             )}
             <span className={`ai-demo__answer${phase >= 3 ? " is-on" : ""}`}>
-              {ANSWER_LEAD}
-              <mark className="ai-demo__pick">{ANSWER_PICK}</mark>
+              {/* Explicit spaces: raw-text extraction must read cleanly
+                  across the mark boundary (GEO). The pick renders block. */}
+              {ANSWER_LEAD}{" "}
+              <mark className="ai-demo__pick">{ANSWER_PICK}</mark>{" "}
               {ANSWER_TAIL}
             </span>
           </div>
