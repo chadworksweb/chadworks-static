@@ -9,7 +9,10 @@
 import { useEffect, useRef } from "react";
 
 const TILE = 256;
-const FRAME_MS = 83; // ~12fps -- analog static cadence, not 60fps churn
+const FRAME_MS = 150; // ~6.5fps -- slow analog shimmer (Chad: slower)
+// Luminance spread around neutral mid-gray. Overlay blend treats 128 as
+// invisible, so a tighter spread = lower contrast (Chad: more subtle).
+const SPREAD = 88;
 
 export function GrainField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,8 +43,9 @@ export function GrainField() {
 
     function paint() {
       // Fresh random luminance per pixel, per frame -- static, regenerated.
+      // Compressed around mid-gray so the overlay blend stays soft.
       for (let i = 0; i < data.length; i += 4) {
-        const v = (Math.random() * 255) | 0;
+        const v = (128 + (Math.random() - 0.5) * SPREAD) | 0;
         data[i] = v;
         data[i + 1] = v;
         data[i + 2] = v;

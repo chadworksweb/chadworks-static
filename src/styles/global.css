@@ -1235,7 +1235,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
   pointer-events: none;
   z-index: 0;
   mix-blend-mode: overlay;
-  opacity: 0.4; /* THE visibility dial -- tune here */
+  opacity: 0.32; /* THE visibility dial -- tune here */
 }
 .svc-qual-section > * { position: relative; z-index: 1; }
 .svc-qual-section > .svc-grain-canvas { z-index: 0; }
