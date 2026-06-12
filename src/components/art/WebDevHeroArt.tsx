@@ -13,7 +13,7 @@ const PURP = "#8054bc";
 const INDI = "#243989";
 const TEAL = "#4a6b6e";
 
-function BrowserChip() {
+export function BrowserChip() {
   return (
     <svg viewBox="0 0 160 112" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="157" height="109" rx="12" fill={CARD} stroke={LINE} />
@@ -30,7 +30,7 @@ function BrowserChip() {
   );
 }
 
-function CodeChip() {
+export function CodeChip() {
   return (
     <svg viewBox="0 0 120 86" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="117" height="83" rx="12" fill={CARD} stroke={LINE} />
@@ -45,7 +45,7 @@ function CodeChip() {
   );
 }
 
-function ServerChip() {
+export function ServerChip() {
   return (
     <svg viewBox="0 0 150 96" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="147" height="40" rx="9" fill={CARD} stroke={LINE} />
@@ -66,7 +66,7 @@ function ServerChip() {
   );
 }
 
-function BracketsChip() {
+export function BracketsChip() {
   return (
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="61" height="61" rx="14" fill={CARD} stroke={LINE} />
@@ -78,7 +78,7 @@ function BracketsChip() {
   );
 }
 
-function DatabaseChip() {
+export function DatabaseChip() {
   return (
     <svg viewBox="0 0 72 76" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="69" height="73" rx="14" fill={CARD} stroke={LINE} />
@@ -91,7 +91,7 @@ function DatabaseChip() {
   );
 }
 
-function TerminalChip() {
+export function TerminalChip() {
   return (
     <svg viewBox="0 0 96 68" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="93" height="65" rx="12" fill={INDI} />

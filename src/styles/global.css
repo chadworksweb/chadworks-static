@@ -277,6 +277,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-dark .svc-faq__a { color: var(--dark-muted); }
 /* non-fill headings on dark stay solid + light */
 .svc-dark .svc-block__heading:not(.svc-fill) { color: var(--dark-text); }
+.svc-dark .svc-block__subheading { color: var(--dark-muted); }
 /* scroll-fill heading -- light fill variant for dark backgrounds */
 .svc-dark .svc-fill {
   background-image: linear-gradient(90deg,

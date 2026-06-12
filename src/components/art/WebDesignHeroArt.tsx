@@ -19,7 +19,7 @@ const LAV = "#e5d2f4";
 const LAVBG = "#ede7f6";
 
 // Palette card: the brand ramp as four swatch bars.
-function PaletteChip() {
+export function PaletteChip() {
   return (
     <svg viewBox="0 0 120 86" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="117" height="83" rx="12" fill={CARD} stroke={LINE} />
@@ -32,7 +32,7 @@ function PaletteChip() {
 }
 
 // Type specimen: big Aa over sample text lines.
-function TypeChip() {
+export function TypeChip() {
   return (
     <svg viewBox="0 0 110 96" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="107" height="93" rx="12" fill={CARD} stroke={LINE} />
@@ -52,7 +52,7 @@ function TypeChip() {
 }
 
 // Pen tool: a bezier curve with anchor points and handles.
-function PenChip() {
+export function PenChip() {
   return (
     <svg viewBox="0 0 96 80" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="93" height="77" rx="12" fill={CARD} stroke={LINE} />
@@ -68,7 +68,7 @@ function PenChip() {
 }
 
 // Layout frame: a wireframe composition with a hero band + two cards.
-function LayoutChip() {
+export function LayoutChip() {
   return (
     <svg viewBox="0 0 150 104" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="147" height="101" rx="12" fill={CARD} stroke={LINE} />
@@ -82,7 +82,7 @@ function LayoutChip() {
 }
 
 // Color wheel: a conic ring in brand hues.
-function WheelChip() {
+export function WheelChip() {
   return (
     <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="69" height="69" rx="14" fill={CARD} stroke={LINE} />
@@ -99,7 +99,7 @@ function WheelChip() {
 
 // INVERTED type specimen: dark indigo card, lavender Aa. Every hero chip set
 // carries one or two inverted shapes (sitewide rule, Chad 2026-06-11).
-function TypeChipDark() {
+export function TypeChipDark() {
   return (
     <svg viewBox="0 0 110 96" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="107" height="93" rx="12" fill={INDI} />
@@ -119,7 +119,7 @@ function TypeChipDark() {
 }
 
 // INVERTED pen tool: the bezier on a dark indigo card, lavender curve.
-function PenChipDark() {
+export function PenChipDark() {
   return (
     <svg viewBox="0 0 96 80" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="93" height="77" rx="12" fill={INDI} />
@@ -135,7 +135,7 @@ function PenChipDark() {
 }
 
 // Button pill: the chadworks CTA shape with its arrow.
-function ButtonChip() {
+export function ButtonChip() {
   return (
     <svg viewBox="0 0 110 44" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.5" y="1.5" width="107" height="41" rx="20.5" fill={LAV} stroke={LINE} />
