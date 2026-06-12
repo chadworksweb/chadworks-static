@@ -1102,10 +1102,20 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-shot__link:hover { color: var(--accent); }
 
 /* Proof grid */
+/* Columns are set PER PAGE via --svc-proof-cols (ServiceTemplate, the same
+   stepColumns math as the steps grid) so the last row is always full --
+   never a 3 + 1 orphan (rule 8). The old auto-fit version produced exactly
+   that orphan for 4-item proofs at the 1200 rail. Collapses like svc-steps. */
 .svc-proof {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-columns: repeat(var(--svc-proof-cols, 3), minmax(0, 1fr));
   gap: var(--space-md);
+}
+@media (max-width: 900px) {
+  .svc-proof { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .svc-proof { grid-template-columns: 1fr; }
 }
 .svc-proof__item { padding: var(--space-md); }
 .svc-proof__label { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); margin-bottom: var(--space-2xs); }
@@ -2930,4 +2940,70 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (max-width: 600px) {
   .vis-spectrum__stops { grid-template-columns: 1fr 1fr; gap: var(--space-md) var(--space-sm); }
   .vis-spectrum__stop:nth-child(n) { text-align: left; }
+}
+
+/* =====================================================================
+   TITLE REVEAL -- the /about/ hero signature: art painted through the H1
+   letterforms by cursor comet trails. COPIED from the chadlewine
+   global.css "Title Reveal (comet trail art scrub)" block (COPY, don't
+   rewrite). Engine: src/components/art/TitleReveal.tsx.
+   ===================================================================== */
+
+.title-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.title-reveal h1,
+.title-reveal h2,
+.title-reveal a {
+  cursor: pointer;
+}
+
+.title-reveal__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.title-reveal__text {
+  position: relative;
+  z-index: 1;
+}
+
+/* =====================================================================
+   ABOUT PAGE -- scoped adjustments only. The sections themselves are the
+   called engines (statement bands, proof panels, steps, made, qual, CTA).
+   ===================================================================== */
+
+/* Era labels ride the statement-band numeral slot: words, not 2-digit
+   numerals, so they take a smaller size and a fixed column so the text
+   column lines up across bands ("2019-2025" = the widest label). */
+.about-era .svc-statement__num {
+  font-size: clamp(1.5rem, 1.1rem + 1.9vw, 2.75rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  min-width: 9.5ch;
+}
+
+/* Qualification postscript (the rates cross-link) sits under the two
+   columns, on the band, above the grain. */
+.about-qual-ps {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-md);
+  color: var(--text-secondary);
+}
+.about-qual-ps a {
+  color: var(--accent);
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 600px) {
+  /* No comet reveal on phones (same call as the chadlewine cover hero) --
+     the plain H1 underneath stays visible. */
+  .about-hero .title-reveal__canvas { display: none; }
 }

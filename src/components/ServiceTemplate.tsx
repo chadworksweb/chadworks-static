@@ -139,7 +139,9 @@ function isOnDark(hex: string) {
   const { r, g, b } = hexToRgb(hex);
   return 0.2126 * r + 0.7152 * g + 0.0722 * b < 150;
 }
-function statementTone(i: number, total: number, outliers?: number[]) {
+// Exported: the band-arc engine is CALLED by custom pages too (the /about/
+// era timeline), never rebuilt (CWS-COMPONENT-REGISTRY rule).
+export function statementTone(i: number, total: number, outliers?: number[]) {
   let bg: string;
   if (i === total - 1) bg = BAND_WHITE; // final band always white
   else if (outliers?.includes(i)) bg = BAND_OUTLIER; // outlier, when needed
@@ -157,7 +159,9 @@ function statementTone(i: number, total: number, outliers?: number[]) {
 const LANE_COLORS = ["#243989", "#8054bc", "#4a6b6e", "#d4a574"];
 
 // Every CTA button: label + the default long-arrow-alt-right icon.
-function CtaButton({ href, label }: { href: string; label: string }) {
+// Exported: THE sitewide CTA (design-system BUTTONS standard) -- standalone
+// pages call it too instead of re-rendering their own button markup.
+export function CtaButton({ href, label }: { href: string; label: string }) {
   return (
     <Link href={href} className="svc-btn">
       <span className="svc-btn__label">{label}</span>
@@ -358,7 +362,12 @@ export default function ServiceTemplate({ service }: { service: Service }) {
       {/* PROOF -- concrete examples / portfolio links, no vague claims. */}
       <section className="section svc-block reveal">
         <h2 className="svc-block__heading svc-fill">{s.proof.heading}</h2>
-        <ul className="svc-proof">
+        <ul
+          className="svc-proof"
+          style={
+            { "--svc-proof-cols": stepColumns(s.proof.items.length) } as React.CSSProperties
+          }
+        >
           {s.proof.items.map((item, i) => (
             <li key={i} className="svc-proof__item panel">
               <p className="svc-proof__label">

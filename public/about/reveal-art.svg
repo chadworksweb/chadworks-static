@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="480" viewBox="0 0 1600 480">
+  <!-- Brand-hue color field for the /about/ TitleReveal: the art the cursor
+       paints through the H1 letterforms. Tokens mirrored from CWS-BRAND:
+       accent-strong #361e9c base, indigo #243989, purple #8054bc, lavender
+       #e5d2f4, copper #d4a574 outlier. Authored, decorative only. -->
+  <defs>
+    <radialGradient id="purple" cx="0.22" cy="0.35" r="0.55">
+      <stop offset="0" stop-color="#8054bc"/>
+      <stop offset="1" stop-color="#8054bc" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lavender" cx="0.55" cy="0.6" r="0.5">
+      <stop offset="0" stop-color="#e5d2f4"/>
+      <stop offset="1" stop-color="#e5d2f4" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="copper" cx="0.86" cy="0.3" r="0.4">
+      <stop offset="0" stop-color="#d4a574"/>
+      <stop offset="1" stop-color="#d4a574" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="indigo" cx="0.7" cy="0.95" r="0.6">
+      <stop offset="0" stop-color="#243989"/>
+      <stop offset="1" stop-color="#243989" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="peak" cx="0.4" cy="0.15" r="0.35">
+      <stop offset="0" stop-color="#cdb4f0"/>
+      <stop offset="1" stop-color="#cdb4f0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="480" fill="#361e9c"/>
+  <rect width="1600" height="480" fill="url(#indigo)"/>
+  <rect width="1600" height="480" fill="url(#purple)"/>
+  <rect width="1600" height="480" fill="url(#lavender)"/>
+  <rect width="1600" height="480" fill="url(#peak)"/>
+  <rect width="1600" height="480" fill="url(#copper)"/>
+</svg>
