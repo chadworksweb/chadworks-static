@@ -1,0 +1,88 @@
+"use client";
+
+// CHANNEL-STATIC GRAIN -- the noise re-randomizes IN PLACE every frame (the
+// channel-4 TV effect), borrowing the Crystopa Forge lava concept: a tiny
+// offscreen canvas repainted per frame, then tiled across the band. Nothing
+// slides; the texture itself lives. Throttled to ~12fps (analog cadence),
+// parked off-screen, reduced-motion renders a single still frame.
+
+import { useEffect, useRef } from "react";
+
+const TILE = 256;
+const FRAME_MS = 83; // ~12fps -- analog static cadence, not 60fps churn
+
+export function GrainField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const off = document.createElement("canvas");
+    off.width = TILE;
+    off.height = TILE;
+    const octx = off.getContext("2d");
+    if (!octx) return;
+    const img = octx.createImageData(TILE, TILE);
+    const data = img.data;
+
+    const sync = () => {
+      const w = Math.max(1, canvas.clientWidth);
+      const h = Math.max(1, canvas.clientHeight);
+      if (canvas.width !== w) canvas.width = w;
+      if (canvas.height !== h) canvas.height = h;
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(canvas);
+
+    function paint() {
+      // Fresh random luminance per pixel, per frame -- static, regenerated.
+      for (let i = 0; i < data.length; i += 4) {
+        const v = (Math.random() * 255) | 0;
+        data[i] = v;
+        data[i + 1] = v;
+        data[i + 2] = v;
+        data[i + 3] = 255;
+      }
+      octx!.putImageData(img, 0, 0);
+      const pattern = ctx!.createPattern(off, "repeat");
+      if (pattern) {
+        ctx!.fillStyle = pattern;
+        ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      }
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      paint();
+      return () => ro.disconnect();
+    }
+
+    let parked = false;
+    let last = 0;
+    let raf = 0;
+    const io = new IntersectionObserver(([entry]) => {
+      parked = !entry.isIntersecting;
+    });
+    io.observe(canvas);
+
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      if (parked || now - last < FRAME_MS) return;
+      last = now;
+      paint();
+    };
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+      ro.disconnect();
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="svc-grain-canvas" aria-hidden="true" />;
+}

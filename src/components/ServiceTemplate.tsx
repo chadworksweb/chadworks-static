@@ -21,6 +21,7 @@ import {
   buildBreadcrumbJsonLd,
 } from "@/lib/service";
 import { Prompt } from "@/components/Prompt";
+import { GrainField } from "@/components/GrainField";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
@@ -481,9 +482,10 @@ export default function ServiceTemplate({ service }: { service: Service }) {
       </section>
 
       {/* QUALIFICATION (optional) -- who it's for / who it isn't. Bold
-          periwinkle band with the MOVING GRAIN texture (Chad's ss17). */}
+          periwinkle band with CHANNEL-STATIC grain regenerating in place. */}
       {s.qualification && (
         <section className="section full svc-block svc-qual-section reveal">
+          <GrainField />
           <h2 className="svc-block__heading">{s.qualification.heading}</h2>
           <div className="svc-qual">
             <div className="svc-qual__col svc-qual__col--fit panel">

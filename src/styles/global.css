@@ -1213,10 +1213,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .svc-faq__layout { grid-template-columns: 1fr; }
 }
 
-/* QUALIFICATION -- bold periwinkle band with MOVING GRAIN (Chad's ss17
-   reference: film grain living over a saturated color field). The grain is
-   one SVG feTurbulence tile on an oversized pseudo-element, jumped around in
-   discrete steps -- TV-static jitter, transform-only, one layer. */
+/* QUALIFICATION -- bold periwinkle band with CHANNEL-STATIC GRAIN: the
+   noise canvas (GrainField) re-randomizes IN PLACE each frame, the channel-4
+   TV effect via the CF lava repaint concept. */
 .svc-qual-section {
   position: relative;
   background: var(--band-mid, #6470b3);
@@ -1227,34 +1226,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: #fff;
   text-shadow: 0 2px 24px rgba(36, 57, 137, 0.35);
 }
-.svc-qual-section::before {
-  content: "";
+.svc-grain-canvas {
+  grid-column: full;
   position: absolute;
-  inset: -100%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-  opacity: 0.15;
   mix-blend-mode: overlay;
-  animation: cw-grain 0.85s infinite;
-  animation-timing-function: steps(1, end);
-}
-@keyframes cw-grain {
-  0%    { transform: translate(0, 0); }
-  12.5% { transform: translate(-2.5%, 1.5%); }
-  25%   { transform: translate(1.5%, -2.5%); }
-  37.5% { transform: translate(-1.5%, -1.5%); }
-  50%   { transform: translate(2.5%, 1%); }
-  62.5% { transform: translate(-1%, 2.5%); }
-  75%   { transform: translate(1.5%, 1.5%); }
-  87.5% { transform: translate(-2.5%, -1%); }
-  100%  { transform: translate(0, 0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .svc-qual-section::before { animation: none; }
+  opacity: 0.4; /* THE visibility dial -- tune here */
 }
 .svc-qual-section > * { position: relative; z-index: 1; }
+.svc-qual-section > .svc-grain-canvas { z-index: 0; }
 
 /* MADE-BY -- the septic "Hi, I'm Chad" founder block (industry_made):
    cutout photo + caption card, manifesto rows on accent-tinted gradients,
