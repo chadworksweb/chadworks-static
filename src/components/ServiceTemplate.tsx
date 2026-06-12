@@ -24,7 +24,7 @@ import { Prompt } from "@/components/Prompt";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
-import { WaterRipple } from "@/components/WaterRipple";
+import { RippleGrid } from "@/components/ripple/RippleGrid";
 import { Ribbon } from "@/components/Ribbon";
 import { ProblemMore } from "@/components/ProblemMore";
 
@@ -374,38 +374,24 @@ export default function ServiceTemplate({ service }: { service: Service }) {
         </ul>
       </section>
 
-      {/* PORTFOLIO (optional) -- screenshot shots with the water-ripple cursor. */}
+      {/* PORTFOLIO (optional) -- screenshot shots driven by THE sitewide
+          water-ripple engine (RippleGrid: the chadlewine explore-grid hover
+          effect, called here, never rebuilt per page). */}
       {s.portfolio && (
         <section className="section svc-block reveal">
           <h2 className="svc-block__heading">{s.portfolio.heading}</h2>
           {s.portfolio.intro && (
             <p className="svc-block__body measure-prose"><W value={s.portfolio.intro} /></p>
           )}
-          <div className="svc-shots">
-            {s.portfolio.items.map((p, i) => (
-              <div key={i} className="svc-shot">
-                <WaterRipple src={p.img} alt={p.alt} className="svc-shot__frame" />
-                <p className="svc-shot__label">
-                  {p.href ? (
-                    p.href.startsWith("http") ? (
-                      <a
-                        href={p.href}
-                        className="svc-shot__link"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {p.label}
-                      </a>
-                    ) : (
-                      <Link href={p.href} className="svc-shot__link">{p.label}</Link>
-                    )
-                  ) : (
-                    p.label
-                  )}
-                </p>
-              </div>
-            ))}
-          </div>
+          <RippleGrid
+            items={s.portfolio.items.map((p, i) => ({
+              key: `${s.slug}-shot-${i}`,
+              src: p.img,
+              alt: p.alt,
+              label: p.label,
+              href: p.href,
+            }))}
+          />
         </section>
       )}
 
