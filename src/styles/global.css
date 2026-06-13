@@ -3069,3 +3069,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .rates-ledger__row { grid-template-columns: 1fr; row-gap: 0.3rem; }
   .rates-ledger__num { justify-self: start; }
 }
+
+/* =====================================================================
+   FAQS PAGE -- scoped adjustments only. The four groups reuse the
+   svc-faq layout (sticky theme column + accordion) and the
+   svc-faq-section / --dark bands; the only new piece is the numbered
+   kicker that sits above each group theme.
+   ===================================================================== */
+
+.cw-faq-group__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  margin-bottom: var(--space-2xs);
+}
+.svc-faq-section--dark .cw-faq-group__kicker { color: #c9b3ec; }

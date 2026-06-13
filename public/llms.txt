@@ -26,6 +26,7 @@
 
 - [About Chad Lewine](https://chadworks.co/about/): The person behind chadworks: one person who designs the site and writes the code, era by era from MySpace-taught HTML to clients named in AI answers.
 - [Rates](https://chadworks.co/rates/): The real numbers with the math showing. Work bills at $315/hour; the smallest engagement is $3,200; most websites land near $6,200; WordPress care runs $550 every 6 months. Value-based, not the cheapest, deliberately.
+- [FAQs](https://chadworks.co/faqs/): Straight answers in four groups: working together, what it costs, how the site gets built and owned, and getting found in classic search and AI assistants (with the real AI Overview and AI-answer precedents).
 - Founder: Chad Lewine. Twenty years custom-building websites; designing since age 11.
 - Track record: 50+ client engagements from 2019 through 2025, on top of the decade before them.
 - Posture: value-based pricing ($315/hr, $3,200 floor). Not the cheapest option, deliberately.
