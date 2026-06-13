@@ -3085,3 +3085,118 @@ p, li, dd, figcaption { text-wrap: pretty; }
   margin-bottom: var(--space-2xs);
 }
 .svc-faq-section--dark .cw-faq-group__kicker { color: #c9b3ec; }
+
+/* =====================================================================
+   CONTACT PAGE -- the dark contact band, its split layout, and the CF
+   "colorburst" glow orbs (mechanism COPIED from cf-marketing-site; assets
+   adapted to brand-hue radial gradients screen-blended on dark). The orbs
+   are large soft glow fields behind the panel, NOT particles (rule 11).
+   ===================================================================== */
+
+/* The rotating angle that drives every orb layer's conic swirl mask. */
+@property --cw-swirl {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.cw-contact { position: relative; overflow: hidden; }
+
+/* Orb field: absolute, behind the content, pointer-transparent. */
+.cw-orbfield {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cw-contact__inner { position: relative; z-index: 1; }
+
+.cw-orb {
+  position: absolute;
+  filter: blur(22px);
+}
+.cw-orb--a {
+  left: -7%;
+  top: 4%;
+  width: clamp(320px, 38vw, 560px);
+  aspect-ratio: 1;
+}
+.cw-orb--b {
+  right: -9%;
+  bottom: -14%;
+  width: clamp(280px, 32vw, 480px);
+  aspect-ratio: 1;
+}
+
+/* Each layer = a brand-hue radial blob, masked by a rotating conic gradient so
+   it reads as drifting wisps rather than a flat disc. Default opacity keeps the
+   glow visible with no JS; the breathing script modulates it when scripted. */
+.cw-orb__layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  opacity: 0.4;
+  transition: opacity 2s ease-in-out;
+  -webkit-mask-image: conic-gradient(from var(--cw-swirl), black 0deg, rgba(0, 0, 0, 0.6) 60deg, rgba(0, 0, 0, 0.2) 120deg, transparent 180deg, transparent 300deg, rgba(0, 0, 0, 0.2) 330deg, black 360deg);
+  mask-image: conic-gradient(from var(--cw-swirl), black 0deg, rgba(0, 0, 0, 0.6) 60deg, rgba(0, 0, 0, 0.2) 120deg, transparent 180deg, transparent 300deg, rgba(0, 0, 0, 0.2) 330deg, black 360deg);
+  -webkit-mask-size: 150% 150%;
+  mask-size: 150% 150%;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+/* Brand hues: purple, lavender, deep-indigo (the accent-strong tone). */
+.cw-orb__layer:nth-child(1) {
+  background: radial-gradient(circle at 50% 50%, rgba(128, 84, 188, 0.85), transparent 70%);
+  animation: cw-swirl-mask 13s linear infinite;
+}
+.cw-orb__layer:nth-child(2) {
+  background: radial-gradient(circle at 50% 50%, rgba(229, 210, 244, 0.7), transparent 66%);
+  animation: cw-swirl-mask 17s linear infinite reverse;
+}
+.cw-orb__layer:nth-child(3) {
+  background: radial-gradient(circle at 50% 50%, rgba(54, 30, 156, 0.8), transparent 72%);
+  animation: cw-swirl-mask 11s linear infinite;
+  animation-delay: -4s;
+}
+@keyframes cw-swirl-mask { to { --cw-swirl: 360deg; } }
+
+/* Split: reach-direct copy left, the dual form right. */
+.cw-contact__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .cw-contact__layout { grid-template-columns: 1fr; }
+}
+
+.cw-contact__copy { display: flex; flex-direction: column; gap: var(--space-md); }
+.cw-contact__email {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--dark-text);
+  text-decoration: none;
+  width: fit-content;
+  border-bottom: 1px solid rgba(229, 210, 244, 0.4);
+  padding-bottom: 0.15rem;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.cw-contact__email:hover { color: #e5d2f4; border-color: #e5d2f4; }
+.cw-contact__email-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--dark-muted);
+  margin-bottom: 0.5rem;
+}
+.cw-contact__note { color: var(--dark-muted); line-height: var(--leading-body); }
+
+/* Reduced motion: stop the swirl + breathing, hold a calm static glow. */
+@media (prefers-reduced-motion: reduce) {
+  .cw-orb__layer { animation: none; opacity: 0.32; }
+}

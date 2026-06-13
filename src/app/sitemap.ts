@@ -31,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about/",
     "/rates/",
     "/faqs/",
+    "/contact/",
     // Situation pages
     "/build-your-vision/", // (Build Your Vision -- ambitious custom builds)
     "/switch/leave-wordpress/",
