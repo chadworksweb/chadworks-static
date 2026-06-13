@@ -240,7 +240,7 @@ export default function RatesPage() {
           </dl>
 
           <p className="svc-pricing__disclaimer">
-            <strong>One promise about the number:</strong> the quote you get is
+            <strong>One promise about the number:</strong>{" "}the quote you get is
             scoped to what you actually want, and it does not climb once you are
             committed. If the scope grows, we talk about it before the price
             does.

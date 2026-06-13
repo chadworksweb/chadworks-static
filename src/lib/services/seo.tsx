@@ -78,22 +78,22 @@ export const seo: Service = {
       trigger: "Where SEO fits now",
       paragraphs: [
         <>
-          <strong>Invisible</strong> is where most businesses sit, and the
+          <strong>Invisible</strong>{" "}is where most businesses sit, and the
           marker on the scale below sits there for a reason: not ranking
           means not read.
         </>,
         <>
-          <strong>Found</strong> is what SEO buys: standing in the results
+          <strong>Found</strong>{" "}is what SEO buys: standing in the results
           for the phrases your buyers type. Without it, nothing downstream
           can happen, because you&apos;re not in the room.
         </>,
         <>
-          <strong>Chosen</strong> is what your pages do once a human or an
+          <strong>Chosen</strong>{" "}is what your pages do once a human or an
           engine actually reads them. Clear answers, real proof, structure
           an engine can lift. Ranking puts you in front of that judgment.
         </>,
         <>
-          <strong>Cited</strong> is the new top of the scale: being the
+          <strong>Cited</strong>{" "}is the new top of the scale: being the
           business the AI names. It&apos;s built on the first two. Nobody
           honest sells it without them.
         </>,
@@ -200,7 +200,7 @@ export const seo: Service = {
       "SEO runs at $315 an hour, sold as scoped project blocks or a retainer, with the scope and number in writing before we start. It's priced on what owning your phrases is worth in your market, and in most markets that's a multiple of what the work costs. I'm not the cheapest, deliberately.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> SEO compounds slowly. If you need the
+        <strong>Straight up:</strong>{" "}SEO compounds slowly. If you need the
         phone ringing this month, this is the wrong tool, and I&apos;ll
         tell you what the right one is instead of selling you this one.
       </>

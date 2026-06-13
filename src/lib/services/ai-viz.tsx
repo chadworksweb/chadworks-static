@@ -54,19 +54,19 @@ export const aiViz: Service = {
       trigger: "What decides who gets named",
       paragraphs: [
         <>
-          <strong>Engines read structure first.</strong> Schema and
+          <strong>Engines read structure first.</strong>{" "}Schema and
           headings that match real questions. An AI decides what your page
           says before any human does, and messy structure reads as
           silence.
         </>,
         <>
-          <strong>They cross-check identity.</strong> Your Google Business
+          <strong>They cross-check identity.</strong>{" "}Your Google Business
           Profile, your reviews, your socials, and the site they all need
           to match. Inconsistency reads as risk, and engines don&apos;t
           recommend risk.
         </>,
         <>
-          <strong>The quotable gets quoted.</strong> Pages that answer the
+          <strong>The quotable gets quoted.</strong>{" "}Pages that answer the
           question in the first two sentences get lifted into answers.
           Pages that warm up for four paragraphs get read and discarded.
         </>,
@@ -188,7 +188,7 @@ export const aiViz: Service = {
       "AI visibility runs as a monthly retainer built on my $315 hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if the one-time audit is all your
+        <strong>Straight up:</strong>{" "}if the one-time audit is all your
         situation needs, I&apos;ll tell you before you commit to a retainer.
         The audit stands on its own, and you can act on it with anyone.
       </>

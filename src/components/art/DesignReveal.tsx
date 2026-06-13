@@ -130,8 +130,8 @@ export function DesignReveal() {
             <div className="dr-a__hero">
               <span className="dr-a__eyebrow" />
               <span className="dr-a__h1">
-                The work speaks.
-                <em> This is where it talks.</em>
+                The work speaks.{" "}
+                <em>This is where it talks.</em>
               </span>
               <span className="dr-a__sub" />
               <span className="dr-a__btn" />

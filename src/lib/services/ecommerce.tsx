@@ -72,20 +72,20 @@ export const ecommerce: Service = {
       trigger: "What a designed store does differently",
       paragraphs: [
         <>
-          <strong>Product pages</strong> carry the weight. Real photography
+          <strong>Product pages</strong>{" "}carry the weight. Real photography
           presented properly, the buying question answered before it&apos;s
           asked, and the add-to-cart visible without hunting. Amateur product
           images turn buyers off faster than price does, and I&apos;ll tell
           you if yours do.
         </>,
         <>
-          <strong>Checkout</strong> is where stores quietly bleed. Every
+          <strong>Checkout</strong>{" "}is where stores quietly bleed. Every
           extra field and surprise cost loses real money. I build the
           shortest honest path from cart to paid, on rails your fulfillment
           can actually keep up with.
         </>,
         <>
-          <strong>The platform bill</strong> deserves honesty. Shopify's base
+          <strong>The platform bill</strong>{" "}deserves honesty. Shopify's base
           price looks small, and the monthly bill can add up as apps stack
           on. WooCommerce trades that for hosting and upkeep you control. I
           lay out both costs before you choose, because you'll live with the
@@ -169,7 +169,7 @@ export const ecommerce: Service = {
       "Store builds are priced on what they win for your business, from the $3,200 floor with most landing near $6,200. Catalog size and custom flows move the number, and you'll see it in writing before anything starts. The platform's own monthly costs get laid out at the same time, because a store bill you didn't see coming is the oldest trick in this industry.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if your product photos are weak,
+        <strong>Straight up:</strong>{" "}if your product photos are weak,
         I&apos;ll tell you before we build, because no design rescues a
         store from amateur images. People will be turned off by them, and
         fixing that first is worth more than any feature.

@@ -99,17 +99,17 @@ export const aiVisibilityAudit: Service = {
       trigger: "What the audit actually measures",
       paragraphs: [
         <>
-          <strong>Your standing.</strong> Where you appear today: classic
+          <strong>Your standing.</strong>{" "}Where you appear today: classic
           rankings for real buying phrases, AI answers for the questions
           your market asks, and the map results local buyers see first.
         </>,
         <>
-          <strong>The structure underneath.</strong> Whether an engine can
+          <strong>The structure underneath.</strong>{" "}Whether an engine can
           read your pages at all: schema, headings, answer-shaped copy, and
           the performance scores engines treat as trust signals.
         </>,
         <>
-          <strong>Every identity cross-check.</strong> Your Google Business
+          <strong>Every identity cross-check.</strong>{" "}Your Google Business
           Profile, your reviews, your socials, and the site they should all
           match. Engines verify before they recommend, the same way buyers
           do.
@@ -190,7 +190,7 @@ export const aiVisibilityAudit: Service = {
       "The audit is a fixed piece of work priced from my $315 hourly rate and quoted as one flat number before you commit. The number depends on the size of your site and your market, and it goes in writing first. No subscription hides inside it, and nothing renews.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> the audit might tell you things are
+        <strong>Straight up:</strong>{" "}the audit might tell you things are
         mostly fine. When that happens you&apos;ll know exactly which two or
         three fixes matter, and you won&apos;t need a retainer. That outcome
         counts as a win, and it does happen.

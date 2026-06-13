@@ -70,18 +70,18 @@ export const shopify: Service = {
       trigger: "What I change about that",
       paragraphs: [
         <>
-          <strong>The face</strong> gets designed. Your typography, your
+          <strong>The face</strong>{" "}gets designed. Your typography, your
           colors, your product presentation, built over Shopify&apos;s rails
           until the theme underneath stops being visible.
         </>,
         <>
-          <strong>The apps</strong> get audited. Shopify&apos;s app store
+          <strong>The apps</strong>{" "}get audited. Shopify&apos;s app store
           solves everything for $10 a month each, and that&apos;s how a $39
           plan becomes a $300 monthly bill. Every app has to earn its slot,
           and most don&apos;t.
         </>,
         <>
-          <strong>The product pages</strong> get the real attention. That&apos;s
+          <strong>The product pages</strong>{" "}get the real attention. That&apos;s
           where buying happens, and where stock themes settle for a photo
           grid and a description box. Yours get built to answer the buying
           question before it&apos;s asked.
@@ -163,7 +163,7 @@ export const shopify: Service = {
       "A Shopify build is priced on what it wins for your business, from the $3,200 floor with most landing near $6,200. Shopify's own monthly plan sits on top, and I'll lay out that real number, including what the apps you actually need cost, before you ever commit to the platform.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> Shopify&apos;s base plan is
+        <strong>Straight up:</strong>{" "}Shopify&apos;s base plan is
         competitively priced, and the monthly bill can quickly add up as
         apps pile on. Keeping that stack lean is part of the build, not an
         afterthought.

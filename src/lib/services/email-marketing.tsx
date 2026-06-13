@@ -74,17 +74,17 @@ export const emailMarketing: Service = {
       trigger: "Where the channel actually breaks",
       paragraphs: [
         <>
-          <strong>The list decays.</strong> Dead addresses and never-opens
+          <strong>The list decays.</strong>{" "}Dead addresses and never-opens
           pile up, providers notice, and your legitimate sends start
           landing in spam for everyone else too.
         </>,
         <>
-          <strong>Blasts bore.</strong> A customer who bought twice and a
+          <strong>Blasts bore.</strong>{" "}A customer who bought twice and a
           stranger who downloaded a PDF get the same email, so it&apos;s
           relevant to neither. Segments exist to fix exactly this.
         </>,
         <>
-          <strong>Over-sending burns.</strong> Every send spends a little
+          <strong>Over-sending burns.</strong>{" "}Every send spends a little
           of the list&apos;s patience. Send too often and the unsubscribes
           and spam flags eat the channel from the inside.
         </>,
@@ -174,7 +174,7 @@ export const emailMarketing: Service = {
       "Email setup runs at $315 an hour as a scoped block: list cleanup, authentication, segments, templates, and the calendar, with the number in writing before we start. Ongoing sends can be scoped after, or your team can run the system themselves. It's documented for exactly that.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if your list is under 500 contacts,
+        <strong>Straight up:</strong>{" "}if your list is under 500 contacts,
         your platform is free and the spend here is setup only. I will
         never move you onto a paid plan you don&apos;t need.
       </>

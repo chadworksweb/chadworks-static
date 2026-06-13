@@ -73,19 +73,19 @@ export const digitalMarketing: Service = {
       trigger: "How the triage reads your business",
       paragraphs: [
         <>
-          <strong>Where your buyers start.</strong> Someone with a burst
+          <strong>Where your buyers start.</strong>{" "}Someone with a burst
           pipe searches or asks an AI. Someone discovering a product
           scrolls. The channel has to match the moment of intent, or the
           spend is decoration.
         </>,
         <>
-          <strong>What the math says.</strong> Every channel has a real
+          <strong>What the math says.</strong>{" "}Every channel has a real
           cost-to-return shape for your kind of business. Some never pencil
           out at your ticket size, and it&apos;s cheaper to know that
           before the retainer than after it.
         </>,
         <>
-          <strong>The load you can sustain.</strong> Channels die when
+          <strong>The load you can sustain.</strong>{" "}Channels die when
           feeding them becomes a second job nobody owns. The triage weighs
           what your business will actually keep up, not what a pitch deck
           assumes.
@@ -186,7 +186,7 @@ export const digitalMarketing: Service = {
       "The triage itself is billable time at $315 an hour, because it's the most valuable thing I do: it's the difference between funding the two channels that fit your buyers and funding six that don't. Ongoing channel work gets scoped in writing after it, and only for the channels that survived.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> free marketing strategy is a sales
+        <strong>Straight up:</strong>{" "}free marketing strategy is a sales
         call wearing a costume. The advice points wherever the agency makes
         its margin. Paid triage answers to you, and that&apos;s the entire
         difference.

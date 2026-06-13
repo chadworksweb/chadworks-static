@@ -70,19 +70,19 @@ export const customCodedStatic: Service = {
       trigger: "Where the advantage shows up",
       paragraphs: [
         <>
-          <strong>Speed</strong> is structural, not optimized-in. The pages
+          <strong>Speed</strong>{" "}is structural, not optimized-in. The pages
           are pre-built files served instantly, which visitors feel and
           search engines reward. There is no slower version of this site
           waiting to happen.
         </>,
         <>
-          <strong>Security</strong> becomes a non-topic. No login page, no
+          <strong>Security</strong>{" "}becomes a non-topic. No login page, no
           database, no plugin vulnerabilities. The attack surface of a
           static site is close to nothing, which is why this site runs no
           security software at all.
         </>,
         <>
-          <strong>Cost</strong> flips after launch. No maintenance plan for
+          <strong>Cost</strong>{" "}flips after launch. No maintenance plan for
           the platform, no plugin licenses, hosting measured in single
           dollars. The route costs more attention up front and almost
           nothing to keep alive.
@@ -174,7 +174,7 @@ export const customCodedStatic: Service = {
       "Custom static is priced like every build here: on what it wins for your business, from the $3,200 floor with most landing near $6,200. The difference is everything after launch. No platform maintenance, no plugin renewals, hosting that rounds to nothing. Content changes go through me and bill at $315 an hour, which for most marketing sites means a handful of small invoices a year instead of a monthly subscription.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if your content changes every week,
+        <strong>Straight up:</strong>{" "}if your content changes every week,
         this is the wrong route and I&apos;ll tell you so. Static earns its
         keep on sites that need to be fast and found, not edited daily.
       </>

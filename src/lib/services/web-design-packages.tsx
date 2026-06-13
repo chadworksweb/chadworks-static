@@ -72,13 +72,13 @@ export const webDesignPackages: Service = {
       trigger: "How the scoping actually works",
       paragraphs: [
         <>
-          <strong>Scope</strong> is decided together, before money moves. We
+          <strong>Scope</strong>{" "}is decided together, before money moves. We
           settle what the site needs to do, which pages earn their place, and
           what gets cut without hurting the result. You approve the written
           scope, and that document is the deal.
         </>,
         <>
-          <strong>Changes</strong> are handled like an adult conversation. If
+          <strong>Changes</strong>{" "}are handled like an adult conversation. If
           you add something mid-build, I tell you what it costs before I build
           it. Nothing new appears on an invoice that didn&apos;t appear in a
           conversation first.
@@ -166,7 +166,7 @@ export const webDesignPackages: Service = {
       "The floor gets a focused site that does one job well. The typical build is where most businesses land: full design, development, and the launch handled. Past that, the number tracks the vision, and we scope it together. Hourly work bills at $315 when a defined package isn't the right shape.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> these are postures, not a menu. The real
+        <strong>Straight up:</strong>{" "}these are postures, not a menu. The real
         number comes from a real conversation about scope, and you&apos;ll
         have it in writing before anything starts.
       </>

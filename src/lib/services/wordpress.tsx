@@ -71,19 +71,19 @@ export const wordpress: Service = {
       trigger: "What done-right looks like",
       paragraphs: [
         <>
-          <strong>Lean</strong> is the build rule. A WordPress site needs far
+          <strong>Lean</strong>{" "}is the build rule. A WordPress site needs far
           fewer plugins than the typical install carries. Every plugin is a
           thing that can break, slow the site, or get hacked, so each one has
           to earn its place.
         </>,
         <>
-          <strong>Maintained</strong> is the survival rule. WordPress is
+          <strong>Maintained</strong>{" "}is the survival rule. WordPress is
           software, and software needs updates. The sites that age badly are
           the ones nobody touched after launch. Mine are on a maintenance
           plan with a real person behind it.
         </>,
         <>
-          <strong>Owned</strong> is the exit rule. The site, the hosting
+          <strong>Owned</strong>{" "}is the exit rule. The site, the hosting
           account, and the admin access live in your name. If we ever part
           ways, you keep everything and nothing goes dark.
         </>,
@@ -165,7 +165,7 @@ export const wordpress: Service = {
       "A WordPress build is priced like every build here: on what it wins for your business, starting at the $3,200 floor with most landing near $6,200. The difference from the static route is the ongoing side: WordPress needs maintenance, and mine is $550 every six months for updates and small content changes, stated here so it never surprises you.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if a WordPress site is sold to you
+        <strong>Straight up:</strong>{" "}if a WordPress site is sold to you
         without a maintenance plan, you&apos;re being set up to pay for a
         rescue later. The plan isn&apos;t an upsell, it&apos;s how the
         platform survives.

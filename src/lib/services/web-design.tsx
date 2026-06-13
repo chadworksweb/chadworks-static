@@ -68,21 +68,21 @@ export const webDesign: Service = {
       trigger: "More on what design decides",
       paragraphs: [
         <>
-          <strong>Trust</strong> comes first. A visitor can&apos;t inspect
+          <strong>Trust</strong>{" "}comes first. A visitor can&apos;t inspect
           your work from a search result, so the website stands in for it. A
           considered design reads as a business that sweats the details. A
           stale template reads as a business that doesn&apos;t, even when the
           work behind it is excellent.
         </>,
         <>
-          <strong>Direction</strong> is the quiet job. Good design decides
+          <strong>Direction</strong>{" "}is the quiet job. Good design decides
           where the eye goes, what feels clickable, and which action the whole
           page leans toward. A site can be beautiful and still point nowhere,
           which is why I design the path to contact before I pick a single
           color.
         </>,
         <>
-          <strong>Memory</strong> is the long game. You are almost never the
+          <strong>Memory</strong>{" "}is the long game. You are almost never the
           only tab open. Template sites blur into each other the moment the
           visitor moves on, while a site designed around your business is the
           one they can still picture the next day.
@@ -206,7 +206,7 @@ export const webDesign: Service = {
       "Design is priced on what it's worth to your business, not on how fast a font can be picked. Projects start at a $3,200 floor, most land near $6,200 with the development included, and hourly work bills at $315. There are cheaper designers, plenty of them. The difference is that you're not buying a template with your logo dropped in. You're buying a design that belongs to your business alone, built by the same person who codes it.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong> if the lowest number is the goal, we
+        <strong>Straight up:</strong>{" "}if the lowest number is the goal, we
         probably aren&apos;t a match, and I&apos;d rather say so here than
         after you&apos;ve spent the money. Real numbers come from a real
         conversation about scope, not a pricing table.
