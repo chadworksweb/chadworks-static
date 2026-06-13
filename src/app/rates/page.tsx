@@ -55,7 +55,7 @@ const LEDGER: { label: string; num: string; note: string }[] = [
   {
     label: "Where most websites land",
     num: "~$6,200",
-    note: "A full site with the structure, speed, and schema that gets it found. This is the typical number, not a teaser that climbs once you are committed.",
+    note: "A full site built for speed, with the structure and schema that gets it found. This is the typical number, not a teaser that climbs once you are committed.",
   },
   {
     label: "WordPress care, ongoing",
@@ -72,7 +72,7 @@ const BUYS: { title: string; body: string }[] = [
   },
   {
     title: "A site that is an asset, not a cost",
-    body: "Fast, structured, and built to get found in search and named by AI assistants. The kind of site that earns its number back instead of sitting there looking expensive.",
+    body: "Structured and fast, built to get found in search and named by AI assistants. The kind of site that earns its number back instead of sitting there looking expensive.",
   },
   {
     title: "Honesty before the money moves",
@@ -129,7 +129,7 @@ const FORM: LeadFormConfig = {
       label: "What are you building, and what's the budget you have in mind?",
       required: true,
       rows: 4,
-      placeholder: "The project, roughly where you'd like the number to land, and where it's stuck.",
+      placeholder: "The project, and roughly where you'd like the number to land.",
     },
     { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
   ],
@@ -225,8 +225,8 @@ export default function RatesPage() {
           <div className="svc-pricing__price-sub">Everything bills from one rate</div>
           <p className="svc-pricing__copy">
             Every number below is that hourly rate times the hours the work
-            honestly takes. Nothing padded, nothing buried, and no surprise
-            line item waiting for you at the end of the project.
+            honestly takes. Nothing is padded or buried, and no surprise line
+            item waits for you at the end of the project.
           </p>
 
           <dl className="rates-ledger">

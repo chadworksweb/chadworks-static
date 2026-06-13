@@ -111,7 +111,7 @@ const PROOF: { label: string; href: string; detail: string }[] = [
     label: "Shopify at multi-million volume",
     href: "/shopify/",
     detail:
-      "I've used Shopify for a multi-million dollar manufacturing company. When I talk platforms, that's the scale the advice comes from.",
+      "I've used Shopify for a multi-million dollar manufacturing company, so my platform advice comes from that kind of scale.",
   },
   {
     label: "A law firm inside Google's AI Overview",
@@ -136,7 +136,7 @@ const PROOF: { label: string; href: string; detail: string }[] = [
 const HOW: { title: string; body: string }[] = [
   {
     title: "You talk to the builder",
-    body: "The person who answers the email is the person who built your site. No account managers and no ticket queue between us.",
+    body: "The person who answers the email is the person who built your site. No account manager or ticket queue stands between you and the work.",
   },
   {
     title: "Your wallet gets guarded",
@@ -169,7 +169,7 @@ const FORM: LeadFormConfig = {
       label: "What are you building?",
       required: true,
       rows: 4,
-      placeholder: "The business, the vision, and where it's stuck.",
+      placeholder: "What you're building, and where it's stuck today.",
     },
     { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
   ],
@@ -206,7 +206,7 @@ export default function AboutPage() {
         {/* Answer-first: quotable in the first 100 words. */}
         <p className="svc-lede measure-prose">
           chadworks is one person. I&apos;m Chad Lewine, designing since age 11
-          and custom-building client websites for 20 years. There&apos;s no
+          and custom-building websites for 20 years. There&apos;s no
           team behind a curtain and no account manager translating. The person
           you email is the person who writes the code.
         </p>
@@ -287,8 +287,8 @@ export default function AboutPage() {
           </div>
           <div className="svc-made__copy">
             <p className="svc-made__intro">
-              Twenty years of client work, and the part I&apos;d never automate
-              is this: when you email chadworks, you get me.
+              Twenty years of building websites, and the part I&apos;d never
+              automate is this: when you email chadworks, you get me.
             </p>
             <ul className="svc-made__manifesto">
               <li>
@@ -343,8 +343,9 @@ export default function AboutPage() {
           </div>
         </div>
         <p className="about-qual-ps">
-          The numbers themselves are public. They live on the{" "}
-          <Link href="/rates/">rates page</Link>.
+          The numbers themselves are public. The{" "}
+          <Link href="/rates/">rates page</Link> lays them out in full, with the
+          math showing.
         </p>
       </section>
 
