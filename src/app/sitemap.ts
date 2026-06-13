@@ -29,6 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/email-marketing/",
     // Standalone pages
     "/about/",
+    "/rates/",
     // Situation pages
     "/build-your-vision/", // (Build Your Vision -- ambitious custom builds)
     "/switch/leave-wordpress/",

@@ -3007,3 +3007,65 @@ p, li, dd, figcaption { text-wrap: pretty; }
      the plain H1 underneath stays visible. */
   .about-hero .title-reveal__canvas { display: none; }
 }
+
+/* =====================================================================
+   RATES PAGE -- scoped adjustments only. The glass price panel is the
+   called engine (.svc-pricing__panel); the ledger below is the page's
+   show-the-math signature: the real numbers in aligned mono so the math
+   reads at a glance.
+   ===================================================================== */
+
+.rates-panel { max-width: 880px; }
+
+/* The ledger: one row per number. Label and the mono figure share the top
+   line (figure right-aligned, accent gradient); the note wraps full width
+   below. A hairline rule between rows keeps it reading as a statement, not
+   a price grid. */
+.rates-ledger {
+  margin: var(--space-lg) 0 0;
+  display: grid;
+  gap: 0;
+}
+.rates-ledger__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: var(--space-md);
+  padding: 1.4rem 0;
+  border-top: 1px solid rgba(128, 84, 188, 0.16);
+}
+.rates-ledger__row:first-child { border-top: none; padding-top: 0; }
+.rates-ledger__label {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+.rates-ledger__num {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1.25rem, 0.9rem + 1.4vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  background: linear-gradient(120deg, var(--text-primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.01em;
+}
+.rates-ledger__note {
+  grid-column: 1 / -1;
+  margin: 0.5rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 64ch;
+}
+
+@media (max-width: 600px) {
+  /* Stack label over figure so neither gets crushed on a phone. */
+  .rates-ledger__row { grid-template-columns: 1fr; row-gap: 0.3rem; }
+  .rates-ledger__num { justify-self: start; }
+}
