@@ -136,35 +136,19 @@ export const septic: Service = {
     },
   },
 
-  // approach renders as the bold ProcessCapsule timeline (overridden in page.tsx).
+  // The nine-step build timeline, rendered as the ProcessCapsule (page.tsx).
   approach: {
-    heading: "How the build runs",
+    heading: "From first call to live site, in nine steps.",
     steps: [
-      {
-        title: "Map the jobs",
-        body:
-          "We list your services and every town you cover, then decide which pages do the selling: routine pumping, inspections, real-estate certs, drain field, plus a page per service area.",
-      },
-      {
-        title: "Build for the phone first",
-        body:
-          "Mobile is the site, not an afterthought. Tap-to-call in a sticky header, fast load, and the trust trio above the fold on every page.",
-      },
-      {
-        title: "Write it to be found",
-        body:
-          "Plain-language service pages and real FAQs, niched to what your buyers actually search and ask an assistant, with the local detail each town page needs.",
-      },
-      {
-        title: "Wire the schema",
-        body:
-          "LocalBusiness, Service, and AreaServed structured data so Google and the AI crawlers read you as a defined entity, not a guess from prose.",
-      },
-      {
-        title: "Launch and watch",
-        body:
-          "Soft launch, check it on real phones, then go live. Afterward I watch what is ranking and where the calls come from, and aim the next round of work there.",
-      },
+      { title: "Discovery", body: "I interview you to extract the necessary information about your business like company history, mission and vision, important products or services, milestones, etc." },
+      { title: "Website Architecture (Sitemap)", body: "An SEO and user-friendly sitemap to visually organize all of your pages in an easy to read and digest visual." },
+      { title: "Homepage Design", body: "The overall design of the site will be delivered with the first revision of the homepage." },
+      { title: "Sub Page Build Out", body: "The rest of the website's pages will be built out with the design from the homepage and the content provided." },
+      { title: "Search Optimization (SEO)", body: "The website pages and content will be optimized for search out of the box." },
+      { title: "Mobile Optimization and Testing", body: "All content and pages must be complete before mobile testing and optimization is performed." },
+      { title: "Soft Launch", body: "We launch the site on your main domain. We ask friends and family to visit the site and test it out to try and find any last bugs we did not catch or issues with specific operating systems, browsers or devices." },
+      { title: "Official Launch", body: "We announce the launch of your website, and toast to a job well done for everyone involved. Congrats on your new web property, go get 'em. I'll be here for anything else you may need." },
+      { title: "Post-Launch Safety Net", body: "For a limited period after official launch, I'll fix any issues or glaring mistakes that come up at no charge." },
     ],
   },
 
@@ -203,119 +187,131 @@ export const septic: Service = {
     ],
   },
 
+  testimonials: {
+    heading: "30+ reviews on Google. Read a few below.",
+    items: [
+      { quote: "He exceeded my expectations.", attribution: "Giselle" },
+      { quote: "Easy to work with, responsive, and provides a fast turn-around.", attribution: "Jon Detrixhe" },
+      { quote: "Very good at keeping costs down.", attribution: "Stacey Vey" },
+      { quote: "He is an SEO magician!", attribution: "Ananda Forest" },
+      { quote: "Chad is an amazing web designer and content creator.", attribution: "Rovin Rozario" },
+      { quote: "Friendly, responsive and a good listener.", attribution: "Tim Noonan" },
+    ],
+  },
+
   made: {
     eyebrow: "Made in the USA",
     heading: "Hi, I'm Chad.",
     intro:
-      "I've been building websites for trade and service businesses since the MySpace days. Septic is the kind of work I like: local, hands-on, and won or lost on whether the site does its job at the worst possible moment for the customer.",
+      "I've been building websites for trade and service businesses since the MySpace days.",
     manifesto: [
-      { lead: "I design it.", aside: "(For the phone.)" },
-      { lead: "I write it.", aside: "(To be found.)" },
-      { lead: "I build it.", aside: "(Fast and clean.)" },
-      { lead: "I launch it.", aside: "(And watch it.)" },
+      { lead: "I design it.", aside: "(No template.)" },
+      { lead: "I code it.", aside: "(No page builder.)" },
+      { lead: "I maintain it.", aside: "(No ghosting.)" },
     ],
     negation: [
-      "No bloated page-builder themes.",
-      "No stock photos of generic tankers.",
-      "No offshore content farm.",
-      "No selling you pages your market won't reward.",
+      "No subcontractors.",
+      "No offshore.",
+      "No AI slop.",
+      "No warehouse agency you'll never hear from after the invoice clears.",
     ],
     close:
-      "When you call, I pick up. When something on your current site is costing you calls, I tell you straight.",
+      "When you call, I pick up. When something breaks at 11pm before your busy season, I'm the one fixing it.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad Lewine, founder of chadworks, who builds the septic websites",
-    captionMain: "I build it myself.",
-    captionSub: "(Page by page.)",
+    imgAlt: "Chad, founder of chadworks",
+    captionMain: "Don't worry, I'm a professional.",
+    captionSub: "(Web designer.)",
     sig: "Chad",
-    sigMeta: "chadworks - Greater Philadelphia",
+    sigMeta: "chadworks - Philadelphia, PA",
   },
 
   price: {
-    heading: "What it costs, plainly",
-    figure: "Quoted flat, up front",
-    figureSub: "Priced from $315/hr, in writing before you commit",
+    heading: "What I quote up front is what you pay.",
+    figure: "$5,200 - $8,200",
+    figureSub: "Custom build, scope-dependent",
     body:
-      "A septic site is scoped to the services and towns you actually cover, then quoted as one flat number before you commit, priced from my $315 hourly rate. I'm not the cheapest option, deliberately. You're hiring one builder who does the whole thing, not a template you fight with for a year.",
+      "Pricing is based on scope, not hours. A focused conversion site lands near the low end of the range. Add intake forms, a real photo gallery, or service-area pages and the number moves up. You see the full quote before we start, and that's the number on the final invoice, no retainer running in the background. When you need something later, you email me and I bill the work.",
     disclaimer: (
       <>
-        <strong>Straight up:</strong>{" "}a great site is the foundation, not a
-        magic switch. It wins the calls it can win and ranks for what the market
-        will give it. If your area is a slow build or a fast one, I'll tell you
-        which before you spend a dollar.
+        <strong>Heads up:</strong>{" "}the range above reflects the typical build.
+        Larger scopes, complex requirements, or markets with heavy competition can
+        easily push past the high end. Nothing on this page is a formal quote, real
+        numbers come after a free consult where we scope your actual project
+        together.
       </>
     ),
   },
 
   faqLead:
-    "Straight answers on speed, local ranking, the emergency call, and what it takes to be found in AI answers.",
+    "Questions that come up when septic owners compare what I build to what they see on the best-performing competitor sites.",
   faqs: [
     {
-      q: "Why does my septic website need to load fast on a phone?",
-      a: "Because the emergency caller is on a phone, in a hurry, with a tank backing up. A site that takes five seconds to load on mobile loses that caller to the one that loaded in two. Speed is the single biggest lever on a septic site, so the whole build is mobile-first: fast load, tap-to-call in the header, and the important things visible without scrolling.",
+      q: "Top septic sites lead with their PSMA cert and license number. Will mine?",
+      a: "Yes. Trust badges row above the fold, state license, PSMA cert, insurance carrier, BBB, NOWRA if applicable. Whatever credentials you actually carry. None of them faked.",
     },
     {
-      q: "How do I rank for all the towns I service, not just my home base?",
-      a: "Each service area gets its own real page, with the local detail that town's searchers and Google reward: permit notes, county rules, and the specific service. One page that lists ten townships in a footer ranks for none of them. A page per town, written properly, is the local SEO play that catches septic pumping searches across your whole coverage area.",
+      q: "Sites like John Kline have a page for every town they serve. Do I get that?",
+      a: "Yes, service-area pages are part of every build. Each one is real, real towns, real local content, real schema, not thin AI-spun duplicates Google will quietly de-index. Pricing tier determines how many; the base build typically covers 5 to 9, and we scale up from there.",
     },
     {
-      q: "Do top septic sites really need a sticky tap-to-call bar on mobile?",
-      a: "Yes, and every build I ship has one. The phone number is the most clickable thing on a septic site, on purpose. A sticky header keeps tap-to-call one thumb-press away on every page and every scroll, which is exactly what the 11pm panic caller needs.",
+      q: "Do you separate residential and commercial flows?",
+      a: "Yes. Residential optimizes for the panic homeowner with a backed-up tank at 11pm, fast load, tap-to-call CTA up top, license visible. Commercial gets a grease-trap intake form, fleet bio, named insurance carriers, and a quote workflow that doesn't pretend a restaurant chain is the same lead as a homeowner. Tell me your mix and I'll build for the heavier side.",
     },
     {
-      q: "What should be above the fold on a septic homepage?",
-      a: "The trust trio and the phone. State license, PSMA cert, and a named insurance carrier, plus tap-to-call, all visible before any scrolling. A homeowner is about to let a stranger onto their property, so clearing the credibility bar in the first two seconds is what earns the call.",
+      q: "Top septic sites have a sticky Call Now bar on mobile. Is that standard?",
+      a: "Standard. Every build ships with a tap-to-call sticky header on mobile and a tap-to-call CTA in the desktop nav. The phone number is the most clickable thing on the site, on purpose.",
     },
     {
-      q: "Will my new septic site show up when someone asks ChatGPT who to call?",
-      a: "It is built to. The site is server-rendered and carries LocalBusiness, Service, and AreaServed schema, so Google and the assistants can actually read who you are and where you work. Getting named in AI answers is the ongoing AI visibility work that rides on top of the build; a readable, schema-rich site is the prerequisite, and that is what I ship.",
+      q: "Schema, AreaServed, LocalBusiness, what does any of that mean, and do I need it?",
+      a: "It's the structured data Google, and now ChatGPT, Perplexity, and Gemini, read to know who you are, where you work, and what you do. Without it you're a name in a paragraph. With it you're an entity Google and AI search can cite. All wired up correctly in the build, no extra cost.",
     },
     {
-      q: "Can you rebuild my existing septic site, or do I need to start over?",
-      a: "Either, depending on what's there. Sometimes the bones are fine and the fixes are speed, the missing trust signals, and the town pages. Sometimes a builder-bloated site is faster to replace than to repair. I'll audit what you have and tell you honestly which path costs you less for the same result.",
+      q: "Will live Google reviews show on my site, or do I have to screenshot them?",
+      a: "Live, embedded via the Google Business Profile API so they update on their own. The Reviews page link buried in a footer is dead weight on most septic sites, visitors don't click it. We put the actual five-star content where customers are already looking.",
+    },
+    {
+      q: "How long does a build take?",
+      a: "2 to 3 weeks from kickoff to launch for a focused conversion site. Bigger scopes, multiple service-area pages, content migration, intake forms with custom routing, run 4 to 6 weeks. I quote a delivery date up front and stick to it.",
+    },
+    {
+      q: "Can you migrate me off Wix, Squarespace, GoDaddy, or whatever I'm on now?",
+      a: "Yes. Full migration is included in the build price. Wix and Squarespace make export painful on purpose, that's part of the racket. I handle the rebuild, you keep your domain and your hosting account in your name.",
+    },
+    {
+      q: "Why do you show pricing when most septic-focused agencies don't?",
+      a: "Because you should know roughly what you're going to spend before we talk. Most agencies hide pricing so they can size the quote to what they think you'll pay. The range here is honest: $5,200 to $8,200 based on scope, quoted up front.",
+    },
+    {
+      q: "You're one person, what if something happens to you?",
+      a: "Your site lives on your hosting account in your name. WordPress install, no proprietary lock-in. Any competent WordPress developer can take it over because nothing about the build is mine to hold over you. Admin access is yours from day one. I leave clean docs.",
     },
   ],
 
   cta: {
-    heading: "Let's win the 11pm call",
+    heading: "If your septic services website looks like it was built in 2012, let's fix that.",
     body:
-      "Tell me about your septic business, the services you run, and the towns you cover. I'll show you exactly where your current site is leaking calls and what a build that closes those leaks looks like. No pitch, no slide deck.",
-    buttonLabel: "Start a conversation",
+      "No pitch, no pressure, no slide deck. Tell me what's broken and what jobs you actually want more of. I'll tell you what I'd build and what it would cost.",
+    buttonLabel: "Send",
     href: "/contact/",
   },
 
   form: {
-    source: "Septic Web Design page",
-    subject: "New chadworks Inquiry - Septic Web Design",
-    submitLabel: "Send it to Chad",
-    successMessage:
-      "Got it. I read every one of these myself, and you'll hear back from me within a day.",
+    source: "Septic services niche page",
+    subject: "New chadworks Inquiry - Septic",
+    submitLabel: "Send",
+    successMessage: "Thanks, got it. I'll reply within one business day.",
     fields: [
-      { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
-      { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
+      { kind: "text", name: "name", label: "Your name", required: true, autocomplete: "name" },
       { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
-      { kind: "text", name: "business", label: "Business Name", required: true, span: "half" },
-      { kind: "url", name: "current_site", label: "Your Current Website", placeholder: "https://", span: "half" },
-      {
-        kind: "select",
-        name: "situation",
-        label: "The Situation",
-        span: "half",
-        options: [
-          { value: "no-site", label: "I don't have a site yet" },
-          { value: "rebuild", label: "I have one and it isn't working" },
-          { value: "slow", label: "Mine is slow or hard to find" },
-          { value: "unsure", label: "Not sure what I need" },
-        ],
-      },
+      { kind: "text", name: "phone", label: "Phone", required: true, autocomplete: "tel", span: "half" },
       {
         kind: "textarea",
-        name: "details",
-        label: "Your services and towns",
+        name: "message",
+        label: "Your message",
         required: true,
         rows: 4,
-        placeholder: "The septic services you run and the towns you cover.",
+        placeholder: "A line or two about your current site, your service area, the jobs you wish you had more of...",
       },
-      { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
     ],
   },
 
@@ -355,6 +351,6 @@ export const septic: Service = {
   meta: {
     title: "Website Design for Septic Companies | chadworks",
     description:
-      "Septic service websites built to win the 11pm emergency call: fast on a phone, tap-to-call in the header, license and insurance up top, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Quoted flat, priced from $315/hr.",
+      "Septic service websites built to win the 11pm emergency call: fast on a phone, tap-to-call in the header, license and insurance up top, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run $5,200 to $8,200, quoted up front.",
   },
 };

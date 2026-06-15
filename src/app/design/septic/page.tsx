@@ -1,12 +1,13 @@
 // Route: /design/septic/ -- the septic work of art, reproduced section by
-// section and reskinned to the global tokens, under the site shell (CWS
-// directive 2026-06-15). Bespoke composition (NOT the generic service
-// template), in the source's order:
-//   faucet hero -> why-split + mockup + 3 lanes + trust framework
+// section in the SOURCE ORDER and reskinned to the global tokens, under the
+// site shell (CWS directive 2026-06-15). Bespoke composition (NOT the generic
+// service template). Source order:
+//   hero -> why-split + lanes + framework
 //   -> methods walkthrough (intro/TOC + ch01 Services + ch02 Sitemap
-//      + ch03 Wireframe=camera + ch04 Brand Kit + ch05 Sample Copy)
-//   -> ch06 Visibility (ChatGPT/Google/Maps mockups)
-//   -> passes-vs-fails compare -> the interactive rubric -> FAQ -> CTA.
+//      + ch03 Wireframe=camera + ch04 Brand Kit + ch05 Sample Copy + ch06 Visibility)
+//   -> compare -> portfolio -> inspect quiz -> made -> pricing -> FAQ
+//   -> anti-agency email thread -> nine-step timeline -> testimonials
+//   -> contact CTA -> cross-industry grid.
 
 import type { Metadata } from "next";
 import { Fragment } from "react";
@@ -19,7 +20,15 @@ import {
 } from "@/lib/service";
 import { PageComposer } from "@/components/capsules/PageComposer";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { CtaCapsule, FaqCapsule, PortfolioCapsule } from "@/components/capsules";
+import {
+  CtaCapsule,
+  FaqCapsule,
+  PortfolioCapsule,
+  MadeByCapsule,
+  PriceCapsule,
+  TestimonialsCapsule,
+  ProcessCapsule,
+} from "@/components/capsules";
 import { WireframeCamera } from "@/components/art/WireframeCamera";
 import { septicWireframe } from "@/components/art/wireframes/septic";
 import { SepticHero, SepticBuild } from "@/components/septic/SepticArtSections";
@@ -30,6 +39,8 @@ import {
 } from "@/components/septic/SepticMethods";
 import { SepticBrandKit, SepticSampleCopy } from "@/components/septic/SepticBrandSample";
 import { SepticVisibility } from "@/components/septic/SepticVisibility";
+import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
+import { SepticOthers } from "@/components/septic/SepticOthers";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -73,8 +84,7 @@ export default function SepticDesignPage() {
       <SepticHero />
       <SepticBuild />
 
-      {/* The "what goes into your site" walkthrough. ch03 (Wireframe) is the
-          camera teardown; the other chapters are the reproduced blocks. */}
+      {/* "What goes into your site" walkthrough. ch03 = the camera teardown. */}
       <SectionShell full reveal={false} className="cw-art-methods-section">
         <SepticMethodsIntro />
         <SepticServicesChapter />
@@ -115,7 +125,7 @@ export default function SepticDesignPage() {
 
       <SepticVisibility />
 
-      {/* Passes vs fails inspection */}
+      {/* Passes vs fails inspection (diagonal gradient band). */}
       <SectionShell full className="cw-art-section cw-art-compare-section">
         <h2 className="cw-art-section__heading">
           How your septic services website passes inspection vs. fails it.
@@ -141,8 +151,7 @@ export default function SepticDesignPage() {
         <PortfolioCapsule portfolio={service.portfolio} slug={service.slug} />
       )}
 
-      {/* The interactive six-point rubric (reuses the Scorecard config),
-          on the source's dark inverted band, two-column. */}
+      {/* The interactive six-point rubric on the dark inverted band, two-column. */}
       <SectionShell full className="cw-art-score-section">
         <div className="cw-art-score-layout">
           <div className="cw-art-score-intro">
@@ -157,6 +166,9 @@ export default function SepticDesignPage() {
         </div>
       </SectionShell>
 
+      {/* Founder bio + pricing + FAQ (existing capsules, exact source content). */}
+      {service.made && <MadeByCapsule made={service.made} />}
+      <PriceCapsule price={service.price} ctaHref={service.cta.href} />
       <FaqCapsule
         faqs={service.faqs}
         faqLead={service.faqLead}
@@ -164,7 +176,27 @@ export default function SepticDesignPage() {
         scheme="inverted"
         schemeAuto
       />
+
+      {/* The real anti-agency email thread. */}
+      <SectionShell reveal={false} className="cw-art-voice-section">
+        <SepticVoicebox />
+      </SectionShell>
+
+      {/* Nine-step build process (bold timeline). */}
+      <ProcessCapsule
+        heading={service.approach.heading}
+        steps={service.approach.steps}
+        scheme="inverted"
+      />
+
+      {service.testimonials && (
+        <TestimonialsCapsule testimonials={service.testimonials} />
+      )}
+
       <CtaCapsule cta={service.cta} form={service.form} scheme="inverted" />
+
+      {/* Cross-industry network grid (full-bleed). */}
+      <SepticOthers />
     </PageComposer>
   );
 }
