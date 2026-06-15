@@ -30,7 +30,8 @@ export function MadeByCapsule({ made }: MadeByCapsuleProps) {
           <ul className="svc-made__manifesto">
             {made.manifesto.map((m, i) => (
               <li key={i}>
-                {m.lead} <span className="svc-made__aside">{m.aside}</span>
+                {`${m.lead} `}
+                <span className="svc-made__aside">{m.aside}</span>
               </li>
             ))}
           </ul>

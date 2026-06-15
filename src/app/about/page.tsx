@@ -9,11 +9,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL, ORG } from "@/lib/service";
-import { statementTone, CtaButton } from "@/components/ServiceTemplate";
-import { TitleReveal } from "@/components/art/TitleReveal";
-import { PageMotion } from "@/components/PageMotion";
-import { GrainField } from "@/components/GrainField";
-import { LeadForm } from "@/components/forms/LeadForm";
+import {
+  PageComposer,
+  HeroCapsule,
+  EraTimelineCapsule,
+  ProofCapsule,
+  ApproachCapsule,
+  MadeByCapsule,
+  QualificationCapsule,
+  CtaCapsule,
+} from "@/components/capsules";
 import type { LeadFormConfig } from "@/lib/forms";
 
 const PAGE_URL = `${SITE_URL}/about/`;
@@ -177,193 +182,95 @@ const FORM: LeadFormConfig = {
 
 export default function AboutPage() {
   return (
-    <>
-      <PageMotion />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+    <PageComposer jsonLd={[breadcrumbJsonLd, personJsonLd]}>
+      {/* HERO -- TitleReveal paints the brand color field through the
+          letterforms as the cursor crosses them. */}
+      <HeroCapsule
+        className="about-hero"
+        crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
+        eyebrow="The person behind chadworks"
+        title="Chad Lewine"
+        titleReveal="/about/reveal-art.svg"
+        lede="chadworks is one person. I'm Chad Lewine, designing since age 11 and custom-building websites for 20 years. There's no team behind a curtain and no account manager translating. The person you email is the person who writes the code."
+        cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
-      />
 
-      {/* HERO -- the only H1. TitleReveal paints the brand color field
-          through the letterforms as the cursor crosses them. */}
-      <section className="section svc-hero about-hero">
-        <nav className="svc-crumbs" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">About</span>
-        </nav>
-
-        <p className="eyebrow">The person behind chadworks</p>
-        <TitleReveal artImageUrl="/about/reveal-art.svg">
-          <h1 className="svc-hero__title">
-            <span className="text-gradient">Chad Lewine</span>
-          </h1>
-        </TitleReveal>
-        {/* Answer-first: quotable in the first 100 words. */}
-        <p className="svc-lede measure-prose">
-          chadworks is one person. I&apos;m Chad Lewine, designing since age 11
-          and custom-building websites for 20 years. There&apos;s no
-          team behind a curtain and no account manager translating. The person
-          you email is the person who writes the code.
-        </p>
-
-        <div className="svc-hero__cta">
-          <CtaButton href="/contact/" label="Start a conversation" />
-        </div>
-      </section>
-
-      {/* THE STORY -- era timeline on the statement-band arc (the engine is
-          called from ServiceTemplate; era labels ride the numeral slot). */}
-      <section className="section full svc-statements-intro reveal">
-        <h2 className="svc-statements__heading">The story, era by era</h2>
-      </section>
-      {ERAS.map((era, i) => {
-        const tone = statementTone(i, ERAS.length);
-        return (
-          <section
-            key={era.label}
-            className={`section full svc-statement about-era reveal${tone.onDark ? " svc-statement--ondark" : ""}`}
-            style={{ background: tone.bg, color: tone.onDark ? "var(--dark-text)" : undefined }}
-          >
-            <div className="svc-statement__row">
-              <span className="svc-statement__num" aria-hidden="true">
-                {era.label}
-              </span>
-              <p className="svc-statement__text">{era.text}</p>
-            </div>
-          </section>
-        );
-      })}
+      {/* THE STORY -- era timeline on the build-time band arc. */}
+      <EraTimelineCapsule heading="The story, era by era" eras={ERAS} />
 
       {/* PROOF -- concrete, linked, anonymized per the permission flags. */}
-      <section className="section svc-block reveal">
-        <h2 className="svc-block__heading svc-fill">What twenty years looks like</h2>
-        <ul className="svc-proof" style={{ "--svc-proof-cols": 2 } as React.CSSProperties}>
-          {PROOF.map((item) => (
-            <li key={item.href} className="svc-proof__item panel">
-              <p className="svc-proof__label">
-                <Link href={item.href} className="svc-proof__link">
-                  {item.label}
-                </Link>
-              </p>
-              <p className="svc-proof__detail">{item.detail}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ProofCapsule proof={{ heading: "What twenty years looks like", items: PROOF }} />
 
       {/* HOW I WORK -- the working principles, dark anchor. */}
-      <section className="section full svc-block svc-dark reveal">
-        <h2 className="svc-block__heading">How I work</h2>
-        <ol className="svc-steps" style={{ "--svc-cols": 2 } as React.CSSProperties}>
-          {HOW.map((step, i) => (
-            <li key={step.title} className="svc-step panel">
-              <span className="svc-step__num">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <h3 className="svc-step__title">{step.title}</h3>
-                <p className="svc-step__body">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <ApproachCapsule
+        scheme="inverted"
+        approach={{ heading: "How I work", steps: HOW }}
+      />
 
       {/* MADE-BY -- the made block, about edition. */}
-      <section className="section svc-block svc-made reveal">
-        <p className="eyebrow">The human</p>
-        <h2 className="svc-block__heading svc-made__heading">It&apos;s me, your web guy.</h2>
-        <div className="svc-made__grid">
-          <div className="svc-made__photo">
-            {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
-            <img src="/people/chad-cutout.webp" alt="Chad Lewine, the person behind chadworks" loading="lazy" />
-            <div className="svc-made__caption">
-              <span className="svc-made__caption-main">Yes, this is the whole company.</span>
-              <span className="svc-made__caption-sub">(That&apos;s the point.)</span>
-            </div>
-          </div>
-          <div className="svc-made__copy">
-            <p className="svc-made__intro">
-              Twenty years of building websites, and the part I&apos;d never
-              automate is this: when you email chadworks, you get me.
-            </p>
-            <ul className="svc-made__manifesto">
-              <li>
-                Designing since age 11. <span className="svc-made__aside">(Not a metaphor.)</span>
-              </li>
-              <li>
-                HTML since 8th grade. <span className="svc-made__aside">(Thanks, MySpace.)</span>
-              </li>
-              <li>
-                Paid client builds since 2008. <span className="svc-made__aside">(50+ engagements since 2019.)</span>
-              </li>
-              <li>
-                Every site custom built. <span className="svc-made__aside">(Including this one.)</span>
-              </li>
-            </ul>
-            <ul className="svc-made__negation">
-              <li><span className="svc-made__x" aria-hidden="true">&times;</span>No subcontractors.</li>
-              <li><span className="svc-made__x" aria-hidden="true">&times;</span>No offshore handoffs.</li>
-              <li><span className="svc-made__x" aria-hidden="true">&times;</span>No invented case studies.</li>
-              <li><span className="svc-made__x" aria-hidden="true">&times;</span>No pretending the process is polished when DNS won&apos;t propagate and dinner is late.</li>
-            </ul>
-            <p className="svc-made__close">
-              The web has reinvented itself a dozen times since I started. The
-              deal here never changed: you get the person, not a brand wrapper.
-            </p>
-            <p className="svc-made__sig">
-              Chad Lewine
-              <span className="svc-made__sig-meta">chadworks (designing since age 11)</span>
-            </p>
-          </div>
-        </div>
-      </section>
+      <MadeByCapsule
+        made={{
+          eyebrow: "The human",
+          heading: "It's me, your web guy.",
+          img: "/people/chad-cutout.webp",
+          imgAlt: "Chad Lewine, the person behind chadworks",
+          captionMain: "Yes, this is the whole company.",
+          captionSub: "(That's the point.)",
+          intro:
+            "Twenty years of building websites, and the part I'd never automate is this: when you email chadworks, you get me.",
+          manifesto: [
+            { lead: "Designing since age 11.", aside: "(Not a metaphor.)" },
+            { lead: "HTML since 8th grade.", aside: "(Thanks, MySpace.)" },
+            { lead: "Paid client builds since 2008.", aside: "(50+ engagements since 2019.)" },
+            { lead: "Every site custom built.", aside: "(Including this one.)" },
+          ],
+          negation: [
+            "No subcontractors.",
+            "No offshore handoffs.",
+            "No invented case studies.",
+            "No pretending the process is polished when DNS won't propagate and dinner is late.",
+          ],
+          close:
+            "The web has reinvented itself a dozen times since I started. The deal here never changed: you get the person, not a brand wrapper.",
+          sig: "Chad Lewine",
+          sigMeta: "chadworks (designing since age 11)",
+        }}
+      />
 
       {/* QUALIFICATION -- big-ticket posture on the grain band. */}
-      <section className="section full svc-block svc-qual-section reveal">
-        <GrainField />
-        <h2 className="svc-block__heading">Who I build for</h2>
-        <div className="svc-qual">
-          <div className="svc-qual__col svc-qual__col--fit panel">
-            <p className="svc-qual__label">This is for you if</p>
-            <ul className="svc-qual__list">
-              <li>You want what you want, and you&apos;d rather pay to have it built right than negotiate it down to almost.</li>
-              <li>You see the site and the visibility behind it as an investment that should return, not a cost to shrink.</li>
-            </ul>
-          </div>
-          <div className="svc-qual__col svc-qual__col--not panel">
-            <p className="svc-qual__label">Probably not if</p>
-            <ul className="svc-qual__list">
-              <li>The lowest number decides. I&apos;m not the cheapest, deliberately, and I&apos;d rather say that here than after a proposal.</li>
-              <li>You want a template with your logo dropped in. Plenty of builders do that, and I&apos;m not one of them.</li>
-            </ul>
-          </div>
-        </div>
-        <p className="about-qual-ps">
-          The numbers themselves are public. The{" "}
-          <Link href="/rates/">rates page</Link> lays them out in full, with the
-          math showing.
-        </p>
-      </section>
+      <QualificationCapsule
+        qualification={{
+          heading: "Who I build for",
+          fit: [
+            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost.",
+            "You see the site and the visibility behind it as an investment that should return, not a cost to shrink.",
+          ],
+          notFit: [
+            "The lowest number decides. I'm not the cheapest, deliberately, and I'd rather say that here than after a proposal.",
+            "You want a template with your logo dropped in. Plenty of builders do that, and I'm not one of them.",
+          ],
+        }}
+        footer={
+          <p className="about-qual-ps">
+            The numbers themselves are public. The{" "}
+            <Link href="/rates/">rates page</Link> lays them out in full, with the
+            math showing.
+          </p>
+        }
+      />
 
       {/* CTA -- dark band, copy left, the page's own form right. */}
-      <section className="section full band-dark svc-cta reveal">
-        <div className="svc-cta__panel">
-          <div className="svc-cta__split">
-            <div>
-              <h2 className="svc-cta__heading">Tell me what you&apos;re building</h2>
-              <p className="svc-cta__body">
-                Whatever it is, you&apos;ll get a straight answer from the person
-                who&apos;d actually do the work, usually within a day.
-              </p>
-            </div>
-            <LeadForm config={FORM} />
-          </div>
-        </div>
-      </section>
-    </>
+      <CtaCapsule
+        scheme="inverted"
+        form={FORM}
+        cta={{
+          heading: "Tell me what you're building",
+          body:
+            "Whatever it is, you'll get a straight answer from the person who'd actually do the work, usually within a day.",
+          buttonLabel: "",
+          href: "/contact/",
+        }}
+      />
+    </PageComposer>
   );
 }

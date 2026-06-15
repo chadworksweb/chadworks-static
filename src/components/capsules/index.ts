@@ -19,3 +19,5 @@ export { FaqCapsule } from "./FaqCapsule";
 export { AssuranceCapsule } from "./AssuranceCapsule";
 export { NextStepsCapsule } from "./NextStepsCapsule";
 export { CtaCapsule } from "./CtaCapsule";
+export { ContactCapsule } from "./ContactCapsule";
+export { EraTimelineCapsule } from "./EraTimelineCapsule";

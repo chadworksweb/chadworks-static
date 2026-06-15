@@ -7,6 +7,7 @@
 // Phase F derives "<Page> FAQs" by default (overridable) and inverts the
 // svc-fill wipe when the band is dark.
 
+import type { ReactNode } from "react";
 import type { Service, Writable } from "@/lib/service";
 import { isPrompt } from "@/lib/service";
 import type { Scheme } from "@/lib/capsule";
@@ -16,8 +17,17 @@ import { FaqAccordion } from "@/components/FaqAccordion";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
+// A themed group for the standalone /faqs/ layout (variant="groups"). Answers
+// are ReactNode (inline links allowed); the page builds the FAQPage schema from
+// its own plain-text twins.
+export type FaqGroup = {
+  theme: string;
+  lead: ReactNode;
+  items: { q: string; a: ReactNode }[];
+};
+
 export type FaqCapsuleProps = {
-  faqs: Service["faqs"];
+  faqs?: Service["faqs"];
   faqLead?: Writable;
   // The FAQ prefers the dark band but yields to rule 9: PageComposer demotes
   // `scheme` to "default" when the next present section is also inverted.
@@ -28,15 +38,52 @@ export type FaqCapsuleProps = {
   // FAQs"), cascading to every service page. An explicit `heading` overrides it.
   pageName?: string;
   heading?: React.ReactNode;
+  // variant="groups": the /faqs/ four-band layout (kicker + theme + accordion),
+  // each band alternating dark/light by index so two darks never stack (rule 9).
+  variant?: "single" | "groups";
+  groups?: FaqGroup[];
 };
 
 export function FaqCapsule({
-  faqs,
+  faqs = [],
   faqLead,
   scheme,
   pageName,
   heading,
+  variant = "single",
+  groups = [],
 }: FaqCapsuleProps) {
+  if (variant === "groups") {
+    return (
+      <>
+        {groups.map((group, gi) => {
+          const groupDark = gi % 2 === 0;
+          return (
+            <SectionShell
+              key={gi}
+              full
+              className="svc-block svc-faq-section"
+              trailingClassName={groupDark ? "svc-faq-section--dark" : undefined}
+            >
+              <div className="svc-faq__layout">
+                <div className="svc-faq__intro">
+                  <p className="cw-faq-group__kicker">
+                    {String(gi + 1).padStart(2, "0")}
+                  </p>
+                  <h2 className="svc-block__heading svc-fill">{group.theme}</h2>
+                  <p className="svc-faq__lead">{group.lead}</p>
+                </div>
+                <FaqAccordion
+                  items={group.items.map((f) => ({ q: f.q, a: f.a }))}
+                />
+              </div>
+            </SectionShell>
+          );
+        })}
+      </>
+    );
+  }
+
   const dark = isDarkScheme(scheme);
   const resolvedHeading =
     heading ?? (pageName ? `${pageName} FAQs` : "Questions, answered");

@@ -8,9 +8,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/service";
-import { CtaButton } from "@/components/ServiceTemplate";
-import { FaqAccordion } from "@/components/FaqAccordion";
-import { PageMotion } from "@/components/PageMotion";
+import {
+  PageComposer,
+  HeroCapsule,
+  FaqCapsule,
+  CtaCapsule,
+} from "@/components/capsules";
 
 const PAGE_URL = `${SITE_URL}/faqs/`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
@@ -280,65 +283,30 @@ const breadcrumbJsonLd = {
 
 export default function FaqsPage() {
   return (
-    <>
-      <PageMotion />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-
-      {/* HERO -- the only H1. Answer-first lede orients the page. */}
-      <section className="section svc-hero faqs-hero">
-        <nav className="svc-crumbs" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">FAQs</span>
-        </nav>
-
-        <p className="eyebrow">Questions, answered</p>
-        <h1 className="svc-hero__title">
-          <span className="text-gradient">Frequently asked questions</span>
-        </h1>
-        <p className="svc-lede measure-prose">
-          Everything people ask before hiring chadworks, grouped so you can jump
-          to what you came for: working together, what it costs, how the site
-          gets built, and getting found in search and AI.
-        </p>
-      </section>
+    <PageComposer jsonLd={[breadcrumbJsonLd, faqJsonLd]}>
+      <HeroCapsule
+        className="faqs-hero"
+        crumbs={[{ label: "Home", href: "/" }, { label: "FAQs" }]}
+        eyebrow="Questions, answered"
+        title="Frequently asked questions"
+        lede="Everything people ask before hiring chadworks, grouped so you can jump to what you came for: working together, what it costs, how the site gets built, and getting found in search and AI."
+      />
 
       {/* FOUR THEMED GROUPS -- each a full band; dark and light alternate by
-          index so no two dark sections ever stack (rule 9). The group before
-          the dark CTA lands light. Each group reuses the svc-faq layout
-          (sticky theme column left, accordion right). */}
-      {GROUPS.map((group, gi) => {
-        const dark = gi % 2 === 0;
-        return (
-          <section
-            key={group.theme}
-            className={`section full svc-block svc-faq-section reveal${dark ? " svc-faq-section--dark" : ""}`}
-          >
-            <div className="svc-faq__layout">
-              <div className="svc-faq__intro">
-                <p className="cw-faq-group__kicker">{String(gi + 1).padStart(2, "0")}</p>
-                <h2 className="svc-block__heading svc-fill">{group.theme}</h2>
-                <p className="svc-faq__lead">{group.lead}</p>
-              </div>
-              <FaqAccordion items={group.items.map((f) => ({ q: f.q, a: f.a }))} />
-            </div>
-          </section>
-        );
-      })}
+          index (inside the capsule) so no two dark sections ever stack (rule 9).
+          The last group lands light, ahead of the dark CTA. */}
+      <FaqCapsule variant="groups" groups={GROUPS} />
 
-      {/* CTA -- dark band. The group above it is light (group 4), so two dark
-          bands never stack. */}
-      <section className="section full band-dark svc-cta reveal">
-        <div className="svc-cta__panel">
-          <h2 className="svc-cta__heading">Still have a question?</h2>
-          <p className="svc-cta__body measure-prose">
-            Ask it directly and you will get the same straight answer, from the
-            person who would actually do the work, usually within a day.
-          </p>
-          <CtaButton href="/contact/" label="Ask Chad directly" />
-        </div>
-      </section>
-    </>
+      <CtaCapsule
+        scheme="inverted"
+        cta={{
+          heading: "Still have a question?",
+          body:
+            "Ask it directly and you will get the same straight answer, from the person who would actually do the work, usually within a day.",
+          buttonLabel: "Ask Chad directly",
+          href: "/contact/",
+        }}
+      />
+    </PageComposer>
   );
 }

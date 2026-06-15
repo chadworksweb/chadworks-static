@@ -6,11 +6,8 @@
 // Chad's public voice, real facts only. JSON-LD: ContactPage + BreadcrumbList.
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
-import { DualForm } from "@/components/forms/DualForm";
-import { ContactOrbs } from "@/components/art/ContactOrbs";
-import { PageMotion } from "@/components/PageMotion";
+import { PageComposer, HeroCapsule, ContactCapsule } from "@/components/capsules";
 import type { LeadFormConfig } from "@/lib/forms";
 
 const PAGE_URL = `${SITE_URL}/contact/`;
@@ -130,66 +127,26 @@ const breadcrumbJsonLd = {
 
 export default function ContactPage() {
   return (
-    <>
-      <PageMotion />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd) }} />
-
-      {/* HERO -- the only H1. Answer-first: what happens when you reach out. */}
-      <section className="section svc-hero contact-hero">
-        <nav className="svc-crumbs" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">Contact</span>
-        </nav>
-
-        <p className="eyebrow">Get in touch</p>
-        <h1 className="svc-hero__title">
-          <span className="text-gradient">Contact</span>
-        </h1>
-        <p className="svc-lede measure-prose">
-          Send a message and it reaches the person who would actually do the
-          work, not a queue. You get a straight answer on whether it fits and what
-          it would take, usually within a day.
-        </p>
-      </section>
-
-      {/* CONTACT BAND -- dark, with the CF glow orbs behind. Reach-direct copy
-          on the left, the rslgo dual form on the right. Only one dark section,
-          so no rule-9 adjacency to manage. */}
-      <section className="section full band-dark cw-contact reveal">
-        <ContactOrbs />
-        <div className="cw-contact__inner">
-          <div className="cw-contact__layout">
-            <div className="cw-contact__copy">
-              <h2 className="svc-cta__heading">Tell me about the project</h2>
-              <p className="cw-contact__note">
-                Two ways in. Email me directly, or use the form: quick if you
-                just want to start a conversation, detailed if you already know
-                the shape of the build. Both land in the same inbox.
-              </p>
-              <div>
-                <p className="cw-contact__email-label">Email directly</p>
-                <a className="cw-contact__email" href={`mailto:${EMAIL}`}>
-                  {EMAIL}
-                </a>
-              </div>
-              <p className="cw-contact__note">
-                Based in Pennsylvania, working with businesses across the country
-                and beyond. The work is remote, so where you are has never
-                decided whether it fits.
-              </p>
-            </div>
-
-            <DualForm
-              quick={QUICK}
-              detailed={DETAILED}
-              quickLabel="Quick message"
-              detailedLabel="Detailed inquiry"
-            />
-          </div>
-        </div>
-      </section>
-    </>
+    <PageComposer jsonLd={[breadcrumbJsonLd, contactPageJsonLd]}>
+      <HeroCapsule
+        className="contact-hero"
+        crumbs={[{ label: "Home", href: "/" }, { label: "Contact" }]}
+        eyebrow="Get in touch"
+        title="Contact"
+        lede="Send a message and it reaches the person who would actually do the work, not a queue. You get a straight answer on whether it fits and what it would take, usually within a day."
+      />
+      <ContactCapsule
+        scheme="inverted"
+        heading="Tell me about the project"
+        intro="Two ways in. Email me directly, or use the form: quick if you just want to start a conversation, detailed if you already know the shape of the build. Both land in the same inbox."
+        emailLabel="Email directly"
+        email={EMAIL}
+        locationNote="Based in Pennsylvania, working with businesses across the country and beyond. The work is remote, so where you are has never decided whether it fits."
+        quick={QUICK}
+        detailed={DETAILED}
+        quickLabel="Quick message"
+        detailedLabel="Detailed inquiry"
+      />
+    </PageComposer>
   );
 }

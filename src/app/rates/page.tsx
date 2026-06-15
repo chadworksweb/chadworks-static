@@ -6,13 +6,16 @@
 // JSON-LD: WebPage + FAQPage + BreadcrumbList.
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
-import { CtaButton } from "@/components/ServiceTemplate";
-import { FaqAccordion } from "@/components/FaqAccordion";
-import { PageMotion } from "@/components/PageMotion";
-import { GrainField } from "@/components/GrainField";
-import { LeadForm } from "@/components/forms/LeadForm";
+import {
+  PageComposer,
+  HeroCapsule,
+  PriceCapsule,
+  ApproachCapsule,
+  QualificationCapsule,
+  FaqCapsule,
+  CtaCapsule,
+} from "@/components/capsules";
 import type { LeadFormConfig } from "@/lib/forms";
 
 const PAGE_URL = `${SITE_URL}/rates/`;
@@ -184,143 +187,83 @@ const breadcrumbJsonLd = {
 
 export default function RatesPage() {
   return (
-    <>
-      <PageMotion />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+    <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd, faqJsonLd]}>
+      <HeroCapsule
+        className="rates-hero"
+        crumbs={[{ label: "Home", href: "/" }, { label: "Rates" }]}
+        eyebrow="What this costs"
+        title="Rates"
+        lede="Work bills at $315 an hour. The smallest engagement is $3,200, and most websites land near $6,200. Those are the real numbers, on the table before we start, because you should get to see the math before you decide anything."
+        cta={{ href: "/contact/", buttonLabel: "Get a straight answer" }}
+      />
 
-      {/* HERO -- the only H1. Answer-first: the real numbers in the first
-          100 words so an engine can lift them. */}
-      <section className="section svc-hero rates-hero">
-        <nav className="svc-crumbs" aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">Rates</span>
-        </nav>
+      {/* SHOW THE MATH -- the glass price panel + the show-the-math ledger. */}
+      <PriceCapsule
+        variant="ledger"
+        ledger={LEDGER}
+        panelClassName="rates-panel"
+        headingFill
+        ctaHref="/contact/"
+        ctaLabel="Get a real number"
+        price={{
+          heading: "The numbers, with the math showing",
+          figure: "$315 / hour",
+          figureSub: "Everything bills from one rate",
+          body:
+            "Every number below is that hourly rate times the hours the work honestly takes. Nothing is padded or buried, and no surprise line item waits for you at the end of the project.",
+          disclaimer: (
+            <>
+              <strong>One promise about the number:</strong>{" "}the quote you get is
+              scoped to what you actually want, and it does not climb once you are
+              committed. If the scope grows, we talk about it before the price
+              does.
+            </>
+          ),
+        }}
+      />
 
-        <p className="eyebrow">What this costs</p>
-        <h1 className="svc-hero__title">
-          <span className="text-gradient">Rates</span>
-        </h1>
-        <p className="svc-lede measure-prose">
-          Work bills at $315 an hour. The smallest engagement is $3,200, and
-          most websites land near $6,200. Those are the real numbers, on the
-          table before we start, because you should get to see the math before
-          you decide anything.
-        </p>
+      {/* WHAT THE NUMBER BUYS -- value framing on the dark anchor. */}
+      <ApproachCapsule
+        scheme="inverted"
+        approach={{ heading: "What the number actually buys", steps: BUYS }}
+      />
 
-        <div className="svc-hero__cta">
-          <CtaButton href="/contact/" label="Get a straight answer" />
-        </div>
-      </section>
+      {/* QUALIFICATION -- big-ticket posture on the grain band. */}
+      <QualificationCapsule
+        qualification={{
+          heading: "Whether the number fits",
+          fit: [
+            "You read a website as an investment that should return, and you would rather it be built right than built cheap.",
+            "You want the number on the table early, with the reasoning behind it, so you can decide with the full picture.",
+          ],
+          notFit: [
+            "The lowest bid is the thing that decides it. I am not the cheapest, deliberately, and I would rather tell you that now than after a proposal.",
+            "You need a template with a logo dropped in. That work exists, it costs less, and it is not what this rate is for.",
+          ],
+        }}
+      />
 
-      {/* SHOW THE MATH -- the glass price panel + the ledger. Scanning border
-          comes from .svc-pricing__panel; the ledger lays the real numbers in
-          aligned mono so the math is legible at a glance. */}
-      <section className="section full scheme-alternate svc-block svc-pricing reveal">
-        <h2 className="svc-block__heading svc-fill">The numbers, with the math showing</h2>
-        <div className="svc-pricing__panel rates-panel">
-          <div className="svc-pricing__price">$315 / hour</div>
-          <div className="svc-pricing__price-sub">Everything bills from one rate</div>
-          <p className="svc-pricing__copy">
-            Every number below is that hourly rate times the hours the work
-            honestly takes. Nothing is padded or buried, and no surprise line
-            item waits for you at the end of the project.
-          </p>
-
-          <dl className="rates-ledger">
-            {LEDGER.map((row) => (
-              <div key={row.num} className="rates-ledger__row">
-                <dt className="rates-ledger__label">{row.label}</dt>
-                <dd className="rates-ledger__num">{row.num}</dd>
-                <dd className="rates-ledger__note">{row.note}</dd>
-              </div>
-            ))}
-          </dl>
-
-          <p className="svc-pricing__disclaimer">
-            <strong>One promise about the number:</strong>{" "}the quote you get is
-            scoped to what you actually want, and it does not climb once you are
-            committed. If the scope grows, we talk about it before the price
-            does.
-          </p>
-          <CtaButton href="/contact/" label="Get a real number" />
-        </div>
-      </section>
-
-      {/* WHAT THE NUMBER BUYS -- value framing, dark anchor. Big-ticket
-          posture: lead with what the spend returns, never apologize for it. */}
-      <section className="section full svc-block svc-dark reveal">
-        <h2 className="svc-block__heading">What the number actually buys</h2>
-        <ol className="svc-steps" style={{ "--svc-cols": 2 } as React.CSSProperties}>
-          {BUYS.map((step, i) => (
-            <li key={step.title} className="svc-step panel">
-              <span className="svc-step__num">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <h3 className="svc-step__title">{step.title}</h3>
-                <p className="svc-step__body">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* QUALIFICATION -- big-ticket posture on the grain band. The honest
-          disqualifier for price-shoppers, stated plainly. */}
-      <section className="section full svc-block svc-qual-section reveal">
-        <GrainField />
-        <h2 className="svc-block__heading">Whether the number fits</h2>
-        <div className="svc-qual">
-          <div className="svc-qual__col svc-qual__col--fit panel">
-            <p className="svc-qual__label">This is for you if</p>
-            <ul className="svc-qual__list">
-              <li>You read a website as an investment that should return, and you would rather it be built right than built cheap.</li>
-              <li>You want the number on the table early, with the reasoning behind it, so you can decide with the full picture.</li>
-            </ul>
-          </div>
-          <div className="svc-qual__col svc-qual__col--not panel">
-            <p className="svc-qual__label">Probably not if</p>
-            <ul className="svc-qual__list">
-              <li>The lowest bid is the thing that decides it. I am not the cheapest, deliberately, and I would rather tell you that now than after a proposal.</li>
-              <li>You need a template with a logo dropped in. That work exists, it costs less, and it is not what this rate is for.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ -- the accordion, light (a dark CTA follows, so this stays light
-          to keep two inverted bands from stacking, rule 9). */}
-      <section className="section full svc-block svc-faq-section reveal">
-        <div className="svc-faq__layout">
-          <div className="svc-faq__intro">
-            <h2 className="svc-block__heading svc-fill">Questions about the money</h2>
-            <p className="svc-faq__lead">
-              The honest answers, including the ones most sites skip. If yours
-              is not here, ask it directly and you will get the same straight
-              read.
-            </p>
-          </div>
-          <FaqAccordion items={FAQS.map((f) => ({ q: f.q, a: f.a }))} />
-        </div>
-      </section>
+      {/* FAQ -- light (the dark CTA follows; PageComposer demotes it, rule 9). */}
+      <FaqCapsule
+        scheme="inverted"
+        schemeAuto
+        heading="Questions about the money"
+        faqLead="The honest answers, including the ones most sites skip. If yours is not here, ask it directly and you will get the same straight read."
+        faqs={FAQS}
+      />
 
       {/* CTA -- dark band, copy left, the page's own form right. */}
-      <section className="section full band-dark svc-cta reveal">
-        <div className="svc-cta__panel">
-          <div className="svc-cta__split">
-            <div>
-              <h2 className="svc-cta__heading">Want a number for your project?</h2>
-              <p className="svc-cta__body">
-                Tell me what you are building and roughly where you would like
-                the number to land. You will get a straight answer from the person
-                who would do the work, usually within a day.
-              </p>
-            </div>
-            <LeadForm config={FORM} />
-          </div>
-        </div>
-      </section>
-    </>
+      <CtaCapsule
+        scheme="inverted"
+        form={FORM}
+        cta={{
+          heading: "Want a number for your project?",
+          body:
+            "Tell me what you are building and roughly where you would like the number to land. You will get a straight answer from the person who would do the work, usually within a day.",
+          buttonLabel: "",
+          href: "/contact/",
+        }}
+      />
+    </PageComposer>
   );
 }
