@@ -7,6 +7,7 @@ export { HeroCapsule } from "./HeroCapsule";
 export { KeyFactsCapsule } from "./KeyFactsCapsule";
 export { ProblemCapsule, ProblemArtCapsule } from "./ProblemCapsule";
 export { ApproachCapsule } from "./ApproachCapsule";
+export { ProcessCapsule } from "./ProcessCapsule";
 export { PathsCapsule } from "./PathsCapsule";
 export { ProofCapsule } from "./ProofCapsule";
 export { PortfolioCapsule } from "./PortfolioCapsule";

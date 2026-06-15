@@ -979,6 +979,117 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-step__title { font-size: var(--text-lg); margin-bottom: var(--space-2xs); }
 .svc-step__body { color: var(--text-secondary); }
 
+/* =====================================================================
+   PROCESS CAPSULE -- the bold timeline (recreated from the live chadworks.co
+   "Website Design Process", rebranded to CWS tokens, rendered on the svc-dark
+   band). A vertical center line; cards alternate left/right; a numbered dot
+   marker sits ON the line; each card carries a mono "Step N" supertitle over a
+   bold title. Single-column (line on the left) on tablet/mobile.
+   ===================================================================== */
+.cw-process__intro { margin-bottom: var(--space-lg); }
+.cw-process__line {
+  position: relative;
+  list-style: none;
+  margin: var(--space-xl) 0 0;
+  padding: 0;
+}
+/* the center line */
+.cw-process__line::before {
+  content: "";
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    var(--grad-mid) 6%,
+    var(--accent) 94%,
+    transparent 100%
+  );
+}
+.cw-process__item {
+  position: relative;
+  width: 50%;
+  box-sizing: border-box;
+  padding-bottom: var(--space-lg);
+}
+.cw-process__item:last-child { padding-bottom: 0; }
+/* odd items on the left (text flush to the line), even on the right */
+.cw-process__item:nth-child(odd) {
+  margin-left: 0;
+  padding-right: calc(var(--space-lg) + 1.4rem);
+  text-align: right;
+}
+.cw-process__item:nth-child(even) {
+  margin-left: 50%;
+  padding-left: calc(var(--space-lg) + 1.4rem);
+}
+/* numbered dot, centered on the line */
+.cw-process__marker {
+  position: absolute;
+  top: 0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--dark-text);
+  background: linear-gradient(150deg, var(--grad-mid) 0%, var(--accent) 100%);
+  box-shadow: 0 0 0 6px rgba(36, 57, 137, 0.55), 0 6px 18px rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+.cw-process__item:nth-child(odd) .cw-process__marker {
+  right: -1.2rem;
+  transform: translateX(50%);
+}
+.cw-process__item:nth-child(even) .cw-process__marker {
+  left: -1.2rem;
+  transform: translateX(-50%);
+}
+.cw-process__card { padding: var(--space-md) var(--space-md); }
+.cw-process__step {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dark-muted);
+  margin-bottom: var(--space-2xs);
+}
+.cw-process__title {
+  font-size: var(--text-xl);
+  color: var(--dark-text);
+  line-height: var(--leading-snug);
+}
+.cw-process__body {
+  color: var(--dark-muted);
+  margin-top: var(--space-2xs);
+  line-height: var(--leading-body);
+}
+/* Tablet vertical + mobile: collapse to a single left rail. */
+@media (max-width: 900px) {
+  .cw-process__line::before { left: 1.2rem; transform: none; }
+  .cw-process__item,
+  .cw-process__item:nth-child(odd),
+  .cw-process__item:nth-child(even) {
+    width: 100%;
+    margin-left: 0;
+    text-align: left;
+    padding-left: calc(2.4rem + var(--space-md));
+    padding-right: 0;
+  }
+  .cw-process__item:nth-child(odd) .cw-process__marker,
+  .cw-process__item:nth-child(even) .cw-process__marker {
+    left: 1.2rem;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
 /* Paths -- funnel cards to sub-options (whole card is the link) */
 /* ASYMMETRIC HOVER LANES -- the septic lane chrome (industry_lane: glass
    surface, oversized faded numeral, 3px accent left border, staggered
