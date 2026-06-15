@@ -26,7 +26,7 @@ export const ORG = {
   sameAs: [] as string[],
 } as const;
 
-export type Lane = "websites" | "visibility";
+export type Lane = "websites" | "visibility" | "design";
 
 // ---------------------------------------------------------------------
 // WRITING PROMPTS -- "prompts only" authoring (ported from chadlewine).
