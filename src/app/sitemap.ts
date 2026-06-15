@@ -42,6 +42,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/switch/squarespace-to-static/",
     "/switch/wix-to-static/",
     "/switch/godaddy-to-static/",
+    // Design lane -- the absorbed niche pages (kept verbatim as works of art)
+    "/design/septic/",
+    "/design/foundation-repair/",
   ];
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,
