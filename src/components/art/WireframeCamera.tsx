@@ -295,6 +295,23 @@ export function WireframeCamera({
     };
     pillEls.forEach((p) => p.addEventListener("click", onPill));
 
+    // Skip ahead / go back -- jump past or before the hijack.
+    const skipBtn = hijack.querySelector<HTMLButtonElement>("[data-wf-skip]");
+    const backBtn = hijack.querySelector<HTMLButtonElement>("[data-wf-back]");
+    const onSkip = () => {
+      const rect = hijack!.getBoundingClientRect();
+      const target =
+        window.scrollY + rect.top + hijack!.offsetHeight - window.innerHeight * 0.1;
+      window.scrollTo({ top: target, behavior: "smooth" });
+    };
+    const onBack = () => {
+      const rect = hijack!.getBoundingClientRect();
+      const target = window.scrollY + rect.top - 120;
+      window.scrollTo({ top: target, behavior: "smooth" });
+    };
+    skipBtn?.addEventListener("click", onSkip);
+    backBtn?.addEventListener("click", onBack);
+
     reset();
 
     return () => {
@@ -302,6 +319,8 @@ export function WireframeCamera({
       window.removeEventListener("scroll", onScrollMobile);
       window.removeEventListener("resize", reset);
       pillEls.forEach((p) => p.removeEventListener("click", onPill));
+      skipBtn?.removeEventListener("click", onSkip);
+      backBtn?.removeEventListener("click", onBack);
       if (rafId) cancelAnimationFrame(rafId);
       if (mobileRaf) cancelAnimationFrame(mobileRaf);
     };
@@ -396,6 +415,14 @@ export function WireframeCamera({
             <span className="cw-wfcam__progress">
               <strong ref={progressRef}>1</strong> / {sections.length}
             </span>
+            <div className="cw-wfcam__nav">
+              <button className="cw-wfcam__skip" data-wf-back type="button">
+                &uarr; Go back
+              </button>
+              <button className="cw-wfcam__skip" data-wf-skip type="button">
+                Skip ahead &darr;
+              </button>
+            </div>
           </div>
         </div>
       </div>

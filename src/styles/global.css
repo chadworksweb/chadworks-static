@@ -4275,3 +4275,78 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-compare__cell--lose::before { content: "\00d7  "; color: #c0496b; font-weight: 700; }
 .cw-art-compare__cell--win::before { content: "\2713  "; color: #2f8f5b; font-weight: 700; }
 @media (max-width: 600px) { .cw-art-compare__cell, .cw-art-compare__head { padding: 0.7rem 0.8rem; font-size: 0.85rem; } }
+
+/* =====================================================================
+   Septic review fixes (Chad, 2026-06-15): restore the source's inverted /
+   gradient section bands, the camera skip/back buttons, and the 2-column
+   inspect-quiz layout. Reskinned to global tokens.
+   ===================================================================== */
+
+/* ----- camera skip / back buttons (reskin of industry_wf_skip) ----- */
+.cw-wfcam__nav { display: flex; gap: 0.5rem; margin-left: auto; }
+.cw-wfcam__skip {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 0.55rem 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease-smooth), color 0.25s var(--ease-smooth), background 0.25s var(--ease-smooth);
+}
+.cw-wfcam__skip:hover { border-color: var(--accent); color: var(--accent); background: rgba(128, 84, 188, 0.06); }
+@media (max-width: 900px) { .cw-wfcam__nav { width: 100%; justify-content: center; margin-left: 0; } }
+
+/* ----- methods section: dark -> white gradient band behind the intro ----- */
+.cw-art-methods-section.section {
+  background: linear-gradient(
+    to bottom,
+    #1f1727 0,
+    var(--dark-bg) 12rem,
+    var(--grad-mid) 22rem,
+    var(--bg-base) 32rem,
+    var(--bg-base) 100%
+  );
+  border-block: 1px solid var(--border-subtle);
+}
+/* the intro sits on the dark band -> light text */
+.cw-art-methods-section .cw-art-methods-eyebrow { color: #e5d2f4; }
+.cw-art-methods-section .cw-art-methods-heading { color: #ede7f6; }
+.cw-art-methods-section .cw-art-methods-lead { color: #e5d2f4; }
+
+/* ----- compare section: diagonal indigo -> lavender gradient band ----- */
+.cw-art-compare-section.section {
+  background: linear-gradient(105deg, #1a1330 0%, var(--dark-bg) 30%, var(--grad-mid) 50%, var(--bg-surface) 75%, var(--bg-base) 100%);
+}
+.cw-art-compare-section .cw-art-section__heading { color: #ede7f6; max-width: 22ch; }
+
+/* ----- inspect quiz: full dark inverted band + 2-column layout ----- */
+.cw-art-score-section.section {
+  background: linear-gradient(135deg, #1f1727 0%, var(--dark-bg) 100%);
+  color: #ffffff;
+  overflow: clip;
+}
+.cw-art-score-layout { display: grid; grid-template-columns: 1fr 2fr; gap: clamp(2rem, 4vw, 3.5rem); align-items: start; }
+@media (max-width: 900px) { .cw-art-score-layout { grid-template-columns: 1fr; } }
+.cw-art-score-section .cw-art-section__eyebrow { color: #c9b6e8; }
+.cw-art-score-section .cw-art-section__heading { color: #ffffff; }
+.cw-art-score-help { font-size: 1.05rem; line-height: 1.7; color: #e5d2f4; margin: 0; }
+
+/* Scorecard, adapted to the dark band */
+.cw-art-score-section .cw-score__label { color: rgba(229, 210, 244, 0.70); }
+.cw-art-score-section .cw-score__title { color: #ffffff; }
+.cw-art-score-section .cw-score__reset { color: rgba(229, 210, 244, 0.75); border-color: rgba(229, 210, 244, 0.22); }
+.cw-art-score-section .cw-score__reset:hover { color: #fff; border-color: rgba(229, 210, 244, 0.5); }
+.cw-art-score-section .cw-score__item { background: rgba(255, 255, 255, 0.04); border-color: rgba(229, 210, 244, 0.16); }
+.cw-art-score-section .cw-score__item:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(229, 210, 244, 0.30); }
+.cw-art-score-section .cw-score__item[aria-pressed="true"] { background: rgba(128, 84, 188, 0.22); border-color: var(--accent); }
+.cw-art-score-section .cw-score__criterion strong { color: #ffffff; }
+.cw-art-score-section .cw-score__criterion small { color: rgba(229, 210, 244, 0.62); }
+.cw-art-score-section .cw-score__total { border-top-color: rgba(229, 210, 244, 0.18); }
+.cw-art-score-section .cw-score__total-label { color: rgba(229, 210, 244, 0.70); }
+.cw-art-score-section .cw-score__total-num { color: #ffffff; }
+.cw-art-score-section .cw-score__verdict { color: #e5d2f4; }

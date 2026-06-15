@@ -75,7 +75,7 @@ export default function SepticDesignPage() {
 
       {/* The "what goes into your site" walkthrough. ch03 (Wireframe) is the
           camera teardown; the other chapters are the reproduced blocks. */}
-      <SectionShell reveal={false} className="cw-art-methods-section">
+      <SectionShell full reveal={false} className="cw-art-methods-section">
         <SepticMethodsIntro />
         <SepticServicesChapter />
         <SepticSitemapChapter />
@@ -116,7 +116,7 @@ export default function SepticDesignPage() {
       <SepticVisibility />
 
       {/* Passes vs fails inspection */}
-      <SectionShell className="cw-art-section">
+      <SectionShell full className="cw-art-section cw-art-compare-section">
         <h2 className="cw-art-section__heading">
           How your septic services website passes inspection vs. fails it.
         </h2>
@@ -141,10 +141,20 @@ export default function SepticDesignPage() {
         <PortfolioCapsule portfolio={service.portfolio} slug={service.slug} />
       )}
 
-      {/* The interactive six-point rubric (reuses the Scorecard config). */}
-      <SectionShell className="cw-art-section">
-        <h2 className="cw-art-section__heading">Inspect your current site.</h2>
-        {service.problemArt}
+      {/* The interactive six-point rubric (reuses the Scorecard config),
+          on the source's dark inverted band, two-column. */}
+      <SectionShell full className="cw-art-score-section">
+        <div className="cw-art-score-layout">
+          <div className="cw-art-score-intro">
+            <span className="cw-art-section__eyebrow">Inspect your own site</span>
+            <h2 className="cw-art-section__heading">Inspect your current site.</h2>
+            <p className="cw-art-score-help">
+              Tap each row that applies to your site. Your score and verdict
+              update as you go.
+            </p>
+          </div>
+          <div className="cw-art-score-calc">{service.problemArt}</div>
+        </div>
       </SectionShell>
 
       <FaqCapsule
