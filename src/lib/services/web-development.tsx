@@ -59,19 +59,19 @@ export const webDevelopment: Service = {
       trigger: "More reasons it matters",
       paragraphs: [
         <>
-          <strong>Speed</strong> is the obvious one. A slow site loses people
+          <strong>Speed</strong>{" "}is the obvious one. A slow site loses people
           before the design ever gets a chance to work on them, and search
           engines notice the same thing your visitors do. The code underneath
           decides that, not the colors.
         </>,
         <>
-          <strong>Visibility</strong> is the quieter one. Search engines and
+          <strong>Visibility</strong>{" "}is the quieter one. Search engines and
           the AI tools people now ask for recommendations don&apos;t see your
           site the way you do. They read the structure under it. Clean markup
           gets found and quoted, while page-builder tangle gets skipped.
         </>,
         <>
-          <strong>Stability</strong> is the one you find out about later. A
+          <strong>Stability</strong>{" "}is the one you find out about later. A
           custom-coded site and a page-builder site can look exactly the same
           on day one. The difference shows up after that. One stays fast and
           costs almost nothing to run. The other gets slower and more expensive
@@ -191,7 +191,7 @@ export const webDevelopment: Service = {
   cta: {
     heading: "Not sure which way to build?",
     body:
-      "Tell me what you're building toward and where your current site is letting you down. I'll give you an honest read on the best way to build it and what the work would really take, before either of us commits to anything.",
+      "Tell me what you're building toward and where your current site is letting you down. I'll give you a straight answer on the best way to build it and what the work would really take, before either of us commits to anything.",
     buttonLabel: "Tell me about your project",
     href: "/contact/",
   },
@@ -254,7 +254,7 @@ export const webDevelopment: Service = {
     items: [
       "You own the code and the hosting outright -- nothing of yours is ever locked inside my account.",
       "Every build includes two weeks of free bug fixes after launch.",
-      "I give you an honest read on fit before either of us commits to anything.",
+      "I give you a straight answer on fit before either of us commits to anything.",
       "You get the working files handed over, no lock-in, nothing held hostage.",
     ],
   },
@@ -267,7 +267,7 @@ export const webDevelopment: Service = {
         body: "Tell me what you're building toward through the contact form or a quick email. I usually reply within a day.",
       },
       {
-        title: "An honest read",
+        title: "A straight answer",
         body: "I'll tell you straight whether chadworks is the right fit, with a rough shape and cost, and no pressure either way.",
       },
       {
