@@ -27,6 +27,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/seo/",
     "/digital-marketing/",
     "/email-marketing/",
+    // ChatGPT ports (own flat pages at their old URLs)
+    "/show-up-on-chatgpt/",
+    "/advertising-on-chatgpt/",
     // Standalone pages
     "/about/",
     "/rates/",
