@@ -18,7 +18,7 @@
 //   LEGAL: before any "looks like WordPress / WP Engine" visual mimicry in ads,
 //   check advertising / trademark IP law first (Chad flagged this 2026-05-28).
 
-import { type Service, prompt } from "@/lib/service";
+import { type Service } from "@/lib/service";
 
 export const leaveWordpress: Service = {
   slug: "switch/leave-wordpress",
@@ -29,11 +29,10 @@ export const leaveWordpress: Service = {
   intent:
     "chadworks rebuilds WordPress sites that just sit there as fast, secure static sites and hosts them for less, for businesses near Philadelphia that pay for a CMS they almost never touch.",
 
-  // Answer-first lede. PROMPT: Chad's hooks verbatim so the voice stays his.
-  answer: prompt(
-    "Answer-first lede (Chad's voice)",
-    "Open with the flip from the emails: \"Does your site just sit there? Well, let it sit there for less.\" The argument: most small-business sites get picked on WordPress for features (edit-it-yourself, page builders) the owner never actually uses, and now that AI makes a clean static rebuild cheap and fast, there is no reason to keep paying for that bloat. You keep the site you have and leave the overhead. Quotable in the first 100 words. First-person, warm. Name the entity (WordPress) and answer the question (why leave, what you get) up front for GEO.",
-  ),
+  // Answer-first lede: names WordPress + answers why-leave / what-you-get in
+  // the first 100 words (GEO), in Chad's warm first-person.
+  answer:
+    "Does your site just sit there? Then let it sit there for less. Most small businesses pick WordPress for a feature they're sure they'll use, editing the site themselves whenever they want, and then almost never do. You keep paying for that engine every month regardless. Now that a clean static rebuild is fast and affordable, there's no reason to keep renting it. I rebuild your WordPress site as fast, secure static pages on the same domain, with the same look and the same words you already have, and host it for about ten dollars a month less. You keep the site. You just stop paying for the parts you never touch.",
 
   keyFactsHeading: "Leaving WordPress, at a glance",
   keyFacts: [
@@ -52,18 +51,9 @@ export const leaveWordpress: Service = {
     more: {
       trigger: "Why it keeps costing more",
       paragraphs: [
-        prompt(
-          "The 'feature you never use' argument",
-          "Chad's email, near-verbatim: paying for a site you can edit yourself but you really never touch, that extra feature is costing you $100, maybe a few hundred, sometimes over a thousand dollars a year, for a feature you never use. I can make those changes for you in a split second for a fraction of the cost of a retainer.",
-        ),
-        prompt(
-          "Why WordPress gets heavier and pricier",
-          "Expand on bloat and rising cost: WordPress carries plugins, page builders, a database, and a constant update cycle, all of which need hosting muscle, maintenance, and security patching. That is why WP hosting prices keep climbing. A static site drops all of it. Now that AI makes the rebuild cheap, the math finally flips for businesses that do not need a CMS.",
-        ),
-        prompt(
-          "The reassurance: you don't lose anything",
-          "Address the obvious fear: leaving WordPress does not mean losing your site or starting over. I rebuild what you have as a static site, same look, same content, same domain, and you just stop paying for the engine you never ran. And if you do need edits, I handle them faster and cheaper than a retainer.",
-        ),
+        "Here's the part that stings once you see it. You're paying for the ability to edit the site yourself, and you almost never do. That one feature can run anywhere from a hundred dollars a year to well over a thousand, depending on your host, for something you don't touch. When you do need a change, I make it for you in a few minutes, at a fraction of what a monthly retainer costs.",
+        "WordPress is never just WordPress. Underneath it sits a stack of plugins, a page builder, a database, and a never-ending update cycle, and all of it needs hosting muscle and steady security patching to stay safe. That is why WordPress hosting costs a little more every year. A static site drops the whole apparatus. Now that a rebuild is fast and affordable, the math finally tips for the many businesses that never needed a CMS in the first place.",
+        "And leaving WordPress doesn't mean losing your site or starting from a blank page. I rebuild exactly what you have, the same look and the same words, sitting on the same domain. The only thing that disappears is the engine you were never really running. If an edit comes up later, you send it to me and it's handled, faster and cheaper than any retainer.",
       ],
     },
   },
@@ -89,7 +79,7 @@ export const leaveWordpress: Service = {
       {
         title: "Need a change later? You just ask me",
         body:
-          "When you want a tweak or a new page down the road, you message me and I handle it, usually fast and for a fraction of what a maintenance retainer would have cost. You get the result without paying every month for a dashboard you never open.",
+          "When you want a tweak or a new page down the road, you message me and I handle it, usually fast and for a fraction of the cost of a standing monthly maintenance retainer.",
       },
     ],
   },
@@ -97,7 +87,7 @@ export const leaveWordpress: Service = {
   paths: {
     heading: "Where this leads",
     intro:
-      "Leaving WordPress lands you on a static build. If you want the full picture of what that actually is, start here.",
+      "Leaving WordPress lands you on a static build. If you want the full picture of what that actually is and why it tends to win, start with the custom-coded route below.",
     items: [
       {
         label: "Custom Coded / Static",
@@ -125,21 +115,16 @@ export const leaveWordpress: Service = {
       },
       {
         label: "A real before-and-after",
-        detail: prompt(
-          "Speed / cost proof point",
-          "Add a concrete before-and-after once we have one: a real WordPress site rebuilt static, with the load-time drop, the monthly-cost drop, and the security surface that disappeared. Use a real client number, no vague claims (GEO checklist: proof not promises).",
-        ),
+        detail:
+          "A documented before-and-after is on the way. The first WordPress-to-static rebuild I publish here will carry the real numbers, how much faster the site loads and how much the monthly bill dropped, instead of a vague promise. Until that client case is live, I would rather show you nothing than show you something invented.",
       },
     ],
   },
 
   price: {
     heading: "What hosting costs after you leave",
-    // PROMPT: pricing posture in Chad's voice; the numbers are fixed in the brief.
-    body: prompt(
-      "Static hosting pricing posture",
-      "State it plainly in Chad's voice: static hosting is $20 a month, about $10 less than the typical $30 WordPress host, with no update cycle and security included because there is simply less that can break. Non-profits and tight-budget organizations pay $10 a month. Contrast it with the WordPress feature-you-never-use premium. Keep the chadworks honesty posture: if you really do live in your CMS, I will tell you to stay. Note that the one-time rebuild is quoted separately on the rates page; this number is the ongoing hosting.",
-    ),
+    body:
+      "Static hosting through chadworks is $20 a month. The typical WordPress host runs around $30, so leaving puts roughly $10 back in your pocket every month, for a site that also loads faster and has far less that can break. There is no update cycle to keep up with, and security comes built in because there is so little surface left to attack. Non-profits and tight-budget organizations pay $10 a month. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat stands: if you truly live inside your CMS and publish all the time, I'll tell you to keep it.",
   },
 
   qualification: {
@@ -177,19 +162,14 @@ export const leaveWordpress: Service = {
     },
     {
       q: "Do you only work with local businesses?",
-      a: prompt(
-        "Local Philadelphia positioning",
-        "Chad's angle: I am local and I stay within about 50 miles of Philadelphia, in PA. Decide how hard to gate this. The local-trust angle is a selling point for the outreach campaign, but we may still take a good remote fit. Phrase it warmly, in Chad's voice.",
-      ),
+      a: "I'm based near Philadelphia, and a lot of this work is local on purpose. There's a real trust in hiring someone in your own area who actually picks up the phone. That said, the work itself is remote-friendly, so if you're further out and it's a good fit, I'm not going to turn you away over a map. Reach out and we'll figure it out.",
     },
   ],
 
   cta: {
     heading: "Let your site sit there for less",
-    body: prompt(
-      "CTA body (local + low-friction)",
-      "Close in Chad's voice: invite them to send the URL of their current WordPress site for a quick, no-pressure read on whether leaving makes sense and what they would save each month. Lean on the local Philadelphia angle. Reassure them that if they genuinely use WordPress, I will tell them to stay.",
-    ),
+    body:
+      "Send me the address of your current WordPress site and I'll take a quick look, no pressure, and tell you whether leaving actually makes sense and what you'd save each month. I'm right here near Philadelphia if you'd rather work with someone local. And if it turns out you really do use WordPress, I'll be the first to tell you to stay put.",
     buttonLabel: "See what you'd save",
     href: "/contact/",
   },

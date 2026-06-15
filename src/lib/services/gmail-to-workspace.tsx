@@ -13,7 +13,7 @@
 // domain DNS, and depending on their security setup, a few REAL-TIME 2FA codes
 // traded during the session. Surfaced honestly in the approach and an FAQ.
 
-import { type Service, prompt } from "@/lib/service";
+import { type Service } from "@/lib/service";
 
 export const gmailToWorkspace: Service = {
   slug: "switch/gmail-to-workspace",
@@ -24,11 +24,10 @@ export const gmailToWorkspace: Service = {
   intent:
     "chadworks moves businesses off a free @gmail.com address onto Google Workspace, so their email reads you@yourdomain.com inside the exact same Gmail interface.",
 
-  // Answer-first lede. PROMPT: Chad's hooks verbatim so the voice stays his.
-  answer: prompt(
-    "Answer-first lede (Chad's voice)",
-    "Open with Chad's hook: \"Using a Gmail for your business? Bad look.\" Then the reveal: did you know you can use your own domain name, you@yourdomain.com, inside the Gmail interface you already know? It is the exact same product, just your real, branded email address, and it is less than $10 a month. Quotable in the first 100 words. First-person, warm. Name the entities (Gmail, Google Workspace) and answer the question (what you get, what it costs) up front for GEO.",
-  ),
+  // Answer-first lede: names Gmail + Google Workspace and answers
+  // what-you-get / what-it-costs in the first 100 words (GEO), Chad's voice.
+  answer:
+    "Using a free Gmail for your business? It's a bad look, and a fixable one. Here's what most people don't realize: you can put your own domain on your email, you@yourdomain.com, inside the exact same Gmail you already use every day. That is all Google Workspace is. Same inbox, same app, same everything, with your real business name on the address instead of @gmail.com. It runs under ten dollars a month, paid to Google, and I set the whole thing up for you for a flat $300. Nothing new to learn, just a more credible name on every email you send.",
 
   keyFactsHeading: "Gmail to Workspace, at a glance",
   keyFacts: [
@@ -47,18 +46,9 @@ export const gmailToWorkspace: Service = {
     more: {
       trigger: "Why the address matters",
       paragraphs: [
-        prompt(
-          "The 'bad look' argument",
-          "Chad's angle, near-verbatim: using a Gmail for your business is a bad look. A free @gmail.com, or worse an old AOL or Yahoo or Comcast address, signals amateur before the customer reads a word. A you@yourdomain.com address signals a real, established business, for less than $10 a month.",
-        ),
-        prompt(
-          "Same product, no learning curve",
-          "Reassure: this is not switching to some unfamiliar email system. Google Workspace IS Gmail, the identical interface, app, and features, just branded to your domain. Nothing to relearn. The only thing that changes is the name on your email.",
-        ),
-        prompt(
-          "Cheap and done-for-you",
-          "Close the loop: a branded address is surprisingly cheap, under $10 a month to Google, and the only real hurdle, the setup, is the part I handle for you. You end up looking more professional without lifting a finger or learning a thing.",
-        ),
+        "Using a free Gmail for your business is a bad look, plain and simple, and an old AOL or Yahoo address is worse. Before a customer reads a single word you've written, the name on your email has already told them whether you bothered to set up the basics. A you@yourdomain.com address quietly says the opposite: a real, established business that has its act together, for less than ten dollars a month.",
+        "And this isn't a switch to some unfamiliar email system you'll have to relearn. Google Workspace is Gmail. The same inbox and the same app on your phone, with every shortcut and label you already lean on. The single thing that changes is the address people see when you email them, so everything else stays exactly where you already keep it today.",
+        "The best part is how little it asks of you. The address itself is cheap, under ten dollars a month to Google, and the one genuinely fiddly part, the setup, is the part I handle start to finish. You end up looking more professional to every customer without lifting a finger or learning a thing.",
       ],
     },
   },
@@ -138,10 +128,7 @@ export const gmailToWorkspace: Service = {
     },
     {
       q: "Will I lose my old emails and contacts?",
-      a: prompt(
-        "Migration / data-safety answer",
-        "Answer honestly in Chad's voice: clarify what carries over. Existing mail and contacts can generally be migrated into Workspace, but confirm the exact path for the client's current setup (Gmail import vs another provider) before promising. Keep it reassuring without overstating.",
-      ),
+      a: "In most cases, no, your existing mail and contacts come with you. Google has tools to import from a regular Gmail account, and other providers usually have a path too. The exact route depends on where your email lives today, so I confirm what will carry over for your specific setup before we start, rather than promising blind. You will not be left starting from an empty inbox.",
     },
     {
       q: "Do you need access to my accounts?",
@@ -149,19 +136,14 @@ export const gmailToWorkspace: Service = {
     },
     {
       q: "Can you use my existing domain, or do I need a new one?",
-      a: prompt(
-        "Domain ownership answer",
-        "Cover both cases in Chad's voice: if you already own a domain, we use it. If you do not have one yet, note whether chadworks registers it for you or points you to it, and any cost. Confirm Chad's preferred handling before finalizing.",
-      ),
+      a: "Either works. If you already own a domain, that is the one we put on your email. If you don't have one yet, it is an easy and inexpensive thing to sort out, usually only ten to twenty dollars a year through a registrar, and I'll help you choose the right one and get it pointed where it needs to go. You won't be left to figure out the technical side alone.",
     },
   ],
 
   cta: {
     heading: "Put your real name on your email",
-    body: prompt(
-      "CTA body (low-friction)",
-      "Close in Chad's voice: invite them to reach out to get switched onto a branded you@yourdomain.com address. Reinforce that it is the same Gmail, a flat $300 to set up, and that I handle the technical part. Keep it warm and low-pressure.",
-    ),
+    body:
+      "Ready to put your real name on your email? Reach out and I'll get you switched over to a branded you@yourdomain.com address. It is the same Gmail you already use, a flat $300 for me to set up, and I handle the entire technical side so you don't have to. No pressure on the way in, just a more credible inbox waiting for you on the other end.",
     buttonLabel: "Get a branded email",
     href: "/contact/",
   },

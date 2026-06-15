@@ -22,12 +22,17 @@
 - [Digital Marketing](https://chadworks.co/digital-marketing/): Honest channel triage: which channels a business actually needs, with access to OpenAI's ChatGPT advertising beta.
 - [Email Marketing](https://chadworks.co/email-marketing/): The channel you own: clean lists, real segments, restrained cadence. Mailchimp is free up to 500 contacts, and clients hear when free is all they need.
 
+## Switch
+
+- [Leave WordPress](https://chadworks.co/switch/leave-wordpress/): Rebuild a WordPress site that just sits there as fast, secure static pages on the same domain. Static hosting is $20 a month (about $10 less than a typical WordPress host), $10 for non-profits. Local-lead near Philadelphia, remote-friendly.
+- [Gmail to Google Workspace](https://chadworks.co/switch/gmail-to-workspace/): Move off a free @gmail.com onto a branded you@yourdomain.com inside the same Gmail interface. Google Workspace runs under $10 a month per user; chadworks sets it up for a flat $300 (training and signature included), $25 per additional mailbox.
+
 ## About
 
 - [About Chad Lewine](https://chadworks.co/about/): The person behind chadworks: one person who designs the site and writes the code, era by era from MySpace-taught HTML to clients named in AI answers.
 - [Rates](https://chadworks.co/rates/): The real numbers with the math showing. Work bills at $315/hour; the smallest engagement is $3,200; most websites land near $6,200; WordPress care runs $550 every 6 months. Value-based, not the cheapest, deliberately.
 - [FAQs](https://chadworks.co/faqs/): Straight answers in four groups: working together, what it costs, how the site gets built and owned, and getting found in classic search and AI assistants (with the real AI Overview and AI-answer precedents).
-- [Contact](https://chadworks.co/contact/): Reach Chad Lewine directly. Email chad@chadworks.co or send the form (quick or detailed). It goes to the person who does the work, with an honest read back within a day. Remote, based in Pennsylvania.
+- [Contact](https://chadworks.co/contact/): Reach Chad Lewine directly. Email chad@chadworks.co or send the form (quick or detailed). It goes to the person who does the work, with a straight answer back within a day. Remote, based in Pennsylvania.
 - Founder: Chad Lewine. Twenty years custom-building websites; designing since age 11.
 - Track record: 50+ client engagements from 2019 through 2025, on top of the decade before them.
 - Posture: value-based pricing ($315/hr, $3,200 floor). Not the cheapest option, deliberately.
