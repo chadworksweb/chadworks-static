@@ -1,0 +1,20 @@
+// Barrel export for the global capsule layer. Pages import capsules from here;
+// composeService (lib/compose) places the canonical service order.
+export { SectionShell } from "./SectionShell";
+export { PageComposer, JsonLd } from "./PageComposer";
+export { W, ArrowRight, CheckIcon, CtaButton } from "./shared";
+export { HeroCapsule } from "./HeroCapsule";
+export { KeyFactsCapsule } from "./KeyFactsCapsule";
+export { ProblemCapsule, ProblemArtCapsule } from "./ProblemCapsule";
+export { ApproachCapsule } from "./ApproachCapsule";
+export { PathsCapsule } from "./PathsCapsule";
+export { ProofCapsule } from "./ProofCapsule";
+export { PortfolioCapsule } from "./PortfolioCapsule";
+export { TestimonialsCapsule } from "./TestimonialsCapsule";
+export { MadeByCapsule } from "./MadeByCapsule";
+export { PriceCapsule } from "./PriceCapsule";
+export { QualificationCapsule } from "./QualificationCapsule";
+export { FaqCapsule } from "./FaqCapsule";
+export { AssuranceCapsule } from "./AssuranceCapsule";
+export { NextStepsCapsule } from "./NextStepsCapsule";
+export { CtaCapsule } from "./CtaCapsule";
