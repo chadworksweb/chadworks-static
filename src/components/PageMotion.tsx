@@ -13,26 +13,34 @@ export function PageMotion() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // --- scroll reveal ---
-    const revealEls = Array.from(
-      document.querySelectorAll<HTMLElement>(".reveal")
-    );
-    let io: IntersectionObserver | null = null;
-    if (reduce) {
-      revealEls.forEach((el) => el.classList.add("is-visible"));
-    } else {
-      io = new IntersectionObserver(
-        (entries, obs) => {
+    // Two triggers share one `.is-visible` toggle:
+    //   .reveal       -- fires as the element just enters (rootMargin -8%).
+    //   .reveal-late  -- waits until the element is well up the viewport
+    //                    (rootMargin -32%), so a longer glide is seen mid-screen
+    //                    rather than down at the fold. Used by the process cards.
+    const observers: IntersectionObserver[] = [];
+    const setupReveal = (selector: string, rootMargin: string) => {
+      const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
+      if (reduce) {
+        els.forEach((el) => el.classList.add("is-visible"));
+        return;
+      }
+      const obs = new IntersectionObserver(
+        (entries, o) => {
           entries.forEach((e) => {
             if (e.isIntersecting) {
               e.target.classList.add("is-visible");
-              obs.unobserve(e.target);
+              o.unobserve(e.target);
             }
           });
         },
-        { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
+        { threshold: 0.12, rootMargin }
       );
-      revealEls.forEach((el) => io!.observe(el));
-    }
+      els.forEach((el) => obs.observe(el));
+      observers.push(obs);
+    };
+    setupReveal(".reveal", "0px 0px -8% 0px");
+    setupReveal(".reveal-late", "0px 0px -32% 0px");
 
     // --- scroll-fill headings ---
     const fillEls = Array.from(
@@ -64,7 +72,7 @@ export function PageMotion() {
     }
 
     return () => {
-      io?.disconnect();
+      observers.forEach((o) => o.disconnect());
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);

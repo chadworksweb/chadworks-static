@@ -1768,6 +1768,21 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .reveal.is-visible { opacity: 1; transform: none; filter: blur(0); }
 
+/* reveal-late -- a longer glide on a longer track, fired higher in the viewport
+   (PageMotion gives it a -32% rootMargin) so the travel is seen mid-screen.
+   Used by the process timeline cards. */
+.reveal-late {
+  opacity: 0;
+  transform: translateY(90px);
+  filter: blur(4px);
+  transition: opacity 1s var(--ease-swoop), transform 1s var(--ease-swoop),
+    filter 1s var(--ease-swoop);
+}
+.reveal-late.is-visible { opacity: 1; transform: none; filter: blur(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal-late { opacity: 1; transform: none; filter: none; transition: none; }
+}
+
 /* NO PARTICLES anywhere on the site (Chad, 2026-06-11). The ambient
    drifting-dot system that lived here was removed under that rule. */
 

@@ -46,7 +46,7 @@ export function ProcessCapsule({
       )}
       <ol className="cw-process__line">
         {steps.map((s, i) => (
-          <li key={i} className="cw-process__item reveal">
+          <li key={i} className="cw-process__item reveal-late">
             <span className="cw-process__marker" aria-hidden="true">
               {String(i + 1).padStart(2, "0")}
             </span>
