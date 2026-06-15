@@ -3,17 +3,14 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import type { CSSProperties } from "react";
 
-// THE SITEWIDE WATER-RIPPLE ENGINE (chadworks). This is chadlewine's
-// MerchRippleCanvas copied LINE FOR LINE (Chad, 2026-06-11: "there is NO
-// shortcut for this") -- the explore-grid hover effect. The ONLY changes:
-// the component name, and the two pacing constants marked CHADWORKS below
-// (slowed per Chad; chadlewine ships SPEED 0.3 / LIFETIME_S 3.5).
-//
 // Analytic radial-ripple shader. Each click spawns an independent expanding
 // ring; the shader sums all active rings into a heightfield and refracts the
 // source image. No PDE, no reflections, no interference past the visible
-// shell. To revert this surface back to the wave-equation sim, swap the
-// import in ExploreGrid back to DiscoFaceWater. Same handle interface.
+// shell. COPIED VERBATIM from chadlewine's MerchRippleCanvas (the canonical
+// engine) -- only the export identifiers are renamed to RippleCanvas so the
+// rest of the chadworks codebase keeps importing the same names. The earlier
+// chadworks tuning drift (SPEED 0.16 / LIFETIME 6.5) is reverted: those slowed
+// the ring and kept the WebGL canvas mounted ~2x longer per hover.
 
 export interface RippleCanvasHandle {
   drop: (xPct: number, yPct: number, strength?: number) => void;
@@ -33,8 +30,7 @@ const MAX_DROPS = 28;
 // Wave propagation speed in normalized canvas units per second. Lower = the
 // ring expands more slowly across the card. ~0.3 means the ring takes
 // roughly 3.3s to cross the canvas.
-// CHADWORKS: 0.3 -> 0.16 (MUCH slower, per Chad 2026-06-11).
-const SPEED = 0.16;
+const SPEED = 0.3;
 // Spatial frequency of the wave inside the shell (cycles per canvas unit).
 // Higher = more ripples crammed in. Lower = more space between rings.
 const FREQ = 38.0;
@@ -45,8 +41,7 @@ const SHELL_LEAD = 0.022;
 const SHELL_TRAIL = 0.16;
 // How long a ring stays in the shader pool. Anything past this returns 0.
 // Needs to be >= 1/SPEED so the ring reaches the edge before fading.
-// CHADWORKS: 3.5 -> 6.5 (1/SPEED = 6.25; keeps the slowed ring alive to the edge).
-const LIFETIME_S = 6.5;
+const LIFETIME_S = 3.5;
 // Refraction strength when sampling the source image.
 const DISPLACEMENT = 0.032;
 
@@ -214,8 +209,6 @@ export const RippleCanvas = forwardRef<RippleCanvasHandle, Props>(
       let imgAR = 1;
       let imgReady = false;
       let cancelled = false;
-      // CHADWORKS (static export): no /_next/image optimizer exists; all our
-      // sources are local "/..." paths, so the optimized branch never fires.
       const optimizedSrc = src.startsWith("/")
         ? src
         : `/_next/image?url=${encodeURIComponent(src)}&w=1080&q=100`;

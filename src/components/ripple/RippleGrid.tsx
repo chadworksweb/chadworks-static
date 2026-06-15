@@ -31,8 +31,9 @@ const DROP_GAP_PX = 10;
 // How long a card keeps its water canvas mounted after the last drop. Needs
 // to outlast RippleCanvas's LIFETIME_S so a ring's full animation plays
 // out even if the cursor leaves the card immediately after dropping it.
-// CHADWORKS: 3800 -> 6800 (tracks the slowed LIFETIME_S of 6.5s).
-const SETTLE_MS = 6800;
+// VERBATIM chadlewine ExploreGrid value (reverted from the 6800 drift now
+// that LIFETIME_S is back to 3.5s -- the canvas unmounts ~2x sooner).
+const SETTLE_MS = 3800;
 
 export function RippleGrid({ items }: Props) {
   const gridRef = useRef<HTMLDivElement>(null);
