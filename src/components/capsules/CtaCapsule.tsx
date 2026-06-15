@@ -4,13 +4,18 @@
 
 import type { Service } from "@/lib/service";
 import type { LeadFormConfig } from "@/lib/forms";
+import type { Scheme } from "@/lib/capsule";
 import { LeadForm } from "@/components/forms/LeadForm";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W, CtaButton } from "@/components/capsules/shared";
 
+// The CTA is always a fixed dark band; `scheme` is declared so the rule-9 pass
+// sees it as inverted for adjacency (it never changes the rendered treatment).
 export type CtaCapsuleProps = {
   cta: Service["cta"];
   form?: LeadFormConfig;
+  scheme?: Scheme;
+  schemeAuto?: boolean;
 };
 
 export function CtaCapsule({ cta, form }: CtaCapsuleProps) {

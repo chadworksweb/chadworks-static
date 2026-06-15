@@ -9,6 +9,8 @@
 
 import type { Service, Writable } from "@/lib/service";
 import { isPrompt } from "@/lib/service";
+import type { Scheme } from "@/lib/capsule";
+import { isDarkScheme } from "@/lib/capsule";
 import { Prompt } from "@/components/Prompt";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import { SectionShell } from "@/components/capsules/SectionShell";
@@ -17,16 +19,21 @@ import { W } from "@/components/capsules/shared";
 export type FaqCapsuleProps = {
   faqs: Service["faqs"];
   faqLead?: Writable;
-  dark?: boolean;
+  // The FAQ prefers the dark band but yields to rule 9: PageComposer demotes
+  // `scheme` to "default" when the next present section is also inverted.
+  // `schemeAuto` flags it as the demotable section.
+  scheme?: Scheme;
+  schemeAuto?: boolean;
   heading?: React.ReactNode;
 };
 
 export function FaqCapsule({
   faqs,
   faqLead,
-  dark,
+  scheme,
   heading = "Questions, answered",
 }: FaqCapsuleProps) {
+  const dark = isDarkScheme(scheme);
   return (
     <SectionShell
       full

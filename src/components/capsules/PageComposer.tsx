@@ -1,16 +1,21 @@
 // =====================================================================
 // chadworks Static -- PAGE COMPOSER (the capsule-of-capsules wrapper)
 // A page PLACES capsules inside <PageComposer>. The composer renders
-// <PageMotion> once and emits the page-level JSON-LD passed to it, then the
-// capsule children in order.
+// <PageMotion> once, emits the page-level JSON-LD passed to it, and runs the
+// rule-9 scheme-adjacency pass over its capsule children before rendering them
+// in order.
 //
-// Phase A: motion + page JSON-LD + children (matches the old template prelude
-// exactly: PageMotion, then the JSON-LD <script> tags, then the sections).
-// Phase C will add the rule-9 scheme-adjacency pass over the children here,
-// replacing the manual `faqDark` boolean in the template.
+// RULE 9 (CWS-DESIGN-SYSTEM): two fully inverted (dark) sections can never be
+// consecutive. Each capsule that participates declares a `scheme` prop; a
+// capsule that PREFERS dark but yields (e.g. the FAQ) also sets `schemeAuto`.
+// The pass demotes an auto-inverted section to "default" when the previous or
+// next present section is also inverted -- replacing the old manual `faqDark`
+// boolean. Fixed-inverted sections (approach, CTA, process) keep their scheme;
+// if two fixed darks would still stack, we warn at build time.
 // =====================================================================
 
-import type { ReactNode } from "react";
+import { Children, cloneElement, isValidElement, type ReactNode } from "react";
+import { type Scheme, isDarkScheme } from "@/lib/capsule";
 import { PageMotion } from "@/components/PageMotion";
 
 // Inline structured data. dangerouslySetInnerHTML is the standard, safe pattern
@@ -34,7 +39,43 @@ type PageComposerProps = {
   children: ReactNode;
 };
 
+type SchemeProps = { scheme?: Scheme; schemeAuto?: boolean };
+
 export function PageComposer({ jsonLd = [], children }: PageComposerProps) {
+  // Flat list of placed capsule elements, in render order.
+  const kids = Children.toArray(children);
+
+  // Preferred scheme + auto flag per child (non-elements resolve to no scheme).
+  const prefs: SchemeProps[] = kids.map((k) =>
+    isValidElement(k) ? (k.props as SchemeProps) : {}
+  );
+
+  // Resolve schemes left-to-right, demoting auto-inverted sections that would
+  // sit next to another inverted section.
+  const resolved: (Scheme | undefined)[] = [];
+  for (let i = 0; i < prefs.length; i++) {
+    let sc = prefs[i].scheme;
+    if (prefs[i].schemeAuto && isDarkScheme(sc)) {
+      const prev = resolved[i - 1];
+      const next = prefs[i + 1]?.scheme;
+      if (isDarkScheme(prev) || isDarkScheme(next)) sc = "default";
+    }
+    resolved[i] = sc;
+    // Build-time guard: two FIXED inverted sections still adjacent is a rule-9
+    // violation the author must fix (insert a light section between them).
+    if (
+      i > 0 &&
+      isDarkScheme(resolved[i]) &&
+      isDarkScheme(resolved[i - 1]) &&
+      !prefs[i].schemeAuto &&
+      !prefs[i - 1].schemeAuto
+    ) {
+      console.warn(
+        "[PageComposer] rule 9: two inverted sections are consecutive; insert a light section between them."
+      );
+    }
+  }
+
   return (
     <>
       {/* NO PARTICLES anywhere on the site (Chad, 2026-06-11). */}
@@ -42,7 +83,20 @@ export function PageComposer({ jsonLd = [], children }: PageComposerProps) {
       {jsonLd.map((data, i) => (
         <JsonLd key={i} data={data} />
       ))}
-      {children}
+      {kids.map((k, i) => {
+        // Re-inject the resolved scheme only where the pass actually changed an
+        // auto section's scheme, so untouched capsules render byte-identically.
+        if (
+          isValidElement(k) &&
+          prefs[i].schemeAuto &&
+          resolved[i] !== prefs[i].scheme
+        ) {
+          return cloneElement(k as React.ReactElement<SchemeProps>, {
+            scheme: resolved[i],
+          });
+        }
+        return k;
+      })}
     </>
   );
 }

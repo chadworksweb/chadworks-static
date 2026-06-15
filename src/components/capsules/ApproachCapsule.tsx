@@ -3,11 +3,17 @@
 // always fill (rule 8, stepColumns).
 
 import type { Service } from "@/lib/service";
-import { stepColumns } from "@/lib/capsule";
+import { type Scheme, stepColumns } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type ApproachCapsuleProps = { approach: Service["approach"] };
+// `scheme` is the fixed-inverted (svc-dark) declaration the PageComposer rule-9
+// pass reads for adjacency; the capsule always renders its dark treatment.
+export type ApproachCapsuleProps = {
+  approach: Service["approach"];
+  scheme?: Scheme;
+  schemeAuto?: boolean;
+};
 
 export function ApproachCapsule({ approach }: ApproachCapsuleProps) {
   return (

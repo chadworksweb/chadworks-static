@@ -11,7 +11,7 @@
 // decision into PageComposer.
 // =====================================================================
 
-import { Fragment, type ReactNode } from "react";
+import { Fragment, cloneElement, isValidElement, type ReactNode } from "react";
 import {
   type Service,
   buildServiceJsonLd,
@@ -61,9 +61,10 @@ export type ServiceSlot =
 export type ServiceOverrides = Partial<Record<ServiceSlot, ReactNode | null>>;
 
 export function composeService(s: Service, overrides: ServiceOverrides = {}) {
-  // Rule 9: the CTA is always dark, so the FAQ takes its dark treatment ONLY
-  // when a light section (assurance / next-steps) sits between it and the CTA.
-  const faqDark = Boolean(s.assurance || s.nextSteps);
+  // Rule 9 is no longer decided here: each dark capsule declares its `scheme`
+  // and PageComposer runs the scheme-adjacency pass. The FAQ prefers the dark
+  // band (scheme="inverted") but is `schemeAuto`, so PageComposer demotes it to
+  // light when the next present section (the dark CTA) is also inverted.
 
   // Default node per slot (null when the optional section is absent).
   const defaults: Record<ServiceSlot, ReactNode> = {
@@ -90,7 +91,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     problemArt: s.problemArt ? (
       <ProblemArtCapsule>{s.problemArt}</ProblemArtCapsule>
     ) : null,
-    approach: <ApproachCapsule approach={s.approach} />,
+    approach: <ApproachCapsule approach={s.approach} scheme="inverted" />,
     paths: s.paths ? <PathsCapsule paths={s.paths} /> : null,
     proof: <ProofCapsule proof={s.proof} />,
     portfolio: s.portfolio ? (
@@ -104,10 +105,17 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     qualification: s.qualification ? (
       <QualificationCapsule qualification={s.qualification} />
     ) : null,
-    faq: <FaqCapsule faqs={s.faqs} faqLead={s.faqLead} dark={faqDark} />,
+    faq: (
+      <FaqCapsule
+        faqs={s.faqs}
+        faqLead={s.faqLead}
+        scheme="inverted"
+        schemeAuto
+      />
+    ),
     assurance: s.assurance ? <AssuranceCapsule assurance={s.assurance} /> : null,
     nextSteps: s.nextSteps ? <NextStepsCapsule nextSteps={s.nextSteps} /> : null,
-    cta: <CtaCapsule cta={s.cta} form={s.form} />,
+    cta: <CtaCapsule cta={s.cta} form={s.form} scheme="inverted" />,
   };
 
   const order: ServiceSlot[] = [
@@ -129,6 +137,22 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     "cta",
   ];
 
+  // Flat list of placed capsule elements, each keyed by slot. Passed directly
+  // (not wrapped in Fragments) so PageComposer's rule-9 pass sees every capsule
+  // as a direct child and no extra DOM node breaks the main > .section grid.
+  const placed = order
+    .map((slot) => {
+      // An override key present in the map wins (including an explicit null,
+      // which drops the slot). Otherwise use the default node.
+      const node = slot in overrides ? overrides[slot] : defaults[slot];
+      return node && isValidElement(node)
+        ? cloneElement(node, { key: slot })
+        : node
+          ? <Fragment key={slot}>{node}</Fragment>
+          : null;
+    })
+    .filter(Boolean);
+
   return (
     <PageComposer
       jsonLd={[
@@ -137,13 +161,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
         buildFaqJsonLd(s),
       ]}
     >
-      {order.map((slot) => {
-        // An override key present in the map wins (including an explicit null,
-        // which drops the slot). Otherwise use the default node. Rendered in a
-        // keyed Fragment so no extra DOM node breaks the main > .section grid.
-        const node = slot in overrides ? overrides[slot] : defaults[slot];
-        return node ? <Fragment key={slot}>{node}</Fragment> : null;
-      })}
+      {placed}
     </PageComposer>
   );
 }
