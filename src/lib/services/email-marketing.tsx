@@ -61,7 +61,6 @@ export const emailMarketing: Service = {
     "You own the list. Rankings and social reach are rented from an algorithm; the email list leaves with you, whatever platform it lives on.",
     "It can start at $0. Mailchimp is free up to 500 contacts, and I'll tell you when free is all you need.",
     "Segments beat blasts. Every client list I've set up across 20 years of website builds proves it: relevance is the open rate.",
-    "Buttons get pressed. People click buttons more than text links, and small mechanical choices like that decide whether a send earns anything.",
     "Restraint is the strategy. Over-sending burns a list faster than anything else, so the calendar is part of the build.",
   ],
 

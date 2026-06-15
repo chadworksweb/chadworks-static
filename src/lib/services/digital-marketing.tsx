@@ -61,7 +61,6 @@ export const digitalMarketing: Service = {
     "Search and AI answers come first for service businesses, because that's where buyers with intent already are.",
     "Every channel gets a written why: what it should return, and the date it gets reviewed or killed.",
     "The triage stays honest even when it shrinks my own invoice. Telling you what to skip is most of the value.",
-    "20 years of building websites and the channels around them, now including paid placement inside OpenAI's ChatGPT advertising beta.",
   ],
 
   problem: {

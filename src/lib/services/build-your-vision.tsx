@@ -42,7 +42,6 @@ export const buildYourVision: Service = {
     "The proof is that I build my own. Rising Compass and chadlewine.com are products I designed, built, and run, not stock projects I bought from someone else. The same person who built those builds yours.",
     "I build custom, not from a template. That means your vision drives the architecture, instead of your vision getting bent to fit a page builder or a theme that was never meant for it.",
     "AI changed what one focused builder can ship. Things that used to need a funded team and a year are now buildable, and that is exactly why an original idea is worth starting now instead of waiting.",
-    "This is not for strict budgets, and that is on purpose. Ambitious builds take real work, and the rates page is honest about it. What you get is something that is actually yours and actually works.",
   ],
 
   problem: {

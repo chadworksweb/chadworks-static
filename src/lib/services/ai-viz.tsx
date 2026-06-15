@@ -40,7 +40,6 @@ export const aiViz: Service = {
     "This work put a Pennsylvania criminal-defense firm into Google's AI Overview and a Brooklyn psychologist into AI answers. Real placements, not a theory.",
     "The deliverable is a written checklist pass: intent, answer-first structure, schema, profiles, performance, and proof signals, run on every page that matters.",
     "Sold as a monthly retainer because engines re-decide constantly. If the one-time read is all you need, I'll point you to the audit and say so.",
-    "Same person who builds the sites. I'm not reselling a tool or white-labeling an agency, and the work shows up under my own name.",
   ],
   outlierFacts: [1],
 
