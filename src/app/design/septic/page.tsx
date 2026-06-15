@@ -19,7 +19,7 @@ import {
 } from "@/lib/service";
 import { PageComposer } from "@/components/capsules/PageComposer";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { CtaCapsule, FaqCapsule } from "@/components/capsules";
+import { CtaCapsule, FaqCapsule, PortfolioCapsule } from "@/components/capsules";
 import { WireframeCamera } from "@/components/art/WireframeCamera";
 import { septicWireframe } from "@/components/art/wireframes/septic";
 import { SepticHero, SepticBuild } from "@/components/septic/SepticArtSections";
@@ -135,6 +135,11 @@ export default function SepticDesignPage() {
           ))}
         </div>
       </SectionShell>
+
+      {/* Sites I've built (real client shots, water-ripple on hover). */}
+      {service.portfolio && (
+        <PortfolioCapsule portfolio={service.portfolio} slug={service.slug} />
+      )}
 
       {/* The interactive six-point rubric (reuses the Scorecard config). */}
       <SectionShell className="cw-art-section">

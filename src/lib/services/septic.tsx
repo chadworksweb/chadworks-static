@@ -189,6 +189,20 @@ export const septic: Service = {
     ],
   },
 
+  portfolio: {
+    heading: "Sites I've built for trade and service businesses.",
+    intro:
+      "Trade service, event hospitality, specialty landscape, and a solo wellness practice. Click anywhere on a shot to send a ripple through it.",
+    items: [
+      { label: "Russ Tree Service", img: "/portfolio/russtree.webp", alt: "Russ Tree Service homepage", href: "https://russtreeservice.com" },
+      { label: "AAC Event Catering", img: "/portfolio/aac.webp", alt: "AAC Event Catering homepage", href: "https://aaceventcatering.com" },
+      { label: "EdenScapes", img: "/portfolio/edenscapes.webp", alt: "EdenScapes Japanese garden design page", href: "https://eden-scapes.com/japanese-garden-design-installation/" },
+      { label: "Massage Professionals", img: "/portfolio/massagepros.webp", alt: "Massage Professionals LLC homepage", href: "https://massageprofessionalsllc.com" },
+      { label: "ADS Automation", img: "/portfolio/adsautomation.webp", alt: "ADS Automation homepage", href: "https://adsautomation.com" },
+      { label: "Thorobird", img: "/portfolio/thorobird.webp", alt: "Thorobird homepage", href: "https://thorobird.com" },
+    ],
+  },
+
   made: {
     eyebrow: "Made in the USA",
     heading: "Hi, I'm Chad.",
