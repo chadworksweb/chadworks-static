@@ -172,6 +172,7 @@ export default function SepticDesignPage() {
       <FaqCapsule
         faqs={service.faqs}
         faqLead={service.faqLead}
+        heading="The best septic services websites all share similar aspects that make them successful. Yours will have them all and then some."
         pageName={service.title}
         scheme="inverted"
         schemeAuto
