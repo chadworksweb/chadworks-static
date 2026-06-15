@@ -41,7 +41,7 @@ export function RippleGrid({ items }: Props) {
   // outer card. The outer card includes the label text below the image, so
   // using its height for the cursor->drop projection puts the drop above the
   // cursor.
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
   const waterRefs = useRef<(RippleCanvasHandle | null)[]>([]);
 
   // Set of card indexes that should currently have a water canvas mounted.
@@ -179,28 +179,66 @@ export function RippleGrid({ items }: Props) {
       {items.map((item, idx) => {
         const active = activeIdxs.has(idx);
         const hovered = hoveredIdx === idx;
+        // The image FRAME is the primary click target (matches chadlewine's
+        // image-link): the whole thumbnail is clickable, shows a pointer
+        // cursor, and gets the hover affordance + "View site" cue.
+        const external = item.href?.startsWith("http");
+        const frameInner = (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={item.src} alt={item.alt} className="svc-shot__img" loading="lazy" />
+            {active && (
+              <RippleCanvas
+                ref={(handle) => { waterRefs.current[idx] = handle; }}
+                src={item.src}
+                className="svc-shot__water"
+              />
+            )}
+            {item.href && (
+              <span className="svc-shot__cue" aria-hidden="true">
+                View site <span className="svc-shot__cue-arrow">&#8599;</span>
+              </span>
+            )}
+          </>
+        );
         return (
           <div
             key={item.key}
             className={`svc-shot${hovered ? " svc-shot--hovered" : ""}`}
           >
-            <div
-              ref={(el) => { cardRefs.current[idx] = el; }}
-              className="svc-shot__frame"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={item.src} alt={item.alt} className="svc-shot__img" loading="lazy" />
-              {active && (
-                <RippleCanvas
-                  ref={(handle) => { waterRefs.current[idx] = handle; }}
-                  src={item.src}
-                  className="svc-shot__water"
-                />
-              )}
-            </div>
+            {item.href ? (
+              external ? (
+                <a
+                  ref={(el) => { cardRefs.current[idx] = el; }}
+                  href={item.href}
+                  className="svc-shot__frame svc-shot__frame--link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${item.label} (opens in a new tab)`}
+                >
+                  {frameInner}
+                </a>
+              ) : (
+                <Link
+                  ref={(el) => { cardRefs.current[idx] = el; }}
+                  href={item.href}
+                  className="svc-shot__frame svc-shot__frame--link"
+                  aria-label={item.label}
+                >
+                  {frameInner}
+                </Link>
+              )
+            ) : (
+              <div
+                ref={(el) => { cardRefs.current[idx] = el; }}
+                className="svc-shot__frame"
+              >
+                {frameInner}
+              </div>
+            )}
             <p className="svc-shot__label">
               {item.href ? (
-                item.href.startsWith("http") ? (
+                external ? (
                   <a href={item.href} className="svc-shot__link" target="_blank" rel="noopener noreferrer">
                     {item.label}
                   </a>
