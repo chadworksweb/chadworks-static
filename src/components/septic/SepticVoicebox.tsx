@@ -473,7 +473,7 @@ export function SepticVoicebox() {
         {/* /.cw-art-voice__main */}
         <div className="cw-art-voice__aside-img" aria-hidden="true">
           <img
-            src="/people/chad-cutout.webp"
+            src="/people/chad-cutout-home.webp"
             alt=""
             loading="lazy"
             decoding="async"

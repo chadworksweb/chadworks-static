@@ -1222,7 +1222,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* the clickable thumbnail: pointer cursor + a clear lift/ring on hover so it
    reads as something you can click into. */
 .svc-shot__frame--link { cursor: pointer; }
-.svc-shot--hovered .svc-shot__frame--link,
 .svc-shot__frame--link:hover {
   filter: brightness(1.05);
   transform: translateY(-5px);
@@ -1267,12 +1266,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   pointer-events: none;
 }
 .svc-shot__cue-arrow { font-size: 0.8rem; line-height: 1; }
-.svc-shot--hovered .svc-shot__cue,
 .svc-shot__frame--link:hover .svc-shot__cue,
 .svc-shot__frame--link:focus-visible .svc-shot__cue { opacity: 1; transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
   .svc-shot__frame--link, .svc-shot__cue { transition: none; }
-  .svc-shot--hovered .svc-shot__frame--link, .svc-shot__frame--link:hover { transform: none; }
+  .svc-shot__frame--link:hover { transform: none; }
 }
 .svc-shot__label { font-family: var(--font-display); font-weight: 600; color: var(--text-primary); }
 .svc-shot__link:hover { color: var(--accent); }

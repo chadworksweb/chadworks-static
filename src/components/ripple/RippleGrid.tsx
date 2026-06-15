@@ -47,9 +47,11 @@ export function RippleGrid({ items }: Props) {
   // Set of card indexes that should currently have a water canvas mounted.
   // Toggled on cursor entry and removed after SETTLE_MS without further hits.
   const [activeIdxs, setActiveIdxs] = useState<Set<number>>(new Set());
-  // Index of the card directly under the cursor right now (or null). Drives
-  // the hover brightness boost.
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  // NOTE: the hover affordance (border/lift/cue) is driven by pure CSS :hover,
+  // NOT a JS hovered-index. Deriving it from the DAMPED ripple cursor lagged
+  // the border behind the real pointer (it "stuck" on the last card on fast
+  // back-and-forth) and re-rendered the grid on every drop. CSS :hover is
+  // instant and accurate; the damped glow now only drives the water trail.
   const settleTimers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
   const glowTargetRef = useRef<{ x: number; y: number } | null>(null);
@@ -81,7 +83,6 @@ export function RippleGrid({ items }: Props) {
   }, []);
 
   const dropOnCards = useCallback((cx: number, cy: number) => {
-    let nowOver: number | null = null;
     cardRefs.current.forEach((card, idx) => {
       if (!card) return;
       const rect = card.getBoundingClientRect();
@@ -89,12 +90,10 @@ export function RippleGrid({ items }: Props) {
       const fx = ((cx - rect.left) / rect.width) * 100;
       const fy = ((cy - rect.top) / rect.height) * 100;
       if (fx < 0 || fx > 100 || fy < 0 || fy > 100) return;
-      nowOver = idx;
       activate(idx);
       const handle = waterRefs.current[idx];
       if (handle) handle.drop(fx, fy, 0.22);
     });
-    setHoveredIdx(nowOver);
   }, [activate]);
 
   const tickGlow = useCallback(function tickGlowInner() {
@@ -154,13 +153,10 @@ export function RippleGrid({ items }: Props) {
         glowFrameRef.current = requestAnimationFrame(tickGlow);
       }
     };
-    const onLeave = () => setHoveredIdx(null);
     grid.addEventListener("pointermove", onMove);
-    grid.addEventListener("pointerleave", onLeave);
     const timersAtMount = settleTimers.current;
     return () => {
       grid.removeEventListener("pointermove", onMove);
-      grid.removeEventListener("pointerleave", onLeave);
       if (glowFrameRef.current != null) {
         cancelAnimationFrame(glowFrameRef.current);
         glowFrameRef.current = null;
@@ -178,7 +174,6 @@ export function RippleGrid({ items }: Props) {
     <div ref={gridRef} className="svc-shots">
       {items.map((item, idx) => {
         const active = activeIdxs.has(idx);
-        const hovered = hoveredIdx === idx;
         // The image FRAME is the primary click target (matches chadlewine's
         // image-link): the whole thumbnail is clickable, shows a pointer
         // cursor, and gets the hover affordance + "View site" cue.
@@ -202,10 +197,7 @@ export function RippleGrid({ items }: Props) {
           </>
         );
         return (
-          <div
-            key={item.key}
-            className={`svc-shot${hovered ? " svc-shot--hovered" : ""}`}
-          >
+          <div key={item.key} className="svc-shot">
             {item.href ? (
               external ? (
                 <a
