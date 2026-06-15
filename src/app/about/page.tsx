@@ -144,7 +144,7 @@ const HOW: { title: string; body: string }[] = [
   },
   {
     title: "The no is part of the service",
-    body: "When a build or a channel won't pay for itself, I say so before the money moves. An honest read costs you nothing and saves you plenty.",
+    body: "When a build or a channel won't pay for itself, I say so before the money moves. A straight answer costs you nothing and saves you plenty.",
   },
   {
     title: "You own every piece",
@@ -356,7 +356,7 @@ export default function AboutPage() {
             <div>
               <h2 className="svc-cta__heading">Tell me what you&apos;re building</h2>
               <p className="svc-cta__body">
-                Whatever it is, you&apos;ll get an honest read from the person
+                Whatever it is, you&apos;ll get a straight answer from the person
                 who&apos;d actually do the work, usually within a day.
               </p>
             </div>

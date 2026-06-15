@@ -204,7 +204,7 @@ export const ecommerce: Service = {
 
   cta: {
     heading: "Ready to sell like you mean it?",
-    body: "Tell me what you sell and how orders leave your building. You'll get an honest read on the right platform, the real costs of each, and what a store designed to sell would take.",
+    body: "Tell me what you sell and how orders leave your building. You'll get a straight answer on the right platform, the real costs of each, and what a store designed to sell would take.",
     buttonLabel: "Tell me about your store",
     href: "/contact/",
   },
@@ -270,7 +270,7 @@ export const ecommerce: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me what you sell through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "Platform, costs, and whether your catalog needs anything special, stated plainly." },
+      { title: "A straight answer", body: "Platform, costs, and whether your catalog needs anything special, stated plainly." },
       { title: "A scoped plan", body: "Written scope, number, and timeline before any payment." },
       { title: "Build, launch, handover", body: "The store goes live in your accounts, and your team learns to run it." },
     ],

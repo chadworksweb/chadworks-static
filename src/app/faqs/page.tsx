@@ -71,14 +71,14 @@ const GROUPS: FaqGroup[] = [
         a: (
           <>
             A conversation. Tell me the business, what you want the site to do,
-            and where it is stuck today. From there you get an honest read on
+            and where it is stuck today. From there you get a straight answer on
             whether it is a fit and what it would take. The{" "}
             <Link href="/contact/">contact page</Link> is the fastest way to
             start.
           </>
         ),
         aText:
-          "A conversation. Tell me the business, what you want the site to do, and where it is stuck today. From there you get an honest read on whether it is a fit and what it would take. The contact page is the fastest way to start.",
+          "A conversation. Tell me the business, what you want the site to do, and where it is stuck today. From there you get a straight answer on whether it is a fit and what it would take. The contact page is the fastest way to start.",
       },
     ],
   },

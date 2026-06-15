@@ -223,8 +223,8 @@ export const aiViz: Service = {
   cta: {
     heading: "Want to be the answer?",
     body:
-      "Tell me your business and your market. You'll get an honest read on where you stand in AI answers today and what a retainer would actually change.",
-    buttonLabel: "Get the honest read",
+      "Tell me your business and your market. You'll get a straight answer on where you stand in AI answers today and what a retainer would actually change.",
+    buttonLabel: "Get the straight answer",
     href: "/contact/",
   },
 
@@ -281,7 +281,7 @@ export const aiViz: Service = {
       "Scope and number go in writing before any payment.",
       "The audit and every monthly report are yours to keep and act on with anyone.",
       "Every change lands in the monthly report, dated.",
-      "You get an honest read before committing. If the audit is all you need, that's what I'll say.",
+      "You get a straight answer before committing. If the audit is all you need, that's what I'll say.",
     ],
   },
 
@@ -289,7 +289,7 @@ export const aiViz: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me your business and market through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "Where you stand in AI answers and classic search today, and whether a retainer is even the move." },
+      { title: "A straight answer", body: "Where you stand in AI answers and classic search today, and whether a retainer is even the move." },
       { title: "A scoped retainer", body: "Pages, checks, cadence, and the monthly number, in writing before anything starts." },
       { title: "The checklist runs", body: "The first full pass lands, then the cycle keeps you in the answers, with progress you can read every month." },
     ],

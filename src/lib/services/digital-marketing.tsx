@@ -40,7 +40,7 @@ export const digitalMarketing: Service = {
   eyebrow: "The honest channel triage",
   title: "Digital Marketing",
   intent:
-    "chadworks sells digital marketing as triage: an honest read on which channels a business actually needs, then proper work on the ones that earn their place.",
+    "chadworks sells digital marketing as triage: a straight answer on which channels a business actually needs, then proper work on the ones that earn their place.",
 
   answer: (
     <>
@@ -220,7 +220,7 @@ export const digitalMarketing: Service = {
   ],
 
   cta: {
-    heading: "Want the honest read on your channels?",
+    heading: "Want the straight answer on your channels?",
     body:
       "Tell me your business and what you're spending on now. You'll get a plain answer on which channels deserve your money and which ones are decoration.",
     buttonLabel: "Get the triage",
@@ -265,7 +265,7 @@ export const digitalMarketing: Service = {
   qualification: {
     heading: "Is the triage the right move?",
     fit: [
-      "You want one honest read instead of six vendor pitches.",
+      "You want one straight answer instead of six vendor pitches.",
       "You're ready to fund the surviving channels properly once the triage picks them.",
     ],
     notFit: [
@@ -297,6 +297,6 @@ export const digitalMarketing: Service = {
   meta: {
     title: "Digital Marketing: Honest Channel Triage, Not the Full Menu | chadworks",
     description:
-      "Digital marketing sold as triage: a paid, honest read on which channels your business actually needs, then proper work on the survivors. Search and AI visibility come first; follower-chasing never makes the list. Run by someone working inside OpenAI's ChatGPT advertising beta. $315/hr, every call in writing.",
+      "Digital marketing sold as triage: a paid, straight answer on which channels your business actually needs, then proper work on the survivors. Search and AI visibility come first; follower-chasing never makes the list. Run by someone working inside OpenAI's ChatGPT advertising beta. $315/hr, every call in writing.",
   },
 };

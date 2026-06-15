@@ -239,8 +239,8 @@ export const seo: Service = {
   cta: {
     heading: "Want rankings that feed the answers?",
     body:
-      "Tell me your market and the phrases you think buyers type. You'll get an honest read on what's winnable and what it's worth.",
-    buttonLabel: "Start with the honest read",
+      "Tell me your market and the phrases you think buyers type. You'll get a straight answer on what's winnable and what winning it is worth to you.",
+    buttonLabel: "Start with the straight answer",
     href: "/contact/",
   },
 
@@ -297,7 +297,7 @@ export const seo: Service = {
       "Scope and number go in writing before any payment.",
       "Ranking movement gets reported as it happens, not hidden in quarterly decks.",
       "Everything built lives on your site and your accounts. Nothing is held hostage.",
-      "You get an honest read on what's winnable before committing to any of it.",
+      "You get a straight answer on what's winnable before committing to any of it.",
     ],
   },
 
@@ -305,7 +305,7 @@ export const seo: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me your market and phrases through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "What's winnable in your market, and whether SEO is even the move." },
+      { title: "A straight answer", body: "What's winnable in your market, and whether SEO is even the move." },
       { title: "A scoped plan", body: "Pages, phrases, timeline, and the number, in writing before anything starts." },
       { title: "The standing compounds", body: "Rankings build, you watch them land, and the wins become the base for the next ones." },
     ],

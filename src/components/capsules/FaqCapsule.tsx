@@ -24,6 +24,9 @@ export type FaqCapsuleProps = {
   // `schemeAuto` flags it as the demotable section.
   scheme?: Scheme;
   schemeAuto?: boolean;
+  // The page name drives the default heading "<Page> FAQs" (e.g. "Web Design
+  // FAQs"), cascading to every service page. An explicit `heading` overrides it.
+  pageName?: string;
   heading?: React.ReactNode;
 };
 
@@ -31,9 +34,12 @@ export function FaqCapsule({
   faqs,
   faqLead,
   scheme,
-  heading = "Questions, answered",
+  pageName,
+  heading,
 }: FaqCapsuleProps) {
   const dark = isDarkScheme(scheme);
+  const resolvedHeading =
+    heading ?? (pageName ? `${pageName} FAQs` : "Questions, answered");
   return (
     <SectionShell
       full
@@ -42,7 +48,7 @@ export function FaqCapsule({
     >
       <div className="svc-faq__layout">
         <div className="svc-faq__intro">
-          <h2 className="svc-block__heading svc-fill">{heading}</h2>
+          <h2 className="svc-block__heading svc-fill">{resolvedHeading}</h2>
           {faqLead && (
             <p className="svc-faq__lead">
               <W value={faqLead} />

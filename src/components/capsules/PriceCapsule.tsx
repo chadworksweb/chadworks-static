@@ -17,7 +17,7 @@ export type PriceCapsuleProps = {
 export function PriceCapsule({
   price,
   ctaHref,
-  ctaLabel = "Get an honest read",
+  ctaLabel = "Get a straight answer",
 }: PriceCapsuleProps) {
   return (
     <SectionShell full className="scheme-alternate svc-block svc-pricing">

@@ -266,7 +266,7 @@ export const webDesignPackages: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me about the business and the site through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "I'll tell you straight whether a package fits your project, and which posture it points at." },
+      { title: "A straight answer", body: "I'll tell you straight whether a package fits your project, and which posture it points at." },
       { title: "The written scope", body: "You get the defined scope and the defined number, in writing, before any payment." },
       { title: "The build runs", body: "Design, development, launch, and two weeks of fixes. The number you approved is the number you pay." },
     ],

@@ -65,7 +65,7 @@ const DETAILED: LeadFormConfig = {
   subject: "New Detailed Inquiry from the Contact Page (chadworks)",
   submitLabel: "Send the details",
   successMessage:
-    "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with an honest read on the number.",
+    "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with a straight answer on the number.",
   fields: [
     { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
     { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
@@ -149,7 +149,7 @@ export default function ContactPage() {
         </h1>
         <p className="svc-lede measure-prose">
           Send a message and it reaches the person who would actually do the
-          work, not a queue. You get an honest read on whether it fits and what
+          work, not a queue. You get a straight answer on whether it fits and what
           it would take, usually within a day.
         </p>
       </section>

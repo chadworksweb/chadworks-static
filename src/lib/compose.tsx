@@ -109,6 +109,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
       <FaqCapsule
         faqs={s.faqs}
         faqLead={s.faqLead}
+        pageName={s.title}
         scheme="inverted"
         schemeAuto
       />

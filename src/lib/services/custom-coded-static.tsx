@@ -208,7 +208,7 @@ export const customCodedStatic: Service = {
 
   cta: {
     heading: "Want the fast, quiet, yours-forever version?",
-    body: "Tell me about your business and what the site needs to do. I'll give you an honest read on whether static is your route, and what the build would take.",
+    body: "Tell me about your business and what the site needs to do. I'll give you a straight answer on whether static is your route, and what the build would take.",
     buttonLabel: "Tell me about your project",
     href: "/contact/",
   },
@@ -266,7 +266,7 @@ export const customCodedStatic: Service = {
       "You own the code and the hosting outright, from day one.",
       "Every build includes two weeks of free fixes after launch.",
       "Running costs after launch round to nothing, stated up front.",
-      "You get an honest read on fit before either of us commits.",
+      "You get a straight answer on fit before either of us commits.",
     ],
   },
 
@@ -274,7 +274,7 @@ export const customCodedStatic: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me about the business and the site through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "I'll tell you straight whether static fits how your content actually lives." },
+      { title: "A straight answer", body: "I'll tell you straight whether static fits how your content actually lives." },
       { title: "A scoped plan", body: "If it's a fit, you get a written scope, number, and timeline before any payment." },
       { title: "Build and launch", body: "Custom code, GEO baked in, launched in your name with two weeks of free fixes." },
     ],

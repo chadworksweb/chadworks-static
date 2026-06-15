@@ -62,7 +62,7 @@ const hub: HubConfig = {
     },
     {
       label: "Digital Marketing",
-      detail: "The broad sweep: the channels, the strategy, and the honest read on which ones your business actually needs.",
+      detail: "The broad sweep: the channels, the strategy, and the straight answer on which ones your business actually needs.",
       href: "/digital-marketing/",
     },
     {
@@ -83,7 +83,7 @@ const hub: HubConfig = {
   ],
   cta: {
     heading: "Want to know where you actually stand?",
-    body: "Tell me your business and I'll look at where you show up right now: in search, in the AI assistants, and everywhere your buyers check. You'll get an honest read on the gap, before anyone commits to anything.",
+    body: "Tell me your business and I'll look at where you show up right now: in search, in the AI assistants, and everywhere your buyers check. You'll get a straight answer on the gap, before anyone commits to anything.",
   },
   form: {
     source: "visibility hub",

@@ -1,10 +1,15 @@
 // QUALIFICATION CAPSULE (optional) -- who it's for / who it isn't. Bold
 // periwinkle band with CHANNEL-STATIC grain regenerating in place.
 //
-// Phase B note: the grain renders as a direct child (the pre-refactor markup,
-// byte-stable). Phase F moves it to SectionShell's `bg` layer (beneath content)
-// to fix the grain-above-content bug structurally.
+// The grain renders as a direct child: the existing .svc-qual-section CSS
+// already layers it behind content (canvas z-index 0, content z-index 1) AND
+// keeps its mix-blend-mode:overlay keyed to the periwinkle band. Routing it
+// through SectionShell's bg layer was tried and reverted: the bg layer's
+// stacking context makes the overlay blend against transparent, washing the
+// band to gray. An optional `footer` renders after the fit/not-fit grid (e.g.
+// the /about/ rates cross-link paragraph).
 
+import type { ReactNode } from "react";
 import type { Service } from "@/lib/service";
 import { GrainField } from "@/components/GrainField";
 import { SectionShell } from "@/components/capsules/SectionShell";
@@ -12,10 +17,12 @@ import { W } from "@/components/capsules/shared";
 
 export type QualificationCapsuleProps = {
   qualification: NonNullable<Service["qualification"]>;
+  footer?: ReactNode;
 };
 
 export function QualificationCapsule({
   qualification: q,
+  footer,
 }: QualificationCapsuleProps) {
   return (
     <SectionShell full className="svc-block svc-qual-section">
@@ -43,6 +50,7 @@ export function QualificationCapsule({
           </ul>
         </div>
       </div>
+      {footer}
     </SectionShell>
   );
 }

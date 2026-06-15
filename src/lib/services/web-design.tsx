@@ -40,11 +40,11 @@ export const webDesign: Service = {
       customer. I&apos;m Chad, and I&apos;ve been designing websites for 20
       years. Bring me a brand and I&apos;ll design a site that earns trust on
       sight, or bring me the business alone and we&apos;ll find the look
-      together. When the design is settled, I{" "}
+      together. Once the design is settled, I{" "}
       <Link href="/web-development/" className="svc-inline-link">
         develop
       </Link>{" "}
-      it too.
+      it into a fast, working site myself, so nothing gets lost in a handoff.
     </>
   ),
 
@@ -103,7 +103,7 @@ export const webDesign: Service = {
       {
         title: "Structure first, decoration second",
         body:
-          "The layout and hierarchy get designed before the styling. Where the eye lands, what feels clickable, where a page sends the reader next. If the bones don't sell, no color rescues it.",
+          "The layout and hierarchy get designed before the styling: where the eye lands, what feels clickable, where a page sends the reader next. Weak structure is the one thing no amount of color can ever rescue.",
       },
       {
         title: "A design system, not a lucky page",
@@ -243,7 +243,7 @@ export const webDesign: Service = {
   cta: {
     heading: "Have a vision, or only a hunch?",
     body:
-      "Either works. Tell me about your business and what you want people to feel the moment they land. I'll give you an honest read on what the design needs, before anyone commits to anything.",
+      "Either works. Tell me about your business and what you want people to feel the moment they land. I'll give you a straight answer on what the design needs before anyone commits.",
     buttonLabel: "Tell me about your project",
     href: "/contact/",
   },
@@ -353,12 +353,12 @@ export const webDesign: Service = {
   },
 
   assurance: {
-    heading: "Why it's safe to start",
+    heading: "Absolute transparency",
     items: [
       "The design files and the finished site are yours outright, down to the working files.",
       "Every build includes two weeks of free fixes after launch.",
-      "You get an honest read on fit before either of us commits to anything.",
-      "No lock-in. Everything lives in your name, and you can take it anywhere.",
+      "A straight answer on fit before anyone spends a dollar.",
+      "No lock-in. Everything lives in your name, yours to take anywhere you go.",
     ],
   },
 
@@ -370,7 +370,7 @@ export const webDesign: Service = {
         body: "Tell me about your business through the contact form or a quick email. I usually reply within a day.",
       },
       {
-        title: "An honest read",
+        title: "A straight answer",
         body: "I'll tell you straight whether chadworks is the right fit, with a rough shape and cost, no pressure.",
       },
       {

@@ -263,7 +263,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
    z-index 1. Sections WITHOUT a bg layer are untouched. */
 .cw-shell--has-bg { position: relative; }
 .cw-shell--has-bg > * { position: relative; z-index: 1; }
-.cw-shell__bg {
+/* The bg layer sits beneath content. The z-index lives on this more-specific
+   selector (0,2,0) so it beats any section's own `> *` lift rule (e.g.
+   .svc-qual-section > *), keeping the texture behind. */
+.cw-shell--has-bg > .cw-shell__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -1272,6 +1275,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: #fff;
   text-shadow: 0 2px 24px rgba(36, 57, 137, 0.35);
 }
+/* The FAQ heading carries svc-fill (the scroll-fill wipe). On the DARK FAQ band
+   the default wipe gradient is dark-on-dark; swap to the light/inverted wipe so
+   the heading reads (same treatment as .svc-dark .svc-fill). The text-shadow is
+   dropped because svc-fill paints transparent text (the shadow would ghost). */
+.svc-faq-section--dark .svc-block__heading.svc-fill {
+  text-shadow: none;
+  background-image: linear-gradient(90deg,
+    #ffffff 0%, var(--grad-peak) 30%, var(--dark-muted) 50%,
+    rgba(229, 210, 244, 0.38) 50.1%, rgba(229, 210, 244, 0.38) 100%);
+}
 .svc-faq__layout {
   position: relative;
   display: grid;
@@ -1677,6 +1690,25 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-nextstep__title { font-size: var(--text-lg); margin-bottom: var(--space-3xs); }
 .svc-nextstep__body { color: var(--text-secondary); }
+/* arrow-flow: a chevron sits in the gap between steps so the sequence reads as
+   a flow. Shown only on big screens where the steps land in one row; on
+   tablet/mobile (where cards wrap or stack) it would point the wrong way, so
+   it hides. Decorative -- the numbers carry the order for everyone. */
+.svc-nextsteps--flow .svc-nextstep { position: relative; }
+@media (min-width: 1201px) {
+  .svc-nextsteps--flow .svc-nextstep:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 1rem;
+    right: calc(var(--space-lg) * -0.62);
+    width: 0.7rem;
+    height: 0.7rem;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    transform: translateY(-50%) rotate(45deg);
+    opacity: 0.65;
+  }
+}
 
 /* CTA band */
 .svc-cta__heading { font-size: var(--text-2xl); }

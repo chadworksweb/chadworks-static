@@ -117,7 +117,7 @@ const FORM: LeadFormConfig = {
   subject: "New Inquiry from the Rates Page (chadworks)",
   submitLabel: "Send it to Chad",
   successMessage:
-    "Got it. I read every one of these myself, and you'll hear back from me within a day with an honest read on the number.",
+    "Got it. I read every one of these myself, and you'll hear back from me within a day with a straight answer on the number.",
   fields: [
     { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
     { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
@@ -211,7 +211,7 @@ export default function RatesPage() {
         </p>
 
         <div className="svc-hero__cta">
-          <CtaButton href="/contact/" label="Get an honest read" />
+          <CtaButton href="/contact/" label="Get a straight answer" />
         </div>
       </section>
 
@@ -313,7 +313,7 @@ export default function RatesPage() {
               <h2 className="svc-cta__heading">Want a number for your project?</h2>
               <p className="svc-cta__body">
                 Tell me what you are building and roughly where you would like
-                the number to land. You will get an honest read from the person
+                the number to land. You will get a straight answer from the person
                 who would do the work, usually within a day.
               </p>
             </div>

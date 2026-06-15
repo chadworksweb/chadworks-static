@@ -209,8 +209,8 @@ export const emailMarketing: Service = {
   cta: {
     heading: "Want the channel you own working?",
     body:
-      "Tell me about your list, even if it's a messy export nobody has touched in a year. You'll get an honest read on what the channel could return and what the setup takes.",
-    buttonLabel: "Get the honest read",
+      "Tell me about your list, even if it's a messy export nobody has touched in a year. You'll get a straight answer on what the channel could return and what the setup takes.",
+    buttonLabel: "Get the straight answer",
     href: "/contact/",
   },
 
@@ -275,7 +275,7 @@ export const emailMarketing: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me where the list stands through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "What the channel could return for your business, and whether it's even your gap." },
+      { title: "A straight answer", body: "What the channel could return for your business, and whether it's even your gap." },
       { title: "A scoped setup", body: "Cleanup, segments, templates, calendar, and the number, in writing before anything starts." },
       { title: "The channel runs", body: "Sends go out to people who want them, and the list stays yours." },
     ],

@@ -198,7 +198,7 @@ export const shopify: Service = {
 
   cta: {
     heading: "Want Shopify without the Shopify look?",
-    body: "Tell me what you sell and where the store stands today. You'll get an honest read on whether Shopify is your platform, what it really costs monthly, and what a custom face on it would take.",
+    body: "Tell me what you sell and where the store stands today. You'll get a straight answer on whether Shopify is your platform, what it really costs monthly, and what a custom face on it would take.",
     buttonLabel: "Tell me about your store",
     href: "/contact/",
   },
@@ -256,7 +256,7 @@ export const shopify: Service = {
       "The store account, products, and customers are yours from day one.",
       "Every build includes two weeks of free fixes after launch.",
       "The full monthly platform cost is on the table before you subscribe.",
-      "You get an honest read on platform fit before any payment.",
+      "You get a straight answer on platform fit before any payment.",
     ],
   },
 
@@ -264,7 +264,7 @@ export const shopify: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me about the store through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "Whether Shopify fits, what it really costs monthly, and what the build would take." },
+      { title: "A straight answer", body: "Whether Shopify fits, what it really costs monthly, and what the build would take." },
       { title: "A scoped plan", body: "Written scope, number, and timeline before any payment." },
       { title: "Build, launch, handover", body: "A store that reads as yours, live in your accounts, with your team running it." },
     ],

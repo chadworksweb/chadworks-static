@@ -200,7 +200,7 @@ export const wordpress: Service = {
 
   cta: {
     heading: "Want the familiar route, minus the mess?",
-    body: "Tell me about your business and what your team needs to manage. You'll get an honest read on whether WordPress is the right call for you, and what a clean build of it would take.",
+    body: "Tell me about your business and what your team needs to manage. You'll get a straight answer on whether WordPress is the right call for you, and what a clean build of it would take.",
     buttonLabel: "Tell me about your project",
     href: "/contact/",
   },
@@ -258,7 +258,7 @@ export const wordpress: Service = {
       "The site, hosting, and admin access are in your name from day one.",
       "Every build includes two weeks of free fixes after launch.",
       "The maintenance number is published before you ever commit.",
-      "You get an honest read on whether WordPress even fits, first.",
+      "You get a straight answer on whether WordPress even fits, first.",
     ],
   },
 
@@ -266,7 +266,7 @@ export const wordpress: Service = {
     heading: "What happens after you reach out",
     steps: [
       { title: "You reach out", body: "Tell me about the business and the site through the form here. I usually reply within a day." },
-      { title: "An honest read", body: "I'll tell you straight whether WordPress is the right route, or whether you'd be paying for upkeep you don't need." },
+      { title: "A straight answer", body: "I'll tell you straight whether WordPress is the right route, or whether you'd be paying for upkeep you don't need." },
       { title: "A scoped plan", body: "If it's a fit, you get a written scope, the number, and the timeline before any payment." },
       { title: "Build, launch, maintain", body: "The site goes live in your name, and the maintenance plan keeps it healthy after." },
     ],
