@@ -39,7 +39,7 @@ export default function WebDesignPage() {
       overrides={{
         approach: (
           <ProcessCapsule
-            heading={service.approach.heading}
+            pageName="web design"
             steps={service.approach.steps}
             scheme="inverted"
           />

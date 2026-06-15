@@ -1046,14 +1046,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   box-shadow: 0 0 0 6px rgba(36, 57, 137, 0.55), 0 6px 18px rgba(0, 0, 0, 0.35);
   z-index: 1;
 }
-.cw-process__item:nth-child(odd) .cw-process__marker {
-  right: -1.2rem;
-  transform: translateX(50%);
-}
-.cw-process__item:nth-child(even) .cw-process__marker {
-  left: -1.2rem;
-  transform: translateX(-50%);
-}
+/* The marker is 2.4rem wide; offsetting its edge by half that (1.2rem) past the
+   item edge lands its CENTER exactly on the line. No translate (that double-
+   shifted it off-center). */
+.cw-process__item:nth-child(odd) .cw-process__marker { right: -1.2rem; }
+.cw-process__item:nth-child(even) .cw-process__marker { left: -1.2rem; }
 .cw-process__card { padding: var(--space-md) var(--space-md); }
 .cw-process__step {
   font-family: var(--font-mono);

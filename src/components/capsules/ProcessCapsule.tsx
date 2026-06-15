@@ -16,7 +16,10 @@ import { W } from "@/components/capsules/shared";
 export type ProcessStep = { title: string; body?: Writable };
 
 export type ProcessCapsuleProps = {
-  heading: React.ReactNode;
+  // Heading is "The <page> process" by default (e.g. "The web design process"),
+  // derived from `pageName`; an explicit `heading` overrides it.
+  pageName?: string;
+  heading?: React.ReactNode;
   intro?: Writable;
   steps: ProcessStep[];
   stepLabel?: (i: number) => string; // supertitle text; default "Step N"
@@ -25,14 +28,17 @@ export type ProcessCapsuleProps = {
 };
 
 export function ProcessCapsule({
+  pageName,
   heading,
   intro,
   steps,
   stepLabel = (i) => `Step ${i + 1}`,
 }: ProcessCapsuleProps) {
+  const resolvedHeading =
+    heading ?? (pageName ? `The ${pageName} process` : "The process");
   return (
     <SectionShell full className="svc-block svc-dark cw-process">
-      <h2 className="svc-block__heading">{heading}</h2>
+      <h2 className="svc-block__heading">{resolvedHeading}</h2>
       {intro && (
         <p className="svc-block__body measure-prose cw-process__intro">
           <W value={intro} />
@@ -40,7 +46,7 @@ export function ProcessCapsule({
       )}
       <ol className="cw-process__line">
         {steps.map((s, i) => (
-          <li key={i} className="cw-process__item">
+          <li key={i} className="cw-process__item reveal">
             <span className="cw-process__marker" aria-hidden="true">
               {String(i + 1).padStart(2, "0")}
             </span>
