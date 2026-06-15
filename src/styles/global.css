@@ -255,6 +255,23 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .scheme-inverted .eyebrow { color: var(--dark-muted); }
 
 /* =====================================================================
+   CAPSULE SECTIONSHELL -- optional background-texture layer.
+   A capsule may hand SectionShell a `bg` node (e.g. <GrainField/>); the shell
+   adds `.cw-shell--has-bg` and renders `.cw-shell__bg` as an absolute layer
+   BENEATH the content. This is the structural fix for the grain-above-content
+   bug: the texture sits at z-index 0, every other direct child lifts to
+   z-index 1. Sections WITHOUT a bg layer are untouched. */
+.cw-shell--has-bg { position: relative; }
+.cw-shell--has-bg > * { position: relative; z-index: 1; }
+.cw-shell__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* =====================================================================
    INVERTED (DARK) SECTIONS -- light/dark rhythm anchors. Add `full svc-dark`
    to any section; content re-anchors to the rail and every element inverts.
    ===================================================================== */
