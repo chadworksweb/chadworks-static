@@ -3360,3 +3360,52 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (prefers-reduced-motion: reduce) {
   .cw-orb__layer { animation: none; opacity: 0.32; }
 }
+
+/* =====================================================================
+   COMPARE TABLE -- the switch-page comparison (old platform vs a custom
+   static site). A 3-column scan; the "us" column is tinted as the
+   recommended side. Lives in the problemArt section. Plain semantic markup.
+   ===================================================================== */
+.cw-compare {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  margin-top: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-base);
+  box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07);
+}
+.cw-compare__row { display: contents; }
+.cw-compare__cell {
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  font-size: var(--text-base);
+  line-height: var(--leading-snug);
+}
+.cw-compare__row--head .cw-compare__cell { border-top: 0; }
+.cw-compare__feature { font-weight: 600; color: var(--text-primary); }
+.cw-compare__them,
+.cw-compare__us {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cw-compare__them,
+.cw-compare__them-val { color: var(--text-secondary); }
+/* the recommended column, tinted end to end */
+.cw-compare__us,
+.cw-compare__us-val {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+.cw-compare__us { color: var(--accent); font-weight: 600; }
+.cw-compare__us-val { font-weight: 500; }
+@media (max-width: 600px) {
+  .cw-compare__cell { padding: var(--space-xs) var(--space-sm); font-size: var(--text-sm); }
+  .cw-compare__them,
+  .cw-compare__us { font-size: 0.65rem; letter-spacing: 0.06em; }
+}

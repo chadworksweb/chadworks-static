@@ -36,11 +36,9 @@ export const leaveWordpress: Service = {
 
   keyFactsHeading: "Leaving WordPress, at a glance",
   keyFacts: [
-    "Static hosting from chadworks is $20 a month. Most WordPress hosts land around $30, so leaving puts about $10 back in your pocket every month for a site that also happens to be faster.",
+    "Static hosting from chadworks is $20 a month, where most WordPress hosts land around $30, so leaving puts about $10 back in your pocket every month for a site that also happens to be faster. Non-profits pay $10.",
     "There is no admin to log into and no database sitting behind your site, so there is almost nothing left for someone to hack or for you to keep patched. Security comes built in.",
     "WordPress only earns its monthly cost if you are actually publishing on it. If your site mostly just sits there, that edit-it-yourself feature is quietly costing you somewhere between a hundred and a thousand-plus dollars a year that you never get back.",
-    "When you do need a wording change or a new page, you send it to me and I make it for you, usually fast, and for far less than a monthly maintenance retainer.",
-    "Run a non-profit or a tight budget? Static hosting is $10 a month.",
   ],
 
   problem: {

@@ -26,6 +26,9 @@
 
 - [Leave WordPress](https://chadworks.co/switch/leave-wordpress/): Rebuild a WordPress site that just sits there as fast, secure static pages on the same domain. Static hosting is $20 a month (about $10 less than a typical WordPress host), $10 for non-profits. Local-lead near Philadelphia, remote-friendly.
 - [Gmail to Google Workspace](https://chadworks.co/switch/gmail-to-workspace/): Move off a free @gmail.com onto a branded you@yourdomain.com inside the same Gmail interface. Google Workspace runs under $10 a month per user; chadworks sets it up for a flat $300 (training and signature included), $25 per additional mailbox.
+- [Squarespace to Static](https://chadworks.co/switch/squarespace-to-static/): Rebuild a rented Squarespace template as a fast custom static site you own outright, hosted for $20 a month ($10 non-profit), designed around your business instead of a shared theme.
+- [Wix to Static](https://chadworks.co/switch/wix-to-static/): Leave a Wix site you can't export. Rebuilt as a fast custom static site you own and can take anywhere, hosted for $20 a month ($10 non-profit).
+- [GoDaddy to Static](https://chadworks.co/switch/godaddy-to-static/): Trade the GoDaddy Website Builder for a real custom static site designed around your business. Keep your domain, drop the builder fee; hosting is $20 a month ($10 non-profit).
 
 ## About
 

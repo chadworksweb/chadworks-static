@@ -31,11 +31,9 @@ export const gmailToWorkspace: Service = {
 
   keyFactsHeading: "Gmail to Workspace, at a glance",
   keyFacts: [
-    "Google Workspace is the exact same Gmail you already use, the same inbox and the same app, except your address becomes you@yourdomain.com instead of you@gmail.com.",
-    "A branded address reads as more established to a customer than a free @gmail.com, and Google Workspace runs under $10 a month per user, paid to Google.",
-    "chadworks sets the whole thing up for a one-time $300 fee, which includes a 30-minute training session and your email signature.",
-    "Bringing your team over? Additional accounts are $25 each when they are set up at the same time.",
-    "It is the same Gmail interface either way, so there is nothing new to learn. The only thing that changes is the name on your email.",
+    "Google Workspace is the exact same Gmail you already use, the same inbox and the same app, except your address becomes you@yourdomain.com instead of you@gmail.com. Nothing new to learn.",
+    "A branded address reads as far more established to a customer than a free @gmail.com, and Google Workspace runs under $10 a month per user, paid straight to Google.",
+    "chadworks sets the whole thing up for a one-time $300 fee, including a 30-minute training session and your email signature. Extra mailboxes are $25 each when set up at the same time.",
   ],
 
   problem: {
