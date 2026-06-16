@@ -1,0 +1,57 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/website-design-and-development", "destination": "/websites/", "permanent": true },
+    { "source": "/website-design-and-development/website-design-packages", "destination": "/web-design-packages/", "permanent": true },
+    { "source": "/shopify-web-design", "destination": "/shopify/", "permanent": true },
+    { "source": "/web-hosting-for-small-business", "destination": "/websites/", "permanent": true },
+    { "source": "/pay-monthly-websites", "destination": "/web-design-packages/", "permanent": true },
+
+    { "source": "/search-engine-optimization", "destination": "/seo/", "permanent": true },
+    { "source": "/search-engine-optimization/seo-foundations", "destination": "/seo/", "permanent": true },
+    { "source": "/search-engine-optimization/seo-website-audit", "destination": "/ai-visibility-audit/", "permanent": true },
+
+    { "source": "/music-industry-web-design-consulting", "destination": "/music-industry-web-design/", "permanent": true },
+
+    { "source": "/about/rate-and-fees", "destination": "/rates/", "permanent": true },
+    { "source": "/about/faqs", "destination": "/faqs/", "permanent": true },
+
+    { "source": "/ive-got-wix-squarespace-why-do-i-need-a-web-designer", "destination": "/switch/squarespace-to-static/", "permanent": true },
+    { "source": "/read-this-before-you-build-your-own-website", "destination": "/web-design/", "permanent": true },
+    { "source": "/exploring-the-key-benefits-of-webmaster-services", "destination": "/websites/", "permanent": true },
+    { "source": "/insight-ai-driven-search-algorithms-wont-kill-traditional-seo", "destination": "/ai-viz/", "permanent": true },
+
+    { "source": "/resources/web/wordpress-to-static-with-ai", "destination": "/switch/leave-wordpress/", "permanent": true },
+    { "source": "/resources/web/handcoded-form-pipeline", "destination": "/custom-coded-static/", "permanent": true },
+    { "source": "/resources/web/audit-first-style-extraction", "destination": "/web-development/", "permanent": true },
+    { "source": "/resources/visibility/geo-aeo-setup-static-site", "destination": "/ai-viz/", "permanent": true },
+    { "source": "/resources/process/revision-workflow-with-ai", "destination": "/websites/", "permanent": true },
+    { "source": "/resources/process/archive-old-project-cleanly", "destination": "/websites/", "permanent": true },
+    { "source": "/resources/voice/humanize-ai-output", "destination": "/ai-viz/", "permanent": true },
+    { "source": "/resources/web", "destination": "/websites/", "permanent": true },
+    { "source": "/resources/visibility", "destination": "/visibility/", "permanent": true },
+    { "source": "/resources/process", "destination": "/websites/", "permanent": true },
+    { "source": "/resources/voice", "destination": "/visibility/", "permanent": true },
+
+    { "source": "/blog", "destination": "/", "permanent": true },
+    { "source": "/category/client-resources", "destination": "/", "permanent": true },
+    { "source": "/category/general", "destination": "/", "permanent": true },
+
+    { "source": "/cookie-policy", "destination": "/privacy-policy/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
+        { "key": "X-DNS-Prefetch-Control", "value": "on" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; upgrade-insecure-requests" }
+      ]
+    }
+  ]
+}
