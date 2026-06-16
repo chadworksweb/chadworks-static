@@ -24,6 +24,11 @@
 - [Digital Marketing](https://chadworks.co/digital-marketing/): Honest channel triage: which channels a business actually needs, with access to OpenAI's ChatGPT advertising beta.
 - [Email Marketing](https://chadworks.co/email-marketing/): The channel you own: clean lists, real segments, restrained cadence. Mailchimp is free up to 500 contacts, and clients hear when free is all they need.
 
+## Design (industry web design)
+
+- [Website Design for Septic Companies](https://chadworks.co/design/septic/): Septic service websites built to win the 11pm emergency call: fast on a phone, tap-to-call in the header, license and insurance up top, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run $5,200 to $8,200, quoted up front.
+- [Website Design for Foundation Repair Contractors](https://chadworks.co/design/foundation-repair/): Foundation repair websites built to win the basement-flood call: fast on a phone, engineer signoff and transferable warranty up top, a dedicated ranking page for every method (helical piering, crack injection, waterproofing, crawl space, slab leveling), and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run $5,200 to $8,200, quoted up front.
+
 ## Switch
 
 - [Leave WordPress](https://chadworks.co/switch/leave-wordpress/): Rebuild a WordPress site that just sits there as fast, secure static pages on the same domain. Static hosting is $20 a month (about $10 less than a typical WordPress host), $10 for non-profits. Local-lead near Philadelphia, remote-friendly.

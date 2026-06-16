@@ -4200,6 +4200,26 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-copysample__cta-primary { background: linear-gradient(135deg, #084030 0%, #0c5d4a 100%); color: #ffffff; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 6px; text-decoration: none; box-shadow: 0 4px 14px rgba(12, 93, 74, 0.25); }
 .cw-art-copysample__cta-ghost { background: transparent; color: #1f2225; border: 1px solid rgba(12, 93, 74, 0.22); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0.7rem 1.1rem; border-radius: 6px; text-decoration: none; }
 
+/* ----- FoundationWorks demo brand override (foundation-repair) -----
+   The brand-kit and sample-copy panels DEPICT a sample client brand. The
+   default (septic) demo paints SepticPros' green identity; the FoundationWorks
+   demo must paint its own four-color blue system (#243989 / #5A7A9E / #2C3E50)
+   and the Lexend display face named in its type caption. Scoped to the --fdn
+   modifier so the septic demo is untouched. */
+.cw-art-brandkit--fdn .cw-art-brandkit__panel-title,
+.cw-art-brandkit--fdn .cw-art-brandkit__logo-name { color: #243989; }
+.cw-art-brandkit--fdn .cw-art-brandkit__type-heading { font-family: var(--font-display); color: #243989; }
+.cw-art-brandkit--fdn .cw-art-brandkit__button { background: linear-gradient(135deg, #1b2a66 0%, #243989 100%); box-shadow: 0 4px 16px rgba(36, 57, 137, 0.25); }
+.cw-art-brandkit--fdn .cw-art-brandkit__button-ghost { color: #243989; border-color: rgba(36, 57, 137, 0.32); }
+.cw-art-brandkit--fdn .cw-art-brandkit__logo-mark { background: #243989; font-family: var(--font-display); }
+.cw-art-copysample--fdn { border-left-color: #243989; }
+.cw-art-copysample--fdn .cw-art-copysample__tag { background: #243989; }
+.cw-art-copysample--fdn .cw-art-copysample__h1 { font-family: var(--font-display); }
+.cw-art-copysample--fdn .cw-art-copysample__h1 em { background: linear-gradient(120deg, #1b2a66 0%, #243989 55%, #5a7a9e 100%); -webkit-background-clip: text; background-clip: text; }
+.cw-art-copysample--fdn .cw-art-copysample__badge { border-color: rgba(36, 57, 137, 0.22); color: #243989; }
+.cw-art-copysample--fdn .cw-art-copysample__cta-primary { background: linear-gradient(135deg, #1b2a66 0%, #243989 100%); box-shadow: 0 4px 14px rgba(36, 57, 137, 0.25); }
+.cw-art-copysample--fdn .cw-art-copysample__cta-ghost { border-color: rgba(36, 57, 137, 0.22); }
+
 /* ----- Chapter 06 visibility (agent 3): chat + SERP + map ----- */
 .cw-art-ch__intro { max-width: 720px; margin-bottom: 2.4rem; }
 .cw-art-ch__intro--split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1.6rem, 3vw, 2.6rem); align-items: start; max-width: 100%; }
