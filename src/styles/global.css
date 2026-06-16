@@ -1449,7 +1449,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   opacity: 0.32; /* THE visibility dial -- tune here */
 }
 .svc-qual-section > * { position: relative; z-index: 1; }
-.svc-qual-section > .svc-grain-canvas { z-index: 0; }
+/* Restore the canvas to its out-of-flow overlay: the `> *` rule above (equal
+   specificity, later in source) was clobbering position:absolute, dropping the
+   canvas into the grid as a tall empty row that shoved the content down. */
+.svc-qual-section > .svc-grain-canvas { position: absolute; inset: 0; z-index: 0; }
 
 /* MADE-BY -- the septic "Hi, I'm Chad" founder block (industry_made):
    cutout photo + caption card, manifesto rows on accent-tinted gradients,
