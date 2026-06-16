@@ -4753,3 +4753,365 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-others__card--disabled::before { display: none; }
 .cw-art-others__card--active .cw-art-others__name { color: #243989; }
 @media (max-width: 720px) { .cw-art-others__desc { font-size: 0.7rem; } }
+
+/* =====================================================================
+   PORTFOLIO SHOWROOM (cw-port-*) -- the signature /portfolio/ experience.
+   A reusable CSS/SVG device frame (MockupFrame), the Mode A featured
+   showcase with a scroll-driven zoom, and the Mode B archive grid. Token
+   styled; reuses the global browser-chrome treatment and the ripple canvas.
+   ===================================================================== */
+
+/* ---- MockupFrame: the premium browser/laptop bezel -------------------- */
+.cw-port-frame {
+  position: relative;
+  border-radius: calc(var(--radius) + 4px);
+  background: linear-gradient(160deg, #ffffff 0%, #faf7fe 100%);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  /* Layered, realistic depth: a tight contact shadow, a soft mid lift, and a
+     wide ambient cast in the brand indigo. */
+  box-shadow:
+    0 1px 2px rgba(36, 57, 137, 0.10),
+    0 10px 24px rgba(36, 57, 137, 0.10),
+    0 34px 64px rgba(36, 57, 137, 0.16);
+}
+/* a faint top sheen so the bezel reads like a real screen surface */
+.cw-port-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 16%);
+  z-index: 4;
+}
+
+/* the chrome bar */
+.cw-port-frame__bar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.9rem;
+  background: linear-gradient(180deg, #f5f0fb 0%, #efe8f8 100%);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.cw-port-frame__dots { display: inline-flex; gap: 0.4rem; flex: 0 0 auto; }
+.cw-port-frame__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d4ccdf;
+  box-shadow: inset 0 0 0 0.5px rgba(36, 57, 137, 0.08);
+}
+.cw-port-frame__dot:nth-child(1) { background: #e0a3ad; }
+.cw-port-frame__dot:nth-child(2) { background: #e6c79a; }
+.cw-port-frame__dot:nth-child(3) { background: #9fc6a6; }
+.cw-port-frame__url {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.2rem 1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cw-port-frame__bar-spacer { flex: 0 0 2.2rem; }
+@media (max-width: 600px) { .cw-port-frame__bar-spacer { display: none; } }
+
+/* the screenshot surface */
+.cw-port-frame__screen {
+  position: relative;
+  overflow: hidden;
+  background: #ffffff;
+}
+.cw-port-frame__img { display: block; width: 100%; height: auto; }
+.cw-port-frame__water {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* laptop variant (optional): a thicker dark bezel + a base lip drawn in CSS */
+.cw-port-frame--laptop {
+  border-radius: 14px;
+  padding: 10px 10px 0;
+  background: linear-gradient(160deg, #2a2540 0%, #1f1b30 100%);
+  border-color: rgba(36, 57, 137, 0.4);
+}
+.cw-port-frame--laptop .cw-port-frame__screen { border-radius: 6px; }
+.cw-port-frame--laptop::after { display: none; }
+.cw-port-frame--laptop::before {
+  content: "";
+  display: block;
+  height: 12px;
+  margin: 8px -10px 0;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(180deg, #3a3354 0%, #221d35 100%);
+}
+
+/* ---- MODE A: the featured showcase ----------------------------------- */
+.cw-port-feat-shell { margin-top: var(--space-md); }
+.cw-port-feat {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+@media (max-width: 900px) {
+  .cw-port-feat { grid-template-columns: 1fr; gap: var(--space-lg); }
+}
+
+.cw-port-feat__copy { display: flex; flex-direction: column; gap: var(--space-sm); }
+.cw-port-feat__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+  margin: 0;
+}
+.cw-port-feat__lede {
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+  max-width: 46ch;
+}
+.cw-port-feat__link {
+  align-self: flex-start;
+  margin-top: var(--space-2xs);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s var(--ease-smooth), color 0.3s var(--ease-smooth);
+}
+.cw-port-feat__link:hover { border-color: var(--accent); }
+
+/* the layered stage: front piece over a counter-drifting back piece */
+.cw-port-feat__stage {
+  position: relative;
+  isolation: isolate;
+}
+.cw-port-feat__layer { will-change: transform; }
+.cw-port-feat__layer--back {
+  position: absolute;
+  top: -7%;
+  right: -6%;
+  width: 62%;
+  z-index: 1;
+  opacity: 0.9;
+  filter: saturate(0.96);
+}
+.cw-port-feat__layer--back .cw-port-frame {
+  box-shadow: 0 20px 44px rgba(36, 57, 137, 0.16);
+}
+.cw-port-feat__layer--front { position: relative; z-index: 2; }
+.cw-port-feat__shot-link {
+  display: block;
+  border-radius: calc(var(--radius) + 4px);
+  transition: transform 0.4s var(--ease-smooth);
+}
+.cw-port-feat__shot-link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+/* on phones/tablets the back layer would crowd the stage: tuck it inline */
+@media (max-width: 900px) {
+  .cw-port-feat__layer--back {
+    position: static;
+    width: 100%;
+    margin-top: var(--space-md);
+    opacity: 1;
+  }
+  .cw-port-feat__stage { display: flex; flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-port-feat__layer, .cw-port-feat__shot-link { transition: none; }
+}
+
+/* ---- MODE B: the archive grid ---------------------------------------- */
+.cw-port-archive__heading {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+  margin-top: var(--space-2xs);
+}
+.cw-port-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-top: var(--space-lg);
+}
+@media (max-width: 600px) { .cw-port-grid { grid-template-columns: 1fr; } }
+
+.cw-port-card { display: flex; flex-direction: column; gap: var(--space-sm); }
+.cw-port-card__link {
+  display: block;
+  position: relative;
+  border-radius: calc(var(--radius) + 4px);
+  transition: transform 0.4s var(--ease-smooth);
+}
+.cw-port-card__link:hover { transform: translateY(-6px); }
+.cw-port-card__link:hover .cw-port-frame {
+  box-shadow:
+    0 1px 2px rgba(36, 57, 137, 0.10),
+    0 16px 30px rgba(36, 57, 137, 0.14),
+    0 40px 74px rgba(36, 57, 137, 0.22);
+  border-color: rgba(128, 84, 188, 0.4);
+}
+.cw-port-card__link:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 4px;
+}
+.cw-port-card__cue {
+  position: absolute;
+  right: 0.7rem;
+  bottom: 0.7rem;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.42rem 0.7rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(128, 84, 188, 0.35);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
+  pointer-events: none;
+}
+.cw-port-card__cue-arrow { font-size: 0.8rem; line-height: 1; }
+.cw-port-card__link:hover .cw-port-card__cue,
+.cw-port-card__link:focus-visible .cw-port-card__cue {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cw-port-card__meta { display: flex; flex-direction: column; gap: 0.35rem; }
+.cw-port-card__label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-lg);
+  color: var(--text-primary);
+  margin: 0;
+}
+.cw-port-card__label a { color: inherit; text-decoration: none; }
+.cw-port-card__label a:hover { color: var(--accent); }
+.cw-port-card__blurb {
+  color: var(--text-secondary);
+  line-height: var(--leading-body);
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-port-card__link, .cw-port-card__cue { transition: none; }
+  .cw-port-card__link:hover { transform: none; }
+}
+
+/* ---- PORTFOLIO DEVICE VIEWER (desktop / tablet / mobile toggle) -------
+   Each site is shown through a DeviceMockup: a fixed-height stage hosts the
+   frame, and the frame is sized by HEIGHT (aspect-ratio per device) so toggling
+   devices swaps image + bezel without reflowing the grid. */
+.cw-port-device { display: flex; flex-direction: column; gap: 0.85rem; }
+.cw-port-device--card { --cw-stage-h: clamp(230px, 32vw, 340px); }
+.cw-port-device--feature { --cw-stage-h: clamp(320px, 44vw, 540px); }
+
+.cw-port-device__stage {
+  height: var(--cw-stage-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+/* height-driven: definite height (the stage) + aspect-ratio sets the width */
+.cw-port-device__stage .cw-port-frame {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.cw-port-device[data-device="desktop"] .cw-port-frame { aspect-ratio: 1.5; }
+.cw-port-device[data-device="tablet"] .cw-port-frame { aspect-ratio: 0.74; }
+.cw-port-device[data-device="mobile"] .cw-port-frame { aspect-ratio: 0.46; }
+.cw-port-device__stage .cw-port-frame__screen { flex: 1 1 auto; min-height: 0; width: 100%; }
+.cw-port-device__stage .cw-port-frame__img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: top center;
+}
+
+/* tablet + phone bezels (the dark border is the bezel; box-sizing keeps the
+   aspect-ratio honest). */
+.cw-port-frame--tablet,
+.cw-port-frame--phone {
+  background: #15121f;
+  border: 12px solid #15121f;
+  box-shadow:
+    0 1px 2px rgba(36, 57, 137, 0.10),
+    0 12px 28px rgba(36, 57, 137, 0.12),
+    0 36px 66px rgba(36, 57, 137, 0.18);
+}
+.cw-port-frame--tablet { border-radius: 26px; border-width: 12px; }
+.cw-port-frame--phone { border-radius: 34px; border-width: 11px; }
+.cw-port-frame--tablet::after,
+.cw-port-frame--phone::after { display: none; }
+.cw-port-frame--tablet .cw-port-frame__screen,
+.cw-port-frame--phone .cw-port-frame__screen { border-radius: 14px; }
+.cw-port-frame__notch {
+  position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+  width: 42%; height: 15px; background: #15121f;
+  border-radius: 0 0 12px 12px; z-index: 6;
+}
+.cw-port-frame__cam {
+  position: absolute; top: 4px; left: 50%; transform: translateX(-50%);
+  width: 6px; height: 6px; border-radius: 50%; background: #36304a; z-index: 6;
+}
+
+/* the segmented device toggle */
+.cw-port-device__toggle {
+  display: inline-flex; align-self: center; gap: 2px; padding: 3px;
+  background: var(--bg-surface, #f3eefb);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+}
+.cw-port-device__btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em;
+  padding: 0.38rem 0.8rem; border: none; background: transparent;
+  color: var(--text-secondary); border-radius: 999px; cursor: pointer;
+  transition: background 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
+}
+.cw-port-device__btn:hover { color: var(--text-primary); }
+.cw-port-device__btn.is-active { background: var(--accent); color: #fff; }
+.cw-port-device__btn-icon { display: inline-flex; }
+@media (max-width: 600px) { .cw-port-device__btn-label { display: none; } }
+
+/* featured zoom wrapper (the scroll-driven scale target) */
+.cw-port-feat__stage { display: flex; justify-content: center; }
+.cw-port-feat__zoom { width: 100%; transform-origin: center; will-change: transform; }
+
+/* archive card layout (frame is no longer a link; the cue + label are) */
+.cw-port-card { display: flex; flex-direction: column; gap: 0.9rem; }
+.cw-port-card__meta { display: flex; flex-direction: column; gap: 0.35rem; }
+.cw-port-card__cue {
+  align-self: flex-start; margin-top: 0.2rem;
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
+  color: var(--accent); text-decoration: none;
+}
+.cw-port-card__cue:hover { text-decoration: underline; }

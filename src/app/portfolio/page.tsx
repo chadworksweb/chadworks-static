@@ -1,18 +1,22 @@
-// Route: /portfolio/ -- LEAN MVP. A short intro section plus the sitewide
-// PortfolioCapsule fed six real client shots. The full immersive
-// camera-zoom experience (CWS-PORTFOLIO-MOCKUP.md) is deferred to the
-// comb-through; this is the breadth-first version.
+// Route: /portfolio/ -- the signature showroom. A short hero intro, then the
+// FeaturedShowcase (Mode A: the flagship piece with a scroll-driven zoom that
+// degrades to a clean static render on phones and for reduced-motion), then the
+// ArchiveGrid (Mode B: the rest of the work). Every site is shown through a
+// DeviceMockup -- a desktop / tablet / mobile toggle over real captures of the
+// live site at each breakpoint (/portfolio/<slug>-<device>.jpg) inside a CSS/SVG
+// device frame. No stock photos, no live capture at runtime.
 
 import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
 import { PageComposer } from "@/components/capsules/PageComposer";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { PortfolioCapsule } from "@/components/capsules";
+import { FeaturedShowcase } from "@/components/portfolio/FeaturedShowcase";
+import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
 
 const PAGE_URL = `${SITE_URL}/portfolio/`;
 const TITLE = "Portfolio: Real Client Sites by chadworks | chadworks";
 const DESCRIPTION =
-  "A look at real client sites custom built by chadworks: tree service, event catering, landscape design, massage, automation, and more. Every one designed and developed by one person.";
+  "A showroom of real client sites I designed and developed: tree service, event catering, landscape design, massage, automation, law, and more. See each one at desktop, tablet, and mobile. One person, start to finish, every site owned outright by the business it serves.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -33,6 +37,110 @@ export const metadata: Metadata = {
   },
 };
 
+// ---- The flagship piece (Mode A) -----------------------------------------
+const featured = {
+  slug: "russtree",
+  alt: "Russ Tree Service website, designed and developed by chadworks",
+  url: "russtreeservice.com",
+  label: "Russ Tree Service",
+  href: "https://russtreeservice.com",
+};
+
+// ---- The archive (Mode B) -------------------------------------------------
+const archive: ArchiveItem[] = [
+  {
+    key: "aac",
+    slug: "aac",
+    alt: "AAC Event Catering website, designed and developed by chadworks",
+    url: "aaceventcatering.com",
+    label: "AAC Event Catering",
+    href: "https://aaceventcatering.com",
+    blurb:
+      "A catering brand that needed to look as polished as the events it runs. Booking-ready, and built to win the search.",
+  },
+  {
+    key: "edenscapes",
+    slug: "edenscapes",
+    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
+    url: "eden-scapes.com",
+    label: "EdenScapes",
+    href: "https://eden-scapes.com/japanese-garden-design-installation/",
+    blurb:
+      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
+  },
+  {
+    key: "massagepros",
+    slug: "massagepros",
+    alt: "Massage Professionals website, designed and developed by chadworks",
+    url: "massageprofessionalsllc.com",
+    label: "Massage Professionals",
+    href: "https://massageprofessionalsllc.com",
+    blurb:
+      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
+  },
+  {
+    key: "adsautomation",
+    slug: "adsautomation",
+    alt: "ADS Automation website, designed and developed by chadworks",
+    url: "adsautomation.com",
+    label: "ADS Automation",
+    href: "https://adsautomation.com",
+    blurb:
+      "Industrial automation is technical work, so the site reads clear and credible without drowning a visitor in jargon.",
+  },
+  {
+    key: "thorobird",
+    slug: "thorobird",
+    alt: "Thorobird website, designed and developed by chadworks",
+    url: "thorobird.com",
+    label: "Thorobird",
+    href: "https://thorobird.com",
+    blurb:
+      "A brand site with a distinct point of view, custom built so it carries the personality the business actually has.",
+  },
+  {
+    key: "abracadabragems",
+    slug: "abracadabragems",
+    alt: "Abracadabra Gems website, designed and developed by chadworks",
+    url: "abracadabragems.com",
+    label: "Abracadabra Gems",
+    href: "https://abracadabragems.com",
+    blurb:
+      "Gemstones want color and light. The layout puts the product first and lets each piece carry the page.",
+  },
+  {
+    key: "rozariolaw",
+    slug: "rozariolaw",
+    alt: "Rozario Law website, designed and developed by chadworks",
+    url: "rozariolaw.com",
+    label: "Rozario Law",
+    href: "https://rozariolaw.com",
+    blurb:
+      "A law practice has seconds to earn trust. This one opens steady and serious, and tells a visitor exactly what to do next.",
+  },
+  {
+    key: "risingcompass",
+    slug: "risingcompass",
+    alt: "Rising Compass website, designed and developed by chadworks",
+    url: "risingcompass.net",
+    label: "Rising Compass",
+    href: "https://risingcompass.net",
+    blurb:
+      "One of my own builds: a data-driven product with a custom interface, designed and shipped the same way I ship client work.",
+  },
+  {
+    key: "chadlewine",
+    slug: "chadlewine",
+    alt: "Chad Lewine website, designed and developed by chadworks",
+    url: "chadlewine.com",
+    label: "Chad Lewine",
+    href: "https://chadlewine.com",
+    blurb:
+      "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
+  },
+];
+
+// ---- Structured data ------------------------------------------------------
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -42,6 +150,11 @@ const breadcrumbJsonLd = {
   ],
 };
 
+const works = [
+  { name: featured.label, url: featured.href, slug: featured.slug },
+  ...archive.map((a) => ({ name: a.label, url: a.href, slug: a.slug })),
+];
+
 const collectionJsonLd = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -49,56 +162,26 @@ const collectionJsonLd = {
   url: PAGE_URL,
   description: DESCRIPTION,
   provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
-};
-
-const portfolio = {
-  heading: "Sites I've custom built",
-  intro:
-    "A sample of real client work. Each of these was designed and developed by one person, start to finish, and each one belongs to the business it was built for. Hover any shot to bring it to life, or click through to see it live.",
-  items: [
-    {
-      label: "Russ Tree Service",
-      img: "/portfolio/russtree.webp",
-      alt: "Russ Tree Service website by chadworks",
-      href: "https://russtreeservice.com",
-    },
-    {
-      label: "AAC Event Catering",
-      img: "/portfolio/aac.webp",
-      alt: "AAC Event Catering website by chadworks",
-      href: "https://aaceventcatering.com",
-    },
-    {
-      label: "EdenScapes",
-      img: "/portfolio/edenscapes.webp",
-      alt: "EdenScapes Japanese garden design website by chadworks",
-      href: "https://eden-scapes.com/japanese-garden-design-installation/",
-    },
-    {
-      label: "Massage Professionals",
-      img: "/portfolio/massagepros.webp",
-      alt: "Massage Professionals website by chadworks",
-      href: "https://massageprofessionalsllc.com",
-    },
-    {
-      label: "ADS Automation",
-      img: "/portfolio/adsautomation.webp",
-      alt: "ADS Automation website by chadworks",
-      href: "https://adsautomation.com",
-    },
-    {
-      label: "Thorobird",
-      img: "/portfolio/thorobird.webp",
-      alt: "Thorobird website by chadworks",
-      href: "https://thorobird.com",
-    },
-  ],
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: works.length,
+    itemListElement: works.map((w, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "WebSite",
+        name: w.name,
+        url: w.url,
+        image: `${SITE_URL}/portfolio/${w.slug}-desktop.jpg`,
+      },
+    })),
+  },
 };
 
 export default function PortfolioPage() {
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, collectionJsonLd]}>
-      {/* INTRO -- short framing above the shots. */}
+      {/* INTRO -- short framing above the showcase. */}
       <SectionShell>
         <p className="eyebrow">Selected work</p>
         <h1 className="svc-hero__title">
@@ -108,11 +191,32 @@ export default function PortfolioPage() {
           Twenty years of building, and the part I never outsource is the
           building itself. Here are real client sites I designed and developed,
           each one fast, findable, and owned outright by the business it serves.
+          See any of them at desktop, tablet, and mobile.
         </p>
       </SectionShell>
 
-      {/* THE SHOTS -- sitewide water-ripple grid, six real client sites. */}
-      <PortfolioCapsule portfolio={portfolio} slug="portfolio" />
+      {/* MODE A -- the flagship piece, with a scroll-driven zoom that drops to
+          a clean static render on phones and for reduced-motion. */}
+      <SectionShell className="cw-port-feat-shell">
+        <FeaturedShowcase
+          primary={featured}
+          eyebrow="Featured build"
+          heading="Russ Tree Service"
+          lede="A tree service that needed to look established and rank where the calls come from. I built it to load fast, read clear on a phone, and turn a local search into a booked job. Flip it between desktop, tablet, and mobile below."
+        />
+      </SectionShell>
+
+      {/* MODE B -- the archive, lazy below the fold. */}
+      <SectionShell>
+        <p className="eyebrow">The archive</p>
+        <h2 className="cw-port-archive__heading">More sites I&apos;ve custom built</h2>
+        <p className="svc-lede measure-prose">
+          A wider sample of client work. Switch any card between desktop, tablet,
+          and mobile, or open it live. Each was designed and developed by one
+          person, start to finish.
+        </p>
+        <ArchiveGrid items={archive} />
+      </SectionShell>
     </PageComposer>
   );
 }
