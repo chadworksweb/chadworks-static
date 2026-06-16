@@ -1,5 +1,5 @@
 // Service: Website Design for Foundation Repair Contractors
-// (/design/foundation-repair/) -- the foundation-repair niche page brought INTO
+// (/website-design-for-foundation-repair/) -- the foundation-repair niche page brought INTO
 // the capsule system, styled to the global tokens (CWS directive 2026-06-15:
 // works of art become capsules, CSS matches the global site). The distinctive
 // art carries over as capsule sections: the interactive Scorecard (problem
@@ -14,9 +14,10 @@ import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
 
 export const foundationRepair: Service = {
-  slug: "design/foundation-repair",
+  slug: "website-design-for-foundation-repair",
   lane: "design",
   laneLabel: "Design",
+  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
   eyebrow: "Built for the basement-flood call",
   title: "Website Design for Foundation Repair Contractors",
   intent:

@@ -161,7 +161,7 @@ export const webDesign: Service = {
         label: "Specialized design pages",
         detail:
           "Whole pages designed for a single trade, like septic services and foundation repair, each with a look pulled from that industry's world instead of a generic business template.",
-        href: "/design/",
+        href: "/my-industry-specialties/",
       },
       {
         label: "The portfolio",

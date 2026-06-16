@@ -24,7 +24,7 @@ export function FoundationOthers() {
             <div className="cw-art-others__name">Tree Services</div>
             <div className="cw-art-others__desc">Removal &middot; emergency</div>
           </a>
-          <Link className="cw-art-others__card" href="/design/septic/">
+          <Link className="cw-art-others__card" href="/website-design-for-septic-services/">
             <div className="cw-art-others__name">Septic &amp; Pumping</div>
             <div className="cw-art-others__desc">Pumping &middot; maintenance</div>
           </Link>

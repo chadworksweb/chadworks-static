@@ -42,9 +42,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/switch/squarespace-to-static/",
     "/switch/wix-to-static/",
     "/switch/godaddy-to-static/",
-    // Design lane -- the absorbed niche pages (kept verbatim as works of art)
-    "/design/septic/",
-    "/design/foundation-repair/",
+    // Industry web design -- flat root slugs (match the old live URLs) + index
+    "/my-industry-specialties/",
+    "/website-design-for-septic-services/",
+    "/website-design-for-foundation-repair/",
+    "/website-design-for-tree-companies/",
+    "/website-design-for-bands-musicians/",
+    "/web-design-for-authors/",
+    "/music-industry-web-design/",
+    "/web-design-for-pa-preferred-members/",
+    // Local PA web design -- flat root slugs (match the old live URLs) + index
+    "/my-service-areas/",
+    "/website-design-for-norristown-pa/",
+    "/website-design-for-ambler-pa/",
+    "/website-design-for-lansdale-pa/",
+    "/website-design-for-conshohocken-pa/",
+    "/website-design-for-doylestown-pa/",
+    "/website-design-for-lancaster-pa/",
+    "/website-design-for-pottstown-pa/",
+    "/website-design-for-collegeville-pa/",
+    "/website-design-for-phoenixville-pa/",
+    // Portfolio
+    "/portfolio/",
+    // Legal
+    "/terms-of-service/",
+    "/privacy-policy/",
   ];
   return routes.map((path) => ({
     url: `${SITE_URL}${path}`,

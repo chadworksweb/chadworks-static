@@ -72,6 +72,15 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
       <HeroCapsule
         lane={s.lane}
         laneLabel={s.laneLabel}
+        crumbs={
+          s.breadcrumbParent
+            ? [
+                { label: "Home", href: "/" },
+                { label: s.breadcrumbParent.label, href: s.breadcrumbParent.href },
+                { label: s.title },
+              ]
+            : undefined
+        }
         title={s.title}
         titleNode={s.titleNode}
         eyebrow={s.eyebrow}

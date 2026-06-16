@@ -38,7 +38,8 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/switch/wix-to-static/", label: "Wix to Static" },
       { href: "/switch/godaddy-to-static/", label: "GoDaddy to Static" },
       { href: "/switch/gmail-to-workspace/", label: "Gmail to Workspace" },
-      { href: "/design/", label: "Specialized Design" },
+      { href: "/my-industry-specialties/", label: "Industry Web Design" },
+      { href: "/my-service-areas/", label: "Service Areas" },
     ],
   },
   {

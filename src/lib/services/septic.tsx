@@ -1,4 +1,4 @@
-// Service: Website Design for Septic Companies (/design/septic/) -- the septic
+// Service: Website Design for Septic Companies (/website-design-for-septic-services/) -- the septic
 // niche page brought INTO the capsule system, styled to the global tokens (CWS
 // directive 2026-06-15: works of art become capsules, CSS matches the global
 // site). The distinctive art carries over as capsule sections: the interactive
@@ -43,9 +43,10 @@ function SepticHeroArt() {
 }
 
 export const septic: Service = {
-  slug: "design/septic",
+  slug: "website-design-for-septic-services",
   lane: "design",
   laneLabel: "Design",
+  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
   eyebrow: "Built for the 11pm panic call",
   title: "Website Design for Septic Companies",
   intent:
@@ -60,7 +61,7 @@ export const septic: Service = {
       trade businesses since the MySpace days. I&apos;m Chad. Every page is fast
       on a phone, leads with your license and insurance, and is written so Google
       and the assistants name you for{" "}
-      <Link href="/design/">your town and your service</Link>. Want it found in
+      <Link href="/my-industry-specialties/">your town and your service</Link>. Want it found in
       AI answers too?{" "}
       <Link href="/ai-viz/">AI visibility</Link> rides on top of the same build.
     </>

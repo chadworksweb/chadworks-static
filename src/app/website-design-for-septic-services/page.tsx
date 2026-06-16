@@ -1,22 +1,17 @@
-// Route: /design/foundation-repair/ -- the foundation-repair work of art,
-// reproduced section by section in the SOURCE ORDER and reskinned to the global
-// tokens, under the site shell (CWS directive 2026-06-15). Bespoke composition
-// (NOT the generic service template), same faithful-reskin pattern as the septic
-// pilot. Source order:
+// Route: /website-design-for-septic-services/ -- the septic work of art, reproduced section by
+// section in the SOURCE ORDER and reskinned to the global tokens, under the
+// site shell (CWS directive 2026-06-15). Bespoke composition (NOT the generic
+// service template). Source order:
 //   hero -> why-split + lanes + framework
 //   -> methods walkthrough (intro/TOC + ch01 Services + ch02 Sitemap
 //      + ch03 Wireframe=camera + ch04 Brand Kit + ch05 Sample Copy + ch06 Visibility)
 //   -> compare -> portfolio -> inspect quiz -> made -> pricing -> FAQ
 //   -> anti-agency email thread -> nine-step timeline -> testimonials
 //   -> contact CTA -> cross-industry grid.
-//
-// The anti-agency email thread is the SAME real Pixelborn exchange the septic
-// page shows (the foundation source reproduces it verbatim), so we reuse the
-// existing SepticVoicebox component rather than duplicate it.
 
 import type { Metadata } from "next";
 import { Fragment } from "react";
-import { foundationRepair as service } from "@/lib/services/foundation-repair";
+import { septic as service } from "@/lib/services/septic";
 import {
   serviceUrl,
   buildServiceJsonLd,
@@ -35,17 +30,17 @@ import {
   ProcessCapsule,
 } from "@/components/capsules";
 import { WireframeCamera } from "@/components/art/WireframeCamera";
-import { foundationWireframe } from "@/components/art/wireframes/foundation-repair";
-import { FoundationHero, FoundationBuild } from "@/components/foundation/FoundationArtSections";
+import { septicWireframe } from "@/components/art/wireframes/septic";
+import { SepticHero, SepticBuild } from "@/components/septic/SepticArtSections";
 import {
-  FoundationMethodsIntro,
-  FoundationServicesChapter,
-  FoundationSitemapChapter,
-} from "@/components/foundation/FoundationMethods";
-import { FoundationBrandKit, FoundationSampleCopy } from "@/components/foundation/FoundationBrandSample";
-import { FoundationVisibility } from "@/components/foundation/FoundationVisibility";
+  SepticMethodsIntro,
+  SepticServicesChapter,
+  SepticSitemapChapter,
+} from "@/components/septic/SepticMethods";
+import { SepticBrandKit, SepticSampleCopy } from "@/components/septic/SepticBrandSample";
+import { SepticVisibility } from "@/components/septic/SepticVisibility";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
-import { FoundationOthers } from "@/components/foundation/FoundationOthers";
+import { SepticOthers } from "@/components/septic/SepticOthers";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -68,16 +63,16 @@ export const metadata: Metadata = {
 
 const COMPARE_ROWS: [string, string][] = [
   ["4 to 6 second load on mobile", "2 to 3 seconds on a mid-range Android"],
-  ["No PE engineer signoff or transferable warranty mentioned", "Engineer signoff + transferable warranty above the fold"],
-  ["Every method lumped onto one Services page", "A dedicated ranking page for every method you offer"],
-  ["Vague \"we install piers\"", "Helical vs. push vs. slab pier explained per page"],
-  ["Stock photos of generic basements and cracks", "Real before-and-after photos of your jobs"],
-  ["Phone number buried in a footer image", "Tap-to-call CTA in the sticky header"],
-  ["Service area named only in the footer", "Each town named in body text + schema"],
+  ["No PSMA cert or license info anywhere", "PSMA + state license + insurance above the fold"],
+  ["Phone number buried in a footer image", "Sticky tap-to-call header for the emergency caller"],
+  ["Inspection lumped onto the pumping page", "Routine + real-estate cert as separate ranking pages"],
+  ["Service area named only in the footer", "Every local township in body text + schema"],
+  ["Residential + commercial intake on one form", "Grease-trap intake separated from residential pumping"],
+  ["Stock photos of generic trucks", "Real photos of your truck and crew"],
   ["Reviews on a hidden About page", "Live Google reviews embedded on the home page"],
 ];
 
-export default function FoundationDesignPage() {
+export default function SepticDesignPage() {
   return (
     <PageComposer
       jsonLd={[
@@ -86,33 +81,31 @@ export default function FoundationDesignPage() {
         buildFaqJsonLd(service),
       ]}
     >
-      <FoundationHero />
-      <FoundationBuild />
+      <SepticHero />
+      <SepticBuild />
 
       {/* "What goes into your site" walkthrough. ch03 = the camera teardown. */}
       <SectionShell full reveal={false} className="cw-art-methods-section">
-        <FoundationMethodsIntro />
-        <FoundationServicesChapter />
-        <FoundationSitemapChapter />
-        <div id="foundation-ch03" className="cw-art-methods-chapter">
+        <SepticMethodsIntro />
+        <SepticServicesChapter />
+        <SepticSitemapChapter />
+        <div id="septic-ch03" className="cw-art-methods-chapter">
           <div className="cw-art-methods-chapter__intro">
             <div className="cw-art-methods-chapter__meta">
               <span className="cw-art-methods-chapter__num">03</span>
               <span className="cw-art-methods-chapter__label">Wireframe</span>
             </div>
             <h3 className="cw-art-methods-chapter__heading">
-              Every page is fine tuned and robust.
+              Every page is fine-tuned for one purpose.
             </h3>
             <p className="cw-art-methods-chapter__lead">
-              Each page is built to capture the attention of both the human user
-              and the algorithms of Google search and AI search platforms like
-              ChatGPT, Perplexity, Gemini and Claude. Here&apos;s an example of the
-              content that your <strong>Foundation Piering</strong> service page
-              might contain.
+              Below is what a routine pumping page looks like when it does two jobs
+              at once: convince the homeowner with a backed-up tank to call, and
+              convince Google and ChatGPT to surface you when they answer.
             </p>
           </div>
           <WireframeCamera
-            sections={foundationWireframe}
+            sections={septicWireframe}
             intro={{
               eyebrow: "A teardown, section by section",
               heading: "See your site before I build it",
@@ -126,21 +119,21 @@ export default function FoundationDesignPage() {
             }}
           />
         </div>
-        <FoundationBrandKit />
-        <FoundationSampleCopy />
+        <SepticBrandKit />
+        <SepticSampleCopy />
       </SectionShell>
 
-      <FoundationVisibility />
+      <SepticVisibility />
 
       {/* Passes vs fails inspection (diagonal gradient band). */}
       <SectionShell full className="cw-art-section cw-art-compare-section">
         <h2 className="cw-art-section__heading">
-          How your foundation repair website passes inspection vs. fails it.
+          How your septic services website passes inspection vs. fails it.
         </h2>
         <div
           className="cw-art-compare"
           role="table"
-          aria-label="Foundation repair site: what fails inspection vs what passes"
+          aria-label="Septic site: what fails inspection vs what passes"
         >
           <div className="cw-art-compare__head cw-art-compare__head--lose" role="columnheader">Fails inspection</div>
           <div className="cw-art-compare__head cw-art-compare__head--win" role="columnheader">Passes inspection</div>
@@ -179,13 +172,13 @@ export default function FoundationDesignPage() {
       <FaqCapsule
         faqs={service.faqs}
         faqLead={service.faqLead}
-        heading="The best foundation repair websites all share similar aspects that make them successful. Yours will have them all and then some."
+        heading="The best septic services websites all share similar aspects that make them successful. Yours will have them all and then some."
         pageName={service.title}
         scheme="inverted"
         schemeAuto
       />
 
-      {/* The real anti-agency email thread (shared with the septic page). */}
+      {/* The real anti-agency email thread. */}
       <SectionShell reveal={false} className="cw-art-voice-section">
         <SepticVoicebox />
       </SectionShell>
@@ -204,7 +197,7 @@ export default function FoundationDesignPage() {
       <CtaCapsule cta={service.cta} form={service.form} scheme="inverted" />
 
       {/* Cross-industry network grid (full-bleed). */}
-      <FoundationOthers />
+      <SepticOthers />
     </PageComposer>
   );
 }

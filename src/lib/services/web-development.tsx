@@ -148,7 +148,7 @@ export const webDevelopment: Service = {
         label: "Specialized design pages",
         detail:
           "Industry-specific builds, like the septic and foundation-repair pages, developed to rank and convert for one trade rather than everyone at once.",
-        href: "/design/",
+        href: "/my-industry-specialties/",
       },
       {
         label: "The portfolio",

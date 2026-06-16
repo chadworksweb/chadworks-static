@@ -96,6 +96,10 @@ export type Service = {
   slug: string;            // lowercase, hyphenated, keyword-bearing
   lane: Lane;              // which lane page links to this service
   laneLabel: string;       // human label of the lane (breadcrumb)
+  // OPTIONAL: override the middle breadcrumb crumb (the parent index) for pages
+  // that do NOT sit under their lane hub. The flat-root design pages set this to
+  // point at /my-industry-specialties/ or /my-service-areas/ instead of /lane/.
+  breadcrumbParent?: { label: string; href: string };
   eyebrow: string;         // mono kicker
   title: string;           // the H1 -- matches the intent, one per page
   // OPTIONAL: a rich render of the H1 (e.g. one letter carrying a canvas fill).
@@ -291,8 +295,10 @@ export function buildBreadcrumbJsonLd(s: Service) {
       {
         "@type": "ListItem",
         position: 2,
-        name: s.laneLabel,
-        item: `${SITE_URL}/${s.lane}/`,
+        name: s.breadcrumbParent ? s.breadcrumbParent.label : s.laneLabel,
+        item: s.breadcrumbParent
+          ? `${SITE_URL}${s.breadcrumbParent.href}`
+          : `${SITE_URL}/${s.lane}/`,
       },
       {
         "@type": "ListItem",

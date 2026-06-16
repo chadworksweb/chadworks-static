@@ -22,7 +22,7 @@ export function FoundationHero() {
       </div>
       <div className="cw-art-hero__content">
         <nav className="cw-art-hero__eyebrow cw-art-hero__crumbs" aria-label="Breadcrumb">
-          <Link href="/design/">Industry Web Design</Link>
+          <Link href="/my-industry-specialties/">Industry Web Design</Link>
           <span aria-hidden="true">&nbsp;/&nbsp;</span>
           <span aria-current="page">Foundation Repair</span>
         </nav>
