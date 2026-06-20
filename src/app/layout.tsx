@@ -3,6 +3,7 @@ import { Lexend, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "@/styles/global.css";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import { PageTransition } from "@/components/PageTransition";
 import { buildOrgJsonLd, SITE_URL } from "@/lib/service";
 
 // chadworks brand faces. Self-hosted at build time by next/font -- works with
@@ -62,6 +63,7 @@ export default function RootLayout({
         <SiteNav />
         <main>{children}</main>
         <SiteFooter />
+        <PageTransition />
       </body>
     </html>
   );

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { WaveText } from "@/components/WaveText";
 
 const LINKS = [
   { href: "/websites/", label: "Websites" },
@@ -11,25 +13,6 @@ const LINKS = [
   { href: "/rates/", label: "Rates" },
   { href: "/contact/", label: "Contact" },
 ];
-
-// Per-letter spans so each link can do a staggered traveling wave on hover
-// (the chadlewine logo's stepped-delay shimmer, applied to motion). The link's
-// accessible name is unaffected -- screen readers still read the joined text.
-function WaveText({ text }: { text: string }) {
-  return (
-    <span className="nav-wave">
-      {Array.from(text).map((ch, i) => (
-        <span
-          key={i}
-          className="nav-wave__letter"
-          style={{ "--i": i } as React.CSSProperties}
-        >
-          {ch === " " ? " " : ch}
-        </span>
-      ))}
-    </span>
-  );
-}
 
 export default function SiteNav() {
   // Scroll-up-only sticky: hide when scrolling down past a threshold, show on
@@ -53,6 +36,11 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
+  // Homepage (/): the single-scroll home carries the brand only -- no links and
+  // no mobile menu; navigation to the inner pages lives in the footer.
+  const pathname = usePathname();
+  const bare = pathname === "/";
+
   // Escape closes the open panel.
   useEffect(() => {
     if (!open) return;
@@ -62,6 +50,16 @@ export default function SiteNav() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  if (bare) {
+    return (
+      <nav className="site-nav">
+        <div className="site-nav__inner">
+          <span className="site-nav__brand">chadworks&trade;</span>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className={`site-nav${hidden ? " site-nav--hidden" : ""}${open ? " site-nav--open" : ""}`}>

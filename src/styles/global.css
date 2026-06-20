@@ -122,6 +122,11 @@
 * { margin: 0; }
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+/* During a page transition the cover scrolls the new route to the top; that
+   reset must be INSTANT (the old smooth scroll-to-top read as a jump from the
+   bottom). Reduced-motion users get instant scroll everywhere. */
+html.cw-scroll-instant { scroll-behavior: auto; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 /* 100vw includes the scrollbar, and full-bleed art anchors to it -- clip the
    stray horizontal overflow on BOTH roots (DEVELOPMENT-STANDARDS, iOS gutter). */
 html, body { overflow-x: clip; }
@@ -149,6 +154,7 @@ h1, h2, h3, h4 {
   letter-spacing: -0.01em;
 }
 h1 { font-weight: 500; }   /* medium -- the one deliberate exception */
+h2 { font-size: var(--text-2xl); }   /* page-wide default h2 size (matches .cw-pricing__heading / .cw-port-archive__heading); classed h2s override */
 
 /* NO WIDOWED WORDS, anywhere, ever (Chad, 2026-06-11 -- design-system rule 12).
    Headings balance their lines; prose wraps "pretty" so no last line is a
@@ -393,16 +399,28 @@ p, li, dd, figcaption { text-wrap: pretty; }
   white-space: pre;
   transition: color var(--duration-base) var(--ease-smooth);
 }
-.site-nav__links a:hover .nav-wave__letter {
+.site-nav__links a:hover .nav-wave__letter,
+.cw-lane-sub__link:hover .nav-wave__letter {
   animation: nav-letter-colorwave 0.7s var(--ease-smooth) infinite;
   animation-delay: calc(var(--i) * 0.05s);
+  /* hold the wave's start color through the stagger delay, so the first pass
+     doesn't snap from the rest color and read as a hard travelling edge. */
+  animation-fill-mode: backwards;
 }
 @keyframes nav-letter-colorwave {
   0%, 100% { color: var(--nav-link); }
   35%      { color: var(--nav-link-pulse); }  /* #6629bc */
 }
+/* lane sub-titles: the same wave with the color order inverted (deep-purple base
+   pulsing to the lighter nav-link). Overrides only the keyframe name. */
+.cw-lane-sub__link:hover .nav-wave__letter { animation-name: nav-letter-colorwave-rev; }
+@keyframes nav-letter-colorwave-rev {
+  0%, 100% { color: var(--nav-link-pulse); }  /* #6629bc */
+  35%      { color: var(--nav-link); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__links a:hover .nav-wave__letter { animation: none; color: var(--nav-link-pulse); }
+  .site-nav__links a:hover .nav-wave__letter,
+  .cw-lane-sub__link:hover .nav-wave__letter { animation: none; color: var(--nav-link-pulse); }
 }
 
 /* PARKED for later use -- per-letter MOTION wave (vertical bob). Not applied.
@@ -491,13 +509,24 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--text-tertiary);
   font-size: var(--text-sm);
 }
-.site-footer__brandrow {
+.site-footer__cols {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(4, 1fr);
+  gap: var(--space-lg);
+  padding-bottom: var(--space-lg);
+}
+/* Column 1: corporate branding -- the frozen CW gemstone, wordmark, tagline,
+   and direct contact. */
+.site-footer__brandcol {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+}
+.site-footer__gem {
+  width: 8.5rem;
+  aspect-ratio: 16 / 10;
+  margin-bottom: var(--space-xs);
 }
 .site-footer__brand {
   font-family: var(--font-display);
@@ -505,12 +534,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-size: 1.25rem;
   color: var(--text-primary);
 }
-.site-footer__cols {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-lg);
-  padding-bottom: var(--space-lg);
+.site-footer__tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
+.site-footer__contact {
+  margin-top: var(--space-2xs);
+  color: var(--text-tertiary);
+  transition: color var(--duration-base) var(--ease-smooth);
+}
+.site-footer__contact:hover { color: var(--text-primary); }
 .site-footer__heading {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -721,11 +757,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-statements-intro { padding-bottom: 0; }
 .svc-statements__heading {
   position: relative;
-  top: 5px;                               /* nudge down toward the first band */
+  top: 9px;                               /* nudge the letters down toward the first band */
   font-family: var(--font-mono);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;                 /* 50% of the prior 0.12em */
-  font-size: calc(var(--text-sm) * 2);   /* 100% bump */
+  text-transform: none;                   /* lowercase brand wordmark, as written */
+  letter-spacing: 0.02em;
+  font-size: calc(var(--text-sm) * 3.2); /* 20% smaller than the prior 4x */
   font-weight: 500;
   line-height: 1;                         /* sit flush on the first band */
   color: var(--dark-bg);                  /* match the first band's bg (#243989) */
@@ -903,7 +939,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: grid-template-rows 0.6s var(--ease-swoop);
 }
 .svc-more__panel[data-open] { grid-template-rows: 1fr; }
-.svc-more__inner { overflow: hidden; min-width: 0; }
+/* overflow:hidden clips the collapse animation; the padding-bottom reserves
+   room INSIDE that clip so the card's downward drop shadow renders in full
+   instead of being sheared flat at the panel's bottom edge. */
+.svc-more__inner { overflow: hidden; min-width: 0; padding-bottom: 3.25rem; }
 .svc-more__card {
   /* frosted glass: legible as a deliberate opened surface over the ribbons */
   background: rgba(255, 255, 255, 0.55);
@@ -1506,6 +1545,23 @@ p, li, dd, figcaption { text-wrap: pretty; }
   margin-top: 0.25rem;
 }
 .svc-made__copy { max-width: 58ch; }
+
+/* Split variant (homepage "the Chad behind chadworks"): heading rides the top of
+   the right column, the row top-aligns, and the left photo column sticks while
+   the taller copy scrolls past it. */
+.svc-made--split .svc-made__grid { align-items: start; margin-top: var(--space-md); }
+.svc-made--split .svc-made__photo {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--space-md));
+  align-self: start;
+}
+.svc-made--split .svc-made__heading { margin: 0 0 var(--space-sm); }
+.svc-made--split .svc-made__copy > .eyebrow { margin-bottom: var(--space-2xs); }
+.svc-made--split .svc-made__intro { margin-top: 0; }
+@media (max-width: 900px) {
+  /* below the two-column break the portrait shouldn't pin */
+  .svc-made--split .svc-made__photo { position: static; }
+}
 .svc-made__intro {
   font-size: 1.08rem;
   line-height: 1.55;
@@ -2059,13 +2115,13 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .site-nav__links { display: none; }
   .site-nav__toggle { display: flex; }
   .site-footer__cols { grid-template-columns: repeat(2, 1fr); }
+  .site-footer__brandcol { grid-column: 1 / -1; }
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   :root { --site-edge-min: 1rem; }
   .site-footer__cols { grid-template-columns: 1fr; gap: var(--space-md); }
-  .site-footer__brandrow,
   .site-footer__legal { flex-direction: column; gap: var(--space-2xs); }
 }
 
@@ -2126,10 +2182,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   pointer-events: none;
   overflow: hidden;
   -webkit-mask-image:
-    linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 66%, transparent 90%),
     linear-gradient(to right, transparent 0, #000 44%, #000 66%, transparent 100%);
   mask-image:
-    linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%),
+    linear-gradient(to bottom, transparent 0, #000 18%, #000 66%, transparent 90%),
     linear-gradient(to right, transparent 0, #000 44%, #000 66%, transparent 100%);
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
@@ -2333,6 +2389,30 @@ p, li, dd, figcaption { text-wrap: pretty; }
   opacity: 1;
   transform: none;
   transition: opacity 0.7s var(--ease-swoop), transform 0.7s var(--ease-swoop);
+}
+
+/* ---- Bare (one-pager) hero: the divider rides the tagline's row and fills the
+   space to the LEFT of the tagline (ss10). Tagline keeps its place at the right
+   edge of the wordmark. ---- */
+.home-hero__tagrow {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1.4vw, 1.1rem);
+  margin-top: clamp(0.2rem, 0.6vw, 0.6rem);
+}
+.home-hero__tagrow .home-hero__tagline {
+  margin-top: 0;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+.home-hero__rule--inline {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  /* fade in from the left and point toward the tagline on the right */
+  background: linear-gradient(90deg, transparent 0%, var(--grad-peak) 45%, var(--accent) 100%);
+  transform-origin: left center;
 }
 
 /* Reduced motion: kill all hero motion, show the final composition at once. */
@@ -4786,46 +4866,67 @@ p, li, dd, figcaption { text-wrap: pretty; }
   z-index: 4;
 }
 
-/* the chrome bar */
+/* the chrome bar -- a CUSTOM chadworks browser, not the generic OS frame: a
+   "cw" brand badge (the same mark as the gemstone), a secure address bar with
+   a brand-purple lock, and a minimal menu glyph. No red/amber/green dots. */
 .cw-port-frame__bar {
   position: relative;
   z-index: 5;
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.6rem 0.9rem;
-  background: linear-gradient(180deg, #f5f0fb 0%, #efe8f8 100%);
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  background: linear-gradient(180deg, #f4eefc 0%, #e7ddf6 100%);
   border-bottom: 1px solid var(--border-subtle);
 }
-.cw-port-frame__dots { display: inline-flex; gap: 0.4rem; flex: 0 0 auto; }
-.cw-port-frame__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #d4ccdf;
-  box-shadow: inset 0 0 0 0.5px rgba(36, 57, 137, 0.08);
+.cw-port-frame__mark {
+  flex: 0 0 auto;
+  height: 1.4rem;
+  width: auto;
 }
-.cw-port-frame__dot:nth-child(1) { background: #e0a3ad; }
-.cw-port-frame__dot:nth-child(2) { background: #e6c79a; }
-.cw-port-frame__dot:nth-child(3) { background: #9fc6a6; }
 .cw-port-frame__url {
   flex: 1 1 auto;
   min-width: 0;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.02em;
-  color: var(--text-tertiary);
+  font-size: 0.66rem;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
   background: #ffffff;
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
-  padding: 0.2rem 1rem;
+  padding: 0.28rem 0.85rem;
+  box-shadow: inset 0 1px 2px rgba(36, 57, 137, 0.05);
+}
+.cw-port-frame__lock { flex: 0 0 auto; color: var(--accent); }
+.cw-port-frame__url-text {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.cw-port-frame__bar-spacer { flex: 0 0 2.2rem; }
-@media (max-width: 600px) { .cw-port-frame__bar-spacer { display: none; } }
+.cw-port-frame__menu {
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2.5px;
+  padding: 2px 1px;
+}
+.cw-port-frame__menu i {
+  display: block;
+  width: 15px;
+  border-radius: 1px;
+  background: var(--text-tertiary);
+}
+/* thin -> thicker -> thickest, top to bottom */
+.cw-port-frame__menu i:nth-child(1) { height: 1px; }
+.cw-port-frame__menu i:nth-child(2) { height: 2px; }
+.cw-port-frame__menu i:nth-child(3) { height: 3px; }
+@media (max-width: 600px) {
+  .cw-port-frame__menu { display: none; }
+}
 
 /* the screenshot surface */
 .cw-port-frame__screen {
@@ -4861,19 +4962,80 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: linear-gradient(180deg, #3a3354 0%, #221d35 100%);
 }
 
+/* ---- PORTFOLIO TITLEBAR ---------------------------------------------
+   A centered section opener: the name "chadworks portfolio" flanked by two
+   mini CW gemstones (GemstoneMark). The gems counter-rotate so the pair reads
+   as a matched bracket around the title. Each gem host carries a fixed aspect
+   box that frames the wide CW mark; if WebGL is absent the gems are simply
+   absent and the title stands on its own.
+   --------------------------------------------------------------------- */
+/* tighten the gap below the title -- the featured piece rides up close beneath */
+.cw-port-titlebar { padding-bottom: 0; }
+.cw-port-titlebar__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 3vw, 2.25rem);
+  text-align: center;
+}
+.cw-port-titlebar__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400; /* match svc-hero__title / the page-wide h2 weight */
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+.cw-port-titlebar__gem {
+  flex: 0 0 auto;
+  width: clamp(38px, 5.74vw, 69px);
+  aspect-ratio: 3 / 2;
+  /* the title's glyphs ride LOW in the line box (font ascent >> cap height), so
+     its optical center sits below the line-box center; nudge the gems down onto
+     that cap/ink center so they sit perfectly level with the text. A percentage
+     of the gem's own (viewport-scaled) height tracks the responsive type. */
+  transform: translateY(14%);
+}
+@media (max-width: 600px) {
+  .cw-port-titlebar__gem { width: 31px; }
+  .cw-port-titlebar__row { gap: 0.65rem; }
+}
+
+/* GemstoneMark host: the canvas fills the sized box the consumer sets. */
+.cw-gem-mark { position: relative; display: block; line-height: 0; }
+.cw-gem-mark__canvas { display: block; width: 100%; height: 100%; }
+
 /* ---- MODE A: the featured showcase ----------------------------------- */
 .cw-port-feat-shell { margin-top: var(--space-md); }
 .cw-port-feat {
+  /* the feature mockup's stage height -- shared so the copy column can bind to
+     the IMAGE's height, not the toggle-inclusive (and shadow-bleeding) container */
+  --cw-feat-stage-h: clamp(320px, 44vw, 540px);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   gap: clamp(2rem, 5vw, 4rem);
-  align-items: center;
+  align-items: stretch; /* both columns share the row height set by the mockup */
 }
 @media (max-width: 900px) {
   .cw-port-feat { grid-template-columns: 1fr; gap: var(--space-lg); }
 }
 
-.cw-port-feat__copy { display: flex; flex-direction: column; gap: var(--space-sm); }
+/* Copy spans exactly the image's height: the title cluster rides the image's
+   top edge, the visit link sits on its bottom edge. The drop shadow bleeds
+   past the image box, so we bind to the box height (above), not the shadow. */
+.cw-port-feat__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 0; /* stretches to the row (mockup) height via the grid */
+}
+.cw-port-feat__copy-top { display: flex; flex-direction: column; gap: var(--space-sm); }
+@media (max-width: 900px) {
+  .cw-port-feat__copy { min-height: 0; justify-content: normal; gap: var(--space-sm); }
+}
 .cw-port-feat__heading {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
@@ -4889,7 +5051,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .cw-port-feat__link {
   align-self: flex-start;
-  margin-top: var(--space-2xs);
+  margin-top: 0; /* pinned to the image's bottom edge by the column's space-between */
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--accent);
@@ -4951,7 +5113,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-port-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1.5rem, 4vw, 3rem);
+  column-gap: clamp(1.5rem, 4vw, 3rem);
+  row-gap: clamp(3.25rem, 6vw, 5rem);
   margin-top: var(--space-lg);
 }
 @media (max-width: 600px) { .cw-port-grid { grid-template-columns: 1fr; } }
@@ -5030,7 +5193,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
    devices swaps image + bezel without reflowing the grid. */
 .cw-port-device { display: flex; flex-direction: column; gap: 0.85rem; }
 .cw-port-device--card { --cw-stage-h: clamp(230px, 32vw, 340px); }
-.cw-port-device--feature { --cw-stage-h: clamp(320px, 44vw, 540px); }
+.cw-port-device--feature { --cw-stage-h: var(--cw-feat-stage-h, clamp(320px, 44vw, 540px)); }
+/* The feature mockup fills its column at the SAME desktop ratio as the archive
+   cards (3:2), instead of a height-driven crop. */
+.cw-port-device--feature .cw-port-device__stage {
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1.5;
+}
 
 .cw-port-device__stage {
   height: var(--cw-stage-h);
@@ -5085,13 +5255,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* the segmented device toggle */
 .cw-port-device__toggle {
-  display: inline-flex; align-self: center; gap: 2px; padding: 3px;
+  display: flex; align-self: stretch; gap: 2px; padding: 3px;
   background: var(--bg-surface, #f3eefb);
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
 }
 .cw-port-device__btn {
-  display: inline-flex; align-items: center; gap: 0.4rem;
+  flex: 1 1 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
   font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em;
   padding: 0.38rem 0.8rem; border: none; background: transparent;
   color: var(--text-secondary); border-radius: 999px; cursor: pointer;
@@ -5104,14 +5275,594 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* featured zoom wrapper (the scroll-driven scale target) */
 .cw-port-feat__stage { display: flex; justify-content: center; }
-.cw-port-feat__zoom { width: 100%; transform-origin: center; will-change: transform; }
+.cw-port-feat__zoom { width: 100%; }
 
-/* archive card layout (frame is no longer a link; the cue + label are) */
-.cw-port-card { display: flex; flex-direction: column; gap: 0.9rem; }
-.cw-port-card__meta { display: flex; flex-direction: column; gap: 0.35rem; }
+/* archive card layout (frame is no longer a link; the cue + label are). The
+   mockup fills its column to the content edge; the toggle and text follow at
+   full width, and the frame's drop shadow bleeds past the image freely. */
+.cw-port-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.cw-port-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+/* The card stage takes the full column width at the desktop aspect, so the
+   desktop frame fills it edge-to-edge; narrower tablet/phone frames center
+   within. (The feature stage stays height-driven in its own column.) */
+.cw-port-device--card .cw-port-device__stage {
+  height: auto;
+  width: 100%;
+  aspect-ratio: 1.5;
+}
 .cw-port-card__cue {
   align-self: flex-start; margin-top: 0.2rem;
   font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
   color: var(--accent); text-decoration: none;
 }
 .cw-port-card__cue:hover { text-decoration: underline; }
+
+/* =====================================================================
+   GEMSTONE CW (GemstoneCW.tsx) -- the faceted-glass CW mark section.
+   The <canvas> renders its own brand gradient + gem, so the section needs
+   no scheme background; it just provides a sized, positioned host. The two
+   puff hotspots are absolutely placed inside the host (their left% is set in
+   JS to ride the mark's outer edges) and bloom in only while engaged.
+   Ported from design-references/cw-gemstone-hero.html (.hotspot/.puff/.lbl).
+   ===================================================================== */
+.cw-gem { padding: 0; }
+.cw-gem__host {
+  grid-column: full; /* break the canvas out to the full viewport width */
+  position: relative;
+  width: 100%;
+  /* the VISIBLE band: ~20% shorter than the canvas, so the empty top/bottom of
+     the (wide, short) CW gets cropped instead of the letters shrinking. */
+  min-height: clamp(352px, 57.6vh, 608px);
+  overflow: hidden;
+  background: transparent; /* no backdrop -- the color lives in the letters */
+}
+.cw-gem__canvas {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: block;
+  width: 100%;
+  /* full render height keeps the letters at their original size; the shorter
+     host crops the surrounding whitespace. */
+  height: clamp(440px, 72vh, 760px);
+}
+
+/* puff hotspots -- ethereal glows that carry the real lane links */
+.cw-gem__hotspot {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 252px;
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.78);
+  transition: opacity 0.9s ease, transform 1.2s cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+.cw-gem__hotspot--left { left: 28%; }
+.cw-gem__hotspot--right { left: 72%; }
+.cw-gem__hotspot.is-shown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+.cw-gem__puff {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  will-change: transform;
+  transform-origin: 50% 50%;
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(214, 171, 244, 0.6) 30%,
+    rgba(128, 84, 188, 0.55) 58%,
+    rgba(128, 84, 188, 0) 80%
+  );
+  filter: blur(20px);
+  animation: cwGemPuffA 9s ease-in-out infinite;
+  transition: filter 0.6s ease;
+}
+.cw-gem__puff--alt {
+  background: radial-gradient(
+    ellipse 50% 50% at 50% 50%,
+    rgba(128, 84, 188, 0.55) 0%,
+    rgba(91, 57, 140, 0.4) 52%,
+    rgba(91, 57, 140, 0) 80%
+  );
+  filter: blur(30px);
+  animation: cwGemPuffB 12s ease-in-out infinite;
+}
+.cw-gem__lbl {
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  color: #fff;
+  text-shadow: 0 0 14px rgba(36, 57, 137, 0.9), 0 0 34px rgba(36, 57, 137, 0.7),
+    0 2px 4px rgba(36, 57, 137, 0.75);
+  transition: letter-spacing 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.cw-gem__hotspot:hover .cw-gem__lbl { letter-spacing: 0.06em; }
+.cw-gem__hotspot:hover .cw-gem__puff { filter: blur(15px); }
+.cw-gem__hotspot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 6px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* breathe with scale only (about the center) so the glow stays on the label */
+@keyframes cwGemPuffA {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: 0.9; }
+}
+@keyframes cwGemPuffB {
+  0%, 100% { transform: scale(1.06); opacity: 0.85; }
+  50% { transform: scale(0.92); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-gem__puff { animation: none; }
+}
+
+@media (max-width: 600px) {
+  .cw-gem__lbl { font-size: 32px; }
+  .cw-gem__hotspot { width: 200px; }
+}
+
+/* =====================================================================
+   GLOBAL MOTION TOGGLE (one-pager) -- the single, always-sticky pause button.
+   Pinned top-right over the header; replaces every per-section pause button.
+   Reuses the .svc-hero__art-toggle pill, overriding it to fixed positioning.
+   ===================================================================== */
+.cw-motion-toggle {
+  position: fixed;
+  top: 1.05rem;
+  right: clamp(0.9rem, 2vw, 1.6rem);
+  z-index: 60; /* above the sticky header (z 50) */
+}
+/* Keep it visible on mobile -- it also drives the canvas loops, which run there
+   (the .svc-hero__art-toggle base hides at <=900px; override for this one). */
+@media (max-width: 900px) {
+  .cw-motion-toggle { display: inline-flex; }
+}
+
+/* When motion is globally paused, freeze every CSS animation. Canvas/WebGL
+   loops park themselves via the motion store; this covers the CSS side
+   (hero chips, glow, puffs, scanning borders, and the rest). */
+html.cw-motion-paused *,
+html.cw-motion-paused *::before,
+html.cw-motion-paused *::after {
+  animation-play-state: paused !important;
+}
+
+/* =====================================================================
+   LANE SCROLL (one-pager) -- the Websites + Visibility blocks scroll in the
+   left track while a single column of the COMBINED chip stream stays sticky
+   in the right track. The two blocks are distinguished: each fills a screen
+   and the second carries a hairline divide + a faint lavender wash.
+   ===================================================================== */
+.cw-lanes-scroll { padding-block: 0; }
+/* The stack spans the full viewport; the text and the chips share ONE grid cell
+   so the lane copy OVERLAPS the chips (text in front, chips behind), exactly
+   like the original svc-hero where .svc-hero__art sat at z-index -1. */
+.cw-lanes-scroll > .cw-lanes-scroll__stack { grid-column: full; }
+.cw-lanes-scroll__stack {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.cw-lanes-scroll__stack > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+/* Chips: pinned to the far right, sticky for the whole scroll, BEHIND the text. */
+.cw-lanes-scroll__chips {
+  align-self: start;
+  justify-self: end;
+  width: clamp(360px, 40%, 620px);
+  position: sticky;
+  top: var(--nav-height);
+  height: calc(100dvh - var(--nav-height));
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* fade chips in/out at the top and bottom (matches .svc-hero__art) */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 84%, transparent 100%);
+}
+/* Text: re-anchored to the site rail, IN FRONT of the chips. */
+.cw-lanes-scroll__text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--site-width);
+  margin-inline: auto;
+  /* No padding-inline: --site-width already reserves the edge gutter via its
+     min() formula, so adding it again double-indents the column past the rest
+     of the page (which sits at the standard content edge). */
+}
+/* MANIFESTO ("who is chadworks for?") -- centered intro nestled below the CW
+   gemstone over a soft lavender/purple "cloud" lifted from the gemstone puffs
+   (design-references/cw-gemstone-hero.html). The heading block is centered; the
+   expand control reads as ONE frosted-glass card (its trigger is the header)
+   that you can see the cloud through. */
+.cw-manifesto {
+  --cw-mani-w: min(700px, 100%);
+  padding-top: 38px;            /* half the prior 75px gap below the gemstone (ss1) */
+  /* extra room below the button so the cloud has more breathing space before the
+     lanes begin (homepage teaser only; the About panel keeps the section default) */
+  padding-bottom: calc(var(--section-pad-y) + var(--space-xl));
+  text-align: center;
+}
+/* the About manifesto carries the full panel, so keep its default bottom rhythm */
+.cw-mani-field--page .cw-manifesto { padding-bottom: var(--section-pad-y); }
+.cw-manifesto h2 { margin-top: var(--space-2xs); }
+/* upper text + the open panel share one width so their edges line up */
+.cw-manifesto .svc-lede,
+.cw-manifesto__panel { max-width: var(--cw-mani-w); margin-inline: auto; }
+.cw-manifesto .svc-lede {
+  text-align: center;
+  background: none;             /* the cloud is the backdrop now -- drop the frost pill */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding-inline: 0;
+}
+
+/* The shared ambient field: the Lyric Transformer hero, matched 1:1 -- a STATIC,
+   domain-warped fbm cloud (pale indigo drifting through warm paper, a fresh
+   random slice each load) rendered in WebGL by <ManifestoAmbient />. The wrapper
+   spans the gemstone + the manifesto. Inside it, a band "window" (__bg) is
+   anchored at the gemstone's lower third and carries the top/bottom fade; the
+   cloud <canvas> inside is STICKY, so it pins to the viewport (parallax: it does
+   not scroll) while the band scrolls past. It sits behind both (z-index 0); the
+   gem canvas is transparent so the cloud shows through. */
+.cw-mani-field {
+  position: relative;
+  /* the gemstone band height, mirrored from .cw-gem__host, so the cloud can
+     start at its lower third (~2/3 down) */
+  --cw-gem-h: clamp(352px, 57.6vh, 608px);
+}
+/* keep the gem + manifesto painting above the cloud */
+.cw-mani-field > .cw-gem,
+.cw-mani-field > .cw-manifesto {
+  position: relative;
+  z-index: 1;
+}
+/* the band window: full-bleed, from the gemstone's lower third to the bottom of
+   the manifesto, faded top + bottom so there is no hard box edge. */
+.cw-mani-field__bg {
+  position: absolute;
+  z-index: 0;
+  /* the wrapper is a grid (.shell), so an absolutely-positioned child is
+     contained by its GRID AREA, not the padding box. Place it in the `full`
+     column so left/right:0 resolve against the full viewport, not the 1200px
+     content rail -- this is what makes the cloud break out edge to edge. */
+  grid-column: full;
+  left: 0;
+  right: 0;
+  top: calc(var(--cw-gem-h) * 0.6);   /* enters in the lower third of the gemstone */
+  bottom: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+/* the cloud itself: full-bleed and NON-FIXED -- it fills the band and scrolls
+   with the page (no longer pinned). Explicit width/height because a <canvas> is
+   a replaced element and won't stretch to inset:0 on its own. */
+.cw-mani-field__cloud {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* On the About page there is no gemstone above the manifesto, so the cloud band
+   starts at the section top (and just fades in via the mask). */
+.cw-mani-field--page .cw-mani-field__bg { top: 0; }
+/* No-WebGL fallback: a soft static approximation of the same paper + pale-indigo
+   field (applied by ManifestoAmbient when the GL context is unavailable). */
+.cw-mani-field__cloud--fallback {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 30%, rgba(204, 199, 227, 0.55), transparent 60%),
+    radial-gradient(ellipse 55% 38% at 74% 64%, rgba(204, 199, 227, 0.45), transparent 58%),
+    rgb(251, 250, 247);
+}
+
+/* The manifesto body: ONE always-open frosted glass panel (no expand toggle),
+   see-through to the shared ambient cloud behind it. */
+.cw-manifesto__panel {
+  margin-top: var(--space-md);
+  text-align: left;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.30);
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  backdrop-filter: blur(14px) saturate(1.35);
+  box-shadow: 0 22px 54px -30px rgba(91, 57, 140, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  padding: var(--space-lg);
+}
+.cw-manifesto__panel p {
+  font-size: var(--text-base);        /* body size */
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-manifesto__panel p + p { margin-top: var(--space-sm); }
+
+/* The homepage TEASER: a frosted-glass CTA button (same glass as the panel) that
+   sits under the question and links to the full manifesto on /about/. */
+.cw-manifesto__cta {
+  display: inline-flex;
+  align-items: center;
+  /* the section is a grid; without this the item stretches to fill the column
+     (a full-width bar). Center it at its own content width instead. */
+  justify-self: center;
+  margin-top: var(--space-md);
+  /* standard CTA footprint (matches .svc-btn), with the frosted glass face */
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 999px;
+  /* inverted frosted glass: dark fill + light text (vs the light panel glass) */
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(36, 57, 137, 0.42);
+  -webkit-backdrop-filter: blur(14px) saturate(1.35);
+  backdrop-filter: blur(14px) saturate(1.35);
+  box-shadow: 0 22px 54px -30px rgba(36, 57, 137, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--dark-text);
+  text-decoration: none;
+  transition: transform var(--duration-base) var(--ease-smooth),
+    background-color var(--duration-base) var(--ease-smooth),
+    box-shadow var(--duration-base) var(--ease-smooth);
+}
+.cw-manifesto__cta:hover {
+  transform: translateY(-2px);
+  background-color: rgba(36, 57, 137, 0.58);
+  box-shadow: 0 26px 60px -28px rgba(36, 57, 137, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.cw-lane-block {
+  min-height: clamp(440px, 78vh, 760px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: var(--section-pad-y);
+}
+/* The .svc-lede frost box is outdented (negative margin-left) on service pages
+   so rising chips read behind it; on the one-pager lanes that left overhang is
+   unwanted. Drop it so the lede aligns flush with the title and the sub boxes,
+   without moving the sub boxes themselves. */
+.cw-lane-block .svc-lede {
+  margin-left: 0;
+  padding-left: 0;
+}
+/* Indented sub-services: each lane's routes, top-level info only, set in from
+   the lede with a left accent rule so the hierarchy reads at a glance. */
+.cw-lane-subs {
+  margin-top: clamp(1.75rem, 3.5vw, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.6rem);
+  max-width: var(--measure-prose);
+}
+.cw-lane-sub {
+  padding: 1.05rem 0.95rem 1.15rem clamp(1rem, 2vw, 1.75rem);
+  border-left: 2px solid var(--border-subtle);
+  border-radius: 0 8px 8px 0;
+  /* frosted by default, matching the .svc-lede paragraph above */
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  transition: border-color var(--duration-base) var(--ease-smooth),
+    background-color var(--duration-base) var(--ease-smooth),
+    box-shadow var(--duration-base) var(--ease-smooth);
+}
+.cw-lane-sub:hover {
+  border-left-color: var(--accent);
+  /* stays frosted, tinted toward the lavender wash */
+  background-color: rgba(237, 231, 246, 0.62);
+  box-shadow: 0 12px 28px -14px rgba(36, 57, 137, 0.3);
+}
+.cw-lane-sub__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.cw-lane-sub__link {
+  color: inherit;
+  text-decoration: none;
+}
+.cw-lane-sub__body {
+  margin-top: 0.3rem;
+  color: var(--text-secondary);
+  /* 25% tighter than the global body leading, scoped to these boxes only */
+  line-height: calc(var(--leading-body) * 0.75);
+}
+@media (max-width: 900px) {
+  .cw-lanes-scroll__chips { display: none; }
+  .cw-lane-block { min-height: 0; }
+}
+
+/* =====================================================================
+   PRICING (one-pager) -- 2x2 of the public rates: hourly + flat on top,
+   audit + monthly below. Glass cards on the .panel surface.
+   ===================================================================== */
+.cw-pricing__head { margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.cw-pricing__heading {
+  font-size: var(--text-2xl);
+  margin-top: var(--space-2xs);
+}
+.cw-pricing__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+.cw-price-card {
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+.cw-price-card__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.cw-price-card__figure {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  color: var(--text-primary);
+}
+.cw-price-card__unit {
+  font-size: var(--text-lg);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.cw-price-card__note {
+  color: var(--text-secondary);
+  line-height: var(--leading-body);
+}
+@media (max-width: 600px) {
+  .cw-pricing__grid { grid-template-columns: 1fr; }
+}
+
+/* =====================================================================
+   ASTERISK TOOLTIP -- CSS-only disclaimer popup (no JS), used in the
+   At-a-glance bands. Shows on hover and on keyboard focus.
+   ===================================================================== */
+.cw-aster {
+  position: relative;
+  display: inline-block;
+  margin-left: 0.08em;
+  color: var(--accent);
+  font-weight: 700;
+  cursor: help;
+}
+.cw-aster__pop {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.55rem);
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  max-width: min(24rem, 78vw);
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  letter-spacing: 0;
+  text-transform: none;
+  text-align: left;
+  box-shadow: 0 14px 36px rgba(36, 57, 137, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 6;
+  pointer-events: none;
+}
+.cw-aster__pop::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.cw-aster:hover .cw-aster__pop,
+.cw-aster:focus .cw-aster__pop,
+.cw-aster:focus-visible .cw-aster__pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* =====================================================================
+   PAGE TRANSITION (PageTransition) -- the brand "digitization" wipe.
+   A fixed grid of tiles, each one pixel of the brand gradient. The tiles
+   assemble (cover) then dissolve (reveal) with a per-tile random delay.
+   pointer-events stay off so the overlay never traps a click; idle tiles
+   sit at opacity 0, so the layer is invisible between transitions.
+   ===================================================================== */
+.cw-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+}
+.cw-wipe__grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+}
+.cw-wipe__cell {
+  opacity: 0;
+  transform: scale(0.5);
+  transform-origin: center;
+  transition: opacity 0.24s var(--ease-smooth), transform 0.24s var(--ease-smooth);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform, filter;
+}
+/* cover: tiles pop in and overlap a hair (scale > 1) so the full field is
+   seam-free at peak coverage. */
+.cw-wipe[data-phase="cover"] .cw-wipe__cell { opacity: 1; transform: scale(1.04); }
+/* hold: stay fully covered while the new route paints beneath, with a gentle
+   per-tile brightness breathe (staggered by --d) so the cover feels alive. */
+.cw-wipe[data-phase="hold"] .cw-wipe__cell {
+  opacity: 1;
+  transform: scale(1.04);
+  animation: cw-wipe-breathe 2.4s var(--ease-smooth) infinite;
+  animation-delay: var(--d, 0ms);
+}
+/* reveal: tiles fade and drift open, uncovering the already-painted new page. */
+.cw-wipe[data-phase="reveal"] .cw-wipe__cell { opacity: 0; transform: scale(1.12); animation: none; }
+@keyframes cw-wipe-breathe {
+  0%, 100% { filter: brightness(0.94); }
+  50% { filter: brightness(1.08); }
+}
+/* a slow, soft sheen drifting across while held -- the "loading" movement */
+.cw-wipe::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.16) 50%, transparent 62%);
+  background-size: 220% 100%;
+  background-position: 130% 0;
+}
+.cw-wipe[data-phase="hold"]::after {
+  opacity: 1;
+  animation: cw-wipe-sheen 1.7s var(--ease-smooth) infinite;
+}
+@keyframes cw-wipe-sheen {
+  from { background-position: 130% 0; }
+  to { background-position: -30% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-wipe { display: none; }
+}

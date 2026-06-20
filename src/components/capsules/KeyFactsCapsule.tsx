@@ -3,6 +3,7 @@
 // whose background is interpolated dark -> light across the count (statementTone,
 // build-time) so the descent stays smooth and the final band is always white.
 
+import type { ReactNode } from "react";
 import type { Writable } from "@/lib/service";
 import { statementTone } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
@@ -10,7 +11,9 @@ import { W } from "@/components/capsules/shared";
 
 export type KeyFactsCapsuleProps = {
   heading?: string;
-  facts: Writable[];
+  // A fact is finished prose, a TO-WRITE prompt, or arbitrary markup (e.g. a
+  // statement carrying an inline tooltip). W renders all three.
+  facts: (Writable | ReactNode)[];
   outlierFacts?: number[];
 };
 

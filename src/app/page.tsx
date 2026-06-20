@@ -1,46 +1,587 @@
-/* Home -- the hero is the showpiece (HomeHero: terminal-style typing reveal of
-   the wordmark + the tagline lift-in). The sections below remain skeleton and
-   demonstrate the page-shell grid; real content/brand TBD. */
+// Route: / -- the chadworks homepage. A single-scroll page stringing the site's
+// signature moments together: the hero, the faceted-glass CW gemstone, the "at a
+// glance" band arc, the ribbons + knockout problem beat with its frosted expand
+// panel, the portfolio showroom, the about-Chad human block, the FAQ accordion,
+// and the dark contact band.
+//
+// Reuses the existing capsule layer and components verbatim; GemstoneCW is the
+// ported WebGL2 mark. The header is bare here (brand only, no menu, see SiteNav);
+// the inner pages this links to are reached from the full footer.
 
+import type { Metadata } from "next";
+import type { ReactNode, CSSProperties } from "react";
+import Link from "next/link";
+import { SITE_URL } from "@/lib/service";
+import { WaveText } from "@/components/WaveText";
+import { emphasize } from "@/lib/emphasize";
+import { MANIFESTO } from "@/lib/manifesto";
+import {
+  PageComposer,
+  KeyFactsCapsule,
+  ProblemCapsule,
+  MadeByCapsule,
+  QualificationCapsule,
+  FaqCapsule,
+  ContactCapsule,
+} from "@/components/capsules";
+import { SectionShell } from "@/components/capsules/SectionShell";
 import HomeHero from "@/components/HomeHero";
+import { GemstoneCW } from "@/components/GemstoneCW";
+import ManifestoAmbient from "@/components/ManifestoAmbient";
+import { GemstoneMark } from "@/components/GemstoneMark";
+import { GlobalMotionToggle } from "@/components/GlobalMotionToggle";
+import {
+  BrowserChip,
+  CodeChip,
+  ServerChip,
+  TerminalChip,
+} from "@/components/art/WebDevHeroArt";
+import {
+  PaletteChip,
+  LayoutChip,
+  ButtonChip,
+  TypeChipDark,
+  WheelChip,
+} from "@/components/art/WebDesignHeroArt";
+import {
+  SearchChip,
+  RankChip,
+  ChatChipDark,
+  ChartChip,
+  MailChip,
+  PinChipDark,
+} from "@/components/art/VisibilityHeroArt";
+import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
+import { FeaturedShowcase } from "@/components/portfolio/FeaturedShowcase";
+import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
+import type { LeadFormConfig } from "@/lib/forms";
+
+// The Websites + Visibility chip sets COMBINED into one stream (copied from the
+// /websites/ and /visibility/ hero art). They share a single sticky column on
+// the one-pager while both lane blocks scroll past. Scatter keeps each set's
+// tuned left%/width (left% x 360 + width <= 360).
+// Durations are 20% slower than the source hero sets (each x1.2) so the popup
+// chips drift up more gently on the one-pager.
+const ALL_CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
+  // Websites set
+  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "31.8s" } },
+  { key: "palette", svg: <PaletteChip />, style: { left: "56%", width: "126px", animationDelay: "5s", animationDuration: "26.3s" } },
+  { key: "layout", svg: <LayoutChip />, style: { left: "24%", width: "150px", animationDelay: "11s", animationDuration: "34.6s" } },
+  { key: "terminal", svg: <TerminalChip />, style: { left: "68%", width: "104px", animationDelay: "2s", animationDuration: "29s" } },
+  { key: "code", svg: <CodeChip />, style: { left: "14%", width: "118px", animationDelay: "8s", animationDuration: "23.5s" } },
+  { key: "button", svg: <ButtonChip />, style: { left: "46%", width: "110px", animationDelay: "15s", animationDuration: "30.4s" } },
+  { key: "typedark", svg: <TypeChipDark />, style: { left: "60%", width: "94px", animationDelay: "13s", animationDuration: "35.9s" } },
+  { key: "wheel", svg: <WheelChip />, style: { left: "36%", width: "70px", animationDelay: "18s", animationDuration: "24.8s" } },
+  { key: "server", svg: <ServerChip />, style: { left: "6%", width: "130px", animationDelay: "21s", animationDuration: "27.6s" } },
+  // Visibility set
+  { key: "search", svg: <SearchChip />, style: { left: "4%", width: "170px", animationDelay: "3.5s", animationDuration: "32.2s" } },
+  { key: "chat", svg: <ChatChipDark />, style: { left: "52%", width: "150px", animationDelay: "9s", animationDuration: "27.7s" } },
+  { key: "rank", svg: <RankChip />, style: { left: "26%", width: "128px", animationDelay: "16s", animationDuration: "34.3s" } },
+  { key: "chart", svg: <ChartChip />, style: { left: "64%", width: "112px", animationDelay: "6.5s", animationDuration: "29.3s" } },
+  { key: "mail", svg: <MailChip />, style: { left: "14%", width: "98px", animationDelay: "12.5s", animationDuration: "25.1s" } },
+  { key: "pin", svg: <PinChipDark />, style: { left: "46%", width: "70px", animationDelay: "19.5s", animationDuration: "30.2s" } },
+  { key: "chart2", svg: <ChartChip />, style: { left: "70%", width: "96px", animationDelay: "17s", animationDuration: "35.2s" } },
+  { key: "rank2", svg: <RankChip />, style: { left: "8%", width: "104px", animationDelay: "24s", animationDuration: "28.6s" } },
+];
+
+// Top-level info for each sub-service under the two lanes (the one-line summaries
+// from the /websites/ and /visibility/ hubs). Indented under each lane so the
+// section scrolls longer and shares more detail without leaving the page.
+const WEBSITE_SUBS: { title: string; href: string; body: string }[] = [
+  { title: "Web Design", href: "/web-design/", body: "This is usually what clients come to me for. They want a website. They don't know or care how it gets done, they just know they can't do it themselves. This is the standard 'I need a website' service for small to medium businesses or initiatives." },
+  { title: "Web Development", href: "/web-development/", body: "Some clients already have a website that needs expansion or fixing, or they have a design that needs to be brought to life. This is the 'I have a complicated idea and need help making it real' service." },
+  { title: "Web Design Packages", href: "/web-design-packages/", body: "This service is for clients who want a hands-off approach to their website project. Web design packages are flat-rate bundles with minimal customization in return for lower-budget access." },
+  { title: "Custom Coded / Static", href: "/custom-coded-static/", body: "This is where the fun and flexibility is. The site you are on right now is a custom-coded, static site. No limits. These sites are super fast, too. We start from scratch and build *only* what you need, no more, no less. For higher budgets and hands-on clients with a vision that templates and builders like Elementor, Wix or GoDaddy Airo can't provide." },
+  { title: "WordPress", href: "/wordpress/", body: "WordPress is best for projects that require multiple contributors, like a volunteer team, or clients that want to regularly publish, edit or change features or the layout of their site on their own. WordPress is still powerful, but I may try to talk you out of it and into a custom-coded site if it sounds like WordPress will be overkill for your needs." },
+  { title: "Ecommerce", href: "/ecommerce/", body: "Ecommerce is for clients selling physical or digital products directly from their website. This service is specifically for custom-built, self-hosted and managed ecommerce projects that require total control and no limits." },
+  { title: "Shopify", href: "/shopify/", body: "Shopify is the world's number one DIY ecommerce platform. It's a combination of WordPress and Squarespace, best for lower-budget access." },
+];
+
+const VISIBILITY_SUBS: { title: string; href: string; body: string }[] = [
+  { title: "AI Visibility", href: "/ai-viz/", body: "AI Visibility (aka AI Viz) is an emerging service focused on getting found and recommended in the age of AI search. This is similar to SEO in that it's not one technique, but rather a toolkit of techniques that are selected and applied based on your specific market situation. This is for businesses where being the one the AI names is worth real money." },
+  { title: "AI Visibility Audit", href: "/ai-visibility-audit/", body: "The AI Visibility Audit is for clients with an existing website who either want to know how their website performs in the AI search arena, or are already pushing visibility initiatives but aren't getting the results they want." },
+  { title: "SEO", href: "/seo/", body: "SEO *didn't* die, it became the foundation. This is the classic discipline: ranking your pages for the phrases your buyers actually type into Google. It still works on its own, and it's also what the AI assistants read before they decide who to name. Plenty of clients start here and grow into the full visibility service." },
+  { title: "Digital Marketing", href: "/digital-marketing/", body: "Most businesses get sold every channel at once, and that's the expensive mistake. This is triage: a straight answer on the few channels yours actually needs, and an equally straight answer on the ones to skip. For clients who'd rather spend on what moves than on what sounds complete." },
+  { title: "Email Marketing", href: "/email-marketing/", body: "Email is the one channel you own outright. No algorithm sits between you and the people on your list, and the platform can start free (Mailchimp costs nothing up to 500 contacts). This is for clients who want a clean, segmented list and sends people actually open, without burning the goodwill of the inbox." },
+  { title: "Show Up on ChatGPT", href: "/show-up-on-chatgpt/", body: "This is the focused version of the question everyone suddenly has: how do I get named when someone asks ChatGPT? The work is making your site readable and quotable to the AI crawlers, so your business is the one in the answer instead of your competitor. It starts with a focused audit." },
+  { title: "Advertising on ChatGPT", href: "/advertising-on-chatgpt/", body: "The other half of the ChatGPT question is paid. This is managed advertising in the sponsored slot at the bottom of a ChatGPT answer: I run the campaign end to end, while your ad spend goes straight to OpenAI with no markup. It's the fast lane. You can be in front of people as soon as tomorrow." },
+];
+
+// ---- MANIFESTO ("who is chadworks for?") -- the FULL manifesto now lives on the
+// About page (<ManifestoSection />, sourced from @/lib/manifesto). The homepage
+// only TEASES it: the eyebrow + heading right under the gemstone, then a frosted
+// "Read the manifesto" CTA into /about/.
+
+const PAGE_URL = `${SITE_URL}/`;
+const EMAIL = "chad@chadworks.co";
+const TITLE = "chadworks | Websites and visibility, built by one person";
+const DESCRIPTION =
+  "Websites and visibility, designed and developed by one person, and owned outright by the business it serves.";
+
+export const metadata: Metadata = {
+  title: TITLE,
+  description: DESCRIPTION,
+  alternates: { canonical: PAGE_URL },
+};
+
+// ---- BANDS ("At a glance") -- judgment count, every band earns its place. ----
+const FACTS: ReactNode[] = [
+  "I'm your point of contact from deal to delivery. No sales rep, no account manager, no ambiguity.",
+  "The site and every working file behind it become your property, in full, upon final payment.",
+  <>
+    Speed and visibility (SEO/GEO) are built in, not upsell add-ons. Your site
+    loads fast and shows up in Google and in AI search like ChatGPT.
+    <span className="cw-aster" tabIndex={0}>
+      *
+      <span className="cw-aster__pop" role="note">
+        you&apos;ll show up when someone searches you by name. showing up for
+        &quot;dog groomer&quot; or &quot;account in new york&quot; takes
+        specialized work and healthy budgets.
+      </span>
+    </span>
+  </>,
+  "Twenty-plus years doing this, across hundreds of projects spanning a wide range of industries.",
+];
+
+// ---- RIBBONS (the broad beat) -- ribbons + knockout + frosted expand panel.
+// Positive, philosophical framing: why a real site matters more as AI rises. ----
+const PROBLEM = {
+  heading: "Your website is more important than ever.",
+  subheading: "Your digital home base must be authentic and distinguishable.",
+  body: "When anyone can generate a passable page in seconds, the thing that sets you apart is a site that is unmistakably, verifiably yours.",
+  more: {
+    trigger: "Expand to read more",
+    paragraphs: [
+      <>
+        <strong>Speed is mission-critical.</strong> A page that opens at once
+        keeps the visitor you worked to attract, and search engines reward the
+        very same thing, so a fast site pays you back twice over.
+      </>,
+      <>
+        <strong>Visibility optimization (SEO/GEO) is required.</strong> Showing up
+        in Google and in the AI assistants people now ask is structural work, set
+        into the build, so your business is the answer when someone goes looking.
+      </>,
+      <>
+        <strong>Authenticity breaks the market mold.</strong> As the
+        web fills with interchangeable, machine-made pages, a site that carries
+        your real voice and your real work reads as human, and that is exactly
+        what earns trust now.
+      </>,
+      <>
+        <strong>Quality is retained.</strong> When the type
+        is considered and the details are clearly built on purpose, a visitor
+        reads that as a promise: you bring the same care to the work you would do
+        for them.
+      </>,
+    ],
+  },
+};
+
+// ---- PORTFOLIO -- the flagship piece + a trimmed archive (real client sites). ----
+const FEATURED = {
+  slug: "risingcompass",
+  alt: "Rising Compass website, designed and developed by chadworks",
+  url: "risingcompass.net",
+  label: "Rising Compass",
+  href: "https://risingcompass.net",
+};
+
+const ARCHIVE: ArchiveItem[] = [
+  {
+    key: "aac",
+    slug: "aac",
+    alt: "AAC Event Catering website, designed and developed by chadworks",
+    url: "aaceventcatering.com",
+    label: "AAC Event Catering",
+    href: "https://aaceventcatering.com",
+    blurb:
+      "A catering brand that needed to look as polished as the events it runs. Booking-ready, and built to win the search.",
+  },
+  {
+    key: "edenscapes",
+    slug: "edenscapes",
+    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
+    url: "eden-scapes.com",
+    label: "EdenScapes",
+    href: "https://eden-scapes.com/japanese-garden-design-installation/",
+    blurb:
+      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
+  },
+  {
+    key: "massagepros",
+    slug: "massagepros",
+    alt: "Massage Professionals website, designed and developed by chadworks",
+    url: "massageprofessionalsllc.com",
+    label: "Massage Professionals",
+    href: "https://massageprofessionalsllc.com",
+    blurb:
+      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
+  },
+  {
+    key: "rozariolaw",
+    slug: "rozariolaw",
+    alt: "Rozario Law website, designed and developed by chadworks",
+    url: "rozariolaw.com",
+    label: "Rozario Law",
+    href: "https://rozariolaw.com",
+    blurb:
+      "A law practice has seconds to earn trust. This one opens steady and serious, and tells a visitor exactly what to do next.",
+  },
+  {
+    key: "thorobird",
+    slug: "thorobird",
+    alt: "Thorobird website, designed and developed by chadworks",
+    url: "thorobird.com",
+    label: "Thorobird",
+    href: "https://thorobird.com",
+    blurb:
+      "A brand site with a distinct point of view, custom built so it carries the personality the business actually has.",
+  },
+  {
+    key: "chadlewine",
+    slug: "chadlewine",
+    alt: "Chad Lewine website, designed and developed by chadworks",
+    url: "chadlewine.com",
+    label: "Chad Lewine",
+    href: "https://chadlewine.com",
+    blurb:
+      "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
+  },
+];
+
+// ---- FAQ -- a focused single-band accordion. ----
+const FAQS = [
+  {
+    q: "Who actually builds the site?",
+    a: "I do, start to finish. The person who reads your email is the person who designs the pages and writes the code, so nothing gets lost in a handoff.",
+  },
+  {
+    q: "Do I own everything when it's done?",
+    a: "Yes. The code, the hosting, the domain, and the accounts are all in your name from day one. Nothing is held hostage if you ever want to move on.",
+  },
+  {
+    q: "Will the site show up on Google and in AI answers?",
+    a: "Findability is built in, not bolted on. The pages are structured and schema-rich so classic search and AI assistants can both read and recommend them.",
+  },
+  {
+    q: "What does a build cost?",
+    a: "It depends on the scope, and you get a straight number before any money moves. I am not the cheapest, on purpose, and I would rather say that up front than after a proposal.",
+  },
+];
+
+// ---- CONTACT -- the dark band, quick and detailed forms (mirrors /contact/). ----
+const QUICK: LeadFormConfig = {
+  source: "one-pager (quick)",
+  subject: "New Quick Contact from the One Pager (chadworks)",
+  submitLabel: "Send it to Chad",
+  successMessage:
+    "Got it. This lands straight in my inbox and I read every one myself. You'll hear back within a day.",
+  fields: [
+    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
+    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
+    {
+      kind: "textarea",
+      name: "message",
+      label: "What's going on?",
+      required: true,
+      rows: 4,
+      placeholder: "The business, and where it's stuck right now.",
+    },
+  ],
+};
+
+const DETAILED: LeadFormConfig = {
+  source: "one-pager (detailed)",
+  subject: "New Detailed Inquiry from the One Pager (chadworks)",
+  submitLabel: "Send the details",
+  successMessage:
+    "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with a straight answer on the number.",
+  fields: [
+    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
+    { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
+    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
+    { kind: "text", name: "business", label: "Business Name", span: "half" },
+    {
+      kind: "textarea",
+      name: "details",
+      label: "What are you building?",
+      required: true,
+      rows: 5,
+      placeholder: "What the site needs to do, and where it's stuck today.",
+    },
+    { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
+  ],
+};
 
 export default function Home() {
   return (
-    <>
-      <HomeHero />
+    <PageComposer>
+      {/* The single, always-sticky motion toggle (top-right). Owns all motion. */}
+      <GlobalMotionToggle />
 
-      {/* SECTION COLOR SCHEMES -- the three named section treatments, one example
-          of each. See CWS-DESIGN-SYSTEM.md > SECTION COLOR SCHEMES. */}
+      {/* 1. The existing homepage hero (bare: no CTAs, divider stretched). */}
+      <HomeHero bare />
 
-      {/* Default -- white */}
-      <section className="section full scheme-default">
-        <p className="eyebrow">Default</p>
-        <h2 style={{ fontSize: "var(--text-2xl)" }}>White section, same rail.</h2>
-        <p className="measure-prose" style={{ color: "var(--text-secondary)", marginTop: "var(--space-sm)" }}>
-          The default scheme. The background touches the viewport edges, the
-          content keeps the exact site-width gap as every other section.
-        </p>
+      {/* 2 + 2.5. The CW gemstone and the manifesto share ONE ambient field: the
+          Lyric-Transformer fbm cloud (<ManifestoAmbient />) is a full-bleed layer
+          that begins in the lower third of the gemstone and runs through the
+          manifesto, fading in at the top and out at the bottom. It sits behind
+          both (z-index 0); the gem canvas is transparent so the cloud shows
+          through. The shell+full wrapper re-grids its children so the gemstone
+          still breaks out to viewport width. */}
+      <div className="shell full cw-mani-field">
+        {/* The band "window": absolute, anchored at the gemstone's lower third,
+            carrying the top/bottom fade. The cloud inside is non-fixed -- it
+            scrolls with the page (no longer pinned). */}
+        <div className="cw-mani-field__bg" aria-hidden="true">
+          <ManifestoAmbient />
+        </div>
+
+        {/* 2. The faceted-glass CW gemstone (the 3D CW shape), full width. */}
+        <GemstoneCW />
+
+        {/* 2.5. The manifesto TEASER -- the question right under the gemstone, then
+            a frosted "Read the manifesto" CTA into /about/ where the full manifesto
+            now lives, over the shared LT-style cloud. */}
+        <SectionShell className="cw-manifesto">
+          <p className="eyebrow">{MANIFESTO.eyebrow}</p>
+          <h2>{MANIFESTO.heading}</h2>
+          <p className="svc-lede measure-prose">{MANIFESTO.intro}</p>
+          <Link className="cw-manifesto__cta" href="/about/">
+            Read the manifesto
+          </Link>
+        </SectionShell>
+      </div>
+
+      {/* 2a. The two lanes (Websites, then Visibility) scroll past a SINGLE
+          sticky column that holds both chip streams combined. */}
+      <section className="section full cw-lanes-scroll">
+        <div className="cw-lanes-scroll__stack">
+          <div className="cw-lanes-scroll__chips" aria-hidden="true">
+            {ALL_CHIPS.map((c) => (
+              <div key={c.key} className="hero-chip" style={c.style}>
+                {c.svg}
+              </div>
+            ))}
+          </div>
+          <div className="cw-lanes-scroll__text">
+            <div className="cw-lane-block">
+              <p className="eyebrow">Service Lane 01</p>
+              <h2 className="svc-hero__title">
+                <span className="text-gradient">Websites</span>
+              </h2>
+              <p className="svc-lede measure-prose">
+                A website is the one piece of your business you fully own on the
+                internet. I&apos;ve been building websites for over 20 years
+                (since 2002!) The websites I build for my clients are bespoke. I
+                no longer use templates or builders, which makes each chadworks
+                project truly 100% original. Below are the specific web design
+                services I offer.
+              </p>
+              <div className="cw-lane-subs">
+                {WEBSITE_SUBS.map((s) => (
+                  <div className="cw-lane-sub" key={s.title}>
+                    <h3 className="cw-lane-sub__title">
+                      <Link href={s.href} className="cw-lane-sub__link">
+                        <WaveText text={s.title} />
+                      </Link>
+                    </h3>
+                    <p className="cw-lane-sub__body">{emphasize(s.body)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="cw-lane-block cw-lane-block--alt">
+              <p className="eyebrow">Service Lane 02</p>
+              <h2 className="svc-hero__title">
+                <span className="text-gradient">Visibility</span>
+              </h2>
+              <p className="svc-lede measure-prose">
+                You want your current and potential customers or audience to
+                find you online. Visibility is the art and science of making
+                your website or web properties discoverable online. That means
+                optimizing for both Google search (SEO) and more recently, AI
+                chat bots (GEO/AEO).
+              </p>
+              <div className="cw-lane-subs">
+                {VISIBILITY_SUBS.map((s) => (
+                  <div className="cw-lane-sub" key={s.title}>
+                    <h3 className="cw-lane-sub__title">
+                      <Link href={s.href} className="cw-lane-sub__link">
+                        <WaveText text={s.title} />
+                      </Link>
+                    </h3>
+                    <p className="cw-lane-sub__body">{emphasize(s.body)}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
-      {/* Alternate -- lavender */}
-      <section className="section full scheme-alternate">
-        <p className="eyebrow">Alternate</p>
-        <h2 style={{ fontSize: "var(--text-2xl)" }}>Lavender section.</h2>
-        <p className="measure-prose" style={{ color: "var(--text-secondary)", marginTop: "var(--space-sm)" }}>
-          The alternate scheme: lavender background with a hairline border. Used to
-          set a section apart from the default white around it.
-        </p>
-      </section>
+      {/* 3. The "at a glance" bands (computed dark -> lavender arc). */}
+      <KeyFactsCapsule heading={"chadworks™ AT A GLANCE"} facts={FACTS} />
 
-      {/* Inverted -- dark blue */}
-      <section className="section full scheme-inverted">
-        <p className="eyebrow">Inverted</p>
-        <h2 style={{ fontSize: "var(--text-2xl)" }}>Dark blue section.</h2>
-        <p className="measure-prose" style={{ color: "var(--dark-muted)", marginTop: "var(--space-sm)" }}>
-          The inverted scheme: dark indigo background, text inverts. Use it for
-          contrast, CTAs, or contact. Never two inverted sections back to back.
+      {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
+      <ProblemCapsule problem={PROBLEM} />
+
+      {/* 5. PORTFOLIO -- a centered titlebar: the section name flanked by two
+          mini, counter-rotating CW gemstones (the same cut crystal as the hero
+          mark, at badge scale). Then the flagship piece and the archive grid. */}
+      <SectionShell className="cw-port-titlebar">
+        <div className="cw-port-titlebar__row">
+          <GemstoneMark spinDir={1} className="cw-port-titlebar__gem" />
+          <h2 className="cw-port-titlebar__title">chadworks&trade; Portfolio</h2>
+          <GemstoneMark spinDir={1} className="cw-port-titlebar__gem" />
+        </div>
+      </SectionShell>
+
+      {/* 5a. The flagship piece, then the archive grid. */}
+      <SectionShell className="cw-port-feat-shell">
+        <FeaturedShowcase
+          primary={FEATURED}
+          eyebrow="Featured build"
+          heading="Rising Compass"
+          lede="A full web app, not a brochure site: a custom interface over a real engine, built to stay fast and clear as it grows. See how it holds up across screens below."
+        />
+      </SectionShell>
+      <SectionShell>
+        <p className="eyebrow">The archive</p>
+        <h2 className="cw-port-archive__heading">More sites I&apos;ve custom built</h2>
+        <p className="svc-lede measure-prose">
+          A wider sample of client work. Switch any card between desktop, tablet,
+          and mobile, or open it live. Each was designed and developed by one
+          person, start to finish.
         </p>
-      </section>
-    </>
+        <ArchiveGrid items={ARCHIVE} />
+      </SectionShell>
+
+      {/* 6. About Chad -- the human block. */}
+      <MadeByCapsule
+        variant="split"
+        made={{
+          heading: (
+            <>
+              the <em>Chad</em> behind chadworks
+            </>
+          ),
+          img: "/people/chad-cutout.webp",
+          imgAlt: "Chad Lewine, the person behind chadworks",
+          captionMain: "Yes, this is the whole company.",
+          captionSub: "(That's the point.)",
+          intro:
+            "Twenty years of building websites, and the part I'd never automate is this: when you email chadworks, you get me.",
+          manifesto: [
+            { lead: "Designing since age 11.", aside: "(Not a metaphor.)" },
+            { lead: "HTML since 8th grade.", aside: "(Thanks, MySpace.)" },
+            { lead: "Paid client builds since 2008.", aside: "(50+ engagements since 2019.)" },
+            { lead: "Every site custom built.", aside: "(Including this one.)" },
+          ],
+          negation: [
+            "No subcontractors.",
+            "No offshore handoffs.",
+            "No invented case studies.",
+            "No pretending the process is polished when DNS won't propagate and dinner is late.",
+          ],
+          close:
+            "The web has reinvented itself a dozen times since I started. The deal here never changed: you get the person, not a brand wrapper.",
+          sig: "Chad Lewine",
+          sigMeta: "chadworks (designing since age 11)",
+        }}
+      />
+
+      {/* 6a. Good fit -- who I build for and who I don't, so the wrong-fit
+          noise filters itself out before anyone reaches out. */}
+      <QualificationCapsule
+        qualification={{
+          heading: "Who I build for",
+          fit: [
+            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost.",
+            "You see the site and the visibility behind it as an investment that should return, not a cost to shrink.",
+          ],
+          notFit: [
+            "The lowest number decides. I'm not the cheapest, deliberately, and I'd rather say that here than after a proposal.",
+            "You want a template with your logo dropped in. Plenty of builders do that, and I'm not one of them.",
+          ],
+        }}
+      />
+
+      {/* 6b. Pricing -- the real, public rates. Hourly + flat on top, audit +
+          monthly below (2x2). Numbers from the rates page; shown in full. */}
+      <SectionShell full className="cw-pricing">
+        <div className="cw-pricing__head">
+          <p className="eyebrow">What it costs</p>
+          <h2 className="cw-pricing__heading">Straight rates, shown in full.</h2>
+          <p className="svc-lede measure-prose">
+            One honest hourly rate sits under everything, and you get a real
+            number before any work starts. No teaser that climbs once you commit.
+          </p>
+        </div>
+        <div className="cw-pricing__grid">
+          <div className="cw-price-card panel">
+            <p className="cw-price-card__label">Hourly</p>
+            <p className="cw-price-card__figure">$315<span className="cw-price-card__unit"> / hour</span></p>
+            <p className="cw-price-card__note">
+              One honest rate for every hour, whichever part of the work it goes
+              to. No agency markup stacked on top.
+            </p>
+          </div>
+          <div className="cw-price-card panel">
+            <p className="cw-price-card__label">Flat-rate builds</p>
+            <p className="cw-price-card__figure">From $3,200</p>
+            <p className="cw-price-card__note">
+              Most sites land around $6,200: a full build scoped to a real number
+              up front, owned outright by you when it ships.
+            </p>
+          </div>
+          <div className="cw-price-card panel">
+            <p className="cw-price-card__label">AI visibility audit</p>
+            <p className="cw-price-card__figure">By scope</p>
+            <p className="cw-price-card__note">
+              A one-time read on where you show up and where you don&apos;t,
+              billed from the same $315/hour and yours to act on with anyone.
+            </p>
+          </div>
+          <div className="cw-price-card panel">
+            <p className="cw-price-card__label">Monthly care</p>
+            <p className="cw-price-card__figure">$550<span className="cw-price-card__unit"> / 6 mo</span></p>
+            <p className="cw-price-card__note">
+              Optional WordPress upkeep: the updates and backups handled, with a
+              human watching for what tends to break quietly.
+            </p>
+          </div>
+        </div>
+      </SectionShell>
+
+      {/* 7. FAQs -- inverted dark band (septic-page treatment). */}
+      <FaqCapsule
+        heading="Questions, answered"
+        faqLead="The things people ask before they reach out. If yours isn't here, the form below reaches me directly."
+        faqs={FAQS}
+        scheme="inverted"
+        schemeAuto
+      />
+
+      {/* 7a. "Going to bat" -- the real anti-agency email thread (septic page). */}
+      <SectionShell reveal={false} className="cw-art-voice-section">
+        <SepticVoicebox />
+      </SectionShell>
+
+      {/* 8. Contact -- the dark band with the quick/detailed form. */}
+      <ContactCapsule
+        scheme="inverted"
+        heading="Tell me about the project"
+        intro="Two ways in. Email me directly, or use the form: quick if you just want to start a conversation, detailed if you already know the shape of the build. Both land in the same inbox."
+        emailLabel="Email directly"
+        email={EMAIL}
+        locationNote="Based in Pennsylvania, working with businesses across the country and beyond. The work is remote, so where you are has never decided whether it fits."
+        quick={QUICK}
+        detailed={DETAILED}
+        quickLabel="Quick message"
+        detailedLabel="Detailed inquiry"
+      />
+    </PageComposer>
   );
 }

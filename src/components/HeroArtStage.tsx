@@ -23,7 +23,15 @@ function PlayIcon() {
   );
 }
 
-export function HeroArtStage({ children }: { children: React.ReactNode }) {
+export function HeroArtStage({
+  children,
+  hideToggle = false,
+}: {
+  children: React.ReactNode;
+  // One-pager: hide this stage's own button; the global sticky toggle pauses
+  // the chips via the `cw-motion-paused` class (CSS animation-play-state).
+  hideToggle?: boolean;
+}) {
   const [paused, setPaused] = useState(false);
   return (
     <>
@@ -33,6 +41,7 @@ export function HeroArtStage({ children }: { children: React.ReactNode }) {
       >
         {children}
       </div>
+      {!hideToggle && (
       <button
         type="button"
         className="svc-hero__art-toggle"
@@ -44,6 +53,7 @@ export function HeroArtStage({ children }: { children: React.ReactNode }) {
           {paused ? "Resume motion" : "Pause motion"}
         </span>
       </button>
+      )}
     </>
   );
 }

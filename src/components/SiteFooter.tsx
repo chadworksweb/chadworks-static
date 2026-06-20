@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GemstoneMark } from "@/components/GemstoneMark";
 
 // Footer sitemap: every column heading links to its hub where one exists.
 // This is load-bearing for GEO (internal links; every rankable page reachable
@@ -58,11 +59,24 @@ export default function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-footer__inner">
-        <div className="site-footer__brandrow">
-          <span className="site-footer__brand">chadworks&trade;</span>
-          <span className="site-footer__tag">Websites &amp; Visibility</span>
-        </div>
         <nav className="site-footer__cols" aria-label="Footer">
+          {/* Corporate branding / info / contact -- the live CW gemstone. It
+              holds a fixed near-front tilt; the cursor only moves the shimmer. */}
+          <div className="site-footer__brandcol">
+            <GemstoneMark
+              still
+              tiltY={0.3}
+              tiltX={0.1}
+              cursorShimmer
+              specDamp={0.5}
+              className="site-footer__gem"
+            />
+            <span className="site-footer__brand">chadworks&trade;</span>
+            <span className="site-footer__tag">Websites &amp; Visibility</span>
+            <a className="site-footer__contact" href="mailto:chad@chadworks.co">
+              chad@chadworks.co
+            </a>
+          </div>
           {COLUMNS.map((col) => (
             <div key={col.heading} className="site-footer__col">
               <p className="site-footer__heading">

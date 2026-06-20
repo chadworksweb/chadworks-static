@@ -31,7 +31,10 @@ type Phase = "idle" | "typing" | "tm" | "tagline" | "done";
 const useIsomorphic =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-export default function HomeHero() {
+// `bare` (one-pager use): drops the lane CTAs and stands the gradient divider
+// up as a vertical rule to the LEFT of the tagline. The default homepage build
+// is untouched.
+export default function HomeHero({ bare = false }: { bare?: boolean }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [typed, setTyped] = useState(WORDMARK.length); // idle/done = full
   const [caretX, setCaretX] = useState(0);
@@ -95,11 +98,15 @@ export default function HomeHero() {
 
   return (
     <section
-      className={`section full home-hero${animating ? " is-anim" : ""}`}
+      className={`section full home-hero${animating ? " is-anim" : ""}${
+        bare ? " home-hero--bare" : ""
+      }`}
       aria-label="chadworks"
     >
       <div className="home-hero__glow" aria-hidden="true" />
-      <CodeFall />
+      {/* In bare (one-pager) mode the global sticky toggle owns motion, so
+          CodeFall hides its own button but still honors the global pause. */}
+      <CodeFall hideToggle={bare} />
 
       <div className="home-hero__inner">
         <div className="home-hero__mark">
@@ -132,50 +139,78 @@ export default function HomeHero() {
           </span>
         </h1>
 
-        {/* Tagline tucked under the bottom-right of the wordmark. */}
-        <p className={`home-hero__tagline${tagOn ? " is-on" : ""}`}>
-          {TAGLINE.map((w, i) => (
+        {/* Tagline tucked under the bottom-right of the wordmark. In bare
+            (one-pager) mode the gradient divider rides the SAME row, filling the
+            space to the LEFT of the tagline (see ss10). */}
+        {bare ? (
+          <div className="home-hero__tagrow">
             <span
-              key={i}
-              className="home-hero__tagword"
-              style={{ "--wi": i } as React.CSSProperties}
-            >
-              {w}
-            </span>
-          ))}
-        </p>
+              className={`home-hero__rule home-hero__rule--inline${
+                phase === "done" ? " is-on" : ""
+              }`}
+              aria-hidden="true"
+            />
+            <p className={`home-hero__tagline${tagOn ? " is-on" : ""}`}>
+              {TAGLINE.map((w, i) => (
+                <span
+                  key={i}
+                  className="home-hero__tagword"
+                  style={{ "--wi": i } as React.CSSProperties}
+                >
+                  {w}
+                </span>
+              ))}
+            </p>
+          </div>
+        ) : (
+          <p className={`home-hero__tagline${tagOn ? " is-on" : ""}`}>
+            {TAGLINE.map((w, i) => (
+              <span
+                key={i}
+                className="home-hero__tagword"
+                style={{ "--wi": i } as React.CSSProperties}
+              >
+                {w}
+              </span>
+            ))}
+          </p>
+        )}
         </div>
 
-        {/* Gradient divider that draws out above the CTAs. */}
-        <span
-          className={`home-hero__rule${phase === "done" ? " is-on" : ""}`}
-          aria-hidden="true"
-        />
+        {/* Default homepage only: the divider draws out above the lane CTAs. */}
+        {!bare && (
+          <span
+            className={`home-hero__rule${phase === "done" ? " is-on" : ""}`}
+            aria-hidden="true"
+          />
+        )}
 
-        <div className={`home-hero__lanes${phase === "done" ? " is-on" : ""}`}>
-          <a href="/websites/" className="svc-btn">
-            <span className="svc-btn__label">Websites</span>
-            <svg
-              className="svc-btn__arrow"
-              viewBox="0 0 448 512"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-            </svg>
-          </a>
-          <a href="/visibility/" className="svc-btn">
-            <span className="svc-btn__label">Visibility</span>
-            <svg
-              className="svc-btn__arrow"
-              viewBox="0 0 448 512"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-            </svg>
-          </a>
-        </div>
+        {!bare && (
+          <div className={`home-hero__lanes${phase === "done" ? " is-on" : ""}`}>
+            <a href="/websites/" className="svc-btn">
+              <span className="svc-btn__label">Websites</span>
+              <svg
+                className="svc-btn__arrow"
+                viewBox="0 0 448 512"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+              </svg>
+            </a>
+            <a href="/visibility/" className="svc-btn">
+              <span className="svc-btn__label">Visibility</span>
+              <svg
+                className="svc-btn__arrow"
+                viewBox="0 0 448 512"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+              </svg>
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

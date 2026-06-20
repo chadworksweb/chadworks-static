@@ -19,6 +19,7 @@ import {
   QualificationCapsule,
   CtaCapsule,
 } from "@/components/capsules";
+import ManifestoSection from "@/components/ManifestoSection";
 import type { LeadFormConfig } from "@/lib/forms";
 
 const PAGE_URL = `${SITE_URL}/about/`;
@@ -194,6 +195,10 @@ export default function AboutPage() {
         lede="chadworks is one person. I'm Chad Lewine, designing since age 11 and custom-building websites for 20 years. There's no team behind a curtain and no account manager translating. The person you email is the person who writes the code."
         cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
+
+      {/* THE MANIFESTO -- "who is chadworks for?", moved here from the homepage:
+          the frosted panel over the Lyric-Transformer cloud, full bleed. */}
+      <ManifestoSection />
 
       {/* THE STORY -- era timeline on the build-time band arc. */}
       <EraTimelineCapsule heading="The story, era by era" eras={ERAS} />

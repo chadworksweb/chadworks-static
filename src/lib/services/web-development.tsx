@@ -111,8 +111,10 @@ export const webDevelopment: Service = {
 
   paths: {
     heading: "Choose how it's built",
+    // NOTE (parked 2026-06-19): the homepage web-development definition lives
+    // here for now until it gets a proper home on this page.
     intro:
-      "Same service, four ways to build it. If you're not sure which is right, that's what the conversation is for. Here's the short version of each.",
+      "Web development is the code and technology behind the design. Development is the aspect that connects the server (the back end) to the browser (the front end). It is the translation between raw data on a hard drive in a data center and the websites and apps you interact with. Without development, the design would have nothing to sit on; it would be a flat image you couldn't interact with. Same service, four ways to build it. If you're not sure which is right, that's what the conversation is for. Here's the short version of each.",
     items: [
       {
         label: "Custom Coded / Static",

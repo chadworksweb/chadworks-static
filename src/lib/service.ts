@@ -160,7 +160,7 @@ export type Service = {
   // list, close line, signature. Renders before Price.
   made?: {
     eyebrow?: string;
-    heading: string;
+    heading: ReactNode;
     intro: Writable;
     manifesto: { lead: string; aside: string }[];
     negation: string[];

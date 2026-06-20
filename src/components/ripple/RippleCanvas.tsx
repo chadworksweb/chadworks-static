@@ -305,7 +305,10 @@ export const RippleCanvas = forwardRef<RippleCanvasHandle, Props>(
             sx = (1 - sw) * 0.5;
           } else {
             sh = imgAR / faceAR;
-            sy = (1 - sh) * 0.5;
+            // top-align to match the <img> object-position: top center, so the
+            // ripple shows the SAME crop as the static screenshot (no nudge).
+            // texture has UNPACK_FLIP_Y, so v=1 is the image top -> sy = 1 - sh.
+            sy = 1 - sh;
           }
           gl.uniform4f(uCrop, sx, sy, sw, sh);
           gl.uniform4fv(uDrops, dropsBuffer);

@@ -120,8 +120,10 @@ export const webDesign: Service = {
 
   paths: {
     heading: "Choose how it's built",
+    // NOTE (parked 2026-06-19): the homepage web-design definition lives here
+    // for now until it gets a proper home on this page.
     intro:
-      "A design needs a build to live on. Same four routes as the development side. If you're not sure which fits, that's part of the conversation.",
+      "Website design is the visual aspect of a website. This includes the UI (user interface), which includes colors, fonts, images and other media. It also covers UX (user experience), which is the way a visitor explores the website; the path they take, the links they click and where those links go, the forms they fill out and the buttons they push. UI and UX work together to make it easy for your visitors to find what they're looking for. The design is the aesthetic of that interface and experience. Without design, you'd be looking at indecipherable lines of code and spreadsheet-like data, and would not be able to find what you need. A design needs a build to live on. Same four routes as the development side. If you're not sure which fits, that's part of the conversation.",
     items: [
       {
         label: "Custom Coded / Static",

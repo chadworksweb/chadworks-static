@@ -5,13 +5,25 @@ import type { Service } from "@/lib/service";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type MadeByCapsuleProps = { made: NonNullable<Service["made"]> };
+export type MadeByCapsuleProps = {
+  made: NonNullable<Service["made"]>;
+  // "stacked" (default): header sits above the photo+copy grid (every other
+  // page). "split": header moves into the right copy column, the row top-aligns,
+  // and the left photo column sticks while the copy scrolls past it.
+  variant?: "stacked" | "split";
+};
 
-export function MadeByCapsule({ made }: MadeByCapsuleProps) {
-  return (
-    <SectionShell className="svc-block svc-made">
+export function MadeByCapsule({ made, variant = "stacked" }: MadeByCapsuleProps) {
+  const split = variant === "split";
+  const header = (
+    <>
       {made.eyebrow && <p className="eyebrow">{made.eyebrow}</p>}
       <h2 className="svc-block__heading svc-made__heading">{made.heading}</h2>
+    </>
+  );
+  return (
+    <SectionShell className={"svc-block svc-made" + (split ? " svc-made--split" : "")}>
+      {!split && header}
       <div className="svc-made__grid">
         <div className="svc-made__photo">
           {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
@@ -24,6 +36,7 @@ export function MadeByCapsule({ made }: MadeByCapsuleProps) {
           </div>
         </div>
         <div className="svc-made__copy">
+          {split && header}
           <p className="svc-made__intro">
             <W value={made.intro} />
           </p>

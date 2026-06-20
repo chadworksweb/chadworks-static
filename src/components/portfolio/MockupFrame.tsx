@@ -80,13 +80,30 @@ export function MockupFrame({
     <div className={"cw-port-frame cw-port-frame--" + variant + (className ? " " + className : "")}>
       {variant === "browser" && (
         <div className="cw-port-frame__bar" aria-hidden="true">
-          <span className="cw-port-frame__dots">
-            <span className="cw-port-frame__dot" />
-            <span className="cw-port-frame__dot" />
-            <span className="cw-port-frame__dot" />
+          {/* eslint-disable-next-line @next/next/no-img-element -- static export, decorative */}
+          <img className="cw-port-frame__mark" src="/cw-gemstone-mark.png" alt="" />
+          <span className="cw-port-frame__url">
+            <svg
+              className="cw-port-frame__lock"
+              viewBox="0 0 24 24"
+              width="11"
+              height="11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            <span className="cw-port-frame__url-text">{url}</span>
           </span>
-          <span className="cw-port-frame__url">{url}</span>
-          <span className="cw-port-frame__bar-spacer" />
+          <span className="cw-port-frame__menu">
+            <i />
+            <i />
+            <i />
+          </span>
         </div>
       )}
       {variant === "phone" && <span className="cw-port-frame__notch" aria-hidden="true" />}

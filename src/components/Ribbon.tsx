@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isMotionPaused, subscribeMotion } from "@/lib/motion";
 
 // Two intermingling 3D gradient RIBBONS (Stripe-style), on Three.js. Each is a
 // discrete lit object: a long narrow strip whose centerline flows along an
@@ -246,18 +247,28 @@ export function Ribbon({ className, mask = false }: { className?: string; mask?:
         raf = 0;
       };
 
-      // Run only while near the viewport; fully stop the loop when far (context
-      // stays warm). rootMargin warms it ~one viewport ahead.
+      // Run only while near the viewport AND motion isn't globally paused; fully
+      // stop the loop otherwise (context stays warm). rootMargin warms it ~one
+      // viewport ahead.
+      let visible = false;
+      let motionPaused = isMotionPaused();
+      const sync = () => (visible && !motionPaused ? start() : stop());
       const io = new IntersectionObserver(
         (entries) => {
-          for (const e of entries) e.isIntersecting ? start() : stop();
+          for (const e of entries) visible = e.isIntersecting;
+          sync();
         },
         { root: null, rootMargin: "100% 0px 100% 0px", threshold: 0 }
       );
       io.observe(host);
+      const unsubMotion = subscribeMotion((v) => {
+        motionPaused = v;
+        sync();
+      });
 
       cleanup = () => {
         stop();
+        unsubMotion();
         io.disconnect();
         ro.disconnect();
         geo.dispose();

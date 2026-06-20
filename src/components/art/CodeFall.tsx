@@ -12,6 +12,7 @@
 // re-fits on resize, respects prefers-reduced-motion, and carries a pause toggle.
 
 import { useEffect, useRef, useState } from "react";
+import { isMotionPaused, subscribeMotion } from "@/lib/motion";
 
 // Code-flavored glyphs (drawn in the brand mono face). No CJK -- the mono font
 // has no katakana, which would render as tofu boxes.
@@ -37,7 +38,7 @@ const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const pick = () => GLYPHS[(Math.random() * GLYPHS.length) | 0];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-export function CodeFall() {
+export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [paused, setPaused] = useState(false);
@@ -45,6 +46,13 @@ export function CodeFall() {
   useEffect(() => {
     pausedRef.current = paused;
   }, [paused]);
+
+  // Honor the global motion toggle (one-pager): keep local state in sync so the
+  // rAF parks and the local button (when shown) reflects the global state.
+  useEffect(() => {
+    setPaused(isMotionPaused());
+    return subscribeMotion((v) => setPaused(v));
+  }, []);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -351,6 +359,7 @@ export function CodeFall() {
       <div className="home-hero__codefall" ref={wrapRef} aria-hidden="true">
         <canvas ref={canvasRef} />
       </div>
+      {!hideToggle && (
       <button
         type="button"
         className="svc-hero__art-toggle home-hero__codefall-toggle"
@@ -371,6 +380,7 @@ export function CodeFall() {
           {paused ? "Resume motion" : "Pause motion"}
         </span>
       </button>
+      )}
     </>
   );
 }
