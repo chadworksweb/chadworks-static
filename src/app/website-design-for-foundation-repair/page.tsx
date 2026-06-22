@@ -10,7 +10,7 @@
 //   -> anti-agency email thread -> nine-step timeline -> testimonials
 //   -> contact CTA -> cross-industry grid.
 //
-// The anti-agency email thread is the SAME real Pixelborn exchange the septic
+// The anti-agency email thread is the SAME real Brixhollow exchange the septic
 // page shows (the foundation source reproduces it verbatim), so we reuse the
 // existing SepticVoicebox component rather than duplicate it.
 

@@ -8,7 +8,7 @@
 // svc-fill wipe when the band is dark.
 
 import type { ReactNode } from "react";
-import type { Service, Writable } from "@/lib/service";
+import type { Writable } from "@/lib/service";
 import { isPrompt } from "@/lib/service";
 import type { Scheme } from "@/lib/capsule";
 import { isDarkScheme } from "@/lib/capsule";
@@ -27,7 +27,8 @@ export type FaqGroup = {
 };
 
 export type FaqCapsuleProps = {
-  faqs?: Service["faqs"];
+  // answers may be plain strings (Writable) or JSX (inline links allowed)
+  faqs?: { q: string; a: Writable | ReactNode }[];
   faqLead?: Writable;
   // The FAQ prefers the dark band but yields to rule 9: PageComposer demotes
   // `scheme` to "default" when the next present section is also inverted.

@@ -14,6 +14,8 @@ export type ContactCapsuleProps = {
   intro: ReactNode; // the "two ways in" note
   emailLabel: string;
   email: string;
+  phoneLabel?: string;
+  phone?: string;
   locationNote: ReactNode;
   quick: LeadFormConfig;
   detailed: LeadFormConfig;
@@ -28,6 +30,8 @@ export function ContactCapsule({
   intro,
   emailLabel,
   email,
+  phoneLabel,
+  phone,
   locationNote,
   quick,
   detailed,
@@ -48,6 +52,17 @@ export function ContactCapsule({
                 {email}
               </a>
             </div>
+            {phone && (
+              <div>
+                <p className="cw-contact__email-label">{phoneLabel}</p>
+                <a
+                  className="cw-contact__email"
+                  href={`tel:+1${phone.replace(/\D/g, "")}`}
+                >
+                  {phone}
+                </a>
+              </div>
+            )}
             <p className="cw-contact__note">{locationNote}</p>
           </div>
 

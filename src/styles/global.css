@@ -1458,6 +1458,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .svc-acc__item.is-open .svc-acc__q::after { color: var(--accent); }
 .svc-faq-section--dark .svc-acc__a { background: rgba(31, 23, 39, 0.35); }
 .svc-faq-section--dark .svc-acc__a p { color: rgba(229, 210, 244, 0.88); }
+/* inline links inside FAQ answers (global anchors are color:inherit/no-underline) */
+.svc-acc__a-inner a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.25s var(--ease-smooth);
+}
+.svc-faq-section--dark .svc-acc__a-inner a { color: #e5d2f4; }
+.svc-faq-section--dark .svc-acc__a-inner a:hover { color: #fff; }
 
 @media (max-width: 900px) {
   .svc-faq__layout { grid-template-columns: 1fr; }
@@ -1902,6 +1912,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* CTA band */
 .svc-cta__heading { font-size: var(--text-2xl); }
+/* contact CTA heading sized to sit on one line in its half-width column */
+.cw-contact .svc-cta__heading { font-size: 43px; }
 .svc-cta__body { margin: var(--space-sm) 0 var(--space-lg); color: var(--dark-muted); }
 
 /* =====================================================================
@@ -3493,11 +3505,21 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Orb field: absolute, behind the content, pointer-transparent. */
 .cw-orbfield {
+  /* It is a direct child of the full-bleed section grid, so it must span the
+     FULL track -- otherwise it anchors to the site-width content cell and its
+     inset:0 clips the glow to the rail edge (the "cutoff"). */
+  grid-column: full;
+  grid-row: 1 / -1;
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  /* fade the glow out before the top + bottom band edges so a clipped orb never
+     leaves a hard cut line where the dark band meets the sections above/below
+     (the sides bleed freely -- that is the intended full-bleed look) */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 80%, transparent 100%);
 }
 .cw-contact__inner { position: relative; z-index: 1; }
 
@@ -3558,7 +3580,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   gap: clamp(2rem, 4vw, 3.5rem);
   align-items: start;
 }
-@media (max-width: 900px) {
+/* Stack to one column below 1024 (not 900): at ~940 the two 1fr columns were
+   only ~427px each, cramping the form (the "cutoff") and forcing the location
+   note to wrap. Single column gives both full width. */
+@media (max-width: 1024px) {
   .cw-contact__layout { grid-template-columns: 1fr; }
 }
 
@@ -5860,9 +5885,17 @@ html.cw-motion-paused *::after {
 }
 .cw-price-card__label {
   font-family: var(--font-mono);
-  font-size: var(--text-sm);
+  font-size: calc(var(--text-sm) * 1.5);
   letter-spacing: 0.04em;
   color: var(--accent);
+}
+.cw-pricing__cta { display: flex; justify-content: center; margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+.cw-pricing__cta-btn { font-size: var(--text-lg); padding: var(--space-sm) var(--space-xl); }
+.cw-pricing__disclaimer {
+  margin-top: var(--space-sm);
+  text-align: center;
+  font-size: calc(var(--text-xs) * 1.12);
+  color: var(--text-tertiary);
 }
 .cw-price-card__figure {
   font-family: var(--font-display);

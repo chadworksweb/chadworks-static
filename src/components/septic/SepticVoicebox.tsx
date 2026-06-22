@@ -18,7 +18,7 @@ export function SepticVoicebox() {
             Real exchange with a client&apos;s previous agency, December 2023. My client{" "}
             <span className="cw-art-voice__char cw-art-voice__char--client">Greg</span> had been billed{" "}
             <em>$1,000 a month</em> by{" "}
-            <span className="cw-art-voice__char cw-art-voice__char--agency">Pixelborn</span> for what amounted to
+            <span className="cw-art-voice__char cw-art-voice__char--agency">Brixhollow</span> for what amounted to
             hosting.{" "}
             <span className="cw-art-voice__char cw-art-voice__char--manager">Karen Brennan</span>, their business
             manager, handled the cancellation paperwork. I sent{" "}
@@ -29,7 +29,7 @@ export function SepticVoicebox() {
 
           <div className="cw-art-thread">
             <div className="cw-art-thread__header">
-              <div className="cw-art-thread__subject">Cancellation of Services with Pixelborn</div>
+              <div className="cw-art-thread__subject">Cancellation of Services with Brixhollow</div>
               <div className="cw-art-thread__meta">Inbox &middot; 16 messages</div>
             </div>
 
@@ -41,7 +41,7 @@ export function SepticVoicebox() {
                 <div className="cw-art-thread__meta-row">
                   <span className="cw-art-thread__from">
                     <strong>Karen Brennan</strong>
-                    <span>k.brennan@pixelborn.net</span>
+                    <span>k.brennan@brixhollow.net</span>
                   </span>
                   <span className="cw-art-thread__date">Dec 14, 2023, 1:44&nbsp;PM</span>
                 </div>
@@ -81,7 +81,7 @@ export function SepticVoicebox() {
                   </span>
                   <span className="cw-art-thread__date">Dec 15, 2023, 7:29&nbsp;AM</span>
                 </div>
-                <div className="cw-art-thread__to">to Bob Hall (Pixelborn Production)</div>
+                <div className="cw-art-thread__to">to Bob Hall (Brixhollow Production)</div>
                 <p className="cw-art-thread__text">Thanks.</p>
                 <p className="cw-art-thread__text">
                   The process to leave as a client is far more difficult than it should be.
@@ -116,8 +116,8 @@ export function SepticVoicebox() {
                 <div className="cw-art-thread__body">
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
-                      <strong>Pixelborn Accounting</strong>
-                      <span>accounting@pixelborn.net</span>
+                      <strong>Brixhollow Accounting</strong>
+                      <span>accounting@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 10:52&nbsp;AM</span>
                   </div>
@@ -131,7 +131,7 @@ export function SepticVoicebox() {
                   <p className="cw-art-thread__text">
                     Final payment in the amount of $1,000 for your InvC-17453 cleared our banking on 12/11/23. This
                     payment will give you site and online marketing services with our company through end of day Monday,
-                    1/15/24 allowing you and Chad valuable time to transition your site away from Pixelborn servers.
+                    1/15/24 allowing you and Chad valuable time to transition your site away from Brixhollow servers.
                   </p>
                   <p className="cw-art-thread__text">
                     Thank you, Greg, for allowing our Team the opportunity to work with you over the past two years. We
@@ -148,7 +148,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Karen Brennan</strong>
-                      <span>k.brennan@pixelborn.net</span>
+                      <span>k.brennan@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 1:44&nbsp;PM</span>
                   </div>
@@ -164,7 +164,7 @@ export function SepticVoicebox() {
                   <p className="cw-art-thread__text">
                     Payment of InvC-17453 due on 12/15, paid on 12/11/23, provides full site, service, and support
                     through the transition process. As your new provider, Chad, will have through the end of day 1/15/24
-                    to transition your site away from our Pixelborn servers.
+                    to transition your site away from our Brixhollow servers.
                   </p>
                   <p className="cw-art-thread__text">Have a very Merry Christmas and a joy-filled New Year!</p>
                 </div>
@@ -205,7 +205,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Karen Brennan</strong>
-                      <span>k.brennan@pixelborn.net</span>
+                      <span>k.brennan@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 3:00&nbsp;PM</span>
                   </div>
@@ -218,7 +218,7 @@ export function SepticVoicebox() {
                   <p className="cw-art-thread__text">
                     While we have had some ask along the way for Admin Access for a variety of reasons, it is generally
                     because people doing the asking do not understand the possibilities of what could happen. As the
-                    Business Manager here for Pixelborn, I handle the Accounting and HR functions. I will leave it up to
+                    Business Manager here for Brixhollow, I handle the Accounting and HR functions. I will leave it up to
                     our Management Team to discuss this request on your behalf and ask that someone gets back to you as
                     soon as possible.
                   </p>
@@ -250,7 +250,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Bob Hall</strong>
-                      <span>b.hall@pixelborn.net</span>
+                      <span>b.hall@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 3:30&nbsp;PM</span>
                   </div>
@@ -291,7 +291,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Bob Hall</strong>
-                      <span>b.hall@pixelborn.net</span>
+                      <span>b.hall@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 3:44&nbsp;PM</span>
                   </div>
@@ -333,7 +333,7 @@ export function SepticVoicebox() {
                   </div>
                   <div className="cw-art-thread__to">to Bob Hall</div>
                   <p className="cw-art-thread__text">
-                    What will Greg need to use this for? &ldquo;Pixelborn has created an admin account for you to use
+                    What will Greg need to use this for? &ldquo;Brixhollow has created an admin account for you to use
                     once you have your site moved:&rdquo;
                   </p>
                 </div>
@@ -347,7 +347,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Bob Hall</strong>
-                      <span>b.hall@pixelborn.net</span>
+                      <span>b.hall@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 3:49&nbsp;PM</span>
                   </div>
@@ -373,7 +373,7 @@ export function SepticVoicebox() {
                   </div>
                   <div className="cw-art-thread__to">to Bob Hall</div>
                   <p className="cw-art-thread__text">
-                    Gotcha. I didn&apos;t know if it was for Pixelborn invoice history or something. Thank you.
+                    Gotcha. I didn&apos;t know if it was for Brixhollow invoice history or something. Thank you.
                   </p>
                 </div>
               </article>
@@ -422,7 +422,7 @@ export function SepticVoicebox() {
                   <div className="cw-art-thread__meta-row">
                     <span className="cw-art-thread__from">
                       <strong>Bob Hall</strong>
-                      <span>b.hall@pixelborn.net</span>
+                      <span>b.hall@brixhollow.net</span>
                     </span>
                     <span className="cw-art-thread__date">Dec 14, 2023, 4:39&nbsp;PM</span>
                   </div>

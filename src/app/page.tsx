@@ -268,19 +268,34 @@ const ARCHIVE: ArchiveItem[] = [
 const FAQS = [
   {
     q: "Who actually builds the site?",
-    a: "I do, start to finish. The person who reads your email is the person who designs the pages and writes the code, so nothing gets lost in a handoff.",
+    a: "I build the website. You need to provide relevant assets, but besides that, I handle it autonomously from start to finish.",
   },
   {
     q: "Do I own everything when it's done?",
-    a: "Yes. The code, the hosting, the domain, and the accounts are all in your name from day one. Nothing is held hostage if you ever want to move on.",
+    a: "Yes, you own everything when it's done. Sites are hosted on my private client server, but your complete codebase is always available should you desire to move on from chadworks.",
   },
   {
-    q: "Will the site show up on Google and in AI answers?",
-    a: "Findability is built in, not bolted on. The pages are structured and schema-rich so classic search and AI assistants can both read and recommend them.",
+    q: "Will my website show up on Google and in AI answers?",
+    a: (
+      <>
+        Yes, your website will be findable on Google and AI. The pages are
+        structured and schema-rich so classic search and AI assistants can both
+        read and recommend them. However, that doesn&apos;t mean you will show up
+        for people that aren&apos;t already looking for you by name. Visit{" "}
+        <Link href="/visibility/">Visibility</Link> for more information on that.
+      </>
+    ),
   },
   {
-    q: "What does a build cost?",
-    a: "It depends on the scope, and you get a straight number before any money moves. I am not the cheapest, on purpose, and I would rather say that up front than after a proposal.",
+    q: "What does a website cost?",
+    a: (
+      <>
+        A website from chadworks starts at $3,200 but typically crosses the
+        $5,000 mark. A web app or more involved build beyond a brochure website
+        will easily break $10,000. Visit my{" "}
+        <Link href="/rates/">rates page</Link> for more info.
+      </>
+    ),
   },
 ];
 
@@ -288,7 +303,7 @@ const FAQS = [
 const QUICK: LeadFormConfig = {
   source: "one-pager (quick)",
   subject: "New Quick Contact from the One Pager (chadworks)",
-  submitLabel: "Send it to Chad",
+  submitLabel: "Send message to Chad",
   successMessage:
     "Got it. This lands straight in my inbox and I read every one myself. You'll hear back within a day.",
   fields: [
@@ -308,7 +323,7 @@ const QUICK: LeadFormConfig = {
 const DETAILED: LeadFormConfig = {
   source: "one-pager (detailed)",
   subject: "New Detailed Inquiry from the One Pager (chadworks)",
-  submitLabel: "Send the details",
+  submitLabel: "Send message to Chad",
   successMessage:
     "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with a straight answer on the number.",
   fields: [
@@ -543,10 +558,11 @@ export default function Home() {
       <SectionShell full className="cw-pricing">
         <div className="cw-pricing__head">
           <p className="eyebrow">What it costs</p>
-          <h2 className="cw-pricing__heading">Straight rates, shown in full.</h2>
+          <h2 className="cw-pricing__heading">Transparent rates.</h2>
           <p className="svc-lede measure-prose">
-            One honest hourly rate sits under everything, and you get a real
-            number before any work starts. No teaser that climbs once you commit.
+            My rate represents 20+ years of experience and the concierge-level
+            client experience I provide. Working with me is like working with a
+            partner. I look out for you, but I also know my own value.
           </p>
         </div>
         <div className="cw-pricing__grid">
@@ -554,40 +570,37 @@ export default function Home() {
             <p className="cw-price-card__label">Hourly</p>
             <p className="cw-price-card__figure">$315<span className="cw-price-card__unit"> / hour</span></p>
             <p className="cw-price-card__note">
-              One honest rate for every hour, whichever part of the work it goes
-              to. No agency markup stacked on top.
+              I bill increments of 10 minutes. No &quot;1 hour minimum&quot;
+              invoices.
             </p>
           </div>
           <div className="cw-price-card panel">
             <p className="cw-price-card__label">Flat-rate builds</p>
             <p className="cw-price-card__figure">From $3,200</p>
             <p className="cw-price-card__note">
-              Most sites land around $6,200: a full build scoped to a real number
-              up front, owned outright by you when it ships.
+              Most sites land around the $5,000 mark. That represents a full,
+              custom build that you own outright.
             </p>
           </div>
-          <div className="cw-price-card panel">
-            <p className="cw-price-card__label">AI visibility audit</p>
-            <p className="cw-price-card__figure">By scope</p>
-            <p className="cw-price-card__note">
-              A one-time read on where you show up and where you don&apos;t,
-              billed from the same $315/hour and yours to act on with anyone.
-            </p>
-          </div>
-          <div className="cw-price-card panel">
-            <p className="cw-price-card__label">Monthly care</p>
-            <p className="cw-price-card__figure">$550<span className="cw-price-card__unit"> / 6 mo</span></p>
-            <p className="cw-price-card__note">
-              Optional WordPress upkeep: the updates and backups handled, with a
-              human watching for what tends to break quietly.
-            </p>
-          </div>
+        </div>
+        <p className="cw-pricing__disclaimer">
+          The hourly rate is a promise. Flat rates shown are general estimates
+          for information only, not a formal quote or binding offer. Your actual
+          price is set in a written proposal before any work begins.
+        </p>
+        <div className="cw-pricing__cta">
+          <Link href="/rates/" className="svc-btn cw-pricing__cta-btn">
+            <span className="svc-btn__label">View rate details</span>
+            <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
+              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+            </svg>
+          </Link>
         </div>
       </SectionShell>
 
       {/* 7. FAQs -- inverted dark band (septic-page treatment). */}
       <FaqCapsule
-        heading="Questions, answered"
+        heading="Common questions, answered"
         faqLead="The things people ask before they reach out. If yours isn't here, the form below reaches me directly."
         faqs={FAQS}
         scheme="inverted"
@@ -602,11 +615,13 @@ export default function Home() {
       {/* 8. Contact -- the dark band with the quick/detailed form. */}
       <ContactCapsule
         scheme="inverted"
-        heading="Tell me about the project"
-        intro="Two ways in. Email me directly, or use the form: quick if you just want to start a conversation, detailed if you already know the shape of the build. Both land in the same inbox."
+        heading="Tell me about your project."
+        intro="Send me a message about your business, project or initiative. No ideas are dumb, no questions stupid. Tell me your vision, big or small."
         emailLabel="Email directly"
         email={EMAIL}
-        locationNote="Based in Pennsylvania, working with businesses across the country and beyond. The work is remote, so where you are has never decided whether it fits."
+        phoneLabel="Call directly"
+        phone="(215) 872-1240"
+        locationNote="Based in Pennsylvania, working with businesses across the country and beyond."
         quick={QUICK}
         detailed={DETAILED}
         quickLabel="Quick message"
