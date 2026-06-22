@@ -20,28 +20,36 @@ export function FeaturedShowcase({
   eyebrow,
   heading,
   lede,
+  headingAs: HeadingTag = "h2",
+  ctaUnderLede = false,
 }: {
   primary: FeaturedItem;
   eyebrow: string;
   heading: string;
   lede: string;
+  headingAs?: "h2" | "h3";
+  ctaUnderLede?: boolean;
 }) {
+  const cta = (
+    <a
+      className="cw-port-feat__link"
+      href={primary.href}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Visit {primary.label} <span aria-hidden="true">&#8599;</span>
+    </a>
+  );
   return (
     <div className="cw-port-feat">
       <div className="cw-port-feat__copy">
         <div className="cw-port-feat__copy-top">
           <span className="eyebrow">{eyebrow}</span>
-          <h2 className="cw-port-feat__heading">{heading}</h2>
+          <HeadingTag className="cw-port-feat__heading">{heading}</HeadingTag>
           <p className="cw-port-feat__lede">{lede}</p>
+          {ctaUnderLede && cta}
         </div>
-        <a
-          className="cw-port-feat__link"
-          href={primary.href}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Visit {primary.label} <span aria-hidden="true">&#8599;</span>
-        </a>
+        {!ctaUnderLede && cta}
       </div>
 
       <div className="cw-port-feat__stage">

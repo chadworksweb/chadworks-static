@@ -13,6 +13,7 @@ import type { ReactNode, CSSProperties } from "react";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { WaveText } from "@/components/WaveText";
+import { SpeedDemon } from "@/components/SpeedDemon";
 import { emphasize } from "@/lib/emphasize";
 import { MANIFESTO } from "@/lib/manifesto";
 import {
@@ -97,14 +98,27 @@ const WEBSITE_SUBS: { title: string; href: string; body: string }[] = [
   { title: "Shopify", href: "/shopify/", body: "Shopify is the world's number one DIY ecommerce platform. It's a combination of WordPress and Squarespace, best for lower-budget access." },
 ];
 
-const VISIBILITY_SUBS: { title: string; href: string; body: string }[] = [
-  { title: "AI Visibility", href: "/ai-viz/", body: "AI Visibility (aka AI Viz) is an emerging service focused on getting found and recommended in the age of AI search. This is similar to SEO in that it's not one technique, but rather a toolkit of techniques that are selected and applied based on your specific market situation. This is for businesses where being the one the AI names is worth real money." },
+const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }[] = [
+  {
+    title: "AI Visibility",
+    href: "/ai-viz/",
+    body: (
+      <>
+        AI Visibility (aka AI Viz) is an emerging service focused on getting
+        found and recommended in the age of AI search. This is similar to SEO
+        in that it&apos;s not one technique, but rather a toolkit of techniques
+        that are selected and applied based on your specific market situation.
+        This is for businesses where being the one the AI names is worth real
+        money. Check out these pages too:{" "}
+        <Link href="/show-up-on-chatgpt/">Show Up on ChatGPT</Link> and{" "}
+        <Link href="/advertising-on-chatgpt/">Advertising on ChatGPT</Link>.
+      </>
+    ),
+  },
   { title: "AI Visibility Audit", href: "/ai-visibility-audit/", body: "The AI Visibility Audit is for clients with an existing website who either want to know how their website performs in the AI search arena, or are already pushing visibility initiatives but aren't getting the results they want." },
-  { title: "SEO", href: "/seo/", body: "SEO *didn't* die, it became the foundation. This is the classic discipline: ranking your pages for the phrases your buyers actually type into Google. It still works on its own, and it's also what the AI assistants read before they decide who to name. Plenty of clients start here and grow into the full visibility service." },
-  { title: "Digital Marketing", href: "/digital-marketing/", body: "Most businesses get sold every channel at once, and that's the expensive mistake. This is triage: a straight answer on the few channels yours actually needs, and an equally straight answer on the ones to skip. For clients who'd rather spend on what moves than on what sounds complete." },
-  { title: "Email Marketing", href: "/email-marketing/", body: "Email is the one channel you own outright. No algorithm sits between you and the people on your list, and the platform can start free (Mailchimp costs nothing up to 500 contacts). This is for clients who want a clean, segmented list and sends people actually open, without burning the goodwill of the inbox." },
-  { title: "Show Up on ChatGPT", href: "/show-up-on-chatgpt/", body: "This is the focused version of the question everyone suddenly has: how do I get named when someone asks ChatGPT? The work is making your site readable and quotable to the AI crawlers, so your business is the one in the answer instead of your competitor. It starts with a focused audit." },
-  { title: "Advertising on ChatGPT", href: "/advertising-on-chatgpt/", body: "The other half of the ChatGPT question is paid. This is managed advertising in the sponsored slot at the bottom of a ChatGPT answer: I run the campaign end to end, while your ad spend goes straight to OpenAI with no markup. It's the fast lane. You can be in front of people as soon as tomorrow." },
+  { title: "SEO", href: "/seo/", body: "SEO *didn't* die, it became the foundation. This is the classic discipline: ranking your pages for the phrases your buyers actually type into Google. It still works on its own, and it's also what the AI assistants read before they decide who to name." },
+  { title: "Digital Marketing", href: "/digital-marketing/", body: "This is mostly a catch-all term to cover a broad range of services that help your business get seen online. Essentially, everything chadworks does is digital marketing, so this page exists to capture people looking for digital marketing, then share what I offer within that arena." },
+  { title: "Email Marketing", href: "/email-marketing/", body: "E-mail is still the reigning champ of all direct to consumer digital marketing channels. Once a customer gives you their email address, they've given you a direct line to their inbox, the closest thing to the real mailbox any company can get. Email marketing should be a top priority for any serious business or initiative." },
 ];
 
 // ---- MANIFESTO ("who is chadworks for?") -- the FULL manifesto now lives on the
@@ -140,7 +154,7 @@ const FACTS: ReactNode[] = [
       </span>
     </span>
   </>,
-  "Twenty-plus years doing this, across hundreds of projects spanning a wide range of industries.",
+  "I bring 20+ years of web, digital and business experience across hundreds of projects spanning a wide range of industries.",
 ];
 
 // ---- RIBBONS (the broad beat) -- ribbons + knockout + frosted expand panel.
@@ -412,7 +426,9 @@ export default function Home() {
                         <WaveText text={s.title} />
                       </Link>
                     </h3>
-                    <p className="cw-lane-sub__body">{emphasize(s.body)}</p>
+                    <p className="cw-lane-sub__body">
+                      {typeof s.body === "string" ? emphasize(s.body) : s.body}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -444,11 +460,12 @@ export default function Home() {
           primary={FEATURED}
           eyebrow="Featured build"
           heading="Rising Compass"
-          lede="A full web app, not a brochure site: a custom interface over a real engine, built to stay fast and clear as it grows. See how it holds up across screens below."
+          headingAs="h3"
+          ctaUnderLede
+          lede="The Rising Compass is a ground-up, custom web app that tracks and measures the messages contained in the lyrics of the world's most popular songs. I built and manage this 100%, top to bottom."
         />
       </SectionShell>
-      <SectionShell>
-        <p className="eyebrow">The archive</p>
+      <SectionShell className="cw-port-archive-shell">
         <h2 className="cw-port-archive__heading">More sites I&apos;ve custom built</h2>
         <p className="svc-lede measure-prose">
           A wider sample of client work. Switch any card between desktop, tablet,
@@ -456,6 +473,14 @@ export default function Home() {
           person, start to finish.
         </p>
         <ArchiveGrid items={ARCHIVE} />
+        <div className="cw-port-archive__cta-row">
+          <Link href="/portfolio/" className="svc-btn">
+            <span className="svc-btn__label">View full portfolio</span>
+            <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
+              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+            </svg>
+          </Link>
+        </div>
       </SectionShell>
 
       {/* 6. About Chad -- the human block. */}
@@ -471,24 +496,27 @@ export default function Home() {
           imgAlt: "Chad Lewine, the person behind chadworks",
           captionMain: "Yes, this is the whole company.",
           captionSub: "(That's the point.)",
-          intro:
-            "Twenty years of building websites, and the part I'd never automate is this: when you email chadworks, you get me.",
           manifesto: [
-            { lead: "Designing since age 11.", aside: "(Not a metaphor.)" },
-            { lead: "HTML since 8th grade.", aside: "(Thanks, MySpace.)" },
-            { lead: "Paid client builds since 2008.", aside: "(50+ engagements since 2019.)" },
-            { lead: "Every site custom built.", aside: "(Including this one.)" },
+            { lead: "Clear communication.", aside: "(no fluff, no fuss)" },
+            { lead: "Transparent fees and terms.", aside: "(always)" },
+            { lead: "Based in Philadelphia.", aside: "(U.S. made)" },
+            {
+              lead: "Blazing fast turnaround.",
+              aside: (
+                <>
+                  (<SpeedDemon href="https://www.youtube.com/watch?v=l039y9FaIjc">speed demon</SpeedDemon>)
+                </>
+              ),
+            },
           ],
           negation: [
             "No subcontractors.",
             "No offshore handoffs.",
             "No invented case studies.",
-            "No pretending the process is polished when DNS won't propagate and dinner is late.",
+            "No pretending I'm an agency or that the web is a perfect system.",
           ],
-          close:
-            "The web has reinvented itself a dozen times since I started. The deal here never changed: you get the person, not a brand wrapper.",
+          close: "Trends come and go and the web changes. My values don't.",
           sig: "Chad Lewine",
-          sigMeta: "chadworks (designing since age 11)",
         }}
       />
 
@@ -496,13 +524,15 @@ export default function Home() {
           noise filters itself out before anyone reaches out. */}
       <QualificationCapsule
         qualification={{
-          heading: "Who I build for",
+          heading: "Who I Work With",
+          fitLabel: "chadworks is for you if:",
+          notLabel: "Probably not if:",
           fit: [
             "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost.",
             "You see the site and the visibility behind it as an investment that should return, not a cost to shrink.",
           ],
           notFit: [
-            "The lowest number decides. I'm not the cheapest, deliberately, and I'd rather say that here than after a proposal.",
+            "You're on a strict, low budget. In the Venn diagram of good, fast, and cheap, I'm fast and good.",
             "You want a template with your logo dropped in. Plenty of builders do that, and I'm not one of them.",
           ],
         }}

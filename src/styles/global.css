@@ -1610,6 +1610,69 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--text-secondary);
   white-space: nowrap;
 }
+/* "speed demon" easter-egg: the text periodically darts forward and leaves a
+   directional motion-blur streak (leftward ghost trails), snapping back. The
+   trail intensifies on hover. Reduced-motion users get a plain link. */
+.cw-speed-demon {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color 0.3s var(--ease-smooth);
+}
+.cw-speed-demon:hover { color: var(--text-primary); }
+/* outer wrapper carries the ANIMATED lean: skewX is a tween-able oblique that
+   eases in as the burst starts and eases back out (font-style italic can't
+   animate, so this is the slant stand-in). */
+.cw-speed-demon__lean {
+  display: inline-block;
+  will-change: transform;
+}
+/* synced to the 0.9s blur envelope: ease in (matches the old ~0.32s feel), hold,
+   ease out 64%->100% so the lean lands exactly with the blur instead of trailing
+   it by the transition tail on the way out. */
+.cw-speed-demon__lean.is-leaning { animation: cw-speed-demon-lean 0.9s both; }
+@keyframes cw-speed-demon-lean {
+  0% { transform: skewX(0deg); animation-timing-function: var(--ease-smooth); }
+  36% { transform: skewX(-12deg); animation-timing-function: linear; }
+  64% { transform: skewX(-12deg); animation-timing-function: var(--ease-smooth); }
+  100% { transform: skewX(0deg); }
+}
+.cw-speed-demon__text {
+  display: inline-block;
+  will-change: transform, filter;
+}
+/* AMBIENT burst (class toggled from JS each cycle): a one-shot jitter that holds
+   a sustained, vibrating motion blur then settles smoothly. Vertical jitter is
+   kept small so it reads as forward speed, not bouncing. */
+.cw-speed-demon__text.is-blurring {
+  animation: cw-speed-demon-jitter 0.9s both;
+}
+@keyframes cw-speed-demon-jitter {
+  0% { transform: translate(0, 0); filter: blur(0); text-shadow: none; animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.3); }
+  12% { transform: translate(3.4px, -0.2px); filter: blur(0.7px); text-shadow: -4px 0 4px rgba(128, 84, 188, 0.42), -9px 0 9px rgba(128, 84, 188, 0.22), -14px 0 13px rgba(128, 84, 188, 0.1); animation-timing-function: steps(1, jump-end); }
+  22% { transform: translate(4.5px, 0.15px); filter: blur(0.8px); text-shadow: -5px 0 4px rgba(128, 84, 188, 0.44), -10px 0 9px rgba(128, 84, 188, 0.23), -15px 0 13px rgba(128, 84, 188, 0.1); animation-timing-function: steps(1, jump-end); }
+  32% { transform: translate(2.8px, -0.15px); filter: blur(0.6px); text-shadow: -4px 0 4px rgba(128, 84, 188, 0.4), -8px 0 9px rgba(128, 84, 188, 0.21), -13px 0 12px rgba(128, 84, 188, 0.09); animation-timing-function: steps(1, jump-end); }
+  42% { transform: translate(4.2px, 0.2px); filter: blur(0.85px); text-shadow: -5px 0 4px rgba(128, 84, 188, 0.44), -10px 0 9px rgba(128, 84, 188, 0.23), -15px 0 13px rgba(128, 84, 188, 0.1); animation-timing-function: steps(1, jump-end); }
+  52% { transform: translate(3.1px, -0.2px); filter: blur(0.65px); text-shadow: -4px 0 4px rgba(128, 84, 188, 0.41), -9px 0 9px rgba(128, 84, 188, 0.22), -14px 0 12px rgba(128, 84, 188, 0.1); animation-timing-function: steps(1, jump-end); }
+  62% { transform: translate(4.4px, 0.15px); filter: blur(0.8px); text-shadow: -5px 0 4px rgba(128, 84, 188, 0.43), -10px 0 9px rgba(128, 84, 188, 0.23), -15px 0 13px rgba(128, 84, 188, 0.1); animation-timing-function: steps(1, jump-end); }
+  72% { transform: translate(2.9px, -0.1px); filter: blur(0.6px); text-shadow: -4px 0 4px rgba(128, 84, 188, 0.4), -8px 0 9px rgba(128, 84, 188, 0.21), -13px 0 12px rgba(128, 84, 188, 0.09); animation-timing-function: steps(1, jump-end); }
+  80% { transform: translate(3.4px, 0); filter: blur(0.55px); text-shadow: -4px 0 4px rgba(128, 84, 188, 0.34), -8px 0 8px rgba(128, 84, 188, 0.16); animation-timing-function: cubic-bezier(0.22, 0.61, 0.36, 1); }
+  100% { transform: translate(0, 0); filter: blur(0); text-shadow: none; }
+}
+/* HOVER: calm. No burst, no italic -- just a gentle pulse. */
+.cw-speed-demon__text.is-hover-pulse {
+  animation: cw-speed-demon-pulse 1.5s ease-in-out infinite;
+}
+@keyframes cw-speed-demon-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.72; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-speed-demon__lean.is-leaning,
+  .cw-speed-demon__text.is-blurring,
+  .cw-speed-demon__text.is-hover-pulse { animation: none; transform: none; }
+}
 .svc-made__negation {
   list-style: none;
   padding: 0;
@@ -1642,6 +1705,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--text-primary);
   margin: 1.8rem 0 1rem;
 }
+/* homepage: bold close credo, flush to the bottom (no trailing margin) */
+.svc-made--split .svc-made__close { font-weight: 700; margin-bottom: 0; }
 .svc-made__sig {
   font-family: var(--font-display);
   font-weight: 500;
@@ -1764,15 +1829,34 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-qual__col { padding: var(--space-lg); }
 .svc-qual__label {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: calc(var(--text-xs) * 1.5);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin-bottom: var(--space-sm);
 }
-.svc-qual__col--fit .svc-qual__label { color: var(--accent-teal); }
-.svc-qual__col--not .svc-qual__label { color: var(--text-tertiary); }
+/* second gradient stop brightened 15% (rgb(237,231,246) x1.15 clamps to white) */
+.svc-qual__col.panel {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.55) 100%);
+}
+/* eyebrows match the brand blue, not the grey */
+.svc-qual__col--fit .svc-qual__label,
+.svc-qual__col--not .svc-qual__label { color: var(--text-primary); }
+/* a check (fit) / X (not) sits in each column's bottom-right corner */
+.svc-qual__col--fit,
+.svc-qual__col--not { position: relative; }
+.svc-qual__col--fit::after,
+.svc-qual__col--not::after {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.9rem;
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--text-primary);
+}
+.svc-qual__col--fit::after { content: "\2714"; }
+.svc-qual__col--not::after { content: "\2718"; }
 .svc-qual__list { display: grid; gap: var(--space-2xs); }
-.svc-qual__list li { position: relative; padding-left: var(--space-md); color: var(--text-secondary); }
+.svc-qual__list li { position: relative; padding-left: var(--space-md); color: var(--text-secondary); text-shadow: 0 1px 2px rgba(255, 255, 255, 0.96); }
 .svc-qual__col--fit .svc-qual__list li::before { content: "+"; position: absolute; left: 0; color: var(--accent-teal); font-weight: 700; }
 .svc-qual__col--not .svc-qual__list li::before { content: "\2013"; position: absolute; left: 0; color: var(--text-tertiary); }
 
@@ -5104,6 +5188,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 /* ---- MODE B: the archive grid ---------------------------------------- */
+/* Pull the archive up so the gap above it is ~half the usual section spacing
+   (removes one of the two stacked section pads; inner top padding is kept). */
+.cw-port-archive-shell { margin-top: calc(var(--section-pad-y) * -1); }
+.cw-port-archive__cta-row { display: flex; justify-content: center; margin-top: var(--space-lg); }
 .cw-port-archive__heading {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
@@ -5203,27 +5291,67 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 .cw-port-device__stage {
+  position: relative;
   height: var(--cw-stage-h);
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 0;
 }
-/* height-driven: definite height (the stage) + aspect-ratio sets the width */
+/* One persistent shell. Height is fixed by the stage; the WIDTH and the bezel
+   transition per device, so the frame visibly shrinks/expands between shapes
+   while the screenshot crossfades inside it. Widths are the device aspect as a
+   fraction of the stage's 3:2 box: desktop 1.5/1.5, tablet 0.74/1.5,
+   phone 0.46/1.5. */
+.cw-port-device[data-device="desktop"] { --cw-frame-w: 100%; }
+.cw-port-device[data-device="tablet"] { --cw-frame-w: 49.3%; }
+.cw-port-device[data-device="mobile"] { --cw-frame-w: 30.7%; }
 .cw-port-device__stage .cw-port-frame {
   height: 100%;
-  width: auto;
+  width: var(--cw-frame-w, 100%);
   max-width: 100%;
   display: flex;
   flex-direction: column;
+  transition:
+    width 0.46s var(--ease-smooth),
+    border-width 0.46s var(--ease-smooth),
+    border-color 0.46s var(--ease-smooth),
+    border-radius 0.46s var(--ease-smooth);
 }
-.cw-port-device[data-device="desktop"] .cw-port-frame { aspect-ratio: 1.5; }
-.cw-port-device[data-device="tablet"] .cw-port-frame { aspect-ratio: 0.74; }
-.cw-port-device[data-device="mobile"] .cw-port-frame { aspect-ratio: 0.46; }
+/* the browser chrome bar is always mounted; it collapses smoothly as the shell
+   morphs to a tablet/phone instead of popping out */
+.cw-port-device__stage .cw-port-frame__bar {
+  overflow: hidden;
+  max-height: 4rem;
+  transition:
+    max-height 0.46s var(--ease-smooth),
+    opacity 0.32s var(--ease-smooth),
+    padding 0.46s var(--ease-smooth),
+    border-bottom-width 0.46s var(--ease-smooth);
+}
+.cw-port-device__stage .cw-port-frame:not(.cw-port-frame--browser) .cw-port-frame__bar {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom-width: 0;
+}
 .cw-port-device__stage .cw-port-frame__screen { flex: 1 1 auto; min-height: 0; width: 100%; }
+/* screenshots stack and crossfade inside the screen */
 .cw-port-device__stage .cw-port-frame__img {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover; object-position: top center;
+}
+.cw-port-device__stage .cw-port-frame__img.is-fading-in {
+  animation: cw-img-fade 0.46s var(--ease-smooth) both;
+}
+@keyframes cw-img-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .cw-port-device__stage .cw-port-frame,
+  .cw-port-device__stage .cw-port-frame__bar { transition: none; }
+  .cw-port-device__stage .cw-port-frame__img.is-fading-in { animation: none; }
 }
 
 /* tablet + phone bezels (the dark border is the bezel; box-sizing keeps the
@@ -5237,8 +5365,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
     0 12px 28px rgba(36, 57, 137, 0.12),
     0 36px 66px rgba(36, 57, 137, 0.18);
 }
-.cw-port-frame--tablet { border-radius: 26px; border-width: 12px; }
-.cw-port-frame--phone { border-radius: 34px; border-width: 11px; }
+.cw-port-frame--tablet { border-radius: 26px; border-width: 6px; }
+.cw-port-frame--phone { border-radius: 34px; border-width: 5.5px; }
 .cw-port-frame--tablet::after,
 .cw-port-frame--phone::after { display: none; }
 .cw-port-frame--tablet .cw-port-frame__screen,
@@ -5696,6 +5824,15 @@ html.cw-motion-paused *::after {
   /* 25% tighter than the global body leading, scoped to these boxes only */
   line-height: calc(var(--leading-body) * 0.75);
 }
+.cw-lane-sub__body a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  font-weight: 500;
+  transition: color var(--duration-base) var(--ease-smooth);
+}
+.cw-lane-sub__body a:hover { color: var(--text-primary); }
 @media (max-width: 900px) {
   .cw-lanes-scroll__chips { display: none; }
   .cw-lane-block { min-height: 0; }

@@ -37,9 +37,11 @@ export function MadeByCapsule({ made, variant = "stacked" }: MadeByCapsuleProps)
         </div>
         <div className="svc-made__copy">
           {split && header}
-          <p className="svc-made__intro">
-            <W value={made.intro} />
-          </p>
+          {made.intro && (
+            <p className="svc-made__intro">
+              <W value={made.intro} />
+            </p>
+          )}
           <ul className="svc-made__manifesto">
             {made.manifesto.map((m, i) => (
               <li key={i}>
@@ -56,15 +58,19 @@ export function MadeByCapsule({ made, variant = "stacked" }: MadeByCapsuleProps)
               </li>
             ))}
           </ul>
-          <p className="svc-made__close">
-            <W value={made.close} />
-          </p>
-          <p className="svc-made__sig">
-            {made.sig}
-            {made.sigMeta && (
-              <span className="svc-made__sig-meta">{made.sigMeta}</span>
-            )}
-          </p>
+          {made.close && (
+            <p className="svc-made__close">
+              <W value={made.close} />
+            </p>
+          )}
+          {made.sig && (
+            <p className="svc-made__sig">
+              {made.sig}
+              {made.sigMeta && (
+                <span className="svc-made__sig-meta">{made.sigMeta}</span>
+              )}
+            </p>
+          )}
         </div>
       </div>
     </SectionShell>

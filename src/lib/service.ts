@@ -161,15 +161,15 @@ export type Service = {
   made?: {
     eyebrow?: string;
     heading: ReactNode;
-    intro: Writable;
-    manifesto: { lead: string; aside: string }[];
+    intro?: Writable;
+    manifesto: { lead: string; aside: ReactNode }[];
     negation: string[];
-    close: Writable;
+    close?: Writable;
     img: string;
     imgAlt: string;
     captionMain: string;
     captionSub?: string;
-    sig: string;
+    sig?: string;
     sigMeta?: string;
   };
 

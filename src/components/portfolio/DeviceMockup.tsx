@@ -69,14 +69,15 @@ export function DeviceMockup({
 
   return (
     <div className={"cw-port-device cw-port-device--" + size} data-device={device}>
+      {/* One persistent shell: the frame resizes (data-device drives its width +
+          bezel) while MockupFrame crossfades the screenshot inside it. */}
       <div className="cw-port-device__stage">
         <MockupFrame
-          key={device}
           src={`/portfolio/${slug}-${device}.jpg`}
           alt={`${alt} -- ${sel.label.toLowerCase()} view`}
           url={url}
           variant={sel.variant}
-          priority={priority && device === "desktop"}
+          priority={priority}
           ripple={device === "desktop"}
         />
       </div>

@@ -47,6 +47,23 @@ export function MockupFrame({
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastDropRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Screenshot crossfade: when `src` changes (device swap) the new image is
+  // pushed as a fresh layer that fades in over the previous one, which is then
+  // dropped. For static single-device usage this stays a single layer and the
+  // effect never fires, so behavior there is unchanged.
+  const nextId = useRef(0);
+  const [layers, setLayers] = useState<{ src: string; id: number }[]>([{ src, id: 0 }]);
+  useEffect(() => {
+    setLayers((cur) => {
+      if (cur[cur.length - 1].src === src) return cur;
+      nextId.current += 1;
+      return [...cur, { src, id: nextId.current }];
+    });
+  }, [src]);
+  const settleLayers = useCallback(() => {
+    setLayers((cur) => (cur.length > 1 ? [cur[cur.length - 1]] : cur));
+  }, []);
+
   const keepAlive = useCallback(() => {
     if (settleTimer.current) clearTimeout(settleTimer.current);
     settleTimer.current = setTimeout(() => setActive(false), SETTLE_MS);
@@ -78,11 +95,12 @@ export function MockupFrame({
 
   return (
     <div className={"cw-port-frame cw-port-frame--" + variant + (className ? " " + className : "")}>
-      {variant === "browser" && (
-        <div className="cw-port-frame__bar" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element -- static export, decorative */}
-          <img className="cw-port-frame__mark" src="/cw-gemstone-mark.png" alt="" />
-          <span className="cw-port-frame__url">
+      {/* The browser chrome bar is always mounted so it can collapse/expand with
+          the shell during a device morph instead of popping in and out. */}
+      <div className="cw-port-frame__bar" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element -- static export, decorative */}
+        <img className="cw-port-frame__mark" src="/cw-gemstone-mark.png" alt="" />
+        <span className="cw-port-frame__url">
             <svg
               className="cw-port-frame__lock"
               viewBox="0 0 24 24"
@@ -97,15 +115,14 @@ export function MockupFrame({
               <rect x="5" y="11" width="14" height="9" rx="2" />
               <path d="M8 11V7a4 4 0 0 1 8 0v4" />
             </svg>
-            <span className="cw-port-frame__url-text">{url}</span>
-          </span>
-          <span className="cw-port-frame__menu">
-            <i />
-            <i />
-            <i />
-          </span>
-        </div>
-      )}
+          <span className="cw-port-frame__url-text">{url}</span>
+        </span>
+        <span className="cw-port-frame__menu">
+          <i />
+          <i />
+          <i />
+        </span>
+      </div>
       {variant === "phone" && <span className="cw-port-frame__notch" aria-hidden="true" />}
       {variant === "tablet" && <span className="cw-port-frame__cam" aria-hidden="true" />}
       <div
@@ -113,14 +130,22 @@ export function MockupFrame({
         className="cw-port-frame__screen"
         onPointerMove={onMove}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt={alt}
-          className="cw-port-frame__img"
-          loading={priority ? "eager" : "lazy"}
-          {...(priority ? { fetchPriority: "high" as const } : {})}
-        />
+        {layers.map((l, i) => {
+          const isTop = i === layers.length - 1;
+          const fading = isTop && layers.length > 1;
+          return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={l.id}
+              src={l.src}
+              alt={isTop ? alt : ""}
+              className={"cw-port-frame__img" + (fading ? " is-fading-in" : "")}
+              loading={priority && l.id === 0 ? "eager" : "lazy"}
+              onAnimationEnd={fading ? settleLayers : undefined}
+              {...(priority && l.id === 0 ? { fetchPriority: "high" as const } : {})}
+            />
+          );
+        })}
         {ripple && active && (
           <RippleCanvas
             ref={(h) => {
