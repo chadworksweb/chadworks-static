@@ -11,7 +11,7 @@ import { buildOrgJsonLd, SITE_URL } from "@/lib/service";
 // Display = Lexend (logo + headings); body = Instrument Sans; labels = JetBrains Mono.
 const display = Lexend({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
   variable: "--font-display",
   display: "swap",
 });

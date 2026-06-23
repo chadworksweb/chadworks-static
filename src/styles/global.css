@@ -1377,6 +1377,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq__intro { position: relative; }
 @media (min-width: 901px) {
   .svc-faq__intro { position: sticky; top: 110px; }
+  /* homepage-only even split (opt-in via FaqCapsule evenSplit) */
+  .svc-faq-section--even .svc-faq__layout { grid-template-columns: 1fr 1fr; }
 }
 .svc-faq__lead { margin-top: var(--space-md); color: var(--text-secondary); }
 .svc-faq-section--dark .svc-faq__lead { color: rgba(229, 210, 244, 0.82); }
@@ -5899,7 +5901,7 @@ html.cw-motion-paused *::after {
 }
 .cw-price-card__figure {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 300;
   font-size: var(--text-3xl);
   line-height: var(--leading-tight);
   color: var(--text-primary);
@@ -6035,4 +6037,38 @@ html.cw-motion-paused *::after {
 }
 @media (prefers-reduced-motion: reduce) {
   .cw-wipe { display: none; }
+}
+
+/* =====================================================================
+   PIXEL DIVIDER -- a thin brand-gradient pixel row between sections, the
+   page-transition wipe rendered as a one-row rule. Tiles digitize in on
+   scroll (driven by JS in PixelDivider). See PixelDivider.tsx.
+   ===================================================================== */
+.cw-pxdiv {
+  grid-column: full; /* full-bleed: span the viewport, not the content rail */
+  margin-top: 1.5rem;
+  /* gap to the About section (1.5rem + its --section-pad-y) cut 40%:
+     0.6 * (1.5rem + pad) - pad = 0.9rem - 0.4 * pad */
+  margin-bottom: calc(0.9rem - 0.4 * var(--section-pad-y));
+}
+.cw-pxdiv__row {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 24), 1fr);
+  gap: 2px;
+  height: 41vh; /* 45% shorter than the prior 75vh */
+}
+.cw-pxdiv__cell {
+  border-radius: 2px;
+  opacity: 0;
+  transform: scale(0.4);
+  transform-origin: center;
+  transition: opacity 0.26s var(--ease-smooth), transform 0.26s var(--ease-smooth);
+  will-change: opacity, transform;
+}
+.cw-pxdiv__cell.is-on {
+  opacity: 1;
+  transform: scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-pxdiv__cell { transition: none; }
 }

@@ -29,6 +29,7 @@ import { SectionShell } from "@/components/capsules/SectionShell";
 import HomeHero from "@/components/HomeHero";
 import { GemstoneCW } from "@/components/GemstoneCW";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
+import { PixelDivider } from "@/components/PixelDivider";
 import { GemstoneMark } from "@/components/GemstoneMark";
 import { GlobalMotionToggle } from "@/components/GlobalMotionToggle";
 import {
@@ -498,6 +499,10 @@ export default function Home() {
         </div>
       </SectionShell>
 
+      {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
+          in on scroll. Sits between the portfolio and the about block. */}
+      <PixelDivider />
+
       {/* 6. About Chad -- the human block. */}
       <MadeByCapsule
         variant="split"
@@ -543,12 +548,14 @@ export default function Home() {
           fitLabel: "chadworks is for you if:",
           notLabel: "Probably not if:",
           fit: [
-            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost.",
-            "You see the site and the visibility behind it as an investment that should return, not a cost to shrink.",
+            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost right.",
+            "You see your project as an integral part of your initiative, not just the brochure for it.",
+            "You're building something you intend to keep for a long time.",
           ],
           notFit: [
             "You're on a strict, low budget. In the Venn diagram of good, fast, and cheap, I'm fast and good.",
-            "You want a template with your logo dropped in. Plenty of builders do that, and I'm not one of them.",
+            "You want a template with your logo dropped in. Plenty of builders do that, but I'm not one of them.",
+            "You're building this as a hobby, not a business, product or organization.",
           ],
         }}
       />
@@ -559,11 +566,6 @@ export default function Home() {
         <div className="cw-pricing__head">
           <p className="eyebrow">What it costs</p>
           <h2 className="cw-pricing__heading">Transparent rates.</h2>
-          <p className="svc-lede measure-prose">
-            My rate represents 20+ years of experience and the concierge-level
-            client experience I provide. Working with me is like working with a
-            partner. I look out for you, but I also know my own value.
-          </p>
         </div>
         <div className="cw-pricing__grid">
           <div className="cw-price-card panel">
@@ -584,7 +586,7 @@ export default function Home() {
           </div>
         </div>
         <p className="cw-pricing__disclaimer">
-          The hourly rate is a promise. Flat rates shown are general estimates
+          Flat rates shown are general estimates
           for information only, not a formal quote or binding offer. Your actual
           price is set in a written proposal before any work begins.
         </p>
@@ -605,6 +607,7 @@ export default function Home() {
         faqs={FAQS}
         scheme="inverted"
         schemeAuto
+        evenSplit
       />
 
       {/* 7a. "Going to bat" -- the real anti-agency email thread (septic page). */}

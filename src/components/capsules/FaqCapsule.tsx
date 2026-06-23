@@ -43,6 +43,10 @@ export type FaqCapsuleProps = {
   // each band alternating dark/light by index so two darks never stack (rule 9).
   variant?: "single" | "groups";
   groups?: FaqGroup[];
+  // Homepage-only: split the intro/accordion columns evenly (1fr 1fr) instead of
+  // the default 2fr 3fr. Scoped via .svc-faq-section--even so other pages are
+  // untouched.
+  evenSplit?: boolean;
 };
 
 export function FaqCapsule({
@@ -53,6 +57,7 @@ export function FaqCapsule({
   heading,
   variant = "single",
   groups = [],
+  evenSplit = false,
 }: FaqCapsuleProps) {
   if (variant === "groups") {
     return (
@@ -91,7 +96,7 @@ export function FaqCapsule({
   return (
     <SectionShell
       full
-      className="svc-block svc-faq-section"
+      className={`svc-block svc-faq-section${evenSplit ? " svc-faq-section--even" : ""}`}
       trailingClassName={dark ? "svc-faq-section--dark" : undefined}
     >
       <div className="svc-faq__layout">
