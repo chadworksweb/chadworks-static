@@ -93,8 +93,12 @@ export function PixelDivider() {
       return Math.max(0, Math.min(1, (start - y) / (start - end)));
     };
 
-    const render = () => {
-      if (Math.abs(current - lastRendered) < 0.003) return;
+    // `force` bypasses the delta guard: the parking snap (<0.002) is smaller
+    // than the guard (0.003), so without it the final frame -- the only one
+    // where current hits exactly 1 or 0 -- never renders and the last tile
+    // sticks (seen as one dead tile at the row's right edge).
+    const render = (force = false) => {
+      if (!force && Math.abs(current - lastRendered) < 0.003) return;
       lastRendered = current;
       for (let i = 0; i < nodes.length; i++) {
         nodes[i].classList.toggle("is-on", current >= cells[i].t);
@@ -111,7 +115,7 @@ export function PixelDivider() {
         current += (target - current) * (1 - Math.exp(-dt / TAU));
         if (Math.abs(target - current) < 0.002) current = target;
       }
-      render();
+      render(current === target);
       if (current !== target) {
         raf = requestAnimationFrame(frame);
       } else {

@@ -2212,14 +2212,22 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (max-width: 900px) {
   .site-nav__links { display: none; }
   .site-nav__toggle { display: flex; }
-  .site-footer__cols { grid-template-columns: repeat(2, 1fr); }
-  .site-footer__brandcol { grid-column: 1 / -1; }
+  /* Brand sits beside the links (spanning both link rows) instead of a
+     full-width band on top, so the footer fills the tablet width. */
+  .site-footer__cols { grid-template-columns: 1.1fr 1fr 1fr; }
+  .site-footer__brandcol { grid-column: 1; grid-row: 1 / span 2; }
 }
 
 /* Mobile */
 @media (max-width: 600px) {
   :root { --site-edge-min: 1rem; }
-  .site-footer__cols { grid-template-columns: 1fr; gap: var(--space-md); }
+  /* Two columns of links (brand full-width on top) so both halves of the
+     screen are used. */
+  .site-footer__cols {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md) var(--space-sm);
+  }
+  .site-footer__brandcol { grid-column: 1 / -1; grid-row: auto; }
   .site-footer__legal { flex-direction: column; gap: var(--space-2xs); }
 }
 
@@ -2229,10 +2237,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
    character, then the tagline lifts in word-by-word beneath a gradient rule.
    NOT a CRT: no scanlines, no mono wordmark, no green-on-black.
 
-   Default (no-JS / pre-paint) state = everything final + visible, so the
-   static HTML carries the full wordmark + tagline. The hidden/animated states
-   apply ONLY under `.home-hero.is-anim`, which the client island adds before
-   first paint. See src/components/HomeHero.tsx.
+   Default (no-JS) state = everything final + visible, so the static HTML
+   carries the full wordmark + tagline. The hidden/animated states apply ONLY
+   under `.home-hero.is-anim` (added at hydration) or `.home-hero.is-boot`
+   (added pre-paint by the inline script in the section, since hydration lands
+   long after first paint on a static export). See src/components/HomeHero.tsx.
    ===================================================================== */
 .home-hero {
   position: relative;
@@ -2449,6 +2458,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
    ANIMATED STATES -- only when JS has armed the hero (`.is-anim`). Without
    JS, none of these apply and the hero shows its final composition.
    ===================================================================== */
+/* Pre-hydration boot: the inline script in HomeHero adds `.is-boot` at parse
+   time (before first paint) and React's first phase re-render drops it. Hides
+   the same pieces the animation starts from, WITHOUT the .is-on escape hatches,
+   because the static HTML ships every char already .is-on. */
+.home-hero.is-boot .home-hero__char,
+.home-hero.is-boot .home-hero__tm,
+.home-hero.is-boot .home-hero__tagword,
+.home-hero.is-boot .home-hero__lanes { opacity: 0; }
+.home-hero.is-boot .home-hero__rule { transform: scaleX(0); }
+
 .home-hero.is-anim .home-hero__char { opacity: 0; }
 .home-hero.is-anim .home-hero__char.is-on { opacity: 1; }
 

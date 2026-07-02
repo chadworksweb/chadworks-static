@@ -68,6 +68,7 @@ const DETAILED: LeadFormConfig = {
     { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
     { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
     { kind: "text", name: "business", label: "Business Name", span: "half" },
+    { kind: "url", name: "current_url", label: "Existing domain or URL", autocomplete: "url", placeholder: "yourdomain.com" },
     {
       kind: "select",
       name: "budget",
@@ -82,8 +83,16 @@ const DETAILED: LeadFormConfig = {
     },
     {
       kind: "textarea",
+      name: "background",
+      label: "Provide some background info on you or the org",
+      required: true,
+      rows: 4,
+      placeholder: "Who you are, and what the business or organization does.",
+    },
+    {
+      kind: "textarea",
       name: "details",
-      label: "What are you building?",
+      label: "Describe the idea or scope of the project",
       required: true,
       rows: 5,
       placeholder: "What the site needs to do, and where it's stuck today.",

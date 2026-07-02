@@ -332,10 +332,19 @@ const DETAILED: LeadFormConfig = {
     { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
     { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
     { kind: "text", name: "business", label: "Business Name", span: "half" },
+    { kind: "url", name: "current_url", label: "Existing domain or URL", autocomplete: "url", placeholder: "yourdomain.com" },
+    {
+      kind: "textarea",
+      name: "background",
+      label: "Provide some background info on you or the org",
+      required: true,
+      rows: 4,
+      placeholder: "Who you are, and what the business or organization does.",
+    },
     {
       kind: "textarea",
       name: "details",
-      label: "What are you building?",
+      label: "Describe the idea or scope of the project",
       required: true,
       rows: 5,
       placeholder: "What the site needs to do, and where it's stuck today.",
@@ -619,7 +628,7 @@ export default function Home() {
       <ContactCapsule
         scheme="inverted"
         heading="Tell me about your project."
-        intro="Send me a message about your business, project or initiative. No ideas are dumb, no questions stupid. Tell me your vision, big or small."
+        intro="Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small."
         emailLabel="Email directly"
         email={EMAIL}
         phoneLabel="Call directly"

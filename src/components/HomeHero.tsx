@@ -6,9 +6,13 @@
 // NOT a CRT/glitch terminal: no scanlines, no mono wordmark, no green-on-black.
 //
 // SEO / no-JS safe: the full wordmark + tagline render as real text in the
-// static HTML (phase "idle" = everything visible). The animation only engages in
-// the browser, before first paint (isomorphic layout effect = no flash), and is
-// skipped entirely under prefers-reduced-motion (final state shown immediately).
+// static HTML (phase "idle" = everything visible). On a static export the
+// browser paints that HTML long before React hydrates (the layout effect alone
+// flashed the full wordmark), so a parser-blocking inline script inside the
+// section arms a pre-paint boot state (.is-boot) that hides the animated bits
+// from the very first paint; the first phase re-render rewrites className and
+// drops it. Skipped under prefers-reduced-motion (final state shows at once)
+// and without JS (the script never runs, so the text stays visible).
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CodeFall } from "@/components/art/CodeFall";
@@ -102,7 +106,19 @@ export default function HomeHero({ bare = false }: { bare?: boolean }) {
         bare ? " home-hero--bare" : ""
       }`}
       aria-label="chadworks"
+      suppressHydrationWarning
     >
+      {/* Pre-paint boot: runs while the parser is still inside this section,
+          so .is-boot exists before the browser can paint the wordmark. The
+          4s timeout is a fallback that reveals the final composition if React
+          never hydrates. suppressHydrationWarning above covers the class this
+          script adds outside React. */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var e=document.currentScript.parentElement;e.classList.add('is-boot');setTimeout(function(){e.classList.remove('is-boot')},4000);}",
+        }}
+      />
       <div className="home-hero__glow" aria-hidden="true" />
       {/* In bare (one-pager) mode the global sticky toggle owns motion, so
           CodeFall hides its own button but still honors the global pause. */}
