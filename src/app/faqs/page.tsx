@@ -83,6 +83,30 @@ const GROUPS: FaqGroup[] = [
         aText:
           "A conversation. Tell me the business, what you want the site to do, and where it is stuck today. From there you get a straight answer on whether it is a fit and what it would take. The contact page is the fastest way to start.",
       },
+      {
+        q: "Do I need to have the whole scope figured out before we start?",
+        a: "No, you don't have to have the scope figured out when you come to me, but part of the first stage of our working relationship will be developing a detailed scope. This way, my proposal-agreement will be robust in a way that prevents scope-creep, which isn't fun for either party.",
+        aText:
+          "No, you don't have to have the scope figured out when you come to me, but part of the first stage of our working relationship will be developing a detailed scope. This way, my proposal-agreement will be robust in a way that prevents scope-creep, which isn't fun for either party.",
+      },
+      {
+        q: "Can you get a domain name for me?",
+        a: "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+        aText:
+          "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+      },
+      {
+        q: "Can you set up branded email accounts for me?",
+        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+        aText:
+          "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+      },
+      {
+        q: "Do you use AI to build the sites?",
+        a: "Yes, but as a tool that allows me to deliver complex and agency-level work at a fraction of the cost and faster than ever before, not as a replacement for the craft. There is a clear line between using AI to do the heavy lifting and handing the actual creative work to a machine.",
+        aText:
+          "Yes, but as a tool that allows me to deliver complex and agency-level work at a fraction of the cost and faster than ever before, not as a replacement for the craft. There is a clear line between using AI to do the heavy lifting and handing the actual creative work to a machine.",
+      },
     ],
   },
   {
@@ -188,6 +212,30 @@ const GROUPS: FaqGroup[] = [
         aText:
           "Yes, and a common reason people reach out. Moving to a clean, custom build is usually faster and easier for AI tools to read. On WordPress and want off? The leave WordPress page walks through exactly what the move looks like.",
       },
+      {
+        q: "Can I edit the site myself after it's built?",
+        a: "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+        aText:
+          "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+      },
+      {
+        q: "Will my site be secure?",
+        a: "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+        aText:
+          "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+      },
+      {
+        q: "Do you handle privacy policy, cookies, and GDPR?",
+        a: "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+        aText:
+          "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+      },
+      {
+        q: "Can you set up a newsletter or mailing list?",
+        a: "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+        aText:
+          "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+      },
     ],
   },
   {
@@ -254,6 +302,18 @@ const GROUPS: FaqGroup[] = [
         aText:
           "chadworks has access to OpenAI's ChatGPT advertising beta and can set it up and manage it. The honest part: OpenAI requires a minimum spend of $25 a day, billed by OpenAI directly, on top of the management. Whether it is worth it depends on the business, and the digital marketing page gives you a straight read.",
       },
+      {
+        q: "Do I get analytics to see my traffic?",
+        a: "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+        aText:
+          "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+      },
+      {
+        q: "How long does SEO take to work?",
+        a: "Expect the first upward movement around the three-month mark. Reaching page one, and then the top of it, usually runs from six months to a year, and the most competitive terms can take longer still. It comes down to who you are up against: outranking a National Geographic on nature terms or a VistaPrint on printing terms is a different mountain than owning your own niche. I'm realistic with my clients when we discuss and set these kinds of goals.",
+        aText:
+          "Expect the first upward movement around the three-month mark. Reaching page one, and then the top of it, usually runs from six months to a year, and the most competitive terms can take longer still. It comes down to who you are up against: outranking a National Geographic on nature terms or a VistaPrint on printing terms is a different mountain than owning your own niche. I'm realistic with my clients when we discuss and set these kinds of goals.",
+      },
     ],
   },
 ];
@@ -287,8 +347,8 @@ export default function FaqsPage() {
       <HeroCapsule
         className="faqs-hero"
         crumbs={[{ label: "Home", href: "/" }, { label: "FAQs" }]}
-        eyebrow="Questions, answered"
-        title="Frequently asked questions"
+        eyebrow="Common questions about websites and visibility"
+        title="Frequently Asked Questions"
         lede="Everything people ask before hiring chadworks, grouped so you can jump to what you came for: working together, what it costs, how the site gets built, and getting found in search and AI."
       />
 
