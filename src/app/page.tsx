@@ -163,31 +163,31 @@ const FACTS: ReactNode[] = [
 const PROBLEM = {
   heading: "Your website is more important than ever.",
   subheading: "Your digital home base must be authentic and distinguishable.",
-  body: "When anyone can generate a passable page in seconds, the thing that sets you apart is a site that is unmistakably, verifiably yours.",
+  body: "When anyone can generate a passable page in seconds, what sets you apart is a site that is unmistakably, verifiably yours.",
   more: {
     trigger: "Expand to read more",
     paragraphs: [
       <>
-        <strong>Speed is mission-critical.</strong> A page that opens at once
-        keeps the visitor you worked to attract, and search engines reward the
-        very same thing, so a fast site pays you back twice over.
+        <strong>Speed is mission-critical.</strong> A page that opens and loads
+        lightning fast will simultaneously keep the visitor you
+        worked to attract <em>and</em> please search engines and AI search bots,
+        helping with ranking.
       </>,
       <>
-        <strong>Visibility optimization (SEO/GEO) is required.</strong> Showing up
-        in Google and in the AI assistants people now ask is structural work, set
-        into the build, so your business is the answer when someone goes looking.
+        <strong>Visibility optimization is required.</strong> Optimizing the site
+        to show up on Google and AI assistants like ChatGPT is how people find
+        you online. All my projects include baseline visibility optimization.
       </>,
       <>
-        <strong>Authenticity breaks the market mold.</strong> As the
-        web fills with interchangeable, machine-made pages, a site that carries
-        your real voice and your real work reads as human, and that is exactly
-        what earns trust now.
+        <strong>Authenticity breaks the market mold.</strong> As the web fills
+        with interchangeable, indistinguishable, and machine-made websites, a
+        site that carries your voice and your real work is what will build trust
+        with your audience/customers.
       </>,
       <>
-        <strong>Quality is retained.</strong> When the type
-        is considered and the details are clearly built on purpose, a visitor
-        reads that as a promise: you bring the same care to the work you would do
-        for them.
+        <strong>Quality is retained.</strong> When a website is pixel-perfect and
+        details are scrutinized like a work of art, visitors feel it. They&apos;ll know you will bring the same care to the work or
+        products you offer them.
       </>,
     ],
   },
