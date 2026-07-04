@@ -137,6 +137,9 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  // Override the site-wide noindex default (see layout.tsx). The homepage is
+  // the only route exposed to search during the staged relaunch.
+  robots: { index: true, follow: true },
 };
 
 // ---- BANDS ("At a glance") -- judgment count, every band earns its place. ----

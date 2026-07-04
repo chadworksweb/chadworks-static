@@ -30,6 +30,10 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  // Staged relaunch: every route is noindex by default so only pages that
+  // explicitly override robots.index = true are exposed to search. The
+  // homepage sets that override; inner pages opt back in one at a time.
+  robots: { index: false, follow: true },
   title: "chadworks™",
   description: "Websites and visibility, built with luxury-grade craft.",
   openGraph: {
