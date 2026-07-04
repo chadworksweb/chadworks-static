@@ -762,17 +762,20 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Key facts band (lavender full-width) */
 /* Key facts -- luxury statement panels (each fact its own full-width band). */
-.svc-statements-intro { padding-bottom: 0; }
+.svc-statements-intro { padding-bottom: 0; position: relative; z-index: 1; }
 .svc-statements__heading {
   position: relative;
-  top: 9px;                               /* nudge the letters down toward the first band */
+  top: 6px;                               /* nudge the letters down toward the first band */
   font-family: var(--font-mono);
   text-transform: none;                   /* lowercase brand wordmark, as written */
   letter-spacing: 0.02em;
   font-size: calc(var(--text-sm) * 3.2); /* 20% smaller than the prior 4x */
   font-weight: 500;
   line-height: 1;                         /* sit flush on the first band */
-  color: var(--dark-bg);                  /* match the first band's bg (#243989) */
+  color: var(--dark-bg);                  /* deep indigo (#243989) */
+  -webkit-text-stroke: 1px #ffffff;       /* white outline around the glyphs */
+  text-stroke: 1px #ffffff;
+  paint-order: stroke fill;               /* stroke behind the fill so letters keep their weight */
 }
 
 /* Each statement is a full-bleed panel. Backgrounds ramp DARK -> LIGHT and are
@@ -2620,6 +2623,34 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (prefers-reduced-motion: reduce) {
   .design-reveal__frame:not(.is-touched) .design-reveal__handle { animation: none; }
 }
+/* Page switcher: pill tabs above the frame, each swaps the before/after pair. */
+.design-reveal__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: var(--space-sm);
+}
+.design-reveal__tab {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 0.35rem 0.95rem;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-smooth),
+    color var(--duration-fast) var(--ease-smooth),
+    border-color var(--duration-fast) var(--ease-smooth);
+}
+.design-reveal__tab:hover { background: #ffffff; }
+.design-reveal__tab.is-active {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
 .design-reveal__frame {
   container-type: inline-size;
   position: relative;
@@ -2627,7 +2658,12 @@ p, li, dd, figcaption { text-wrap: pretty; }
   border: 1px solid var(--border-subtle);
   background: var(--bg-base);
   box-shadow: 0 22px 50px rgba(36, 57, 137, 0.10), 0 6px 16px rgba(36, 57, 137, 0.05);
-  overflow: hidden;
+  /* NOT clipped: the divider handle must be free to spill past the edges.
+     Rounded corners are handled by the bar (top) and the image clip (bottom). */
+  overflow: visible;
+  /* Interactive widget -- never let a drag select the DRAG tab / URL text. */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .design-reveal__frame:focus-within {
   outline: 2px solid var(--accent);
@@ -2642,6 +2678,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
   padding: 0.55rem 0.9rem;
   background: #f3effa;
   border-bottom: 1px solid var(--border-subtle);
+  border-radius: var(--radius) var(--radius) 0 0; /* frame no longer clips this */
 }
 .design-reveal__dot {
   width: 9px;
@@ -2666,9 +2703,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
    the divider. */
 .design-reveal__stage {
   position: relative;
-  aspect-ratio: 16 / 9.4;
-  overflow: hidden;
+  aspect-ratio: 1902 / 1079; /* match the screenshot dimensions -- no crop */
+  touch-action: pan-y; /* let the page scroll vertically; we own horizontal drag */
 }
+/* The image clip: rounds the bottom corners and hides the wipe overflow, while
+   the divider (a sibling, above) stays unclipped so its handle spills out. */
+.design-reveal__clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+/* Only the divider/handle is grabbable -- the rest of the panel is inert. */
+.design-reveal__frame.is-dragging .design-reveal__stage { cursor: grabbing; }
 .design-reveal__site {
   position: absolute;
   inset: 0;
@@ -2677,6 +2724,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .design-reveal__site--after {
   clip-path: inset(0 0 0 var(--reveal));
   will-change: clip-path;
+}
+/* Real before/after screenshots fill the stage. Both layers share the same
+   size and object-position so the wipe aligns the two versions pixel-for-pixel;
+   top-anchored so the header/logo stays in frame when the stage crops. */
+.design-reveal__shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 /* --- BEFORE: the same business on a default template (deliberately bland;
@@ -2859,6 +2919,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: #ffffff;
   box-shadow: 0 0 0 1px rgba(36, 57, 137, 0.22), 0 0 14px rgba(36, 57, 137, 0.25);
   will-change: left;
+  cursor: grab;
+}
+.design-reveal__frame.is-dragging .design-reveal__divider { cursor: grabbing; }
+/* Widen the grab target: a transparent column along the divider line so the
+   handle is comfortable to catch without hunting the 2.4rem circle. */
+.design-reveal__divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 30px;
+  transform: translateX(-50%);
 }
 .design-reveal__handle {
   position: absolute;
@@ -2874,11 +2947,24 @@ p, li, dd, figcaption { text-wrap: pretty; }
   border: 1px solid var(--border-medium);
   box-shadow: 0 4px 16px rgba(36, 57, 137, 0.25);
   color: var(--accent);
+  transition: transform var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth),
+    background-color var(--duration-fast) var(--ease-smooth);
 }
 .design-reveal__handle svg { width: 1.05rem; height: 1.05rem; display: block; }
+/* Grabbed: while the pointer is down, the handle presses IN -- smaller, a tint,
+   and an inset shadow so it reads as physically depressed under the cursor. */
+.design-reveal__frame.is-dragging .design-reveal__handle {
+  transform: translate(-50%, -50%) scale(0.88);
+  background: #f3effa;
+  box-shadow: inset 0 2px 6px rgba(36, 57, 137, 0.30),
+    0 2px 8px rgba(36, 57, 137, 0.18);
+}
 
-/* The accessible control: native range stretched invisibly over the stage.
-   Drag, tap, arrow keys, and AT all drive the same wipe. */
+/* The accessible control: native range kept for KEYBOARD + AT only (arrow keys,
+   screen readers). Pointer dragging is handled directly on the stage, so this
+   passes pointer events through (pointer-events: none) and never fights the
+   drag. Still tabbable and focusable for keyboard users. */
 .design-reveal__range {
   position: absolute;
   inset: 0;
@@ -2886,11 +2972,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   height: 100%;
   margin: 0;
   opacity: 0;
-  cursor: grab;
+  pointer-events: none;
   -webkit-appearance: none;
   appearance: none;
 }
-.design-reveal__frame.is-dragging .design-reveal__range { cursor: grabbing; }
 
 .design-reveal__labels {
   display: flex;
@@ -2907,7 +2992,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .design-reveal__label--after { color: var(--accent); }
 
 @media (max-width: 600px) {
-  .design-reveal__stage { aspect-ratio: 4 / 3.4; }
   .design-reveal__handle { width: 2rem; height: 2rem; }
 }
 

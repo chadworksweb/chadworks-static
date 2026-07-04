@@ -11,12 +11,46 @@
 // Reduced motion: the divider still moves (it is user-driven input, not
 // ambient animation) but without the lerp chase.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DAMP = 0.14;
 
-export function DesignReveal() {
+// One before/after pair per page of a real client site (Rozario Touma P.C.).
+// Same framing before and after, so the wipe reveals the redesign in place.
+export type RevealPage = {
+  label: string;   // tab label
+  url: string;     // faux browser-chrome address
+  before: string;  // /public path to the "before" shot
+  after: string;   // /public path to the "after" shot
+  beforeAlt: string;
+  afterAlt: string;
+};
+
+const DEFAULT_PAGES: RevealPage[] = [
+  {
+    label: "Homepage",
+    url: "rozariolaw.com",
+    before: "/design-reveal/rt-law_before.webp",
+    after: "/design-reveal/rt-law_after.webp",
+    beforeAlt: "Rozario Touma homepage before the redesign",
+    afterAlt: "Rozario Touma homepage after the chadworks redesign",
+  },
+  {
+    label: "Bio page",
+    url: "rozariolaw.com/team",
+    before: "/design-reveal/rt-law-person-before.webp",
+    after: "/design-reveal/rt-law-person-after.webp",
+    beforeAlt: "Attorney bio page before the redesign",
+    afterAlt: "Attorney bio page after the chadworks redesign",
+  },
+];
+
+export function DesignReveal({ pages = DEFAULT_PAGES }: { pages?: RevealPage[] }) {
+  const [active, setActive] = useState(0);
+  const page = pages[active] ?? pages[0];
+
   const frameRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const rangeRef = useRef<HTMLInputElement>(null);
   // Rest position favors the DESIGNED side (the sell), not a dead 50/50.
   const target = useRef(36);
@@ -24,17 +58,22 @@ export function DesignReveal() {
 
   useEffect(() => {
     const frame = frameRef.current;
+    const stage = stageRef.current;
     const range = rangeRef.current;
-    if (!frame || !range) return;
+    if (!frame || !stage || !range) return;
 
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const clamp = (v: number) => Math.max(0, Math.min(100, v));
     let raf = 0;
     let running = false;
+    let dragging = false;
 
     function apply(v: number) {
       frame!.style.setProperty("--reveal", `${v}%`);
     }
 
+    // Eased glide toward target -- used for KEYBOARD steps only, so arrow keys
+    // feel weighted. A live pointer drag bypasses this (sticks 1:1 to the cursor).
     function tick() {
       const delta = target.current - current.current;
       if (Math.abs(delta) < 0.08) {
@@ -48,12 +87,14 @@ export function DesignReveal() {
       raf = requestAnimationFrame(tick);
     }
 
-    function setTarget(v: number) {
-      target.current = Math.max(2, Math.min(98, v));
-      range!.value = String(Math.round(target.current));
-      if (reduced) {
+    function setTarget(v: number, immediate: boolean) {
+      target.current = clamp(v);
+      range!.value = String(Math.round(target.current)); // keep AT / keyboard synced
+      if (immediate || reduced) {
         current.current = target.current;
         apply(current.current);
+        if (raf) cancelAnimationFrame(raf);
+        running = false;
         return;
       }
       if (!running) {
@@ -62,24 +103,57 @@ export function DesignReveal() {
       }
     }
 
-    // CLICK-TO-DRAG only (Chad, 2026-06-11): no hover-follow. The invisible
-    // native range over the stage is the single driver -- press jumps the
-    // divider to the press point, dragging slides it, arrow keys step it.
-    function onInput() {
-      frame!.classList.add("is-touched"); // retire the attract pulse
-      setTarget(Number(range!.value));
-    }
-    function onDown() { frame!.classList.add("is-dragging", "is-touched"); }
-    function onUp() { frame!.classList.remove("is-dragging"); }
+    const pctFromX = (clientX: number) => {
+      const r = stage!.getBoundingClientRect();
+      return ((clientX - r.left) / r.width) * 100;
+    };
 
+    // POINTER DRAG -- the divider moves ONLY by grabbing the handle (the <>
+    // button on the divider). A press anywhere else in the panel does nothing
+    // and never drags the image; while held, the divider tracks the cursor 1:1.
+    // Pointer capture keeps the drag alive even if the cursor leaves the frame.
+    function onPointerDown(e: PointerEvent) {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
+      e.preventDefault(); // kill image-drag ghost / text selection anywhere in the panel
+      const onHandle = (e.target as Element | null)?.closest?.(
+        ".design-reveal__divider",
+      );
+      if (!onHandle) return; // presses off the handle are inert
+      dragging = true;
+      frame!.classList.add("is-dragging", "is-touched");
+      try { stage!.setPointerCapture(e.pointerId); } catch {}
+      setTarget(pctFromX(e.clientX), true);
+    }
+    function onPointerMove(e: PointerEvent) {
+      if (!dragging) return;
+      setTarget(pctFromX(e.clientX), true);
+    }
+    function endDrag(e: PointerEvent) {
+      if (!dragging) return;
+      dragging = false;
+      frame!.classList.remove("is-dragging");
+      try { stage!.releasePointerCapture(e.pointerId); } catch {}
+    }
+
+    // KEYBOARD / AT -- the range still drives via arrow keys, with the glide.
+    function onInput() {
+      if (dragging) return; // pointer path owns live drags
+      frame!.classList.add("is-touched");
+      setTarget(Number(range!.value), false);
+    }
+
+    stage.addEventListener("pointerdown", onPointerDown);
+    stage.addEventListener("pointermove", onPointerMove);
+    stage.addEventListener("pointerup", endDrag);
+    stage.addEventListener("pointercancel", endDrag);
     range.addEventListener("input", onInput);
-    range.addEventListener("pointerdown", onDown);
-    window.addEventListener("pointerup", onUp);
     return () => {
       cancelAnimationFrame(raf);
+      stage.removeEventListener("pointerdown", onPointerDown);
+      stage.removeEventListener("pointermove", onPointerMove);
+      stage.removeEventListener("pointerup", endDrag);
+      stage.removeEventListener("pointercancel", endDrag);
       range.removeEventListener("input", onInput);
-      range.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("pointerup", onUp);
     };
   }, []);
 
@@ -92,53 +166,62 @@ export function DesignReveal() {
           Grab the divider and drag. Everything that changes is design.
         </p>
       </div>
+
+      {/* Page switcher: each tab swaps in a different before/after pair. */}
+      {pages.length > 1 && (
+        <div
+          className="design-reveal__tabs"
+          role="tablist"
+          aria-label="Choose a page to compare"
+        >
+          {pages.map((p, i) => (
+            <button
+              key={p.label}
+              type="button"
+              role="tab"
+              aria-selected={i === active}
+              className={
+                "design-reveal__tab" + (i === active ? " is-active" : "")
+              }
+              onClick={() => setActive(i)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div ref={frameRef} className="design-reveal__frame" style={{ "--reveal": "36%" } as React.CSSProperties}>
         {/* Browser chrome */}
         <div className="design-reveal__bar" aria-hidden="true">
           <span className="design-reveal__dot" />
           <span className="design-reveal__dot" />
           <span className="design-reveal__dot" />
-          <span className="design-reveal__url">yourbusiness.com</span>
+          <span className="design-reveal__url">{page.url}</span>
         </div>
 
-        <div className="design-reveal__stage" aria-hidden="true">
-          {/* BEFORE: the same business on a default template */}
-          <div className="design-reveal__site design-reveal__site--before">
-            <div className="dr-b__nav">
-              <span className="dr-b__logo">YOUR BUSINESS LLC</span>
-              <span className="dr-b__links" />
+        <div ref={stageRef} className="design-reveal__stage" aria-hidden="true">
+          {/* Only the images are clipped to the rounded frame; the divider
+              overlays OUTSIDE this clip so its handle can spill past the edges. */}
+          <div className="design-reveal__clip">
+            {/* BEFORE: the real client site prior to the redesign */}
+            <div className="design-reveal__site design-reveal__site--before">
+              <img
+                className="design-reveal__shot"
+                src={page.before}
+                alt={page.beforeAlt}
+                draggable={false}
+              />
             </div>
-            <div className="dr-b__hero">
-              <span className="dr-b__h1">Welcome To Our Website</span>
-              <span className="dr-b__sub" />
-              <span className="dr-b__sub dr-b__sub--short" />
-              <span className="dr-b__btn">CLICK HERE</span>
-            </div>
-            <div className="dr-b__row">
-              <span className="dr-b__box" />
-              <span className="dr-b__box" />
-              <span className="dr-b__box" />
-            </div>
-          </div>
 
-          {/* AFTER: the same business, designed */}
-          <div className="design-reveal__site design-reveal__site--after">
-            <div className="dr-a__nav">
-              <span className="dr-a__logo">yourbusiness</span>
-              <span className="dr-a__pill" />
-            </div>
-            <div className="dr-a__hero">
-              <span className="dr-a__eyebrow" />
-              <span className="dr-a__h1">
-                The work speaks.{" "}
-                <em>This is where it talks.</em>
-              </span>
-              <span className="dr-a__sub" />
-              <span className="dr-a__btn" />
-            </div>
-            <div className="dr-a__band">
-              <span className="dr-a__card" />
-              <span className="dr-a__card dr-a__card--tall" />
+            {/* AFTER: the chadworks redesign, clipped by the divider */}
+            <div className="design-reveal__site design-reveal__site--after">
+              <img
+                className="design-reveal__shot"
+                src={page.after}
+                alt={page.afterAlt}
+                draggable={false}
+              />
             </div>
           </div>
 
@@ -159,16 +242,16 @@ export function DesignReveal() {
           ref={rangeRef}
           type="range"
           className="design-reveal__range"
-          min={2}
-          max={98}
+          min={0}
+          max={100}
           defaultValue={36}
           aria-label="Compare the template version with the designed version"
         />
       </div>
 
       <div className="design-reveal__labels">
-        <span className="design-reveal__label">A template</span>
-        <span className="design-reveal__label design-reveal__label--after">Designed</span>
+        <span className="design-reveal__label">Before</span>
+        <span className="design-reveal__label design-reveal__label--after">After</span>
       </div>
     </div>
   );
