@@ -31,9 +31,11 @@ export function ProblemCapsule({ problem }: ProblemCapsuleProps) {
         // Prose lifted off the ribbons into a frosted pop-down (CTA trigger).
         // The body leads the panel; `more.paragraphs` expand on it.
         <ProblemMore trigger={problem.more.trigger}>
-          <p className="svc-block__body">
-            <W value={problem.body} />
-          </p>
+          {!problem.more.hideBodyIntro && (
+            <p className="svc-block__body">
+              <W value={problem.body} />
+            </p>
+          )}
           {problem.more.paragraphs.map((p, i) => (
             <p key={i} className="svc-block__body">
               <W value={p} />

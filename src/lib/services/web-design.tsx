@@ -70,6 +70,7 @@ export const webDesign: Service = {
       "Visitors decide how much to trust your business before they read a single word, and the design is what they're deciding on. Drag the line across the browser below and watch the same business make two completely different first impressions.",
     more: {
       trigger: "More on what design decides",
+      hideBodyIntro: true,
       paragraphs: [
         <>
           <strong>Thoughtful Design &amp; Details.</strong>{" "}A thoughtful

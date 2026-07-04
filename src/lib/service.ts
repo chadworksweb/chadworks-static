@@ -146,7 +146,9 @@ export type Service = {
     // legible because it's a deliberate opened surface, not a permanent scrim.
     // `body` stays the one-line summary / no-disclosure fallback.
     // Paragraphs are ReactNode so lead words can carry inline <strong>.
-    more?: { trigger: string; paragraphs: (ReactNode | Prompted)[] };
+    // hideBodyIntro drops the `body` paragraph that normally leads the panel,
+    // for pages whose `paragraphs` already stand on their own.
+    more?: { trigger: string; paragraphs: (ReactNode | Prompted)[]; hideBodyIntro?: boolean };
   };
   approach: { heading: string; steps: ServiceStep[] };
 
