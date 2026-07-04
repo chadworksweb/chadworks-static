@@ -39,12 +39,8 @@ export const webDesign: Service = {
       layout, the color, the type, and the path that turns a stranger into a
       customer. I&apos;m Chad, and I&apos;ve been designing websites for 20
       years. Bring me a brand and I&apos;ll design a site that earns trust on
-      sight, or bring me the business alone and we&apos;ll find the look
-      together. Once the design is settled, I{" "}
-      <Link href="/web-development/" className="svc-inline-link">
-        develop
-      </Link>{" "}
-      it into a fast, working site myself, so nothing gets lost in a handoff.
+      sight, or bring me the idea and we&apos;ll find the look
+      together.
     </>
   ),
 
@@ -52,42 +48,56 @@ export const webDesign: Service = {
 
   keyFactsHeading: "Web design, at a glance",
   keyFacts: [
-    "People size up a website in about a twentieth of a second, and what they're really sizing up is your business. Design decides what that first instant says.",
-    "Nothing here starts from a theme. Every site is designed around your business, so it can never look like the competitor who bought the same template.",
-    "The person who designs your site is the same person who builds it, so nothing gets lost between a designer's mockup and a developer's compromise.",
+    "People size up a website in about one second, but what they're really sizing up is your business. The quality of your website design is what makes or breaks a first impression.",
+    "All projects are built from the ground up, meaning no templates or page builders. Your website will be distinguished and unique in the truest sense.",
+    (
+      <>
+        The person who designs is the person who builds, and is also the person
+        who does the sale, the proposal and the maintenance.{" "}
+        <Link href="/about/" className="svc-inline-link">
+          Read about that person here.
+        </Link>
+      </>
+    ),
     "I've been designing websites for 20 years, long enough to know which trends will still look right in five, and which ones are already aging.",
   ],
 
   problemArt: <DesignReveal />,
   problem: {
     heading: "Why web design actually matters",
-    subheading: "You're judged before you're read.",
+    subheading: "Aesthetics psychologically build trust before content.",
     body:
       "Visitors decide how much to trust your business before they read a single word, and the design is what they're deciding on. Drag the line across the browser below and watch the same business make two completely different first impressions.",
     more: {
       trigger: "More on what design decides",
       paragraphs: [
         <>
-          <strong>Trust</strong>{" "}comes first. A visitor can&apos;t inspect
-          your work from a search result, so the website stands in for it. A
-          considered design reads as a business that sweats the details. A
-          stale template reads as a business that doesn&apos;t, even when the
-          work behind it is excellent.
+          <strong>Thoughtful Design &amp; Details.</strong>{" "}A thoughtful
+          design indicates that a business cares about details, which translates
+          into quality of product or service a potential customer can expect to
+          receive. A website with loose ends, broken assets, misalignment or
+          chaotic branding is an indicator the business does not care about the
+          details. You can guess what that translates to regarding the service
+          or product.
         </>,
         <>
-          <strong>Direction</strong>{" "}is the quiet job. Good design decides
-          where the eye goes, what feels clickable, and which action the whole
-          page leans toward. A site can be beautiful and still point nowhere,
-          which is why I design the path to contact before I pick a single
-          color.
+          <strong>User Interface &amp; Navigation.</strong>{" "}A site can be
+          beautiful yet still leave the visitor hanging and cause them to
+          bounce. A great website design includes effective interface and
+          navigational design decisions. This covers concepts like what feels
+          clickable, scrollable, and what action an individual page moves the
+          visitors towards.
         </>,
         <>
-          <strong>Memory</strong>{" "}is the long game. You are almost never the
-          only tab open. Template sites blur into each other the moment the
-          visitor moves on, while a site designed around your business is the
-          one they can still picture the next day.
+          <strong>Memory and Impact.</strong>{" "}Most people browsing for a
+          product or service online are simultaneously doing other things, which
+          means your website has to stand out from the amalgam of social media,
+          YouTube, news and competitor websites a visitor may be surfing, along
+          with your site. These days, impactful design requires a bespoke
+          design that stops a visitor in their tracks and leaves an imprint in
+          their mind long after they leave. &quot;Oh, that was the site with the
+          yellow glowing rectangle!&quot; kind of thing.
         </>,
-        "And design never works alone. The code underneath has to keep those pages fast and findable, which is why I handle the development side too instead of handing the design off and hoping.",
       ],
     },
   },
@@ -387,7 +397,7 @@ export const webDesign: Service = {
   },
 
   meta: {
-    title: "Web Design -- Custom Website Design Around Your Business | chadworks",
+    title: "Website Design by chadworks™",
     description:
       "Web design is everything a visitor sees and feels on your website: the layout, color, type, and the path that turns a stranger into a customer. I design custom sites around your business, never from a theme, and develop them too.",
   },
