@@ -195,7 +195,7 @@ export function AdvertisingEligibility() {
             <li>Local services and trades</li>
             <li>Travel and experiences</li>
             <li>Digital products and education</li>
-            <li>Retail, e-commerce, and direct-to-consumer brands</li>
+            <li>Retail, ecommerce, and direct-to-consumer brands</li>
           </ul>
         </div>
         <div className="cw-art-eligible__card cw-art-eligible__card--no">

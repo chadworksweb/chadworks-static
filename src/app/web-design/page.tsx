@@ -5,12 +5,15 @@ import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
 import { webDesign as service } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
-import { ProcessCapsule, AssuranceCapsule } from "@/components/capsules";
+import { ProcessCapsule, AssuranceCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  // Live: overrides the site-wide noindex default (see layout.tsx). Kept in sync
+  // with the sitemap (this slug is now in `routes`, not HELD_FOR_RELAUNCH).
+  robots: { index: true, follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,
@@ -40,13 +43,35 @@ export default function WebDesignPage() {
         approach: (
           <ProcessCapsule
             pageName="web design"
+            heading={service.approach.heading}
             steps={service.approach.steps}
             scheme="inverted"
           />
         ),
         assurance: (
-          <AssuranceCapsule assurance={service.assurance!} variant="design-steps" />
+          <AssuranceCapsule assurance={service.assurance!} variant="tenets" />
         ),
+        // Swap the light PortfolioCapsule for the full shared showroom (same one
+        // the homepage renders).
+        portfolio: <PortfolioShowcaseCapsule archiveHeading="Website Design Showcase" />,
+        // Use the shared homepage About Chad block, but keep this page's own
+        // "professional web designer" photo caption.
+        made: (
+          <AboutChadCapsule
+            captionMain="Don't worry, I'm a professional."
+            captionSub="(Web designer.)"
+          />
+        ),
+        // Swap the page-specific price section for the shared homepage rates band.
+        price: <RatesCapsule />,
+        // Swap the page-specific fit section for the shared homepage one.
+        qualification: <FitCapsule />,
+        // Contact/CTA + "what happens after" get reordered here. The canonical
+        // slot order is [... nextSteps, cta], so to render the contact section
+        // FIRST and "what happens after" AFTER it, we place the shared homepage
+        // contact into the earlier nextSteps slot and NextSteps into the cta slot.
+        nextSteps: <MainContactCapsule />,
+        cta: <NextStepsCapsule nextSteps={service.nextSteps!} />,
       }}
     />
   );

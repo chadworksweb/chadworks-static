@@ -14,6 +14,7 @@ export const dynamic = "force-static";
 // Routes advertised to search engines right now.
 const routes = [
   "/", // home
+  "/web-design/",
 ];
 
 // Pulled from search during the staged relaunch. Kept here so bringing a page
@@ -24,7 +25,6 @@ const HELD_FOR_RELAUNCH = [
   "/visibility/",
   // Websites services
   "/web-development/",
-  "/web-design/",
   "/web-design-packages/",
   "/wordpress/",
   "/custom-coded-static/",

@@ -104,133 +104,102 @@ export const webDesign: Service = {
   },
 
   approach: {
-    heading: "How I design it",
+    heading: "The chadworks™ Web Design Process",
+    // Verbatim restoration of the original chadworks.co "Website Design Process"
+    // bold-timeline steps (9 steps), sourced from the old-site copy doc.
     steps: [
       {
-        title: "I start with your business, not a moodboard",
+        title: "Discovery",
         body:
-          "Before anything visual, I learn what the site has to win: who it speaks to, what they need to feel, and the action that pays you. Every design choice afterward has a job to do.",
+          "I interview you to extract the necessary information about your business like company history, mission and vision, important products or services, milestones, etc.",
       },
       {
-        title: "Structure first, decoration second",
+        title: "Website Architecture (Sitemap)",
         body:
-          "The layout and hierarchy get designed before the styling: where the eye lands, what feels clickable, where a page sends the reader next. Weak structure is the one thing no amount of color can ever rescue.",
+          "Based on the information and content collected in the discovery phase, I build an SEO and user-friendly sitemap to visually organize all of your pages in an easy to read and digest visual. This usually becomes the main menu.",
       },
       {
-        title: "A design system, not a lucky page",
+        title: "Homepage Design",
         body:
-          "Colors, type, and spacing get locked as one system, so every page matches and the pages you add next year still look like they belong. One good-looking homepage is easy. A site that holds together is design.",
+          "The overall design of the site will be delivered with the first revision of the homepage. The rest of the pages will mimic this overall design but have their own content in the main part of the page.",
       },
       {
-        title: "Designed to be built",
+        title: "Sub Page Build Out",
         body:
-          "I develop what I design, so nothing dies in translation. Every idea in the mockup ships as fast, working code, instead of getting quietly simplified by whoever builds it.",
+          "The rest of the website's pages will be built out with the design from the homepage and the content provided. This includes product pages and blog posts.",
+      },
+      {
+        title: "Search Optimization (SEO)",
+        body:
+          "The website pages and content will be optimized for search out of the box. This does not mean you will show up #1 for \"dog groomers\" but it means the site will be in the best shape it can be to begin competing for ranking on Google/Bing.",
+      },
+      {
+        title: "Mobile Optimization & Testing",
+        body:
+          "This is the last step. All content and pages must be complete before mobile testing and optimization is performed.",
+      },
+      {
+        title: "Soft Launch",
+        body:
+          "We launch the site on your main domain. We ask friends and family to visit the site and test it out to try and find any last bugs we did not catch or issues with specifics operating systems, browsers or devices.",
+      },
+      {
+        title: "Official Launch",
+        body:
+          "We announce the launch of your website, and toast to a job well done for everyone involved. Congrats on your new web property, go get 'em. I'll be here for anything else you may need.",
+      },
+      {
+        title: "One Week Post-Launch Safety Net",
+        body:
+          "You have one week from \"official launch\" for me to fix any issues or glaring mistakes that have been discovered at no charge. This does not include new pages or content of any kind, only fixing what was already on the site upon official launch.",
       },
     ],
   },
 
   paths: {
-    heading: "Choose how it's built",
-    // NOTE (parked 2026-06-19): the homepage web-design definition lives here
-    // for now until it gets a proper home on this page.
+    heading: "Web Design Platform Options",
     intro:
-      "Website design is the visual aspect of a website. This includes the UI (user interface), which includes colors, fonts, images and other media. It also covers UX (user experience), which is the way a visitor explores the website; the path they take, the links they click and where those links go, the forms they fill out and the buttons they push. UI and UX work together to make it easy for your visitors to find what they're looking for. The design is the aesthetic of that interface and experience. Without design, you'd be looking at indecipherable lines of code and spreadsheet-like data, and would not be able to find what you need. A design needs a build to live on. Same four routes as the development side. If you're not sure which fits, that's part of the conversation.",
+      "I offer four different platforms on which I can build your website. When you call for your free consultation, we'll discuss the options and likely settle on the option that is best for your situation.",
     items: [
       {
-        label: "Custom Coded / Static",
+        label: "Custom Coded",
         detail:
-          "The purest canvas. Custom built around the design with nothing to update or break, and entirely yours.",
+          "Custom code is how websites were built before CMS platforms like WordPress and builders like Squarespace came along, and in the age of deep internet saturation, custom coded websites are rising again as the go-to for those who want to stand out in a world of templates. Custom coded sites have total control over the design and the function of the website. It's like a block of clay that you get to sculpt into anything you want.",
         href: "/custom-coded-static/",
         viz: <CustomCodedViz />,
       },
       {
         label: "WordPress",
         detail:
-          "Design on a CMS your team can manage. I design over it so it never reads as a theme.",
+          "WordPress powers over 40% of the internet, and for good reason. WordPress is a CMS (content management system), which is a type of website platform that has a user-friendly interface that allows non-web designers to edit not only the content of their site, but much of the design, layout and surface level code, without knowing any code. The thing is, WordPress became ubiquitous. An entire economy has been built up around it, which creates amazing opportunity, but also has led to the templatization of the web. If it makes sense to use WordPress for your project, I'll make sure it's not a cookie cutter design.",
         href: "/wordpress/",
         viz: <WordPressViz />,
       },
       {
         label: "Ecommerce",
         detail:
-          "Design in service of the sale. Built around your products and how people actually buy them.",
+          "Ecommerce is a website with a product and payment system built in. This can be as simple as a PDF download or as complex as a multi-line fashion label. Ecommerce websites aren't necessarily their own type of platform, but rather a set of functions and features that can be built custom, built into WordPress or built on Shopify. If you want to sell online, ecommerce is what you want.",
         href: "/ecommerce/",
         viz: <EcommerceViz />,
       },
       {
         label: "Shopify",
         detail:
-          "A custom face on the platform that does the heavy lifting, so the store reads as yours.",
+          "Shopify is the DIY / Squarespace of ecommerce. While I can build everything Shopify does as a bespoke website you own and control 100%, Shopify is an option if you need to get online on a budget. The trade-off for the speed and convenience is that you'll be using templates, and monthly costs can pile up for special features. I will happily work with Shopify, but I will always tell my clients if building custom is better for their long-term needs.",
         href: "/shopify/",
         viz: <ShopifyViz />,
       },
     ],
   },
 
-  proof: {
-    heading: "Proof, not promises",
-    items: [
-      {
-        label: "Specialized design pages",
-        detail:
-          "Whole pages designed for a single trade, like septic services and foundation repair, each with a look pulled from that industry's world instead of a generic business template.",
-        href: "/my-industry-specialties/",
-      },
-      {
-        label: "The portfolio",
-        detail:
-          "Walk through the live builds in the immersive portfolio and judge the design work with your own eyes.",
-        href: "/portfolio/",
-      },
-    ],
-  },
-
-  made: {
-    eyebrow: "Who makes it",
-    heading: "Hi, I'm Chad.",
-    intro:
-      "I've been designing websites for 20 years, since the Xanga and MySpace days, and every site that leaves here is custom built by me.",
-    manifesto: [
-      { lead: "I design it.", aside: "(No template.)" },
-      { lead: "I code it.", aside: "(No page builder.)" },
-      { lead: "I maintain it.", aside: "(No ghosting.)" },
-    ],
-    negation: [
-      "No subcontractors.",
-      "No offshore.",
-      "No AI slop.",
-      "No warehouse agency you'll never hear from after the invoice clears.",
-    ],
-    close:
-      "When you email, I answer. When something breaks at 11pm, I'm the one fixing it.",
-    img: "/people/chad-cutout.webp",
-    imgAlt: "Chad Lewine, the designer and developer behind chadworks",
-    captionMain: "Don't worry, I'm a professional.",
-    captionSub: "(Web designer.)",
-    sig: "Chad Lewine",
-    sigMeta: "chadworks -- designing since age 11",
-  },
-
-  price: {
-    heading: "What it costs, plainly",
-    figure: "$3,200 - $6,200+",
-    figureSub: "Value-based -- most builds land near $6,200",
-    body:
-      "Design is priced on what it's worth to your business, not on how fast a font can be picked. Projects start at a $3,200 floor, most land near $6,200 with the development included, and hourly work bills at $315. There are cheaper designers, plenty of them. The difference is that you're not buying a template with your logo dropped in. You're buying a design that belongs to your business alone, built by the same person who codes it.",
-    disclaimer: (
-      <>
-        <strong>Straight up:</strong>{" "}if the lowest number is the goal, we
-        probably aren&apos;t a match, and I&apos;d rather say so here than
-        after you&apos;ve spent the money. Real numbers come from a real
-        conversation about scope, not a pricing table.
-      </>
-    ),
-  },
-
   faqLead:
     "The questions buyers actually ask about web design, answered the way I'd answer them on a call. If yours isn't here, ask me directly.",
 
   faqs: [
+    {
+      q: "What is web design?",
+      a: "Website design is the visual aspect of a website. This includes the UI (user interface), which includes colors, fonts, images and other media. It also covers UX (user experience), which is the way a visitor explores the website; the path they take, the links they click and where those links go, the forms they fill out and the buttons they push. UI and UX work together to make it easy for your visitors to find what they're looking for. The design is the aesthetic of that interface and experience. Without design, you'd be looking at indecipherable lines of code and spreadsheet-like data, and would not be able to find what you need.",
+    },
     {
       q: "Do you design from templates or themes?",
       a: "No. Every design is custom built around your business, which is the point of hiring a designer instead of buying a theme. The only time a theme enters the picture is when you deliberately choose the WordPress route for managing your own content, and even then I design on top of it until it doesn't read as one.",
@@ -323,18 +292,6 @@ export const webDesign: Service = {
     ],
   },
 
-  portfolio: {
-    heading: "Click into the work",
-    intro:
-      "Four live builds, four different personalities, none of them started from a theme. Click anywhere on a shot to send a ripple through it.",
-    items: [
-      { label: "chadlewine.com", img: "/portfolio/chadlewine.png", alt: "chadlewine.com, a custom-designed musician website", href: "https://chadlewine.com" },
-      { label: "The Rising Compass", img: "/portfolio/risingcompass.png", alt: "risingcompass.net, a custom-designed song-analysis web app", href: "https://risingcompass.net" },
-      { label: "Rozario Touma, P.C.", img: "/portfolio/rozariolaw.png", alt: "rozariolaw.com, a corporate law firm website designed for New York City clients", href: "https://rozariolaw.com" },
-      { label: "Abracadabra Gems", img: "/portfolio/abracadabragems.png", alt: "abracadabragems.com, an artisan jeweler's website with a handcrafted look", href: "https://abracadabragems.com" },
-    ],
-  },
-
   // REAL reviews (harvested verbatim from live chadworks.co). Two chosen for
   // the design angle: the finished-product reaction and the no-upsell honesty.
   testimonials: {
@@ -353,25 +310,13 @@ export const webDesign: Service = {
     ],
   },
 
-  qualification: {
-    heading: "Is this the right fit?",
-    fit: [
-      "You want a site that looks like your business, no one else's.",
-      "You see design as the thing that wins customers, not a coat of paint at the end.",
-    ],
-    notFit: [
-      "You already bought a theme and want it filled in as-is.",
-      "The lowest bid matters more than what the site wins you.",
-    ],
-  },
-
   assurance: {
-    heading: "Absolute transparency",
+    heading: "chadworks tenets of transparency",
     items: [
-      "The design files and the finished site are yours outright, down to the working files.",
-      "Every build includes two weeks of free fixes after launch.",
-      "A straight answer on fit before anyone spends a dollar.",
-      "No lock-in. Everything lives in your name, yours to take anywhere you go.",
+      "Everything I create for you is legally yours, upon final payment.",
+      "Every project includes at least one week of post-launch coverage.",
+      "No nonsense or fluff. Direct questions and direct answers, in the name of protecting your business goals.",
+      "No lock-in, no long-term contracts or chadworks' proprietary technology or platforms that hold your project hostage should you want to leave.",
     ],
   },
 
@@ -384,11 +329,11 @@ export const webDesign: Service = {
       },
       {
         title: "A straight answer",
-        body: "I'll tell you straight whether chadworks is the right fit, with a rough shape and cost, no pressure.",
+        body: "I'll tell you straight whether chadworks is the right fit, with a rough scope and ballpark estimate, and no pressure to commit.",
       },
       {
         title: "A scoped plan",
-        body: "If it's a fit, you get a clear written scope and timeline before any work or payment starts.",
+        body: "You get a granular and detailed proposal-agreement, outlining the scope of the project, the fees involved and the expectations of both parties.",
       },
       {
         title: "Direction, early",

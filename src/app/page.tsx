@@ -13,24 +13,24 @@ import type { ReactNode, CSSProperties } from "react";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { WaveText } from "@/components/WaveText";
-import { SpeedDemon } from "@/components/SpeedDemon";
 import { emphasize } from "@/lib/emphasize";
 import { MANIFESTO } from "@/lib/manifesto";
 import {
   PageComposer,
   KeyFactsCapsule,
   ProblemCapsule,
-  MadeByCapsule,
-  QualificationCapsule,
   FaqCapsule,
-  ContactCapsule,
+  MainContactCapsule,
+  PortfolioShowcaseCapsule,
+  AboutChadCapsule,
+  RatesCapsule,
+  FitCapsule,
 } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import HomeHero from "@/components/HomeHero";
 import { GemstoneCW } from "@/components/GemstoneCW";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
 import { PixelDivider } from "@/components/PixelDivider";
-import { GemstoneMark } from "@/components/GemstoneMark";
 import { GlobalMotionToggle } from "@/components/GlobalMotionToggle";
 import {
   BrowserChip,
@@ -54,9 +54,6 @@ import {
   PinChipDark,
 } from "@/components/art/VisibilityHeroArt";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
-import { FeaturedShowcase } from "@/components/portfolio/FeaturedShowcase";
-import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
-import type { LeadFormConfig } from "@/lib/forms";
 
 // The Websites + Visibility chip sets COMBINED into one stream (copied from the
 // /websites/ and /visibility/ hero art). They share a single sticky column on
@@ -128,7 +125,6 @@ const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }
 // "Read the manifesto" CTA into /about/.
 
 const PAGE_URL = `${SITE_URL}/`;
-const EMAIL = "chad@chadworks.co";
 const TITLE = "chadworks | Websites and visibility, built by one person";
 const DESCRIPTION =
   "Websites and visibility, designed and developed by one person, and owned outright by the business it serves.";
@@ -196,78 +192,6 @@ const PROBLEM = {
   },
 };
 
-// ---- PORTFOLIO -- the flagship piece + a trimmed archive (real client sites). ----
-const FEATURED = {
-  slug: "risingcompass",
-  alt: "Rising Compass website, designed and developed by chadworks",
-  url: "risingcompass.net",
-  label: "Rising Compass",
-  href: "https://risingcompass.net",
-};
-
-const ARCHIVE: ArchiveItem[] = [
-  {
-    key: "aac",
-    slug: "aac",
-    alt: "AAC Event Catering website, designed and developed by chadworks",
-    url: "aaceventcatering.com",
-    label: "AAC Event Catering",
-    href: "https://aaceventcatering.com",
-    blurb:
-      "A catering brand that needed to look as polished as the events it runs. Booking-ready, and built to win the search.",
-  },
-  {
-    key: "edenscapes",
-    slug: "edenscapes",
-    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
-    url: "eden-scapes.com",
-    label: "EdenScapes",
-    href: "https://eden-scapes.com/japanese-garden-design-installation/",
-    blurb:
-      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
-  },
-  {
-    key: "massagepros",
-    slug: "massagepros",
-    alt: "Massage Professionals website, designed and developed by chadworks",
-    url: "massageprofessionalsllc.com",
-    label: "Massage Professionals",
-    href: "https://massageprofessionalsllc.com",
-    blurb:
-      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
-  },
-  {
-    key: "rozariolaw",
-    slug: "rozariolaw",
-    alt: "Rozario Law website, designed and developed by chadworks",
-    url: "rozariolaw.com",
-    label: "Rozario Law",
-    href: "https://rozariolaw.com",
-    blurb:
-      "A law practice has seconds to earn trust. This one opens steady and serious, and tells a visitor exactly what to do next.",
-  },
-  {
-    key: "thorobird",
-    slug: "thorobird",
-    alt: "Thorobird website, designed and developed by chadworks",
-    url: "thorobird.com",
-    label: "Thorobird",
-    href: "https://thorobird.com",
-    blurb:
-      "A brand site with a distinct point of view, custom built so it carries the personality the business actually has.",
-  },
-  {
-    key: "chadlewine",
-    slug: "chadlewine",
-    alt: "Chad Lewine website, designed and developed by chadworks",
-    url: "chadlewine.com",
-    label: "Chad Lewine",
-    href: "https://chadlewine.com",
-    blurb:
-      "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
-  },
-];
-
 // ---- FAQ -- a focused single-band accordion. ----
 const FAQS = [
   {
@@ -304,58 +228,6 @@ const FAQS = [
 ];
 
 // ---- CONTACT -- the dark band, quick and detailed forms (mirrors /contact/). ----
-const QUICK: LeadFormConfig = {
-  source: "one-pager (quick)",
-  subject: "New Quick Contact from the One Pager (chadworks)",
-  submitLabel: "Send message to Chad",
-  successMessage:
-    "Got it. This lands straight in my inbox and I read every one myself. You'll hear back within a day.",
-  fields: [
-    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
-    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
-    {
-      kind: "textarea",
-      name: "message",
-      label: "What's going on?",
-      required: true,
-      rows: 4,
-      placeholder: "The business, and where it's stuck right now.",
-    },
-  ],
-};
-
-const DETAILED: LeadFormConfig = {
-  source: "one-pager (detailed)",
-  subject: "New Detailed Inquiry from the One Pager (chadworks)",
-  submitLabel: "Send message to Chad",
-  successMessage:
-    "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with a straight answer on the number.",
-  fields: [
-    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
-    { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
-    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
-    { kind: "text", name: "business", label: "Business Name", span: "half" },
-    { kind: "url", name: "current_url", label: "Existing domain or URL", autocomplete: "url", placeholder: "yourdomain.com" },
-    {
-      kind: "textarea",
-      name: "background",
-      label: "Provide some background info on you or the org",
-      required: true,
-      rows: 4,
-      placeholder: "Who you are, and what the business or organization does.",
-    },
-    {
-      kind: "textarea",
-      name: "details",
-      label: "Describe the idea or scope of the project",
-      required: true,
-      rows: 5,
-      placeholder: "What the site needs to do, and where it's stuck today.",
-    },
-    { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
-  ],
-};
-
 export default function Home() {
   return (
     <PageComposer>
@@ -471,146 +343,26 @@ export default function Home() {
       {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
       <ProblemCapsule problem={PROBLEM} />
 
-      {/* 5. PORTFOLIO -- a centered titlebar: the section name flanked by two
-          mini, counter-rotating CW gemstones (the same cut crystal as the hero
-          mark, at badge scale). Then the flagship piece and the archive grid. */}
-      <SectionShell className="cw-port-titlebar">
-        <div className="cw-port-titlebar__row">
-          <GemstoneMark spinDir={1} className="cw-port-titlebar__gem" />
-          <h2 className="cw-port-titlebar__title">chadworks&trade; Portfolio</h2>
-          <GemstoneMark spinDir={1} className="cw-port-titlebar__gem" />
-        </div>
-      </SectionShell>
-
-      {/* 5a. The flagship piece, then the archive grid. */}
-      <SectionShell className="cw-port-feat-shell">
-        <FeaturedShowcase
-          primary={FEATURED}
-          eyebrow="Featured build"
-          heading="Rising Compass"
-          headingAs="h3"
-          ctaUnderLede
-          lede="The Rising Compass is a ground-up, custom web app that tracks and measures the messages contained in the lyrics of the world's most popular songs. I built and manage this 100%, top to bottom."
-        />
-      </SectionShell>
-      <SectionShell className="cw-port-archive-shell">
-        <h2 className="cw-port-archive__heading">More sites I&apos;ve custom built</h2>
-        <p className="svc-lede measure-prose">
-          A wider sample of client work. Switch any card between desktop, tablet,
-          and mobile, or open it live. Each was designed and developed by one
-          person, start to finish.
-        </p>
-        <ArchiveGrid items={ARCHIVE} />
-        <div className="cw-port-archive__cta-row">
-          <Link href="/portfolio/" className="svc-btn">
-            <span className="svc-btn__label">View full portfolio</span>
-            <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
-              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-            </svg>
-          </Link>
-        </div>
-      </SectionShell>
+      {/* 5. PORTFOLIO -- the full showroom (gemstone titlebar, flagship piece,
+          archive grid + CTA), now the shared global PortfolioShowcaseCapsule so
+          the homepage and the service pages render it identically. */}
+      <PortfolioShowcaseCapsule />
 
       {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
           in on scroll. Sits between the portfolio and the about block. */}
       <PixelDivider />
 
-      {/* 6. About Chad -- the human block. */}
-      <MadeByCapsule
-        variant="split"
-        made={{
-          heading: (
-            <>
-              the <em>Chad</em> behind chadworks
-            </>
-          ),
-          img: "/people/chad-cutout.webp",
-          imgAlt: "Chad Lewine, the person behind chadworks",
-          captionMain: "Yes, this is the whole company.",
-          captionSub: "(That's the point.)",
-          manifesto: [
-            { lead: "Clear communication.", aside: "(no fluff, no fuss)" },
-            { lead: "Transparent fees and terms.", aside: "(always)" },
-            { lead: "Based in Philadelphia.", aside: "(U.S. made)" },
-            {
-              lead: "Blazing fast turnaround.",
-              aside: (
-                <>
-                  (<SpeedDemon href="https://www.youtube.com/watch?v=l039y9FaIjc">speed demon</SpeedDemon>)
-                </>
-              ),
-            },
-          ],
-          negation: [
-            "No subcontractors.",
-            "No offshore handoffs.",
-            "No invented case studies.",
-            "No pretending I'm an agency or that the web is a perfect system.",
-          ],
-          close: "Trends come and go and the web changes. My values don't.",
-          sig: "Chad Lewine",
-        }}
-      />
+      {/* 6. About Chad -- the human block, now the shared global AboutChadCapsule
+          so the homepage and the service pages render the same founder section. */}
+      <AboutChadCapsule />
 
-      {/* 6a. Good fit -- who I build for and who I don't, so the wrong-fit
-          noise filters itself out before anyone reaches out. */}
-      <QualificationCapsule
-        qualification={{
-          heading: "Who I Work With",
-          fitLabel: "chadworks is for you if:",
-          notLabel: "Probably not if:",
-          fit: [
-            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost right.",
-            "You see your project as an integral part of your initiative, not just the brochure for it.",
-            "You're building something you intend to keep for a long time.",
-          ],
-          notFit: [
-            "You're on a strict, low budget. In the Venn diagram of good, fast, and cheap, I'm fast and good.",
-            "You want a template with your logo dropped in. Plenty of builders do that, but I'm not one of them.",
-            "You're building this as a hobby, not a business, product or organization.",
-          ],
-        }}
-      />
+      {/* 6a. Good fit -- who I build for and who I don't, now the shared global
+          FitCapsule so the homepage and the service pages match. */}
+      <FitCapsule />
 
-      {/* 6b. Pricing -- the real, public rates. Hourly + flat on top, audit +
-          monthly below (2x2). Numbers from the rates page; shown in full. */}
-      <SectionShell full className="cw-pricing">
-        <div className="cw-pricing__head">
-          <p className="eyebrow">What it costs</p>
-          <h2 className="cw-pricing__heading">Transparent rates.</h2>
-        </div>
-        <div className="cw-pricing__grid">
-          <div className="cw-price-card panel">
-            <p className="cw-price-card__label">Hourly</p>
-            <p className="cw-price-card__figure">$315<span className="cw-price-card__unit"> / hour</span></p>
-            <p className="cw-price-card__note">
-              I bill increments of 10 minutes. No &quot;1 hour minimum&quot;
-              invoices.
-            </p>
-          </div>
-          <div className="cw-price-card panel">
-            <p className="cw-price-card__label">Flat-rate builds</p>
-            <p className="cw-price-card__figure">From $3,200</p>
-            <p className="cw-price-card__note">
-              Most sites land around the $5,000 mark. That represents a full,
-              custom build that you own outright.
-            </p>
-          </div>
-        </div>
-        <p className="cw-pricing__disclaimer">
-          Flat rates shown are general estimates
-          for information only, not a formal quote or binding offer. Your actual
-          price is set in a written proposal before any work begins.
-        </p>
-        <div className="cw-pricing__cta">
-          <Link href="/rates/" className="svc-btn cw-pricing__cta-btn">
-            <span className="svc-btn__label">View rate details</span>
-            <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
-              <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-            </svg>
-          </Link>
-        </div>
-      </SectionShell>
+      {/* 6b. Pricing -- the real, public rates, now the shared global
+          RatesCapsule so the homepage and the service pages match. */}
+      <RatesCapsule />
 
       {/* 7. FAQs -- inverted dark band (septic-page treatment). */}
       <FaqCapsule
@@ -628,20 +380,7 @@ export default function Home() {
       </SectionShell>
 
       {/* 8. Contact -- the dark band with the quick/detailed form. */}
-      <ContactCapsule
-        scheme="inverted"
-        heading="Tell me about your project."
-        intro="Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small."
-        emailLabel="Email directly"
-        email={EMAIL}
-        phoneLabel="Call directly"
-        phone="(215) 872-1240"
-        locationNote="Based in Pennsylvania, working with businesses across the country and beyond."
-        quick={QUICK}
-        detailed={DETAILED}
-        quickLabel="Quick message"
-        detailedLabel="Detailed inquiry"
-      />
+      <MainContactCapsule />
     </PageComposer>
   );
 }
