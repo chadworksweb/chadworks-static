@@ -360,7 +360,7 @@ export default function Home() {
       </section>
 
       {/* 3. The "at a glance" bands (computed dark -> lavender arc). */}
-      <KeyFactsCapsule heading={"chadworks™ AT A GLANCE"} facts={FACTS} />
+      <KeyFactsCapsule heading={"chadworks™ AT A GLANCE"} facts={FACTS} introClassName="cw-home-glance" />
 
       {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
       <ProblemCapsule problem={PROBLEM} />

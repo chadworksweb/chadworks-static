@@ -15,16 +15,22 @@ export type KeyFactsCapsuleProps = {
   // statement carrying an inline tooltip). W renders all three.
   facts: (Writable | ReactNode)[];
   outlierFacts?: number[];
+  // Optional extra class on the intro band, for page-scoped tweaks.
+  introClassName?: string;
 };
 
 export function KeyFactsCapsule({
   heading,
   facts,
   outlierFacts,
+  introClassName,
 }: KeyFactsCapsuleProps) {
   return (
     <>
-      <SectionShell full className="svc-statements-intro">
+      <SectionShell
+        full
+        className={`svc-statements-intro${introClassName ? ` ${introClassName}` : ""}`}
+      >
         <h2 className="svc-statements__heading">{heading ?? "At a glance"}</h2>
       </SectionShell>
       {facts.map((fact, i) => {

@@ -785,6 +785,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* Key facts band (lavender full-width) */
 /* Key facts -- luxury statement panels (each fact its own full-width band). */
 .svc-statements-intro { padding-bottom: 0; position: relative; z-index: 1; }
+/* Homepage only: nudge the "at a glance" line down 1px past the shared 6px. */
+.cw-home-glance .svc-statements__heading { top: 7px; }
 .svc-statements__heading {
   position: relative;
   top: 6px;                               /* nudge the letters down toward the first band */
@@ -6183,10 +6185,10 @@ html.cw-motion-paused *::after {
   color: inherit;
   text-decoration: none;
 }
-/* Launch control: an unlaunched sub-service title shows greyed, not linked. */
+/* Launch control: an unlaunched sub-service title stays the normal dark-blue
+   heading color -- just not linked (no hover wave, not clickable). */
 .cw-lane-sub__sealed {
-  color: var(--text-tertiary);
-  opacity: 0.5;
+  color: var(--text-primary);
 }
 .cw-lane-sub__body {
   margin-top: 0.3rem;
