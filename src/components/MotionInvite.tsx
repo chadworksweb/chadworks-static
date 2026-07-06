@@ -56,8 +56,11 @@ export function MotionInvite() {
           You have reduced motion turned on
         </h2>
         <p className="cw-motion-invite__body">
-          So this site is holding still. It was built to move. Turn it on to see
-          the full experience, or keep things calm.
+          The chadworks&trade; website was designed to showcase cutting-edge web
+          design and development through ambient and gentle motion, but we
+          respect your device&apos;s &ldquo;reduce motion&rdquo; settings. I
+          encourage you to click the button below to see the site in its
+          intended state.
         </p>
         <div className="cw-motion-invite__actions">
           <button
