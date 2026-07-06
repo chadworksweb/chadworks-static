@@ -10,6 +10,7 @@ import { ContactOrbs } from "@/components/art/ContactOrbs";
 import { SectionShell } from "@/components/capsules/SectionShell";
 
 export type ContactCapsuleProps = {
+  id?: string; // anchor target (e.g. "contact" for the header Contact button)
   heading: ReactNode;
   intro: ReactNode; // the "two ways in" note
   emailLabel: string;
@@ -26,6 +27,7 @@ export type ContactCapsuleProps = {
 };
 
 export function ContactCapsule({
+  id,
   heading,
   intro,
   emailLabel,
@@ -39,7 +41,7 @@ export function ContactCapsule({
   detailedLabel,
 }: ContactCapsuleProps) {
   return (
-    <SectionShell full className="band-dark cw-contact">
+    <SectionShell id={id} full className="band-dark cw-contact">
       <ContactOrbs />
       <div className="cw-contact__inner">
         <div className="cw-contact__layout">

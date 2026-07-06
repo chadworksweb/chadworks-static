@@ -12,6 +12,8 @@ import type { Metadata } from "next";
 import type { ReactNode, CSSProperties } from "react";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
+import { LaunchLink } from "@/components/LaunchLink";
 import { WaveText } from "@/components/WaveText";
 import { emphasize } from "@/lib/emphasize";
 import { MANIFESTO } from "@/lib/manifesto";
@@ -108,8 +110,8 @@ const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }
         that are selected and applied based on your specific market situation.
         This is for businesses where being the one the AI names is worth real
         money. Check out these pages too:{" "}
-        <Link href="/show-up-on-chatgpt/">Show Up on ChatGPT</Link> and{" "}
-        <Link href="/advertising-on-chatgpt/">Advertising on ChatGPT</Link>.
+        <LaunchLink href="/show-up-on-chatgpt/">Show Up on ChatGPT</LaunchLink> and{" "}
+        <LaunchLink href="/advertising-on-chatgpt/">Advertising on ChatGPT</LaunchLink>.
       </>
     ),
   },
@@ -210,7 +212,7 @@ const FAQS = [
         structured and schema-rich so classic search and AI assistants can both
         read and recommend them. However, that doesn&apos;t mean you will show up
         for people that aren&apos;t already looking for you by name. Visit{" "}
-        <Link href="/visibility/">Visibility</Link> for more information on that.
+        <LaunchLink href="/visibility/">Visibility</LaunchLink> for more information on that.
       </>
     ),
   },
@@ -221,7 +223,7 @@ const FAQS = [
         A website from chadworks starts at $3,200 but typically crosses the
         $5,000 mark. A web app or more involved build beyond a brochure website
         will easily break $10,000. Visit my{" "}
-        <Link href="/rates/">rates page</Link> for more info.
+        <LaunchLink href="/rates/">rates page</LaunchLink> for more info.
       </>
     ),
   },
@@ -231,8 +233,14 @@ const FAQS = [
 export default function Home() {
   return (
     <PageComposer>
-      {/* The single, always-sticky motion toggle (top-right). Owns all motion. */}
-      <GlobalMotionToggle />
+      {/* Sticky top-right header actions: a Contact button (default button
+          styling) left of the single always-sticky motion toggle. */}
+      <div className="cw-header-actions">
+        <a href="#contact" className="svc-btn cw-header-actions__contact">
+          <span className="svc-btn__label">Contact</span>
+        </a>
+        <GlobalMotionToggle />
+      </div>
 
       {/* 1. The existing homepage hero (bare: no CTAs, divider stretched). */}
       <HomeHero bare />
@@ -262,9 +270,11 @@ export default function Home() {
           <p className="eyebrow">{MANIFESTO.eyebrow}</p>
           <h2>{MANIFESTO.heading}</h2>
           <p className="svc-lede measure-prose">{MANIFESTO.intro}</p>
-          <Link className="cw-manifesto__cta" href="/about/">
-            Read the manifesto
-          </Link>
+          {isLaunched("/about/") && (
+            <Link className="cw-manifesto__cta" href="/about/">
+              Read the manifesto
+            </Link>
+          )}
         </SectionShell>
       </div>
 
@@ -297,9 +307,13 @@ export default function Home() {
                 {WEBSITE_SUBS.map((s) => (
                   <div className="cw-lane-sub" key={s.title}>
                     <h3 className="cw-lane-sub__title">
-                      <Link href={s.href} className="cw-lane-sub__link">
+                      {isLaunched(s.href) ? (
+                        <Link href={s.href} className="cw-lane-sub__link">
+                          <WaveText text={s.title} />
+                        </Link>
+                      ) : (
                         <WaveText text={s.title} />
-                      </Link>
+                      )}
                     </h3>
                     <p className="cw-lane-sub__body">{emphasize(s.body)}</p>
                   </div>
@@ -322,9 +336,13 @@ export default function Home() {
                 {VISIBILITY_SUBS.map((s) => (
                   <div className="cw-lane-sub" key={s.title}>
                     <h3 className="cw-lane-sub__title">
-                      <Link href={s.href} className="cw-lane-sub__link">
+                      {isLaunched(s.href) ? (
+                        <Link href={s.href} className="cw-lane-sub__link">
+                          <WaveText text={s.title} />
+                        </Link>
+                      ) : (
                         <WaveText text={s.title} />
-                      </Link>
+                      )}
                     </h3>
                     <p className="cw-lane-sub__body">
                       {typeof s.body === "string" ? emphasize(s.body) : s.body}

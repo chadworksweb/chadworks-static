@@ -5868,6 +5868,37 @@ p, li, dd, figcaption { text-wrap: pretty; }
   right: clamp(0.9rem, 2vw, 1.6rem);
   z-index: 60; /* above the sticky header (z 50) */
 }
+/* Header actions cluster: the Contact pill sits left of the motion toggle. The
+   cluster owns the fixed positioning so the two stay aligned as the toggle
+   label swaps (Pause motion <-> Resume motion). */
+.cw-header-actions {
+  position: fixed;
+  top: 1.05rem;
+  right: clamp(0.9rem, 2vw, 1.6rem);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+.cw-header-actions .cw-motion-toggle {
+  position: static;
+  top: auto;
+  right: auto;
+}
+/* Match the Contact pill's height to the motion toggle (same font-size + 1px
+   border, so equal vertical padding = equal height). */
+.cw-header-actions__contact { padding-block: var(--space-2xs); }
+/* Mobile: scale the whole cluster down uniformly from the top-right corner so it
+   pulls away from the wordmark. Two tiers so bigger phones aren't over-shrunk. */
+@media (max-width: 470px) {
+  .cw-header-actions { transform: scale(0.82); transform-origin: right center; }
+}
+@media (max-width: 410px) {
+  .cw-header-actions { transform: scale(0.72); transform-origin: right center; }
+}
+@media (max-width: 370px) {
+  .cw-header-actions { transform: scale(0.6); transform-origin: right center; }
+}
 /* Keep it visible on mobile -- it also drives the canvas loops, which run there
    (the .svc-hero__art-toggle base hides at <=900px; override for this one). */
 @media (max-width: 900px) {

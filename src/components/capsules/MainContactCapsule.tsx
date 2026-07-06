@@ -63,6 +63,7 @@ const DETAILED: LeadFormConfig = {
 export function MainContactCapsule() {
   return (
     <ContactCapsule
+      id="contact"
       scheme="inverted"
       heading="Tell me about your project."
       intro="Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small."
