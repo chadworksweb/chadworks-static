@@ -50,8 +50,18 @@ tar czf - -C out . \
   | ssh "$SERVER" "sudo tar xzf - -C ${DOCROOT} && sudo chmod -R a+rX ${DOCROOT}"
 
 echo "Verifying (${ENV}):"
+# Non-fatal: a stubbed staging (DNS/vhost not live yet) returns 000; the files
+# still synced. Don't let a failed curl abort the deploy.
+set +e
 curl -s -o /dev/null -w '  /            -> %{http_code}\n' "${BASE}/"
 curl -s -o /dev/null -w '  /about/      -> %{http_code}\n' "${BASE}/about/"
 curl -s -o /dev/null -w '  404 (/nope/) -> %{http_code}\n' "${BASE}/__nope__/"
+set -e
 
-echo "Done. Live: ${BASE}/"
+if [ "$ENV" = "staging" ]; then
+  echo "Note: staging.chadworks.co is STUBBED until its DNS A record"
+  echo "      (staging -> 138.197.111.66, GoDaddy) + le-nginx vhost + cert are live."
+  echo "      Files are synced to ${DOCROOT}; the URL will 000 until then."
+fi
+
+echo "Done. Target: ${BASE}/  (${DOCROOT})"
