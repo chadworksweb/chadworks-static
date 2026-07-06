@@ -8,7 +8,7 @@ import { stepColumns } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type ProofCapsuleProps = { proof: Service["proof"] };
+export type ProofCapsuleProps = { proof: NonNullable<Service["proof"]> };
 
 export function ProofCapsule({ proof }: ProofCapsuleProps) {
   return (

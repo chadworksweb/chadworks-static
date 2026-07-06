@@ -1,10 +1,10 @@
 "use client";
 
 // TitleReveal -- art painted through letterforms by cursor comet trails.
-// COPIED from chadlewine src/components/TitleReveal.tsx (COPY, don't rewrite;
+// COPIED from the chad site src/components/TitleReveal.tsx (COPY, don't rewrite;
 // CWS-CREATIVE-ARSENAL: the /about/ signature). Adaptations, kept minimal:
 //  - the mask is invalidated again after the svc-hero entrance animation
-//    settles (the chadlewine source had no entrance transform on its H1, so
+//    settles (the chad-site source had no entrance transform on its H1, so
 //    per-char rects measured at mount were already final there).
 
 import { useEffect, useRef, useCallback } from "react";

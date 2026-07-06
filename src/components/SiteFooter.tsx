@@ -34,6 +34,7 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
   {
     heading: "Situations",
     links: [
+      { href: "/switch/leave-social-media/", label: "Leave Social Media" },
       { href: "/switch/leave-wordpress/", label: "Leave WordPress" },
       { href: "/switch/squarespace-to-static/", label: "Squarespace to Static" },
       { href: "/switch/wix-to-static/", label: "Wix to Static" },

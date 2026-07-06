@@ -3,7 +3,8 @@
 // Every page defines its own comprehensive, customized form as data; the
 // LeadForm engine renders it (rslgo field chrome), validates it (the rslgo
 // main.js rules), and submits it through the LEIT contact form pattern
-// (honeypot + base64 timestamp + JSON POST to /api/send, logged to LEIT
+// (honeypot + base64 timestamp + JSON POST to the central LEIT endpoint
+// leit.libraengine.com/api/forms/submit?site=chadworks, logged to LEIT
 // Turso before Resend delivery). Service pages mount their form in the
 // right half of the CTA section; the contact page mounts the rslgo-style
 // dual form (quick <-> detailed toggle).

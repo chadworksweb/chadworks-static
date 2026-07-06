@@ -2,7 +2,8 @@
 // other page's primary CTA points here. Email + form only (phone/booking is
 // NEEDS-CHAD 3). Signature: the CF "colorburst" glow orbs on the dark band
 // (ContactOrbs) behind the rslgo DualForm (quick <-> detailed). Forms post to
-// /api/send via the LEIT pattern, delivered to chad@chadworks.co. Copy in
+// the central LEIT endpoint (leit.libraengine.com/api/forms/submit?site=chadworks),
+// delivered to chad@chadworks.co. Copy in
 // Chad's public voice, real facts only. JSON-LD: ContactPage + BreadcrumbList.
 
 import type { Metadata } from "next";
@@ -14,7 +15,7 @@ const PAGE_URL = `${SITE_URL}/contact/`;
 const EMAIL = "chad@chadworks.co";
 const TITLE = "Contact chadworks | Talk to the Person Who Builds It";
 const DESCRIPTION =
-  "Get in touch with chadworks. Email chad@chadworks.co or send the form, and it reaches Chad Lewine directly, the person who designs the site and writes the code. Honest read within a day.";
+  "Get in touch with chadworks. Email chad@chadworks.co or send the form, and it reaches Chad directly, the person who designs the site and writes the code. Honest read within a day.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -115,7 +116,7 @@ const contactPageJsonLd = {
     url: SITE_URL,
     email: EMAIL,
     areaServed: "US",
-    founder: { "@type": "Person", name: "Chad Lewine" },
+    founder: { "@type": "Person", name: "Chad" },
     contactPoint: {
       "@type": "ContactPoint",
       email: EMAIL,

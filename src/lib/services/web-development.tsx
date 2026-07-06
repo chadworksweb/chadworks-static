@@ -6,7 +6,7 @@
 //
 // .tsx (not .ts) so the answer-first lede can carry an inline cross-link to
 // the web design page. Copy in Chad's PUBLIC voice
-// (chad-lewine-crystopa-forge-voice-profile.md), run against the humanizing
+// (the chad voice profile), run against the humanizing
 // voice rules. First-person "I", warm. GEO sign-off still pending before ship.
 
 import Link from "next/link";

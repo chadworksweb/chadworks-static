@@ -26,6 +26,7 @@ import {
   ProblemArtCapsule,
   ApproachCapsule,
   PathsCapsule,
+  TiersCapsule,
   ProofCapsule,
   PortfolioCapsule,
   TestimonialsCapsule,
@@ -47,6 +48,7 @@ export type ServiceSlot =
   | "problemArt"
   | "approach"
   | "paths"
+  | "tiers"
   | "proof"
   | "portfolio"
   | "testimonials"
@@ -102,7 +104,8 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     ) : null,
     approach: <ApproachCapsule approach={s.approach} scheme="inverted" />,
     paths: s.paths ? <PathsCapsule paths={s.paths} /> : null,
-    proof: <ProofCapsule proof={s.proof} />,
+    tiers: s.tiers ? <TiersCapsule tiers={s.tiers} /> : null,
+    proof: s.proof ? <ProofCapsule proof={s.proof} /> : null,
     portfolio: s.portfolio ? (
       <PortfolioCapsule portfolio={s.portfolio} slug={s.slug} />
     ) : null,
@@ -135,6 +138,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     "problemArt",
     "approach",
     "paths",
+    "tiers",
     "proof",
     "portfolio",
     "testimonials",

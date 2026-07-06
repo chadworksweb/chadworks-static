@@ -53,9 +53,9 @@ const GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Who actually builds my site?",
-        a: "Chad Lewine, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+        a: "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
         aText:
-          "Chad Lewine, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+          "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
       },
       {
         q: "Do you work with businesses outside Pennsylvania?",

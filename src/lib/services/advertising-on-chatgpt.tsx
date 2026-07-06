@@ -99,7 +99,7 @@ export const advertisingOnChatgpt: Service = {
     close:
       "When you call, I pick up, and I will tell you straight whether your category can even run.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad Lewine, founder of chadworks, who manages your ChatGPT advertising",
+    imgAlt: "Chad, founder of chadworks, who manages your ChatGPT advertising",
     captionMain: "It's me. I run the ads.",
     captionSub: "(Not a media buying floor.)",
     sig: "Chad",

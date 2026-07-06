@@ -6,7 +6,7 @@ import type { CSSProperties } from "react";
 // Analytic radial-ripple shader. Each click spawns an independent expanding
 // ring; the shader sums all active rings into a heightfield and refracts the
 // source image. No PDE, no reflections, no interference past the visible
-// shell. COPIED VERBATIM from chadlewine's MerchRippleCanvas (the canonical
+// shell. COPIED VERBATIM from the chad site's MerchRippleCanvas (the canonical
 // engine) -- only the export identifiers are renamed to RippleCanvas so the
 // rest of the chadworks codebase keeps importing the same names. The earlier
 // chadworks tuning drift (SPEED 0.16 / LIFETIME 6.5) is reverted: those slowed

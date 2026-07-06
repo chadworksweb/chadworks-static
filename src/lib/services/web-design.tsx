@@ -192,6 +192,12 @@ export const webDesign: Service = {
     ],
   },
 
+  price: {
+    heading: "What design costs, plainly",
+    body:
+      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 floor. Most builds settle near $6,200, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.",
+  },
+
   faqLead:
     "The questions buyers actually ask about web design, answered the way I'd answer them on a call. If yours isn't here, ask me directly.",
 

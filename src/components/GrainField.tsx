@@ -7,6 +7,7 @@
 // parked off-screen, reduced-motion renders a single still frame.
 
 import { useEffect, useRef } from "react";
+import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 
 const TILE = 256;
 const FRAME_MS = 150; // ~6.5fps -- slow analog shimmer (Chad: slower)
@@ -59,7 +60,7 @@ export function GrainField() {
       }
     }
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = prefersReducedMotion();
     if (reduced) {
       paint();
       return () => ro.disconnect();
@@ -68,14 +69,20 @@ export function GrainField() {
     let parked = false;
     let last = 0;
     let raf = 0;
+    // Honor the global motion pause -- the static freezes on its last frame
+    // when motion is off, and re-randomizes when it resumes.
+    let motionPaused = isMotionPaused();
     const io = new IntersectionObserver(([entry]) => {
       parked = !entry.isIntersecting;
     });
     io.observe(canvas);
+    const unsubMotion = subscribeMotion((v) => {
+      motionPaused = v;
+    });
 
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
-      if (parked || now - last < FRAME_MS) return;
+      if (parked || motionPaused || now - last < FRAME_MS) return;
       last = now;
       paint();
     };
@@ -85,6 +92,7 @@ export function GrainField() {
       cancelAnimationFrame(raf);
       io.disconnect();
       ro.disconnect();
+      unsubMotion();
     };
   }, []);
 

@@ -23,9 +23,9 @@ import ManifestoSection from "@/components/ManifestoSection";
 import type { LeadFormConfig } from "@/lib/forms";
 
 const PAGE_URL = `${SITE_URL}/about/`;
-const TITLE = "About Chad Lewine: Designing Since Age 11 | chadworks";
+const TITLE = "About Chad: Designing Since Age 11 | chadworks";
 const DESCRIPTION =
-  "chadworks is one person: Chad Lewine, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
+  "chadworks is one person: Chad, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -51,12 +51,12 @@ export const metadata: Metadata = {
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
-  name: "About Chad Lewine",
+  name: "About Chad",
   url: PAGE_URL,
   description: DESCRIPTION,
   mainEntity: {
     "@type": "Person",
-    name: "Chad Lewine",
+    name: "Chad",
     url: PAGE_URL,
     image: `${SITE_URL}/people/chad-cutout.webp`,
     jobTitle: "Web designer and developer",
@@ -190,9 +190,9 @@ export default function AboutPage() {
         className="about-hero"
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
         eyebrow="The person behind chadworks"
-        title="Chad Lewine"
+        title="Chad"
         titleReveal="/about/reveal-art.svg"
-        lede="chadworks is one person. I'm Chad Lewine, designing since age 11 and custom-building websites for 20 years. There's no team behind a curtain and no account manager translating. The person you email is the person who writes the code."
+        lede="chadworks is one person. I'm Chad, designing since age 11 and custom-building websites for 20 years. There's no team behind a curtain and no account manager translating. The person you email is the person who writes the code."
         cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
 
@@ -218,7 +218,7 @@ export default function AboutPage() {
           eyebrow: "The human",
           heading: "It's me, your web guy.",
           img: "/people/chad-cutout.webp",
-          imgAlt: "Chad Lewine, the person behind chadworks",
+          imgAlt: "Chad, the person behind chadworks",
           captionMain: "Yes, this is the whole company.",
           captionSub: "(That's the point.)",
           intro:
@@ -237,7 +237,7 @@ export default function AboutPage() {
           ],
           close:
             "The web has reinvented itself a dozen times since I started. The deal here never changed: you get the person, not a brand wrapper.",
-          sig: "Chad Lewine",
+          sig: "Chad",
           sigMeta: "chadworks (designing since age 11)",
         }}
       />

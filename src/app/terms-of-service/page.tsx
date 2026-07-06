@@ -48,7 +48,7 @@ export default function TermsOfServicePage() {
           <p>
             These Terms of Service govern the web design and development services
             provided by chadworks, a sole-proprietor studio operated by Chad
-            Lewine and based in the Greater Philadelphia area of Pennsylvania
+            and based in the Greater Philadelphia area of Pennsylvania
             (referred to here as &quot;chadworks,&quot; &quot;I,&quot; or
             &quot;me&quot;). By engaging chadworks for a project, you (the
             &quot;client&quot;) agree to these terms.

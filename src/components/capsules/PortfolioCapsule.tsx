@@ -1,5 +1,5 @@
 // PORTFOLIO CAPSULE (optional) -- screenshot shots driven by THE sitewide
-// water-ripple engine (RippleGrid: the chadlewine explore-grid hover effect,
+// water-ripple engine (RippleGrid: the chad-site explore-grid hover effect,
 // called here, never rebuilt per page).
 
 import type { Service } from "@/lib/service";

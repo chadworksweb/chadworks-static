@@ -22,14 +22,14 @@ export const ORG = {
   legalName: "chadworks",
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
-  founder: "Chad Lewine",
+  founder: "Chad",
   sameAs: [] as string[],
 } as const;
 
 export type Lane = "websites" | "visibility" | "design";
 
 // ---------------------------------------------------------------------
-// WRITING PROMPTS -- "prompts only" authoring (ported from chadlewine).
+// WRITING PROMPTS -- "prompts only" authoring (ported from the chad site).
 // A content field holds EITHER finished prose (string / ReactNode) OR a
 // prompt() placeholder. The template renders prompts as visible amber
 // "TO WRITE" blocks (see <Prompt>), so Chad writes the real copy in his
@@ -69,7 +69,7 @@ export type ServiceProof = {
 };
 
 export type ServiceFaq = {
-  // Real question + self-contained answer (Chad-Lewine FAQ method).
+  // Real question + self-contained answer (the chad-site FAQ method).
   q: string;
   a: Writable;
 };
@@ -89,6 +89,35 @@ export type Testimonial = {
   // Real client voice (social proof). quote + who said it. Use real reviews only.
   quote: Writable;
   attribution: Writable;
+};
+
+// --- TIERED OFFER (optional) ------------------------------------------
+// A product-style Situation page (e.g. Leave Social Media / the Greenfield
+// scaled to a small-business buyer) presents ONE attainable entry module plus
+// stackable add-ons. Each add-on can deep-link to its own module page (often a
+// stub during a spike). `price` fields are POSTURE labels, not committed
+// numbers -- honesty rule holds (see buildServiceJsonLd's price-free Offer).
+export type ServiceTierAddOn = {
+  label: string;
+  price: string; // posture label (e.g. "Add-on"), never a fake fixed number
+  detail: Writable;
+  href?: string; // deep-link to the module's own page
+};
+
+export type ServiceTiers = {
+  heading: string;
+  intro?: Writable;
+  entry: {
+    label: string;
+    price: string; // posture label (e.g. "The entry point")
+    priceSub?: string;
+    detail: Writable;
+    includes?: string[];
+    href?: string;
+  };
+  addOnsLabel?: string;
+  addOns: ServiceTierAddOn[];
+  footnote?: Writable; // e.g. spike-placeholder pricing caveat
 };
 
 export type Service = {
@@ -123,7 +152,9 @@ export type Service = {
   // Optional keyword-bearing heading (an <h2> is a GEO signal). Defaults to
   // "At a glance" in the template when a service doesn't set one.
   keyFactsHeading?: string;
-  keyFacts: Writable[];
+  // A fact is finished prose, a TO-WRITE prompt, or inline markup (e.g. a fact
+  // carrying an inline link). The KeyFacts capsule renders all three via <W>.
+  keyFacts: (Writable | ReactNode)[];
   // OPTIONAL: indices of key facts that take the OUTLIER band color (purple
   // accent) instead of the default dark -> light ramp. Used sparingly, when one
   // fact needs to stand apart. The final band is always white (rule 10) and
@@ -155,7 +186,14 @@ export type Service = {
   // --- OPTIONAL funnel: route the reader to sub-options (hub pages) -----
   paths?: { heading: string; intro?: Writable; items: ServicePath[] };
 
-  proof: { heading: string; items: ServiceProof[] };
+  // --- OPTIONAL tiered offer: attainable entry module + stackable add-ons.
+  // Product-style Situation pages only. Absent (and inert) on every existing
+  // page. Renders via TiersCapsule, placed right after `approach`.
+  tiers?: ServiceTiers;
+
+  // OPTIONAL: concrete proof points. Absent on pages that deliberately drop the
+  // "proof" section (e.g. the Leave Social Media spike + its module stubs).
+  proof?: { heading: string; items: ServiceProof[] };
 
   // --- MADE-BY block (ported from the septic page's "Hi, I'm Chad") -----
   // The founder section: photo + caption card, manifesto rows, negation

@@ -14,9 +14,21 @@ const LINKS = [
   { href: "/contact/", label: "Contact" },
 ];
 
+// Routes that carry the bare (brand-only) header instead of the full nav: the
+// homepage plus each individually-relaunched page whose full-nav links would
+// otherwise point at still-sealed pages. Compared without a trailing slash.
+const BARE_ROUTES = new Set([
+  "/",
+  "/show-up-on-chatgpt",
+  "/advertising-on-chatgpt",
+  "/website-design-for-septic-services",
+  "/website-design-for-foundation-repair",
+  "/web-design",
+]);
+
 export default function SiteNav() {
   // Scroll-up-only sticky: hide when scrolling down past a threshold, show on
-  // scroll-up or at the top. Mirrors the chadlewine Nav scroll handler.
+  // scroll-up or at the top. Mirrors the chad-site Nav scroll handler.
   const [hidden, setHidden] = useState(false);
   // Mobile menu (<=900): slide-down panel under the header bar.
   const [open, setOpen] = useState(false);
@@ -36,10 +48,10 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
-  // Homepage (/): the single-scroll home carries the brand only -- no links and
-  // no mobile menu; navigation to the inner pages lives in the footer.
+  // Bare (brand-only) header on the homepage and the relaunched pages -- no
+  // links and no mobile menu; navigation to the inner pages lives in the footer.
   const pathname = usePathname();
-  const bare = pathname === "/";
+  const bare = BARE_ROUTES.has(pathname.replace(/\/+$/, "") || "/");
 
   // Escape closes the open panel.
   useEffect(() => {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { RippleCanvas, type RippleCanvasHandle } from "./RippleCanvas";
 
 // THE SITEWIDE RIPPLE GRID (chadworks). This is the water-ripple
-// orchestration from chadlewine's ExploreGrid copied LINE FOR LINE (the
+// orchestration from the chad site's ExploreGrid copied LINE FOR LINE (the
 // cursor-glow damping, the DROP_GAP_PX wake, the settle-mounted canvases,
 // the pointer plumbing, the no-early-return rule). Only the rendered card
 // markup differs: it renders the chadworks portfolio shot (image + external
@@ -31,7 +31,7 @@ const DROP_GAP_PX = 10;
 // How long a card keeps its water canvas mounted after the last drop. Needs
 // to outlast RippleCanvas's LIFETIME_S so a ring's full animation plays
 // out even if the cursor leaves the card immediately after dropping it.
-// VERBATIM chadlewine ExploreGrid value (reverted from the 6800 drift now
+// VERBATIM chad-site ExploreGrid value (reverted from the 6800 drift now
 // that LIFETIME_S is back to 3.5s -- the canvas unmounts ~2x sooner).
 const SETTLE_MS = 3800;
 
@@ -174,7 +174,7 @@ export function RippleGrid({ items }: Props) {
     <div ref={gridRef} className="svc-shots">
       {items.map((item, idx) => {
         const active = activeIdxs.has(idx);
-        // The image FRAME is the primary click target (matches chadlewine's
+        // The image FRAME is the primary click target (matches the chad site's
         // image-link): the whole thumbnail is clickable, shows a pointer
         // cursor, and gets the hover affordance + "View site" cue.
         const external = item.href?.startsWith("http");

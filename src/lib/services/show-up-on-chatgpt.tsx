@@ -139,7 +139,7 @@ export const showUpOnChatgpt: Service = {
     close:
       "When you call, I pick up. When the audit turns up something ugly, I tell you straight.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad Lewine, founder of chadworks, who runs the AI visibility work",
+    imgAlt: "Chad, founder of chadworks, who runs the AI visibility work",
     captionMain: "I do the audit myself.",
     captionSub: "(Line by line.)",
     sig: "Chad",

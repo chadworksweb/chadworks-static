@@ -75,9 +75,9 @@ const ARCHIVE: ArchiveItem[] = [
   {
     key: "chadlewine",
     slug: "chadlewine",
-    alt: "Chad Lewine website, designed and developed by chadworks",
+    alt: "chadlewine.com website, designed and developed by chadworks",
     url: "chadlewine.com",
-    label: "Chad Lewine",
+    label: "Chad",
     href: "https://chadlewine.com",
     blurb:
       "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
