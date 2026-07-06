@@ -18,8 +18,8 @@ export function RatesCapsule() {
           <p className="cw-price-card__label">Hourly</p>
           <p className="cw-price-card__figure">$315<span className="cw-price-card__unit"> / hour</span></p>
           <p className="cw-price-card__note">
-            I bill increments of 10 minutes. No &quot;1 hour minimum&quot;
-            invoices.
+            I work incredibly fast. I bill increments of 10 minutes. No
+            &quot;1 hour minimum&quot; invoices.
           </p>
         </div>
         <div className="cw-price-card panel">
