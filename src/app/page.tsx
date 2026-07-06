@@ -312,7 +312,9 @@ export default function Home() {
                           <WaveText text={s.title} />
                         </Link>
                       ) : (
-                        <WaveText text={s.title} />
+                        <span className="cw-lane-sub__sealed">
+                          <WaveText text={s.title} />
+                        </span>
                       )}
                     </h3>
                     <p className="cw-lane-sub__body">{emphasize(s.body)}</p>
@@ -341,7 +343,9 @@ export default function Home() {
                           <WaveText text={s.title} />
                         </Link>
                       ) : (
-                        <WaveText text={s.title} />
+                        <span className="cw-lane-sub__sealed">
+                          <WaveText text={s.title} />
+                        </span>
                       )}
                     </h3>
                     <p className="cw-lane-sub__body">

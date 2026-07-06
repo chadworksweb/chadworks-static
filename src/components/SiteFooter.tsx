@@ -81,29 +81,33 @@ export default function SiteFooter() {
               chad@chadworks.co
             </a>
           </div>
-          {/* Sealed launch: the not-yet-shipped links are dimmed + covered by a
-              "working on it" overlay whose action anchors to the homepage contact
-              form. Dead links are aria-hidden + untabbable; relaunched links
-              (live) stay real and reachable, lifted above the overlay so they
-              punch a lit hole through it. Headings link to sealed hubs, so they
-              stay dead too. Remove `is-wip` (+ overlay) to relight the whole
-              footer once every inner page ships. */}
-          <div className="site-footer__links is-wip">
+          {/* Launch control: launched links are live; unlaunched ones render as
+              greyed, non-clickable text (a heading whose hub is unlaunched is a
+              plain label). Driven entirely by launch.ts. */}
+          <div className="site-footer__links">
             <div className="site-footer__linkgrid">
               {COLUMNS.map((col) => (
                 <div key={col.heading} className="site-footer__col">
-                  <p className="site-footer__heading" aria-hidden="true">
-                    {col.href ? <Link href={col.href} tabIndex={-1}>{col.heading}</Link> : col.heading}
+                  <p className="site-footer__heading">
+                    {col.href && isLaunched(col.href) ? (
+                      <Link href={col.href}>{col.heading}</Link>
+                    ) : (
+                      col.heading
+                    )}
                   </p>
                   <ul className="site-footer__list">
                     {col.links.map((l) =>
                       isLaunched(l.href) ? (
-                        <li key={l.href} className="site-footer__item is-live">
-                          <Link href={l.href} className="site-footer__livelink">{l.label}</Link>
+                        <li key={l.href}>
+                          <Link href={l.href}>{l.label}</Link>
                         </li>
                       ) : (
-                        <li key={l.href} className="site-footer__item is-dead" aria-hidden="true">
-                          <Link href={l.href} tabIndex={-1}>{l.label}</Link>
+                        <li
+                          key={l.href}
+                          className="site-footer__item--sealed"
+                          aria-hidden="true"
+                        >
+                          {l.label}
                         </li>
                       )
                     )}
@@ -111,21 +115,21 @@ export default function SiteFooter() {
                 </div>
               ))}
             </div>
-            <div className="site-footer__wip">
-              <p className="site-footer__wip-note">Working on it</p>
-              <a className="svc-btn site-footer__wip-cta" href="/#contact">
-                <span className="svc-btn__label">Get in touch</span>
-              </a>
-            </div>
           </div>
         </nav>
         <div className="site-footer__legal">
           <span>&copy; {new Date().getFullYear()} chadworks&trade;</span>
-          {/* Isolation launch: the legal pages are not live yet, so the labels
-              stay as plain text (no dead links) until those pages ship. */}
           <span className="site-footer__legal-links">
-            <span>Terms of Service</span>
-            <span>Privacy Policy</span>
+            {isLaunched("/terms-of-service/") ? (
+              <Link href="/terms-of-service/">Terms of Service</Link>
+            ) : (
+              <span className="site-footer__item--sealed">Terms of Service</span>
+            )}
+            {isLaunched("/privacy-policy/") ? (
+              <Link href="/privacy-policy/">Privacy Policy</Link>
+            ) : (
+              <span className="site-footer__item--sealed">Privacy Policy</span>
+            )}
           </span>
         </div>
       </div>

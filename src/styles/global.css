@@ -519,66 +519,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
   gap: var(--space-lg);
   padding-bottom: var(--space-lg);
 }
-/* The four sitemap columns, grouped so the launch-control "working on it"
-   overlay can cover exactly this block (not the brand column or the legal row). */
-.site-footer__links { position: relative; }
+/* The four sitemap columns. */
 .site-footer__linkgrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-lg);
 }
-/* Dim + freeze the DEAD links/headings only (per element, not the whole grid --
-   a grid-level opacity would trap the live links in a stacking context below the
-   overlay and they could not punch through). */
-.site-footer__links.is-wip .site-footer__heading,
-.site-footer__links.is-wip .site-footer__item.is-dead {
-  opacity: 0.3;
-  filter: grayscale(1);
+/* Launch control: an unlaunched link renders as greyed, non-clickable text
+   (no overlay). Launched links use the normal .site-footer__list a styling. */
+.site-footer__item--sealed {
+  color: var(--text-tertiary);
+  opacity: 0.45;
   pointer-events: none;
   user-select: none;
-}
-/* Launched links: lifted above the frosted overlay and lit as a carved-out chip
-   so they read as a hole punched through the "working on it" panel. */
-.site-footer__links.is-wip .site-footer__item.is-live {
-  position: relative;
-  z-index: 3;
-}
-.site-footer__livelink {
-  display: inline-block;
-  background: var(--bg-base);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 0.1rem 0.55rem;
-  color: var(--accent);
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(36, 57, 137, 0.18);
-}
-.site-footer__livelink:hover {
-  background: var(--accent);
-  color: #fff;
-}
-.site-footer__wip {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-sm);
-  text-align: center;
-  padding: var(--space-md) var(--space-lg);
-  background: rgba(237, 231, 246, 0.6);
-  border: 1px solid var(--accent);
-  border-radius: var(--radius);
-  box-shadow: 0 12px 30px rgba(36, 57, 137, 0.16);
-}
-.site-footer__wip-note {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--accent);
 }
 /* Column 1: corporate branding -- the frozen CW gemstone, wordmark, tagline,
    and direct contact. */
@@ -6229,6 +6182,11 @@ html.cw-motion-paused *::after {
 .cw-lane-sub__link {
   color: inherit;
   text-decoration: none;
+}
+/* Launch control: an unlaunched sub-service title shows greyed, not linked. */
+.cw-lane-sub__sealed {
+  color: var(--text-tertiary);
+  opacity: 0.5;
 }
 .cw-lane-sub__body {
   margin-top: 0.3rem;
