@@ -33,11 +33,14 @@ import {
   ChatgptStatGrid,
   ChatgptPricingDuo,
 } from "@/components/chatgpt/ChatgptArtSections";
+import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  // Launch-driven: indexed only while launched (see launch.ts).
+  robots: { index: isLaunched("/show-up-on-chatgpt/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,

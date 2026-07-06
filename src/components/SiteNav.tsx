@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { WaveText } from "@/components/WaveText";
+import { isLaunched } from "@/lib/launch";
 
 const LINKS = [
   { href: "/websites/", label: "Websites" },
@@ -13,18 +14,6 @@ const LINKS = [
   { href: "/rates/", label: "Rates" },
   { href: "/contact/", label: "Contact" },
 ];
-
-// Routes that carry the bare (brand-only) header instead of the full nav: the
-// homepage plus each individually-relaunched page whose full-nav links would
-// otherwise point at still-sealed pages. Compared without a trailing slash.
-const BARE_ROUTES = new Set([
-  "/",
-  "/show-up-on-chatgpt",
-  "/advertising-on-chatgpt",
-  "/website-design-for-septic-services",
-  "/website-design-for-foundation-repair",
-  "/web-design",
-]);
 
 export default function SiteNav() {
   // Scroll-up-only sticky: hide when scrolling down past a threshold, show on
@@ -48,10 +37,11 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
-  // Bare (brand-only) header on the homepage and the relaunched pages -- no
-  // links and no mobile menu; navigation to the inner pages lives in the footer.
+  // Bare header (brand only -- no links, no mobile menu) on the homepage and any
+  // launched page, whose full-nav links would otherwise point at sealed pages;
+  // navigation to the inner pages lives in the footer. Driven by launch.ts.
   const pathname = usePathname();
-  const bare = BARE_ROUTES.has(pathname.replace(/\/+$/, "") || "/");
+  const bare = isLaunched(pathname);
 
   // Escape closes the open panel.
   useEffect(() => {

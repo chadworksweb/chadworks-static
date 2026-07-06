@@ -46,11 +46,14 @@ import { FoundationBrandKit, FoundationSampleCopy } from "@/components/foundatio
 import { FoundationVisibility } from "@/components/foundation/FoundationVisibility";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
 import { FoundationOthers } from "@/components/foundation/FoundationOthers";
+import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  // Launch-driven: indexed only while launched (see launch.ts).
+  robots: { index: isLaunched("/website-design-for-foundation-repair/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,

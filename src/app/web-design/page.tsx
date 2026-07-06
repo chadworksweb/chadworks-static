@@ -5,15 +5,15 @@ import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
 import { webDesign as service } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { ProcessCapsule, AssuranceCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
-  // Live: overrides the site-wide noindex default (see layout.tsx). Kept in sync
-  // with the sitemap (this slug is now in `routes`, not HELD_FOR_RELAUNCH).
-  robots: { index: true, follow: true },
+  // Launch-driven: indexed only while launched (see launch.ts).
+  robots: { index: isLaunched("/web-design/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,

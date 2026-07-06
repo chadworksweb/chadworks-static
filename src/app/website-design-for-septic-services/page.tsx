@@ -41,11 +41,14 @@ import { SepticBrandKit, SepticSampleCopy } from "@/components/septic/SepticBran
 import { SepticVisibility } from "@/components/septic/SepticVisibility";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
 import { SepticOthers } from "@/components/septic/SepticOthers";
+import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  // Launch-driven: indexed only while launched (see launch.ts).
+  robots: { index: isLaunched("/website-design-for-septic-services/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,
