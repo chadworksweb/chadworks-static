@@ -14,7 +14,17 @@
   font-family: var(--font-body, system-ui, sans-serif);
   box-shadow: 0 -10px 34px rgba(36, 57, 137, 0.14);
   animation: cw-consent-rise 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* The homepage matrix (CodeFall) hides the native cursor over the hero by
+     setting `cursor:none` on <body>; cursor inherits, so this fixed bar would
+     inherit the hidden cursor. Force a real cursor back over the whole bar. */
+  cursor: default;
 }
+
+/* Interactive bits get their own pointer, overriding the inherited none. */
+.cw-consent a,
+.cw-consent__toggle,
+.cw-consent__toggle input,
+.cw-consent label { cursor: pointer; }
 
 @keyframes cw-consent-rise {
   from { transform: translateY(100%); opacity: 0; }
