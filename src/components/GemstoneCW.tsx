@@ -22,7 +22,7 @@
 // =====================================================================
 
 import { useEffect, useRef } from "react";
-import { isMotionPaused, subscribeMotion } from "@/lib/motion";
+import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 import {
   M4,
   buildCW,
@@ -229,7 +229,7 @@ export function GemstoneCW() {
     ro.observe(canvas);
     resize();
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     let raf = 0;
     let running = false;
     let t0 = 0,

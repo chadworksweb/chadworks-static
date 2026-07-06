@@ -14,7 +14,7 @@
 // =====================================================================
 
 import { useEffect, useRef, useState } from "react";
-import { isMotionPaused, subscribeMotion } from "@/lib/motion";
+import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 
 // Brand display-gradient stops (match PageTransition / --grad-deep/mid/peak).
 const STOPS = [
@@ -70,7 +70,7 @@ export function PixelDivider() {
     const row = rowRef.current;
     if (!root || !row || cells.length === 0) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     const nodes = Array.from(row.children) as HTMLElement[];
     const TAU = 160; // ms time-constant -> ~750ms to settle after scroll stops
 

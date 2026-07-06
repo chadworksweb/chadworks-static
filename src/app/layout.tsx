@@ -4,6 +4,8 @@ import "@/styles/global.css";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 import { PageTransition } from "@/components/PageTransition";
+import { MotionTogglePocket } from "@/components/MotionTogglePocket";
+import { MotionInvite } from "@/components/MotionInvite";
 import { buildOrgJsonLd, SITE_URL } from "@/lib/service";
 
 // chadworks brand faces. Self-hosted at build time by next/font -- works with
@@ -56,8 +58,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${display.variable} ${body.variable} ${mono.variable}`}
+      // The reduced-motion boot script (in <body>) may add `cw-force-motion`
+      // here before hydration; suppress the expected className mismatch.
+      suppressHydrationWarning
     >
       <body>
+        {/* Reduced-motion override (see lib/motion.ts). Runs before paint so a
+            session that opted into full motion re-adds `cw-force-motion` on
+            <html> ahead of the CSS reduced-motion gates and the JS loops. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('cw-force-motion')==='1'){document.documentElement.classList.add('cw-force-motion')}}catch(e){}",
+          }}
+        />
         {/* Site-wide Organization schema (GEO checklist 2): one consistent
             provider entity in the static HTML of every page. */}
         <script
@@ -68,6 +82,8 @@ export default function RootLayout({
         <main>{children}</main>
         <SiteFooter />
         <PageTransition />
+        <MotionTogglePocket />
+        <MotionInvite />
       </body>
     </html>
   );

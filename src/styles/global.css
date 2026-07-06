@@ -126,7 +126,7 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
    reset must be INSTANT (the old smooth scroll-to-top read as a jump from the
    bottom). Reduced-motion users get instant scroll everywhere. */
 html.cw-scroll-instant { scroll-behavior: auto; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media (prefers-reduced-motion: reduce) { html:not(.cw-force-motion) { scroll-behavior: auto; } }
 /* 100vw includes the scrollbar, and full-bleed art anchors to it -- clip the
    stray horizontal overflow on BOTH roots (DEVELOPMENT-STANDARDS, iOS gutter). */
 html, body { overflow-x: clip; }
@@ -392,7 +392,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Per-letter staggered COLOR wave on hover: each letter pulses to the deep
    purple and back, offset by its index, so the pulse travels across the word.
-   (chadlewine logo-text-shimmer, staggered into a traveling wave.) */
+   (chad-site logo-text-shimmer, staggered into a traveling wave.) */
 .nav-wave { display: inline-flex; }
 .nav-wave__letter {
   display: inline-block;
@@ -419,8 +419,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   35%      { color: var(--nav-link); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__links a:hover .nav-wave__letter,
-  .cw-lane-sub__link:hover .nav-wave__letter { animation: none; color: var(--nav-link-pulse); }
+  html:not(.cw-force-motion) {
+    .site-nav__links a:hover .nav-wave__letter,
+    .cw-lane-sub__link:hover .nav-wave__letter { animation: none; color: var(--nav-link-pulse); }
+  }
 }
 
 /* PARKED for later use -- per-letter MOTION wave (vertical bob). Not applied.
@@ -492,7 +494,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .site-nav__panel-inner a:hover { color: var(--nav-link-pulse); }
 @media (prefers-reduced-motion: reduce) {
-  .site-nav__panel { transition: none; }
+  html:not(.cw-force-motion) {
+    .site-nav__panel { transition: none; }
+  }
 }
 
 .site-footer {
@@ -621,7 +625,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-btn__arrow { position: relative; z-index: 1; }
 .svc-btn__arrow { width: 1.4em; height: 1em; fill: currentColor; flex-shrink: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .svc-btn::before { transition: none; }
+  html:not(.cw-force-motion) {
+    .svc-btn::before { transition: none; }
+  }
 }
 
 /* =====================================================================
@@ -732,8 +738,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .svc-hero__art-toggle { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .svc-hero__art,
-  .svc-hero__art-toggle { display: none; }
+  html:not(.cw-force-motion) {
+    .svc-hero__art,
+    .svc-hero__art-toggle { display: none; }
+  }
 }
 .svc-hero__title { font-size: var(--text-3xl); max-width: 16ch; }
 /* FAQs hero: force the H1 onto a single line at any width. Drop the 16ch cap and
@@ -976,9 +984,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .svc-more__card { padding: var(--space-sm) var(--space-md); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .svc-more__panel,
-  .svc-more__card,
-  .svc-more__chev { transition: none; }
+  html:not(.cw-force-motion) {
+    .svc-more__panel,
+    .svc-more__card,
+    .svc-more__chev { transition: none; }
+  }
 }
 
 /* Optional claim under a block heading (e.g. the Problem h3). */
@@ -1249,7 +1259,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 /* Portfolio shots -- THE sitewide water-ripple engine (RippleGrid /
-   RippleCanvas: the chadlewine explore-grid hover effect). The base <img>
+   RippleCanvas: the chad-site explore-grid hover effect). The base <img>
    stays underneath; the WebGL canvas mounts over it while active. */
 .svc-shots {
   display: grid;
@@ -1319,8 +1329,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-shot__frame--link:hover .svc-shot__cue,
 .svc-shot__frame--link:focus-visible .svc-shot__cue { opacity: 1; transform: translateY(0); }
 @media (prefers-reduced-motion: reduce) {
-  .svc-shot__frame--link, .svc-shot__cue { transition: none; }
-  .svc-shot__frame--link:hover { transform: none; }
+  html:not(.cw-force-motion) {
+    .svc-shot__frame--link, .svc-shot__cue { transition: none; }
+    .svc-shot__frame--link:hover { transform: none; }
+  }
 }
 .svc-shot__label { font-family: var(--font-display); font-weight: 600; color: var(--text-primary); }
 .svc-shot__link:hover { color: var(--accent); }
@@ -1456,7 +1468,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-acc__item.is-open .svc-acc__a { grid-template-rows: 1fr; }
 @media (prefers-reduced-motion: reduce) {
-  .svc-acc__a { transition: none; }
+  html:not(.cw-force-motion) {
+    .svc-acc__a { transition: none; }
+  }
 }
 
 /* Dark-section accordion overrides (the septic glass-on-dark look) */
@@ -1692,9 +1706,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   50% { transform: scale(1.05); opacity: 0.72; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cw-speed-demon__lean.is-leaning,
-  .cw-speed-demon__text.is-blurring,
-  .cw-speed-demon__text.is-hover-pulse { animation: none; transform: none; }
+  html:not(.cw-force-motion) {
+    .cw-speed-demon__lean.is-leaning,
+    .cw-speed-demon__text.is-blurring,
+    .cw-speed-demon__text.is-hover-pulse { animation: none; transform: none; }
+  }
 }
 .svc-made__negation {
   list-style: none;
@@ -1979,7 +1995,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* =====================================================================
    PROMPT (TO-WRITE PLACEHOLDER) BLOCK -- "prompts only" authoring.
    Stands in for unwritten copy as a visible amber note (ported from
-   chadlewine, adapted to the light theme). See src/components/Prompt.tsx.
+   the chad site, adapted to the light theme). See src/components/Prompt.tsx.
    ===================================================================== */
 .prompt-block {
   display: block;
@@ -2045,7 +2061,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .reveal-late.is-visible { opacity: 1; transform: none; filter: blur(0); }
 @media (prefers-reduced-motion: reduce) {
-  .reveal-late { opacity: 1; transform: none; filter: none; transition: none; }
+  html:not(.cw-force-motion) {
+    .reveal-late { opacity: 1; transform: none; filter: none; transition: none; }
+  }
 }
 
 /* NO PARTICLES anywhere on the site (Chad, 2026-06-11). The ambient
@@ -2251,10 +2269,12 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Reduced motion: show everything, kill the animation */
 @media (prefers-reduced-motion: reduce) {
-  .svc-hero .svc-crumbs, .svc-hero .eyebrow,
-  .svc-hero__title, .svc-lede, .svc-hero__cta { animation: none; opacity: 1; }
-  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
-  .svc-cta__panel::before, .svc-dark::before { animation: none; }
+  html:not(.cw-force-motion) {
+    .svc-hero .svc-crumbs, .svc-hero .eyebrow,
+    .svc-hero__title, .svc-lede, .svc-hero__cta { animation: none; opacity: 1; }
+    .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+    .svc-cta__panel::before, .svc-dark::before { animation: none; }
+  }
 }
 
 /* =====================================================================
@@ -2390,7 +2410,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero__codefall-toggle { display: none; }
+  html:not(.cw-force-motion) {
+    .home-hero__codefall-toggle { display: none; }
+  }
 }
 
 /* ---- Wordmark + tagline block -------------------------------------- */
@@ -2592,13 +2614,15 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Reduced motion: kill all hero motion, show the final composition at once. */
 @media (prefers-reduced-motion: reduce) {
-  .home-hero__glow { animation: none; }
-  .home-hero__caret { display: none; }
-  .home-hero.is-anim .home-hero__char,
-  .home-hero.is-anim .home-hero__tm,
-  .home-hero.is-anim .home-hero__tagword,
-  .home-hero.is-anim .home-hero__lanes { opacity: 1; transform: none; filter: none; transition: none; }
-  .home-hero.is-anim .home-hero__rule { transform: scaleX(1); transition: none; }
+  html:not(.cw-force-motion) {
+    .home-hero__glow { animation: none; }
+    .home-hero__caret { display: none; }
+    .home-hero.is-anim .home-hero__char,
+    .home-hero.is-anim .home-hero__tm,
+    .home-hero.is-anim .home-hero__tagword,
+    .home-hero.is-anim .home-hero__lanes { opacity: 1; transform: none; filter: none; transition: none; }
+    .home-hero.is-anim .home-hero__rule { transform: scaleX(1); transition: none; }
+  }
 }
 
 @media (max-width: 600px) {
@@ -2668,7 +2692,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   animation: dr-attract 2.2s var(--ease-smooth) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .design-reveal__frame:not(.is-touched) .design-reveal__handle { animation: none; }
+  html:not(.cw-force-motion) {
+    .design-reveal__frame:not(.is-touched) .design-reveal__handle { animation: none; }
+  }
 }
 /* Page switcher: pill tabs above the frame, each swaps the before/after pair. */
 .design-reveal__tabs {
@@ -3333,8 +3359,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .ai-demo__answer.is-on { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ai-demo__msg--user, .ai-demo__msg--ai { opacity: 1; transform: none; transition: none; }
-  .ai-demo__answer { opacity: 1; transition: none; }
+  html:not(.cw-force-motion) {
+    .ai-demo__msg--user, .ai-demo__msg--ai { opacity: 1; transform: none; transition: none; }
+    .ai-demo__answer { opacity: 1; transition: none; }
+  }
 }
 
 /* Typing caret on the question */
@@ -3371,7 +3399,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .ai-demo__thinking i:nth-child(2) { animation-delay: 0.15s; }
 .ai-demo__thinking i:nth-child(3) { animation-delay: 0.3s; }
 @media (prefers-reduced-motion: reduce) {
-  .ai-demo__caret, .ai-demo__thinking i { animation: none; }
+  html:not(.cw-force-motion) {
+    .ai-demo__caret, .ai-demo__thinking i { animation: none; }
+  }
 }
 
 /* The recommendation line -- the highlighted pick */
@@ -3458,7 +3488,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   white-space: nowrap;
 }
 @media (prefers-reduced-motion: reduce) {
-  .vis-spectrum__marker { animation: none; }
+  html:not(.cw-force-motion) {
+    .vis-spectrum__marker { animation: none; }
+  }
 }
 
 /* The four standings under the scale */
@@ -3505,7 +3537,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* =====================================================================
    TITLE REVEAL -- the /about/ hero signature: art painted through the H1
-   letterforms by cursor comet trails. COPIED from the chadlewine
+   letterforms by cursor comet trails. COPIED from the chad site's
    global.css "Title Reveal (comet trail art scrub)" block (COPY, don't
    rewrite). Engine: src/components/art/TitleReveal.tsx.
    ===================================================================== */
@@ -3564,7 +3596,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 @media (max-width: 600px) {
-  /* No comet reveal on phones (same call as the chadlewine cover hero) --
+  /* No comet reveal on phones (same call as the chad-site cover hero) --
      the plain H1 underneath stays visible. */
   .about-hero .title-reveal__canvas { display: none; }
 }
@@ -3772,7 +3804,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Reduced motion: stop the swirl + breathing, hold a calm static glow. */
 @media (prefers-reduced-motion: reduce) {
-  .cw-orb__layer { animation: none; opacity: 0.32; }
+  html:not(.cw-force-motion) {
+    .cw-orb__layer { animation: none; opacity: 0.32; }
+  }
 }
 
 /* =====================================================================
@@ -4018,7 +4052,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-wfcam__progress strong { color: var(--text-primary); font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
-  .cw-wfcam__page { transition: none; }
+  html:not(.cw-force-motion) {
+    .cw-wfcam__page { transition: none; }
+  }
 }
 
 @media (max-width: 900px) {
@@ -4620,8 +4656,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-chat__streaming::after { content: ''; display: inline-block; width: 6px; height: 0.95em; background: var(--text-primary); vertical-align: -2px; margin-left: 2px; animation: cw-art-chat-caret-blink 0.7s steps(2, start) infinite; }
 .cw-art-chat__caption { font-family: var(--font-mono); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-secondary); text-align: center; margin-top: 0.6rem; }
 @media (prefers-reduced-motion: reduce) {
-  .cw-art-chat__input-text::after, .cw-art-chat__streaming::after { animation: none; }
-  .cw-art-chat__thinking span { animation: none; }
+  html:not(.cw-force-motion) {
+    .cw-art-chat__input-text::after, .cw-art-chat__streaming::after { animation: none; }
+    .cw-art-chat__thinking span { animation: none; }
+  }
 }
 .cw-art-serp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; margin: 2.8rem 0 2.2rem; align-items: stretch; }
 @media (max-width: 860px) { .cw-art-serp-row { grid-template-columns: 1fr; gap: 2rem; } }
@@ -5369,7 +5407,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .cw-port-feat__stage { display: flex; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cw-port-feat__layer, .cw-port-feat__shot-link { transition: none; }
+  html:not(.cw-force-motion) {
+    .cw-port-feat__layer, .cw-port-feat__shot-link { transition: none; }
+  }
 }
 
 /* ---- MODE B: the archive grid ---------------------------------------- */
@@ -5456,8 +5496,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   margin: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .cw-port-card__link, .cw-port-card__cue { transition: none; }
-  .cw-port-card__link:hover { transform: none; }
+  html:not(.cw-force-motion) {
+    .cw-port-card__link, .cw-port-card__cue { transition: none; }
+    .cw-port-card__link:hover { transform: none; }
+  }
 }
 
 /* ---- PORTFOLIO DEVICE VIEWER (desktop / tablet / mobile toggle) -------
@@ -5534,9 +5576,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 @keyframes cw-img-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
-  .cw-port-device__stage .cw-port-frame,
-  .cw-port-device__stage .cw-port-frame__bar { transition: none; }
-  .cw-port-device__stage .cw-port-frame__img.is-fading-in { animation: none; }
+  html:not(.cw-force-motion) {
+    .cw-port-device__stage .cw-port-frame,
+    .cw-port-device__stage .cw-port-frame__bar { transition: none; }
+    .cw-port-device__stage .cw-port-frame__img.is-fading-in { animation: none; }
+  }
 }
 
 /* tablet + phone bezels (the dark border is the bezel; box-sizing keeps the
@@ -5732,7 +5776,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cw-gem__puff { animation: none; }
+  html:not(.cw-force-motion) {
+    .cw-gem__puff { animation: none; }
+  }
 }
 
 @media (max-width: 600px) {
@@ -5771,6 +5817,78 @@ html.cw-motion-paused *,
 html.cw-motion-paused *::before,
 html.cw-motion-paused *::after {
   animation-play-state: paused !important;
+}
+
+/* First-visit reduced-motion invite (see MotionInvite.tsx). A static overlay --
+   no entrance animation, so it honors the very preference it asks about. Sits
+   above everything, including the page-transition cover (z 9990). */
+.cw-motion-invite {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(36, 57, 137, 0.28);
+  backdrop-filter: blur(3px);
+}
+.cw-motion-invite__card {
+  width: min(30rem, 100%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px rgba(36, 57, 137, 0.22);
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  text-align: left;
+}
+.cw-motion-invite__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+.cw-motion-invite__body {
+  margin-top: 0.75rem;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-motion-invite__actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.cw-motion-invite__btn {
+  flex: 1 1 auto;
+  min-width: 10rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease-smooth),
+    border-color 0.2s var(--ease-smooth), color 0.2s var(--ease-smooth);
+}
+.cw-motion-invite__btn--go {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #ffffff;
+}
+.cw-motion-invite__btn--go:hover {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+.cw-motion-invite__btn--stay {
+  background: transparent;
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+}
+.cw-motion-invite__btn--stay:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 /* =====================================================================
@@ -6203,7 +6321,9 @@ html.cw-motion-paused *::after {
   to { background-position: -30% 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cw-wipe { display: none; }
+  html:not(.cw-force-motion) {
+    .cw-wipe { display: none; }
+  }
 }
 
 /* =====================================================================
@@ -6237,7 +6357,9 @@ html.cw-motion-paused *::after {
   transform: scale(1);
 }
 @media (prefers-reduced-motion: reduce) {
-  .cw-pxdiv__cell { transition: none; }
+  html:not(.cw-force-motion) {
+    .cw-pxdiv__cell { transition: none; }
+  }
 }
 
 /* ---------------------------------------------------------------------

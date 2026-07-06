@@ -7,6 +7,7 @@
 // keyframe) can flip per cycle.
 
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const BLUR_MS = 900;
 const REST_MS = 2700;
@@ -17,7 +18,7 @@ export function SpeedDemon({ href, children }: { href: string; children: string 
   const reducedRef = useRef(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (prefersReducedMotion()) {
       reducedRef.current = true;
       return;
     }

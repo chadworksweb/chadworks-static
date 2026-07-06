@@ -7,10 +7,11 @@
 // Both respect prefers-reduced-motion (everything shown, no motion).
 
 import { useEffect } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 export function PageMotion() {
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
 
     // --- scroll reveal ---
     // Two triggers share one `.is-visible` toggle:

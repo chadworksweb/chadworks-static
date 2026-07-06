@@ -12,6 +12,7 @@
 // ambient animation) but without the lerp chase.
 
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const DAMP = 0.14;
 
@@ -62,7 +63,7 @@ export function DesignReveal({ pages = DEFAULT_PAGES }: { pages?: RevealPage[] }
     const range = rangeRef.current;
     if (!frame || !stage || !range) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = prefersReducedMotion();
     const clamp = (v: number) => Math.max(0, Math.min(100, v));
     let raf = 0;
     let running = false;

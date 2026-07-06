@@ -16,6 +16,7 @@
 // see a painted letter.
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const W = 40;
 const H = 52;
@@ -65,7 +66,7 @@ export function ChromaLetter({ children }: { children: string }) {
     if (!ctx) return;
     const img = ctx.createImageData(W, H);
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = prefersReducedMotion();
     let raf = 0;
     let last = 0;
     let parked = false;

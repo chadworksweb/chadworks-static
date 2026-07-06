@@ -14,6 +14,7 @@
 // brand-semantic colors (Google blue/red, OpenAI green, star gold) stay literal.
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const USER_QUERY =
   "I think my septic system is backed up in Anytown, ST. Who should I call?";
@@ -176,9 +177,7 @@ export function SepticVisibility() {
       running = false;
     }
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const reduced = prefersReducedMotion();
 
     // Reserve the final rendered height so the card does not grow mid-animation.
     function reserveHeight() {

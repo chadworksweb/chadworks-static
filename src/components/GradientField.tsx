@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 // Stripe-style animated mesh gradient. A full-screen WebGL fragment shader runs
 // domain-warped fractal noise (Ashima simplex FBM, warped twice) across a brand
@@ -171,7 +172,7 @@ export function GradientField({
     ro.observe(canvas);
     resize();
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     let raf = 0;
     let start = 0;
     const draw = (now: number) => {

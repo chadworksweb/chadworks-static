@@ -16,6 +16,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CodeFall } from "@/components/art/CodeFall";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const WORDMARK = "chadworks";
 const TAGLINE = ["so", "you", "don't", "have", "to"];
@@ -53,7 +54,7 @@ export default function HomeHero({ bare = false }: { bare?: boolean }) {
       el ? el.offsetLeft + el.offsetWidth : 0
     );
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
     if (reduce) {
       setPhase("done");
       setTyped(WORDMARK.length);
@@ -116,7 +117,7 @@ export default function HomeHero({ bare = false }: { bare?: boolean }) {
       <script
         dangerouslySetInnerHTML={{
           __html:
-            "if(!matchMedia('(prefers-reduced-motion: reduce)').matches){var e=document.currentScript.parentElement;e.classList.add('is-boot');setTimeout(function(){e.classList.remove('is-boot')},4000);}",
+            "if(document.documentElement.classList.contains('cw-force-motion')||!matchMedia('(prefers-reduced-motion: reduce)').matches){var e=document.currentScript.parentElement;e.classList.add('is-boot');setTimeout(function(){e.classList.remove('is-boot')},4000);}",
         }}
       />
       <div className="home-hero__glow" aria-hidden="true" />

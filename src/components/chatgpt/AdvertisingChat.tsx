@@ -9,6 +9,7 @@
 // sponsored box is appended AFTER the streamed paragraphs.
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const USER_QUERY =
   "Best wireless earbuds for running under $150?";
@@ -183,9 +184,7 @@ export function AdvertisingChat() {
       running = false;
     }
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const reduced = prefersReducedMotion();
 
     function reserveHeight() {
       if (!thread || cancelled) return;

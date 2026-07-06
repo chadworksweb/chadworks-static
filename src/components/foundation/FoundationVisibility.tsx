@@ -17,6 +17,7 @@
 // Maps column) is intentionally OMITTED here to match the foundation source.
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const USER_QUERY =
   "I have hairline cracks in my basement wall in Anytown, ST. Who should I call for foundation repair?";
@@ -179,9 +180,7 @@ export function FoundationVisibility() {
       running = false;
     }
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const reduced = prefersReducedMotion();
 
     // Reserve the final rendered height so the card does not grow mid-animation.
     function reserveHeight() {

@@ -21,6 +21,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const COVER_MS = 420; // cover-in done (cell transition + max stagger) before nav
 const HOLD_MIN_MS = 320; // shortest covered hold, so the gentle motion is seen
@@ -64,7 +65,7 @@ export function PageTransition() {
 
   // Build a chunky, ~square pixel field sized to the viewport (rebuilt on resize).
   useEffect(() => {
-    reduce.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    reduce.current = prefersReducedMotion();
     const build = () => {
       const vw = window.innerWidth,
         vh = window.innerHeight;

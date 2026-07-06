@@ -12,7 +12,7 @@
 // re-fits on resize, respects prefers-reduced-motion, and carries a pause toggle.
 
 import { useEffect, useRef, useState } from "react";
-import { isMotionPaused, subscribeMotion } from "@/lib/motion";
+import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 
 // Code-flavored glyphs (drawn in the brand mono face). No CJK -- the mono font
 // has no katakana, which would render as tofu boxes.
@@ -61,7 +61,7 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = prefersReducedMotion();
 
     // Brand mono family from the next/font CSS var (a hashed family name).
     const mono =

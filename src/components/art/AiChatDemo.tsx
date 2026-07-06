@@ -8,6 +8,7 @@
 // is the new front page of search, and the work here is being IN it.
 
 import { useEffect, useRef, useState } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const QUESTION = "Who should I hire to redesign my company's website?";
 const ANSWER_LEAD =
@@ -28,7 +29,7 @@ export function AiChatDemo() {
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = prefersReducedMotion();
     if (reduced) {
       setPhase(3);
       setChars(QUESTION.length);

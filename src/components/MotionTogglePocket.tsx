@@ -1,22 +1,28 @@
 "use client";
 
-// The single, always-sticky motion toggle for the one-pager. Fixed top-right;
-// flips the global motion store (CSS animations + every canvas loop). Replaces
-// the per-section pause buttons, which are hidden on the one-pager.
+// A literal copy of GlobalMotionToggle, parked in the bottom-right "pocket"
+// (where chat buttons usually sit) instead of the header. Rendered site-wide
+// from the layout so every page gets a persistent global motion pause. Pages
+// whose isolated header ALREADY carries the toggle (the one-pager homepage)
+// render nothing here -- see ISOLATED_HEADER_ROUTES.
 //
-// When the visitor's OS asks for reduced motion and they have NOT opted in yet,
-// the button becomes "Start motion" -- it forces the full experience for the
-// session (and reloads so every mount-time gate re-reads). Once motion is on
-// (forced, or no reduced-motion preference) it is the usual pause/resume toggle.
+// Under an unforced reduced-motion preference it becomes "Start motion" (forces
+// the full experience for the session); otherwise it is the pause/resume toggle.
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   setMotionPaused,
   isReducedMotionUnforced,
   enableForcedMotion,
 } from "@/lib/motion";
 
-export function GlobalMotionToggle() {
+// Routes whose own (isolated) header already shows the motion toggle, so the
+// pocket copy is suppressed to avoid two buttons on the same page.
+const ISOLATED_HEADER_ROUTES = new Set<string>(["/"]);
+
+export function MotionTogglePocket() {
+  const pathname = usePathname();
   const [paused, setPaused] = useState(false);
   const [offerStart, setOfferStart] = useState(false);
 
@@ -24,11 +30,13 @@ export function GlobalMotionToggle() {
     setOfferStart(isReducedMotionUnforced());
   }, []);
 
+  if (ISOLATED_HEADER_ROUTES.has(pathname)) return null;
+
   if (offerStart) {
     return (
       <button
         type="button"
-        className="svc-hero__art-toggle cw-motion-toggle"
+        className="svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket"
         onClick={enableForcedMotion}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -42,7 +50,7 @@ export function GlobalMotionToggle() {
   return (
     <button
       type="button"
-      className="svc-hero__art-toggle cw-motion-toggle"
+      className="svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket"
       aria-pressed={paused}
       onClick={() => {
         const next = !paused;

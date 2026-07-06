@@ -13,6 +13,7 @@
 // only modulates layer opacity (the "breathing") and pauses when off-screen.
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 export function ContactOrbs() {
   const fieldRef = useRef<HTMLDivElement>(null);
@@ -20,7 +21,7 @@ export function ContactOrbs() {
   useEffect(() => {
     const field = fieldRef.current;
     if (!field) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (prefersReducedMotion()) return;
 
     const layers = Array.from(
       field.querySelectorAll<HTMLElement>(".cw-orb__layer")

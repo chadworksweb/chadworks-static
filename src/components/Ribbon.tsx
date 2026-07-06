@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { isMotionPaused, subscribeMotion } from "@/lib/motion";
+import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 
 // Two intermingling 3D gradient RIBBONS (Stripe-style), on Three.js. Each is a
 // discrete lit object: a long narrow strip whose centerline flows along an
@@ -224,7 +224,7 @@ export function Ribbon({ className, mask = false }: { className?: string; mask?:
       ro.observe(host);
       resize();
 
-      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const reduce = prefersReducedMotion();
       let raf = 0;
       let running = false;
       const tick = (now: number) => {

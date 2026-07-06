@@ -8,6 +8,7 @@
 // answer text change from the shared mechanic (cw-art-chat classes).
 
 import { useEffect, useRef } from "react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const USER_QUERY =
   "What's the best tree service near Big Bend, WI?";
@@ -170,9 +171,7 @@ export function ChatgptVisibility() {
       running = false;
     }
 
-    const reduced = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches;
+    const reduced = prefersReducedMotion();
 
     // Reserve the final rendered height so the card does not grow mid-animation.
     function reserveHeight() {
