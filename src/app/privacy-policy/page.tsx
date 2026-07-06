@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
     <>
       <PageMotion />
       <section className="section">
-        <div className="measure-prose">
+        <div className="measure-prose legal-prose">
           <p className="eyebrow">Legal</p>
           <h1 className="svc-hero__title">
             <span className="text-gradient">Privacy Policy</span>

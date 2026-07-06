@@ -201,6 +201,42 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .measure-prose  { max-width: var(--measure-prose); }
 .measure-narrow { max-width: var(--measure-narrow); }
 
+/* Legal prose (privacy policy, terms): the global reset zeroes all margins, so
+   flow spacing is added back here. Numbered <h2> sections get generous top
+   padding for clear separation; paragraphs and lists get an even rhythm. */
+.legal-prose > * + * { margin-top: var(--space-sm); }
+.legal-prose h2 {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--text-xl);
+}
+.legal-prose h2 + p,
+.legal-prose h2 + ul { margin-top: var(--space-xs); }
+.legal-prose ul { display: grid; gap: var(--space-2xs); }
+.legal-prose li {
+  position: relative;
+  padding-left: 1.35em;
+  line-height: var(--leading-body);
+}
+.legal-prose li::before {
+  content: "";
+  position: absolute;
+  left: 0.15em;
+  top: 0.62em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.legal-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--bg-surface);
+  padding: 0.08em 0.4em;
+  border-radius: 5px;
+}
+
 /* Shared surface primitive -- glassmorphic: gradient face, inner light edge,
    floating tinted shadow. Reads premium against light + lavender sections. */
 .panel {
