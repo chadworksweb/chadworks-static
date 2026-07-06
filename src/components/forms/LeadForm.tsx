@@ -10,7 +10,28 @@
 import { useEffect, useRef, useState } from "react";
 import type { FormField, LeadFormConfig } from "@/lib/forms";
 
-const FORM_ENDPOINT = "/api/send";
+// The centralized LEIT contact-form endpoint (leit-dashboard on le-projects-01):
+// anti-spam + Turso logging + Resend send, all server-side. The site slug keys
+// FORM_SITES in server.js. chadworks.co is static (no function runtime of its
+// own), so it posts here like every other LEIT site. See LEIT-CONTACT-FORM-PATTERN.md.
+const FORM_ENDPOINT = "https://leit.libraengine.com/api/forms/submit?site=chadworks";
+const CONTACT_EMAIL = "chad@chadworks.co";
+
+// Safety net for the LEIT endpoint's single point of failure (if the droplet is
+// down, every LEIT form is down). Rather than lose the submission, build a
+// pre-filled email carrying everything the visitor typed so one click sends it.
+// On the normal path the fetch succeeds first and this is never reached.
+function buildMailtoHref(subject: string, data: Record<string, string>) {
+  const skip = new Set(["_source", "_subject", "leit_cf_ts", "leit_company_url"]);
+  const body = Object.entries(data)
+    .filter(([k, v]) => v && !skip.has(k))
+    .map(([k, v]) => {
+      const label = k.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      return `${label}: ${v}`;
+    })
+    .join("\n");
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 function fieldControl(f: Exclude<FormField, { kind: "section" }>, idBase: string) {
   const id = `${idBase}-${f.name}`;
@@ -68,6 +89,7 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
   const formRef = useRef<HTMLFormElement>(null);
   const tsRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [mailtoHref, setMailtoHref] = useState<string>("");
   const idBase = `cwf-${config.source.replace(/[^a-z0-9]+/gi, "-")}`;
 
   // LEIT anti-spam timestamp: base64(now) set on mount and after each reset,
@@ -142,7 +164,10 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
           throw new Error("Form submission failed");
         }
       })
-      .catch(() => setStatus("error"));
+      .catch(() => {
+        setMailtoHref(buildMailtoHref(config.subject, data));
+        setStatus("error");
+      });
   }
 
   return (
@@ -170,7 +195,17 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
       )}
       {status === "error" && (
         <div className="cw-form__message cw-form__message--error" role="status">
-          Something went wrong sending this. Try again, or email chad@chadworks.co directly.
+          {mailtoHref ? (
+            <>
+              One more step to send this. Your details are ready in an email --{" "}
+              <a href={mailtoHref} className="cw-form__mailto-link">
+                open it and hit send
+              </a>
+              , and it lands with Chad. Nothing you typed is lost.
+            </>
+          ) : (
+            <>Something went wrong sending this. Try again, or email chad@chadworks.co directly.</>
+          )}
         </div>
       )}
 

@@ -2208,6 +2208,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   border: 1px solid rgba(255, 68, 102, 0.4);
   color: #ff8899;
 }
+/* The mailto fallback link inside the error message (static-host form send). */
+.cw-form__mailto-link {
+  color: #ffd0d9;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cw-form__mailto-link:hover {
+  color: #ffffff;
+}
 
 /* Dual-form toggle (the rslgo contact toggle, re-tokened) */
 .cw-dualform__toggle {
