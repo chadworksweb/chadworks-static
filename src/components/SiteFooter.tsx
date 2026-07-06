@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GemstoneMark } from "@/components/GemstoneMark";
+import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 import { isLaunched } from "@/lib/launch";
 
 // Footer sitemap: every column heading links to its hub where one exists.
@@ -130,6 +131,7 @@ export default function SiteFooter() {
             ) : (
               <span className="site-footer__item--sealed">Privacy Policy</span>
             )}
+            <CookiePreferencesButton />
           </span>
         </div>
       </div>

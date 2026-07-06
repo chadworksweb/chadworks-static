@@ -19,6 +19,7 @@ const LAUNCHED = new Set<string>([
   "/advertising-on-chatgpt/",
   "/website-design-for-septic-services/",
   "/website-design-for-foundation-repair/",
+  "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant

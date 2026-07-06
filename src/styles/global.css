@@ -596,9 +596,22 @@ p, li, dd, figcaption { text-wrap: pretty; }
   padding-top: var(--space-md);
   border-top: 1px solid var(--border-subtle);
 }
-.site-footer__legal-links { display: inline-flex; gap: var(--space-md); }
+.site-footer__legal-links { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); align-items: center; }
 .site-footer__legal a { color: var(--text-tertiary); }
 .site-footer__legal a:hover { color: var(--text-primary); }
+/* Cookie preferences: a link-styled button living beside the legal links. */
+.site-footer__prefs-btn {
+  font: inherit;
+  font-size: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.site-footer__prefs-btn:hover { color: var(--text-primary); }
 
 /* =====================================================================
    BUTTON PRIMITIVE -- shared CTA. Purple fill on light; lavender on dark.

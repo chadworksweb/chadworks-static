@@ -1,0 +1,198 @@
+/* Cookie-consent bar, chadworks brand: light elevated surface, indigo text,
+   purple accent. Fixed to the bottom; the details panel expands above the
+   action row. Tokens from styles/global.css with safe fallbacks. */
+
+.cw-consent {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: var(--bg-elevated, #ffffff);
+  border-top: 2px solid var(--accent, #8054bc);
+  color: var(--text-primary, #243989);
+  font-family: var(--font-body, system-ui, sans-serif);
+  box-shadow: 0 -10px 34px rgba(36, 57, 137, 0.14);
+  animation: cw-consent-rise 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cw-consent-rise {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Slide-down exit: the drawer plays this before it unmounts (ConsentBanner
+   delays the real action by the animation duration). `forwards` holds the
+   off-screen end frame so it does not flash back before unmount. */
+.cw-consent--closing {
+  animation: cw-consent-fall 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes cw-consent-fall {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+/* Respect reduced motion, unless the visitor force-enabled motion. Disable
+   both the rise and the fall so the drawer just appears/disappears. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-consent,
+  html:not(.cw-force-motion) .cw-consent--closing {
+    animation: none;
+  }
+}
+
+.cw-consent__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md, 1.5rem);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-sm, 1rem) var(--space-md, 1.5rem);
+}
+
+.cw-consent__label {
+  flex-shrink: 0;
+  align-self: center;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent, #8054bc);
+  padding: 0.28rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.cw-consent__text {
+  flex: 1 1 280px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #6b6168);
+}
+
+.cw-consent__text a {
+  color: var(--accent, #8054bc);
+  text-decoration: underline;
+}
+
+.cw-consent__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.cw-consent__btn {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1.05rem;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.cw-consent__btn--primary {
+  background: var(--accent, #8054bc);
+  color: #fff;
+}
+.cw-consent__btn--primary:hover { opacity: 0.9; }
+
+.cw-consent__btn--ghost {
+  background: transparent;
+  color: var(--text-primary, #243989);
+  border-color: var(--border-medium, rgba(36, 57, 137, 0.18));
+}
+.cw-consent__btn--ghost:hover {
+  background: rgba(128, 84, 188, 0.08);
+  border-color: var(--accent, #8054bc);
+}
+
+.cw-consent__btn:focus-visible {
+  outline: 2px solid var(--accent, #8054bc);
+  outline-offset: 2px;
+}
+
+.cw-consent__details {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-md, 1.5rem) var(--space-sm, 1rem);
+  border-top: 1px solid var(--border-subtle, rgba(36, 57, 137, 0.1));
+}
+
+.cw-consent__category {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md, 1.5rem);
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--border-subtle, rgba(36, 57, 137, 0.1));
+}
+
+.cw-consent__cat-info { flex: 1; }
+.cw-consent__cat-name { font-size: 0.92rem; font-weight: 600; margin-bottom: 0.15rem; }
+.cw-consent__cat-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #6b6168);
+  line-height: 1.45;
+}
+
+.cw-consent__always {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-tertiary, rgba(36, 57, 137, 0.55));
+  white-space: nowrap;
+}
+
+/* Toggle switch */
+.cw-consent__toggle {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.cw-consent__toggle input { opacity: 0; width: 0; height: 0; }
+.cw-consent__slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(36, 57, 137, 0.25);
+  border-radius: 999px;
+  transition: background 0.18s ease;
+}
+.cw-consent__slider::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.18s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.cw-consent__toggle input:checked + .cw-consent__slider {
+  background: var(--accent, #8054bc);
+}
+.cw-consent__toggle input:checked + .cw-consent__slider::before {
+  transform: translateX(18px);
+}
+.cw-consent__toggle input:focus-visible + .cw-consent__slider {
+  outline: 2px solid var(--accent, #8054bc);
+  outline-offset: 2px;
+}
+
+.cw-consent__save-row { padding-top: 0.85rem; }
+
+@media (max-width: 560px) {
+  .cw-consent__actions { width: 100%; }
+  .cw-consent__btn { flex: 1 1 auto; text-align: center; }
+}
