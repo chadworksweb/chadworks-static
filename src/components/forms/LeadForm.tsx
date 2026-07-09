@@ -150,6 +150,9 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
 
     setStatus("sending");
     const data = collectFormData(form);
+    // Report the actual page the form was sent from (like chadlewine's
+    // source_page). config._source is the semantic slot; this is the real URL.
+    data.source_page = window.location.pathname;
 
     fetch(FORM_ENDPOINT, {
       method: "POST",
