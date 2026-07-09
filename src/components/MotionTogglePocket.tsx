@@ -47,7 +47,7 @@ export function MotionTogglePocket() {
     );
     const hero =
       heroToggle instanceof HTMLElement && heroToggle.offsetParent !== null
-        ? heroToggle.closest(".svc-hero")
+        ? heroToggle.closest(".svc-hero, .home-hero")
         : null;
     if (!hero) {
       setHeroInView(false);

@@ -415,7 +415,56 @@ p, li, dd, figcaption { text-wrap: pretty; }
   justify-content: space-between;
   gap: var(--space-md);
 }
-.site-nav__brand { font-family: var(--font-display); font-weight: 400; font-size: 1.59375rem; letter-spacing: -0.01em; }
+.site-nav__brand { font-family: var(--font-display); font-weight: 400; font-size: 1.59375rem; letter-spacing: -0.01em; position: relative; }
+/* Logo hover: an RGB-split glitch (ported from the chad-rising header logo),
+   recolored to the chadworks brand -- deep indigo + vivid violet ghost layers
+   instead of cyan/magenta. The ::before/::after mirror the wordmark via
+   data-text and jitter apart on hover. */
+.site-nav__brand::before,
+.site-nav__brand::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.site-nav__brand::before { color: var(--grad-deep); z-index: -1; }
+.site-nav__brand::after { color: var(--nav-link-pulse); z-index: -1; }
+.site-nav__brand:hover { animation: cw-logo-glitch 0.4s steps(2) both; }
+.site-nav__brand:hover::before { animation: cw-logo-glitch-indigo 0.4s steps(3) both; }
+.site-nav__brand:hover::after { animation: cw-logo-glitch-violet 0.4s steps(3) both; }
+@keyframes cw-logo-glitch {
+  0%   { transform: none; }
+  20%  { transform: skewX(-4deg) translateX(2px); }
+  40%  { transform: skewX(3deg) translateX(-1px); }
+  60%  { transform: skewX(-1deg) translateX(1px); }
+  80%  { transform: none; clip-path: inset(20% 0 30% 0); }
+  100% { transform: none; clip-path: none; }
+}
+@keyframes cw-logo-glitch-indigo {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.85; transform: translateX(-3px); }
+  40%  { opacity: 0; }
+  60%  { opacity: 0.6; transform: translateX(-2px) translateY(1px); }
+  80%  { opacity: 0; }
+  100% { opacity: 0; transform: none; }
+}
+@keyframes cw-logo-glitch-violet {
+  0%   { opacity: 0; }
+  20%  { opacity: 0; }
+  40%  { opacity: 0.85; transform: translateX(3px); }
+  60%  { opacity: 0; }
+  80%  { opacity: 0.6; transform: translateX(2px) translateY(-1px); }
+  100% { opacity: 0; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .site-nav__brand:hover,
+  html:not(.cw-force-motion) .site-nav__brand:hover::before,
+  html:not(.cw-force-motion) .site-nav__brand:hover::after { animation: none; }
+}
 .site-nav__links { display: flex; gap: var(--space-md); align-items: center; }
 .site-nav__links a {
   font-family: var(--font-display);           /* Lexend */

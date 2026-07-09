@@ -52,7 +52,12 @@ export default function SiteNav() {
   return (
     <nav className={`site-nav${hidden ? " site-nav--hidden" : ""}${open ? " site-nav--open" : ""}`}>
       <div className="site-nav__inner">
-        <Link href="/" className="site-nav__brand" onClick={() => setOpen(false)}>
+        <Link
+          href="/"
+          className="site-nav__brand"
+          data-text={"chadworks™"}
+          onClick={() => setOpen(false)}
+        >
           chadworks&trade;
         </Link>
         <div className="site-nav__links">

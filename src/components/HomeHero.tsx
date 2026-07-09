@@ -121,9 +121,11 @@ export default function HomeHero({ bare = false }: { bare?: boolean }) {
         }}
       />
       <div className="home-hero__glow" aria-hidden="true" />
-      {/* In bare (one-pager) mode the global sticky toggle owns motion, so
-          CodeFall hides its own button but still honors the global pause. */}
-      <CodeFall hideToggle={bare} />
+      {/* CodeFall's own pause button is the hero-treatment motion control on the
+          one-pager: it drives the global motion store, so it pauses the whole
+          page from the hero (the bottom pocket toggle takes over once the hero
+          scrolls out of view). */}
+      <CodeFall />
 
       <div className="home-hero__inner">
         <div className="home-hero__mark">

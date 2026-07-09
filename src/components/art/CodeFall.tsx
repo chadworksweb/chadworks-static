@@ -12,7 +12,7 @@
 // re-fits on resize, respects prefers-reduced-motion, and carries a pause toggle.
 
 import { useEffect, useRef, useState } from "react";
-import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
+import { isMotionPaused, setMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 
 // Code-flavored glyphs (drawn in the brand mono face). No CJK -- the mono font
 // has no katakana, which would render as tofu boxes.
@@ -363,7 +363,7 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       <button
         type="button"
         className="svc-hero__art-toggle home-hero__codefall-toggle"
-        onClick={() => setPaused((p) => !p)}
+        onClick={() => setMotionPaused(!paused)}
         aria-pressed={paused}
       >
         {paused ? (
