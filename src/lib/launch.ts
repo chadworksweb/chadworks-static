@@ -14,6 +14,7 @@
 
 const LAUNCHED = new Set<string>([
   "/", // homepage -- always live
+  "/about/", // launched 2026-07-09 (rebuilt about page)
   "/web-design/",
   "/show-up-on-chatgpt/",
   "/advertising-on-chatgpt/",

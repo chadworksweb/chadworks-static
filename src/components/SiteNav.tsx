@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { WaveText } from "@/components/WaveText";
 import { isLaunched } from "@/lib/launch";
 
@@ -37,12 +36,6 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
-  // Bare header (brand only -- no links, no mobile menu) on the homepage and any
-  // launched page, whose full-nav links would otherwise point at sealed pages;
-  // navigation to the inner pages lives in the footer. Driven by launch.ts.
-  const pathname = usePathname();
-  const bare = isLaunched(pathname);
-
   // Escape closes the open panel.
   useEffect(() => {
     if (!open) return;
@@ -53,16 +46,9 @@ export default function SiteNav() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  if (bare) {
-    return (
-      <nav className="site-nav">
-        <div className="site-nav__inner">
-          <span className="site-nav__brand">chadworks&trade;</span>
-        </div>
-      </nav>
-    );
-  }
-
+  // The full nav renders sitewide. A link whose route isn't launched yet renders
+  // greyed and non-clickable (a "coming soon" placeholder) instead of pointing
+  // at a sealed page. Launch state is driven entirely by launch.ts.
   return (
     <nav className={`site-nav${hidden ? " site-nav--hidden" : ""}${open ? " site-nav--open" : ""}`}>
       <div className="site-nav__inner">
@@ -70,11 +56,17 @@ export default function SiteNav() {
           chadworks&trade;
         </Link>
         <div className="site-nav__links">
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href}>
-              <WaveText text={l.label} />
-            </Link>
-          ))}
+          {LINKS.map((l) =>
+            isLaunched(l.href) ? (
+              <Link key={l.href} href={l.href}>
+                <WaveText text={l.label} />
+              </Link>
+            ) : (
+              <span key={l.href} className="site-nav__soon" aria-disabled="true">
+                {l.label}
+              </span>
+            )
+          )}
         </div>
         {/* Mobile-only (<=900) hamburger; the inline links hide at that tier. */}
         <button
@@ -94,11 +86,17 @@ export default function SiteNav() {
           untabbable while closed via the inert attribute. */}
       <div id="site-nav-panel" className="site-nav__panel" inert={open ? undefined : true}>
         <div className="site-nav__panel-inner">
-          {LINKS.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
-              {l.label}
-            </Link>
-          ))}
+          {LINKS.map((l) =>
+            isLaunched(l.href) ? (
+              <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+                {l.label}
+              </Link>
+            ) : (
+              <span key={l.href} className="site-nav__soon" aria-disabled="true">
+                {l.label}
+              </span>
+            )
+          )}
         </div>
       </div>
     </nav>

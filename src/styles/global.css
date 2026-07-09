@@ -529,6 +529,23 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: color var(--duration-base) var(--ease-smooth);
 }
 .site-nav__panel-inner a:hover { color: var(--nav-link-pulse); }
+/* "Coming soon" nav items: routes not yet launched render greyed + non-clickable
+   (matches the footer's sealed style). Driven by launch.ts. */
+.site-nav__soon {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+.site-nav__panel-inner .site-nav__soon {
+  padding: 0.9rem var(--site-edge-min);
+  border-top: 1px solid var(--border-subtle);
+}
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     .site-nav__panel { transition: none; }
@@ -1566,6 +1583,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
     color var(--duration-fast) var(--ease-smooth);
 }
 .cw-ach__visit:hover { color: var(--grad-deep); transform: translate(2px, -2px); }
+/* Small screens: the shared heading's 2rem floor runs "Notable Achievements"
+   right up to the edge at ~390px. Ease it down just for this heading here. */
+@media (max-width: 480px) {
+  .cw-ach .svc-block__heading { font-size: clamp(1.55rem, 6.3vw, 2rem); }
+}
 
 /* FAQ */
 /* FAQ -- the septic accordion section (industry_faq): plum -> navy gradient
