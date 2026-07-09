@@ -71,7 +71,7 @@ export function MainContactCapsule() {
       email={EMAIL}
       phoneLabel="Call directly"
       phone="(215) 872-1240"
-      locationNote="Based in Pennsylvania, working with businesses across the country and beyond."
+      locationNote="Based in Pennsylvania, working with businesses across the country."
       quick={QUICK}
       detailed={DETAILED}
       quickLabel="Quick message"
