@@ -22,8 +22,9 @@ import {
 } from "@/lib/motion";
 
 // Routes whose own (isolated) header already shows the motion toggle, so the
-// pocket copy is suppressed to avoid two buttons on the same page.
-const ISOLATED_HEADER_ROUTES = new Set<string>(["/"]);
+// pocket copy is suppressed to avoid two buttons on the same page. Empty now that
+// the homepage uses the real sitewide header + this pocket toggle like every page.
+const ISOLATED_HEADER_ROUTES = new Set<string>();
 
 export function MotionTogglePocket() {
   const pathname = usePathname();

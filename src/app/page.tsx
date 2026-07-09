@@ -33,7 +33,6 @@ import HomeHero from "@/components/HomeHero";
 import { GemstoneCW } from "@/components/GemstoneCW";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
 import { PixelDivider } from "@/components/PixelDivider";
-import { GlobalMotionToggle } from "@/components/GlobalMotionToggle";
 import {
   BrowserChip,
   CodeChip,
@@ -233,15 +232,6 @@ const FAQS = [
 export default function Home() {
   return (
     <PageComposer>
-      {/* Sticky top-right header actions: a Contact button (default button
-          styling) left of the single always-sticky motion toggle. */}
-      <div className="cw-header-actions">
-        <a href="#contact" className="svc-btn cw-header-actions__contact">
-          <span className="svc-btn__label">Contact</span>
-        </a>
-        <GlobalMotionToggle />
-      </div>
-
       {/* 1. The existing homepage hero (bare: no CTAs, divider stretched). */}
       <HomeHero bare />
 
