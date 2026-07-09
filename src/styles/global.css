@@ -899,8 +899,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* Key facts band (lavender full-width) */
 /* Key facts -- luxury statement panels (each fact its own full-width band). */
 .svc-statements-intro { padding-bottom: 0; position: relative; z-index: 1; }
-/* Homepage only: nudge the "at a glance" line down 1px past the shared 6px. */
-.cw-home-glance .svc-statements__heading { top: 7px; }
+/* Homepage only: nudge the "at a glance" line down 1px past the shared 6px, and
+   drop the shared white glyph outline (solid indigo, no stroke). */
+.cw-home-glance .svc-statements__heading {
+  top: 7px;
+  -webkit-text-stroke-width: 0;
+  text-stroke-width: 0;
+  paint-order: normal;
+}
 /* The era-timeline heading (About) drops the white glyph outline the shared
    statements heading carries -- solid indigo only, no stroke. */
 .cw-era-intro .svc-statements__heading {
