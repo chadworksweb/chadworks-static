@@ -50,7 +50,7 @@ export function AboutChadCapsule({
           "No pretending I'm an agency or that the web is a perfect system.",
         ],
         close: "Trends come and go and the web changes. My values don't.",
-        sig: "Chad",
+        sig: "Chad D. L.",
       }}
     />
   );

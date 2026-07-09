@@ -127,9 +127,9 @@ const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }
 // "Read the manifesto" CTA into /about/.
 
 const PAGE_URL = `${SITE_URL}/`;
-const TITLE = "chadworks | Websites and visibility, built by one person";
+const TITLE = "chadworks | so you don't have to";
 const DESCRIPTION =
-  "Websites and visibility, designed and developed by one person, and owned outright by the business it serves.";
+  "chadworks plans and builds digital destinations (cutting edge websites) and helps them show up where customers are searching (Google/ChatGPT, etc).";
 
 export const metadata: Metadata = {
   title: TITLE,

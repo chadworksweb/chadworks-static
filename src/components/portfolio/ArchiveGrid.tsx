@@ -14,7 +14,7 @@ export type ArchiveItem = {
   alt: string;
   url: string; // chrome-bar display host
   label: string;
-  href: string;
+  href?: string; // live site; omit for pieces with no public link
   blurb: string;
 };
 
@@ -27,14 +27,16 @@ export function ArchiveGrid({ items }: { items: ArchiveItem[] }) {
           <div className="cw-port-card__meta">
             <h3 className="cw-port-card__label">{item.label}</h3>
             <p className="cw-port-card__blurb">{item.blurb}</p>
-            <a
-              className="cw-port-card__cue"
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View site <span className="cw-port-card__cue-arrow" aria-hidden="true">&#8599;</span>
-            </a>
+            {item.href && (
+              <a
+                className="cw-port-card__cue"
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View site <span className="cw-port-card__cue-arrow" aria-hidden="true">&#8599;</span>
+              </a>
+            )}
           </div>
         </article>
       ))}

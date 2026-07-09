@@ -24,6 +24,24 @@ const FEATURED: FeaturedItem = {
 
 const ARCHIVE: ArchiveItem[] = [
   {
+    key: "tomweather",
+    slug: "tomweather",
+    alt: "Weather Map Generator app, designed and developed by chadworks",
+    url: "map.tomtheweatherwizard.com",
+    label: "Weather Map Generator",
+    blurb:
+      "A broadcast-style tool that turns a raw forecast into a clean, shareable weather map. You sketch the snow zones and drop the cities right on the map, then export a finished graphic ready to post.",
+  },
+  {
+    key: "rslgo",
+    slug: "rslgo",
+    alt: "RSLgo website, designed and developed by chadworks",
+    url: "rslgo.com",
+    label: "RSLgo",
+    blurb:
+      "A custom coded consulting practice website with ecommerce, custom-designed digital products and highly tailored landing/marketing pages.",
+  },
+  {
     key: "aac",
     slug: "aac",
     alt: "AAC Event Catering website, designed and developed by chadworks",
