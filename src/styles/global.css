@@ -778,7 +778,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-hero__art-toggle:hover { background: #ffffff; color: var(--nav-link-pulse); }
 .svc-hero__art-toggle svg { width: 0.95rem; height: 0.95rem; fill: currentColor; flex-shrink: 0; }
-.hero-chip svg {
+.hero-chip svg,
+.hero-chip img {
   width: 100%;
   height: auto;
   filter: drop-shadow(0 4px 11px rgba(36, 57, 137, 0.10));
@@ -834,9 +835,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-statements-intro { padding-bottom: 0; position: relative; z-index: 1; }
 /* Homepage only: nudge the "at a glance" line down 1px past the shared 6px. */
 .cw-home-glance .svc-statements__heading { top: 7px; }
+/* The era-timeline heading (About) drops the white glyph outline the shared
+   statements heading carries -- solid indigo only, no stroke. */
+.cw-era-intro .svc-statements__heading {
+  -webkit-text-stroke-width: 0;
+  text-stroke-width: 0;
+  paint-order: normal;
+}
 .svc-statements__heading {
   position: relative;
-  top: 6px;                               /* nudge the letters down toward the first band */
+  top: 8px;                               /* nudge the letters down toward the first band */
   font-family: var(--font-mono);
   text-transform: none;                   /* lowercase brand wordmark, as written */
   letter-spacing: 0.02em;
@@ -868,7 +876,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-family: var(--font-display);
   font-weight: 800;
   font-size: clamp(2.75rem, 2rem + 4.5vw, 5.5rem);
-  line-height: 1;
+  /* background-clip:text paints the gradient only inside the line box, so a tight
+     line-height clips glyph tails (the "g" in "Age"/"8th grade"). Give the box
+     descender room. Row is align-items:center, so the label stays centered. */
+  line-height: 1.18;
   letter-spacing: -0.04em;
   background: linear-gradient(135deg, var(--grad-deep), var(--grad-mid) 55%, var(--grad-peak));
   -webkit-background-clip: text;
@@ -889,6 +900,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
   line-height: var(--leading-snug);
   letter-spacing: -0.01em;
   text-wrap: balance;
+}
+/* The left column stacks the big year/label over an optional mini subtitle. */
+.svc-statement__label { display: flex; flex-direction: column; gap: var(--space-3xs); }
+/* Mini subtitle under the year/label; inherits the band's text color, dialed
+   back so the year stays the anchor. */
+.svc-statement__subtitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1rem, 0.85rem + 0.6vw, 1.4rem);
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  opacity: 0.85;
 }
 @media (max-width: 600px) {
   .svc-statement__row { grid-template-columns: 1fr; gap: var(--space-xs); }
@@ -1420,6 +1443,129 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-proof__label { font-family: var(--font-display); font-weight: 600; font-size: var(--text-lg); margin-bottom: var(--space-2xs); }
 .svc-proof__link:hover { color: var(--accent); }
 .svc-proof__detail { color: var(--text-secondary); }
+
+/* ACHIEVEMENTS variant (About "Notable Achievements") -- indexed, gradient-
+   numeral cards on frosted glass. Reuses the timeline's fill-clipped numeral
+   motif so the section reads as part of the same system, not a generic grid. */
+.cw-ach .svc-proof { gap: clamp(var(--space-sm), 2vw, var(--space-lg)); }
+.cw-ach .svc-proof__item {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(var(--space-md), 2.4vw, var(--space-xl));
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.30));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px -24px rgba(91, 57, 140, 0.45);
+}
+/* The shimmer IS the entrance -- no rise, no blur. Neutralize the shared
+   .reveal motion; the card develops purely from the light sweeping across it. */
+.cw-ach .svc-proof__item.reveal {
+  transform: none;
+  filter: none;
+  transition: none;
+}
+/* brand-ramp hairline along the card's top edge */
+.cw-ach .svc-proof__item::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--grad-deep), var(--grad-mid) 55%, var(--grad-peak));
+  opacity: 0.9;
+  z-index: 2;
+}
+/* BASELINE: no stagger -- every card animates together on load. Rebuild timing
+   from here. */
+/* The card develops (fades up) in the wake of the light bar, so the sweep reads
+   as the thing bringing it in. `both` keeps it hidden through its stagger delay. */
+.cw-ach .svc-proof__item.is-visible {
+  animation: cw-ach-develop 0.85s var(--ease-smooth) both;
+  animation-delay: 0ms;
+}
+@keyframes cw-ach-develop {
+  0%, 12% { opacity: 0; }
+  70%, 100% { opacity: 1; }
+}
+/* The light bar -- the reveal vehicle. Sweeps across once, synced to develop. */
+.cw-ach .svc-proof__item::after {
+  content: "";
+  position: absolute;
+  inset: -20% -12%;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.12) 36%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.12) 64%,
+    transparent 80%
+  );
+  transform: translateX(-55%);
+}
+.cw-ach .svc-proof__item.is-visible::after {
+  animation: cw-ach-sweep 4.5s var(--ease-smooth) both;
+  /* Extra lead-in so the shimmer wave holds off before the first card sweeps. */
+  animation-delay: 600ms;
+}
+@keyframes cw-ach-sweep {
+  0% { transform: translateX(-55%); opacity: 0; }
+  8% { opacity: 1; }
+  86% { opacity: 1; }
+  100% { transform: translateX(165%); opacity: 0; }
+}
+/* Stagger the card entrances -- each card starts one beat after the one above
+   it, top card first. Card 1 keeps the 0ms default. */
+.cw-ach .svc-proof__item:nth-child(2).is-visible { animation-delay: 210ms; }
+.cw-ach .svc-proof__item:nth-child(3).is-visible { animation-delay: 420ms; }
+.cw-ach .svc-proof__item:nth-child(4).is-visible { animation-delay: 630ms; }
+/* Shimmers run one at a time, spaced ~0.75s so the next fires while the preceding
+   band is still finishing its exit -- tighter overlap. First fixed at 600ms. */
+.cw-ach .svc-proof__item:nth-child(2).is-visible::after { animation-delay: 1350ms; }
+.cw-ach .svc-proof__item:nth-child(3).is-visible::after { animation-delay: 2100ms; }
+.cw-ach .svc-proof__item:nth-child(4).is-visible::after { animation-delay: 2850ms; }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-ach .svc-proof__item.is-visible { animation: none; opacity: 1; }
+  html:not(.cw-force-motion) .cw-ach .svc-proof__item::after { animation: none; opacity: 0; }
+}
+.cw-ach__index {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--grad-deep), var(--grad-mid) 55%, var(--grad-peak));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: var(--space-sm);
+}
+.cw-ach .svc-proof__label {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+}
+/* Visit arrow on each achievement card -- external, opens in a new tab. Just the
+   arrow, parked in the card's bottom-right corner. */
+.cw-ach__visit {
+  position: absolute;
+  right: clamp(var(--space-md), 2.4vw, var(--space-xl));
+  bottom: clamp(var(--space-sm), 1.5vw, var(--space-md));
+  display: inline-flex;
+  line-height: 1;
+  font-size: var(--text-xl);
+  color: var(--accent);
+  /* Thicken the glyph without changing its shape (font-weight doesn't touch a
+     symbol glyph; a hairline stroke in the same color does). */
+  -webkit-text-stroke: 0.6px currentColor;
+  text-decoration: none;
+  transition: transform var(--duration-fast) var(--ease-smooth),
+    color var(--duration-fast) var(--ease-smooth);
+}
+.cw-ach__visit:hover { color: var(--grad-deep); transform: translate(2px, -2px); }
 
 /* FAQ */
 /* FAQ -- the septic accordion section (industry_faq): plum -> navy gradient
@@ -3620,12 +3766,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
   overflow: hidden;
 }
 
-.title-reveal h1,
-.title-reveal h2,
-.title-reveal a {
-  cursor: pointer;
-}
-
 .title-reveal__canvas {
   position: absolute;
   inset: 0;
@@ -3644,6 +3784,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
    ABOUT PAGE -- scoped adjustments only. The sections themselves are the
    called engines (statement bands, proof panels, steps, made, qual, CTA).
    ===================================================================== */
+
+/* Wider chip stage on About only -- the little-Chad chips cluster at the default
+   column width, so give them ~100px more room, still right-anchored. Scoped to
+   .about-hero so the service heroes keep the shared column. */
+.about-hero .svc-hero__art { width: clamp(460px, 42%, 700px); }
 
 /* Era labels ride the statement-band numeral slot: words, not 2-digit
    numerals, so they take a smaller size and a fixed column so the text
@@ -5912,6 +6057,15 @@ p, li, dd, figcaption { text-wrap: pretty; }
   top: auto;
   bottom: clamp(1rem, 2.5vw, 1.75rem);
   right: clamp(0.9rem, 2vw, 1.6rem);
+  transition: opacity var(--duration-base) var(--ease-smooth),
+    transform var(--duration-base) var(--ease-smooth);
+}
+/* Stowed while a hero with its own pause button is still in view (see
+   MotionTogglePocket) -- fade down and out so only one motion button is live. */
+.cw-motion-toggle--pocket.is-stowed {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
 }
 
 /* When motion is globally paused, freeze every CSS animation. Canvas/WebGL
@@ -6146,6 +6300,45 @@ html.cw-motion-paused *::after {
   color: var(--text-secondary);
 }
 .cw-manifesto__panel p + p { margin-top: var(--space-sm); }
+
+/* Bullet groups inside the panel (the "I'll build it" + "No ..." lists). A
+   dash marker echoes the manifesto's own "--" cadence, in brand purple. */
+.cw-manifesto__list {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2xs);
+}
+.cw-manifesto__list li {
+  position: relative;
+  padding-left: 1.6em;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-manifesto__list li::before {
+  content: "--";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+/* Punch-line beats: a tight stack that reads as one breath (the "I'm not like
+   the others" run, the closers). Slightly stronger than body paragraphs. */
+.cw-manifesto__beats { margin-top: var(--space-sm); }
+.cw-manifesto__beats p {
+  font-size: var(--text-base);
+  line-height: var(--leading-snug, 1.4);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.cw-manifesto__beats p + p { margin-top: var(--space-3xs, 0.25rem); }
+/* A beats block that follows a list or paragraph still needs breathing room. */
+.cw-manifesto__panel .cw-manifesto__list + .cw-manifesto__beats,
+.cw-manifesto__panel p + .cw-manifesto__beats { margin-top: var(--space-md); }
+.cw-manifesto__panel .cw-manifesto__beats + p,
+.cw-manifesto__panel .cw-manifesto__beats + .cw-manifesto__list { margin-top: var(--space-md); }
 
 /* The homepage TEASER: a frosted-glass CTA button (same glass as the panel) that
    sits under the question and links to the full manifesto on /about/. */

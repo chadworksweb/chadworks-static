@@ -1,18 +1,65 @@
-// The "who is chadworks for?" manifesto -- the destination-over-platform thesis,
-// drawn from the Crystopa Forge vision docs: build the thing that pulls an
-// audience off rented social feeds and onto ground the business actually owns.
-// Lives in FULL on the About page (frosted panel over the LT cloud); the homepage
-// teases it with the heading + a "Read the manifesto" CTA. Authored as plain
-// strings (italics via *asterisks* through emphasize()).
+// The "who is chadworks for?" manifesto. Lives in FULL on the About page (frosted
+// panel over the LT cloud); the homepage teases it with eyebrow + heading + intro
+// + a "Read the manifesto" CTA. The About panel renders MANIFESTO.body as typed
+// blocks: "p" paragraphs, "list" bullet groups, and "beats" tight punch-line
+// stacks. Copy is authored verbatim (italics via *asterisks* through emphasize()).
+export type ManifestoBlock =
+  | { kind: "p"; text: string }
+  | { kind: "list"; items: string[] }
+  | { kind: "beats"; items: string[] };
+
 export const MANIFESTO = {
   eyebrow: "The chadworks manifesto",
   heading: "who is chadworks for?",
   intro:
     "chadworks is for motivated individuals and organizations that want to double down on authentic digital presence as a counter measure to social media burnout and AI saturation.",
-  paragraphs: [
-    "The internet used to be a place you visited, somewhere you explored and wanted to spend real time. Social media traded that in for an endless scroll that is fun to use and built to extract: the algorithm buries your reach behind strangers and cat videos, and every follower you earn belongs to the platform instead of to you.",
-    "chadworks builds *the other thing*. A destination on a domain you own, where the people looking for you arrive and actually want to stay. You keep the part of the modern web that works, the immersion and the pull of an experience worth the visit, and you lose the part that doesn't, the noise and the rented attention. Both the audience and the work belong to you, and nobody gets to change the terms overnight.",
-    "Nothing here starts from a template, because a template skips the thinking and stamps you with the same look as everyone else who bought it. Every site is built from zero around your actual business, and it ships as clean, portable code you own outright and can take to any host on earth, anytime. I earn the relationship by being essential, not by trapping you.",
-    "This is for the motivated few: the ones who would rather build something they *own* than keep renting their reach, and whose work gives people something real instead of one more thing to scroll past. If that is you, a digital home that lifts your audience up out of the feed and into a world that is unmistakably yours is the most valuable thing you can put online.",
-  ],
+  body: [
+    {
+      kind: "p",
+      text: "chadworks builds websites and digital experiences for individuals, businesses or organizations that have big ideas or radical perspectives; initiatives that want to shake the Earth beneath our institutionalized culture and society.",
+    },
+    {
+      kind: "list",
+      items: [
+        "That wild idea that nobody thinks will work, I'll build it.",
+        "That online business idea that's too complicated for a freelancer but costs too much by an agency, I'll build it.",
+        "That anti-social media platform that will piss off the cool kids, I'll build it.",
+        "That social justice platform that needs a values-aligned web dev, I'll build it.",
+      ],
+    },
+    {
+      kind: "beats",
+      items: [
+        "I'm not like the others.",
+        "I don't want to sell you maintenance, hosting or retainers.",
+        "I don't want to amass a cache of clients and expand into an agency.",
+        "And I most certainly don't want to stay in my seat.",
+      ],
+    },
+    {
+      kind: "p",
+      text: "I want to build websites and platforms for the true movers and shakers of the world.",
+    },
+    {
+      kind: "list",
+      items: [
+        "No Squarespace",
+        "No WordPress (unless it makes sense)",
+        "No WIX, no Divi, no Elementor",
+        "No templates",
+      ],
+    },
+    { kind: "beats", items: ["No problem."] },
+    {
+      kind: "p",
+      text: "I know my matching client partners are out there. I know our world is ripe for fresh ideas that challenge, ignore and aim to shatter the status quo.",
+    },
+    {
+      kind: "beats",
+      items: [
+        "If that's you, I want to work with you.",
+        "chadworks is who you need to match your wild, liberated, unbridled ambition.",
+      ],
+    },
+  ] satisfies ManifestoBlock[],
 };

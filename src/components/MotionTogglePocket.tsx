@@ -6,6 +6,10 @@
 // whose isolated header ALREADY carries the toggle (the one-pager homepage)
 // render nothing here -- see ISOLATED_HEADER_ROUTES.
 //
+// When the hero carries its OWN pause button (any heroArt page), this pocket
+// copy stays stowed until the hero has fully scrolled out of view, so the page
+// never shows two live motion buttons at once.
+//
 // Under an unforced reduced-motion preference it becomes "Start motion" (forces
 // the full experience for the session); otherwise it is the pause/resume toggle.
 
@@ -25,18 +29,51 @@ export function MotionTogglePocket() {
   const pathname = usePathname();
   const [paused, setPaused] = useState(false);
   const [offerStart, setOfferStart] = useState(false);
+  // True while a hero that carries its own pause button is still in view.
+  const [heroInView, setHeroInView] = useState(false);
 
   useEffect(() => {
     setOfferStart(isReducedMotionUnforced());
   }, []);
 
+  useEffect(() => {
+    // The hero's own toggle is a .svc-hero__art-toggle WITHOUT .cw-motion-toggle
+    // (which only the global/pocket copies carry). Gate the pocket only when
+    // that button is actually rendered (visible; offsetParent is null when the
+    // <=900px rule display:none's it, so mobile keeps the pocket as normal).
+    const heroToggle = document.querySelector(
+      ".svc-hero__art-toggle:not(.cw-motion-toggle)"
+    );
+    const hero =
+      heroToggle instanceof HTMLElement && heroToggle.offsetParent !== null
+        ? heroToggle.closest(".svc-hero")
+        : null;
+    if (!hero) {
+      setHeroInView(false);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => setHeroInView(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(hero);
+    return () => io.disconnect();
+  }, [pathname]);
+
   if (ISOLATED_HEADER_ROUTES.has(pathname)) return null;
+
+  // The start-motion invite is never stowed -- under reduced motion the hero
+  // art (and its toggle) are hidden, so there is no second button to clash with.
+  const stowed = !offerStart && heroInView;
+  const className =
+    "svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket" +
+    (stowed ? " is-stowed" : "");
 
   if (offerStart) {
     return (
       <button
         type="button"
-        className="svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket"
+        className={className}
         onClick={enableForcedMotion}
       >
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -50,8 +87,10 @@ export function MotionTogglePocket() {
   return (
     <button
       type="button"
-      className="svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket"
+      className={className}
       aria-pressed={paused}
+      aria-hidden={stowed}
+      tabIndex={stowed ? -1 : undefined}
       onClick={() => {
         const next = !paused;
         setPaused(next);

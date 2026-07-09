@@ -25,9 +25,27 @@ export function ManifestoSection() {
         <h2>{MANIFESTO.heading}</h2>
         <p className="svc-lede measure-prose">{MANIFESTO.intro}</p>
         <div className="cw-manifesto__panel">
-          {MANIFESTO.paragraphs.map((p, i) => (
-            <p key={i}>{emphasize(p)}</p>
-          ))}
+          {MANIFESTO.body.map((block, i) => {
+            if (block.kind === "list") {
+              return (
+                <ul key={i} className="cw-manifesto__list">
+                  {block.items.map((it, j) => (
+                    <li key={j}>{emphasize(it)}</li>
+                  ))}
+                </ul>
+              );
+            }
+            if (block.kind === "beats") {
+              return (
+                <div key={i} className="cw-manifesto__beats">
+                  {block.items.map((it, j) => (
+                    <p key={j}>{emphasize(it)}</p>
+                  ))}
+                </div>
+              );
+            }
+            return <p key={i}>{emphasize(block.text)}</p>;
+          })}
         </div>
       </SectionShell>
     </div>

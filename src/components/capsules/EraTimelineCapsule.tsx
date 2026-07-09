@@ -4,9 +4,10 @@
 // "2008") and plain narrative text, plus the `about-era` style hook.
 
 import { statementTone } from "@/lib/capsule";
+import { emphasize } from "@/lib/emphasize";
 import { SectionShell } from "@/components/capsules/SectionShell";
 
-export type Era = { label: string; text: string };
+export type Era = { label: string; title?: string; text: string };
 
 export type EraTimelineCapsuleProps = {
   heading: string;
@@ -21,7 +22,7 @@ export function EraTimelineCapsule({
 }: EraTimelineCapsuleProps) {
   return (
     <>
-      <SectionShell full className="svc-statements-intro">
+      <SectionShell full className="svc-statements-intro cw-era-intro">
         <h2 className="svc-statements__heading">{heading}</h2>
       </SectionShell>
       {eras.map((era, i) => {
@@ -38,10 +39,15 @@ export function EraTimelineCapsule({
             }}
           >
             <div className="svc-statement__row">
-              <span className="svc-statement__num" aria-hidden="true">
-                {era.label}
-              </span>
-              <p className="svc-statement__text">{era.text}</p>
+              <div className="svc-statement__label">
+                <span className="svc-statement__num" aria-hidden="true">
+                  {era.label}
+                </span>
+                {era.title && (
+                  <span className="svc-statement__subtitle">{era.title}</span>
+                )}
+              </div>
+              <p className="svc-statement__text">{emphasize(era.text)}</p>
             </div>
           </SectionShell>
         );

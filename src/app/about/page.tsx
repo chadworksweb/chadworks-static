@@ -7,20 +7,18 @@
 // voice; real facts only. JSON-LD: AboutPage + Person + BreadcrumbList.
 
 import type { Metadata } from "next";
-import Link from "next/link";
 import { SITE_URL, ORG } from "@/lib/service";
 import {
   PageComposer,
   HeroCapsule,
   EraTimelineCapsule,
   ProofCapsule,
-  ApproachCapsule,
-  MadeByCapsule,
-  QualificationCapsule,
-  CtaCapsule,
+  AboutChadCapsule,
+  FitCapsule,
+  MainContactCapsule,
 } from "@/components/capsules";
 import ManifestoSection from "@/components/ManifestoSection";
-import type { LeadFormConfig } from "@/lib/forms";
+import { AboutHeroArt } from "@/components/art/AboutHeroArt";
 
 const PAGE_URL = `${SITE_URL}/about/`;
 const TITLE = "About Chad: Designing Since Age 11 | chadworks";
@@ -85,114 +83,79 @@ const breadcrumbJsonLd = {
 
 // The era timeline: each entry rides one statement band (the band-arc engine
 // from ServiceTemplate, called here with era labels in the numeral slot).
-const ERAS: { label: string; text: string }[] = [
+const ERAS: { label: string; title?: string; text: string }[] = [
   {
-    label: "Age 11",
-    text: "The designing started at age 11 and never stopped. Nobody picks a career at 11; this one kept showing up every day until it was one.",
+    label: "1999",
+    title: "Dialup era",
+    text: "First personal computer. Playing computer games, using email and learning how the internet worked.",
   },
   {
-    label: "8th grade",
-    text: "Xanga and MySpace profile pages taught me HTML in 8th grade, one borrowed layout code at a time.",
+    label: "2000",
+    title: "ISDN era",
+    text: "Building hobby sites with Dreamweaver and NetObjects. Learning the development side of the internet.",
   },
   {
-    label: "ISDN",
-    text: "Photoshop came next, learned over an ISDN line that turned every upload into a waiting game. Slow internet teaches you to get it right before you hit send.",
+    label: "2003",
+    title: "DSL era",
+    text: "First paying client at 12 years old under my first company name, *ChaddyD Creations*. Learning Photoshop and HTML/CSS via Xanga and MySpace.",
   },
   {
     label: "2008",
-    text: "Client work began in 2008. Real businesses with real deadlines, and the lesson that a website only matters if it does its job.",
+    title: "Broadband era",
+    text: "Freelance work begins as my main source of income. I enroll in Art Institute of Pittsburgh, majoring in Web Design.",
   },
   {
-    label: "2019-2025",
-    text: "The archive from 2019 through 2025 alone holds 50+ client engagements, sitting on top of the decade that came before them.",
+    label: "2011",
+    text: "Moved to Brooklyn for an agency job as an SEO. Lasted three months, then back to freelance. Learned a lot, but I'm not an employee.",
   },
   {
-    label: "Now",
-    text: "AI lifted the ceiling. Visions that used to need an agency budget and a full team now get custom built at this desk, which is why the work is fun again.",
+    label: "2012",
+    text: "Rebranded as *CDL500*. Doubled down on WordPress. Dozens of keywords ranked on page 1 of Google. Gave a presentation at 2019 WordCamp NYC.",
+  },
+  {
+    label: "2021",
+    text: "Moved back to hometown in Greater Philadelphia, rebranded as *chadworks*.",
+  },
+  {
+    label: "2026",
+    text: "Refreshed *chadworks* brand as a vision-based creative firm, not a commodified web designer. Portfolio of over 250 personally serviced clients.",
   },
 ];
 
-const PROOF: { label: string; href: string; detail: string }[] = [
+const PROOF: { label: string; href?: string; detail?: string }[] = [
   {
-    label: "Shopify at multi-million volume",
-    href: "/shopify/",
-    detail:
-      "I've used Shopify for a multi-million dollar manufacturing company, so my platform advice comes from that kind of scale.",
+    label:
+      "Built multi-million dollar manufacturing brand's first D2C and B2B e-commerce stores on Shopify.",
+    href: "https://idesignhome.com/",
   },
   {
-    label: "A law firm inside Google's AI Overview",
-    href: "/ai-viz/",
-    detail:
-      "A Pennsylvania criminal-defense firm I work with appears in Google's AI Overview for its practice area, with page one of classic search underneath it.",
+    label:
+      "Dominated relevant keywords for 12-location early childhood enrichment franchise in NYC.",
+    href: "https://ftkny.com/",
   },
   {
-    label: "Page one in a brutal market",
-    href: "/seo/",
-    detail:
-      "A Brooklyn psychologist ranks page one for the phrase locals type when they look for a therapist in his neighborhood, and AI assistants now name him too.",
+    label: "Ranked Brooklyn recording studio on page 1 of google",
+    href: "https://douglassrecording.com/",
   },
   {
-    label: "This site is the resume",
-    href: "/custom-coded-static/",
-    detail:
-      "chadworks.co is a custom-coded static site: the same fast, schema-heavy build I sell, doing its own job in public.",
+    label:
+      "Gave a 'sold out' presentation at the official 2019 WordPress WordCamp conference in NYC.",
+    href: "https://nyc.wordcamp.org/2019/session/seo-getting-all-green-in-yoast/",
   },
 ];
-
-const HOW: { title: string; body: string }[] = [
-  {
-    title: "You talk to the builder",
-    body: "The person who answers the email is the person who built your site. No account manager or ticket queue stands between you and the work.",
-  },
-  {
-    title: "Your wallet gets guarded",
-    body: "If a free tool does the job, you'll hear it from me first. Mailchimp is free up to 500 contacts, and clients hear exactly that before anyone talks about spending.",
-  },
-  {
-    title: "The no is part of the service",
-    body: "When a build or a channel won't pay for itself, I say so before the money moves. A straight answer costs you nothing and saves you plenty.",
-  },
-  {
-    title: "You own every piece",
-    body: "Code, hosting, accounts, working files. Everything is yours from day one, and nothing ever gets held hostage.",
-  },
-];
-
-const FORM: LeadFormConfig = {
-  source: "about page",
-  subject: "New Inquiry from the About Page (chadworks)",
-  submitLabel: "Send it to Chad",
-  successMessage:
-    "Got it. I read every one of these myself, and you'll hear back from me within a day.",
-  fields: [
-    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
-    { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
-    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
-    { kind: "text", name: "business", label: "Business Name", span: "half" },
-    {
-      kind: "textarea",
-      name: "details",
-      label: "What are you building?",
-      required: true,
-      rows: 4,
-      placeholder: "What you're building, and where it's stuck today.",
-    },
-    { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
-  ],
-};
 
 export default function AboutPage() {
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, personJsonLd]}>
-      {/* HERO -- TitleReveal paints the brand color field through the
-          letterforms as the cursor crosses them. */}
+      {/* HERO -- the rising-chip stream runs miniature cutouts of Chad, the one
+          spot on the site where the humor lands. */}
       <HeroCapsule
         className="about-hero"
         crumbs={[{ label: "Home", href: "/" }, { label: "About" }]}
-        eyebrow="The person behind chadworks"
-        title="Chad"
-        titleReveal="/about/reveal-art.svg"
-        lede="chadworks is one person. I'm Chad, designing since age 11 and custom-building websites for 20 years. There's no team behind a curtain and no account manager translating. The person you email is the person who writes the code."
+        eyebrow="The Chad behind chadworks"
+        title="About chadworks"
+        heroArt={<AboutHeroArt />}
+        lede="Hi, I'm Chad D.L., the Chad behind chadworks. Yep, just me. I've been building websites for over 20 years—since I was 11 years old, in fact. Web design is not just an occupation for me, it's a method by which information is communicated between parties, whether that's person to person, business to person, or business to business. I specialize in getting the information to and from the right places in a meaningful and visually stunning yet effective manner."
         cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
 
@@ -201,81 +164,21 @@ export default function AboutPage() {
       <ManifestoSection />
 
       {/* THE STORY -- era timeline on the build-time band arc. */}
-      <EraTimelineCapsule heading="The story, era by era" eras={ERAS} />
+      <EraTimelineCapsule heading="chadworks historical timeline" eras={ERAS} />
 
       {/* PROOF -- concrete, linked, anonymized per the permission flags. */}
-      <ProofCapsule proof={{ heading: "What twenty years looks like", items: PROOF }} />
+      <ProofCapsule proof={{ heading: "Notable Achievements", items: PROOF }} variant="achievements" />
 
-      {/* HOW I WORK -- the working principles, dark anchor. */}
-      <ApproachCapsule
-        scheme="inverted"
-        approach={{ heading: "How I work", steps: HOW }}
-      />
+      {/* WHO I WORK WITH -- the canonical fit block, shared with the homepage
+          and service pages. */}
+      <FitCapsule />
 
-      {/* MADE-BY -- the made block, about edition. */}
-      <MadeByCapsule
-        made={{
-          eyebrow: "The human",
-          heading: "It's me, your web guy.",
-          img: "/people/chad-cutout.webp",
-          imgAlt: "Chad, the person behind chadworks",
-          captionMain: "Yes, this is the whole company.",
-          captionSub: "(That's the point.)",
-          intro:
-            "Twenty years of building websites, and the part I'd never automate is this: when you email chadworks, you get me.",
-          manifesto: [
-            { lead: "Designing since age 11.", aside: "(Not a metaphor.)" },
-            { lead: "HTML since 8th grade.", aside: "(Thanks, MySpace.)" },
-            { lead: "Paid client builds since 2008.", aside: "(50+ engagements since 2019.)" },
-            { lead: "Every site custom built.", aside: "(Including this one.)" },
-          ],
-          negation: [
-            "No subcontractors.",
-            "No offshore handoffs.",
-            "No invented case studies.",
-            "No pretending the process is polished when DNS won't propagate and dinner is late.",
-          ],
-          close:
-            "The web has reinvented itself a dozen times since I started. The deal here never changed: you get the person, not a brand wrapper.",
-          sig: "Chad",
-          sigMeta: "chadworks (designing since age 11)",
-        }}
-      />
+      {/* THE HUMAN -- the canonical "the Chad behind chadworks" block, shared
+          with the homepage and service pages. */}
+      <AboutChadCapsule />
 
-      {/* QUALIFICATION -- big-ticket posture on the grain band. */}
-      <QualificationCapsule
-        qualification={{
-          heading: "Who I build for",
-          fit: [
-            "You want what you want, and you'd rather pay to have it built right than negotiate it down to almost.",
-            "You see the site and the visibility behind it as an investment that should return, not a cost to shrink.",
-          ],
-          notFit: [
-            "The lowest number decides. I'm not the cheapest, deliberately, and I'd rather say that here than after a proposal.",
-            "You want a template with your logo dropped in. Plenty of builders do that, and I'm not one of them.",
-          ],
-        }}
-        footer={
-          <p className="about-qual-ps">
-            The numbers themselves are public. The{" "}
-            <Link href="/rates/">rates page</Link> lays them out in full, with the
-            math showing.
-          </p>
-        }
-      />
-
-      {/* CTA -- dark band, copy left, the page's own form right. */}
-      <CtaCapsule
-        scheme="inverted"
-        form={FORM}
-        cta={{
-          heading: "Tell me what you're building",
-          body:
-            "Whatever it is, you'll get a straight answer from the person who'd actually do the work, usually within a day.",
-          buttonLabel: "",
-          href: "/contact/",
-        }}
-      />
+      {/* CONTACT -- the canonical contact block, shared with the homepage. */}
+      <MainContactCapsule />
     </PageComposer>
   );
 }

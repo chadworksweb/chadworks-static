@@ -64,7 +64,7 @@ export type ServiceStep = {
 export type ServiceProof = {
   // A concrete proof point: example, result, or portfolio link. No vague claims.
   label: string;
-  detail: Writable;
+  detail?: Writable;
   href?: string;
 };
 
