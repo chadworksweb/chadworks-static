@@ -7,12 +7,21 @@ import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { isLaunched } from "@/lib/launch";
 
-export function RatesCapsule() {
+// `standalone` = the /rates/ page use: the heading renders as the page's H1 in
+// the standard hero-title styling (the removed rates hero), and the redundant
+// "view rate details" self-link is dropped.
+export function RatesCapsule({ standalone = false }: { standalone?: boolean } = {}) {
   return (
     <SectionShell full className="cw-pricing">
       <div className="cw-pricing__head">
         <p className="eyebrow">What it costs</p>
-        <h2 className="cw-pricing__heading">Transparent rates.</h2>
+        {standalone ? (
+          <h1 className="svc-hero__title cw-pricing__heading--hero">
+            <span className="text-gradient">Transparent rates.</span>
+          </h1>
+        ) : (
+          <h2 className="cw-pricing__heading">Transparent rates.</h2>
+        )}
       </div>
       <div className="cw-pricing__grid">
         <div className="cw-price-card panel">
@@ -36,7 +45,7 @@ export function RatesCapsule() {
         for information only, not a formal quote or binding offer. Your actual
         price is set in a written proposal before any work begins.
       </p>
-      {isLaunched("/rates/") && (
+      {!standalone && isLaunched("/rates/") && (
         <div className="cw-pricing__cta">
           <Link href="/rates/" className="svc-btn cw-pricing__cta-btn">
             <span className="svc-btn__label">View rate details</span>

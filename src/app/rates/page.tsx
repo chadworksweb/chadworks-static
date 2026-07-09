@@ -7,16 +7,7 @@
 
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/service";
-import {
-  PageComposer,
-  HeroCapsule,
-  PriceCapsule,
-  ApproachCapsule,
-  QualificationCapsule,
-  FaqCapsule,
-  CtaCapsule,
-} from "@/components/capsules";
-import type { LeadFormConfig } from "@/lib/forms";
+import { PageComposer, RatesCapsule, MainContactCapsule } from "@/components/capsules";
 
 const PAGE_URL = `${SITE_URL}/rates/`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
@@ -42,103 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-// --- The show-the-math ledger: the real numbers, every one of them the same
-// hourly rate times the hours the work honestly takes. ---
-const LEDGER: { label: string; num: string; note: string }[] = [
-  {
-    label: "The rate everything bills from",
-    num: "$315 / hour",
-    note: "One rate for design, code, and the visibility work behind it. No mystery line items, no agency markup stacked on top.",
-  },
-  {
-    label: "The floor: the smallest engagement",
-    num: "$3,200",
-    note: "Below this the project is too small to do at the standard, so this is where it starts. A focused site, built right, owned by you.",
-  },
-  {
-    label: "Where most websites land",
-    num: "~$6,200",
-    note: "A full site built for speed, with the structure and schema that gets it found. This is the typical number, not a teaser that climbs once you are committed.",
-  },
-  {
-    label: "WordPress care, ongoing",
-    num: "$550 / 6 months",
-    note: "Updates, backups, and a human watching the site for WordPress clients who want it maintained instead of left to drift.",
-  },
-];
-
-// --- What the number actually buys (value framing, big-ticket posture). ---
-const BUYS: { title: string; body: string }[] = [
-  {
-    title: "The person who writes the code",
-    body: "You are paying for the builder directly, not a project manager relaying your notes to someone offshore. The email and the work come from the same desk.",
-  },
-  {
-    title: "A site that is an asset, not a cost",
-    body: "Structured and fast, built to get found in search and named by AI assistants. The kind of site that earns its number back instead of sitting there looking expensive.",
-  },
-  {
-    title: "Honesty before the money moves",
-    body: "When a cheaper path does the job, you hear it first. When a build will not pay for itself, you hear that too, before anyone spends.",
-  },
-  {
-    title: "Everything in your name",
-    body: "Code, hosting, accounts, working files. It is all yours from day one, so the value you bought never gets held hostage later.",
-  },
-];
-
-// --- FAQ (rates-specific; feeds FAQPage JSON-LD). ---
-const FAQS: { q: string; a: string }[] = [
-  {
-    q: "Why $315 an hour?",
-    a: "Because it reflects twenty years of doing this and a result you can point to, not a rate set to undercut the next bid. One rate covers design, code, and the visibility work, so you are never guessing which specialist costs what. You are hiring one person who does all of it well.",
-  },
-  {
-    q: "Can you do it cheaper?",
-    a: "Not while keeping the standard, and I would rather say that here than after a proposal. There are plenty of cheaper options, and some of them are fine for a logo dropped onto a template. If the lowest number is the thing that decides it, then we are probably not the right fit for each other.",
-  },
-  {
-    q: "What makes a project hit the $3,200 floor versus the $6,200 typical?",
-    a: "Scope and structure. A floor project is focused: a clean, fast site that does one job well. The typical $6,200 build adds the depth that gets a business found, more pages with real structure, the schema and content that AI assistants read, and the polish that makes it read as credible. Both are the same hourly rate times honest hours.",
-  },
-  {
-    q: "Is the price fixed before we start?",
-    a: "You get a real number before any work begins, scoped to what you actually want. It is not a teaser that climbs once you are committed. If the scope changes mid-project, we talk about it before the number does, never after.",
-  },
-  {
-    q: "What is the $550 every 6 months for?",
-    a: "WordPress maintenance for clients who want their site cared for instead of left to drift: core and plugin updates, backups, and a human watching for the things that break quietly. It is optional. Custom-coded static sites need far less upkeep, which is part of why they cost less to own over time.",
-  },
-  {
-    q: "Do you take payments over time?",
-    a: "Projects are typically split into milestones, so you are paying against work delivered rather than all at once up front. Monthly website financing is not something chadworks offers anymore. The rates here are the whole picture.",
-  },
-];
-
-const FORM: LeadFormConfig = {
-  source: "rates page",
-  subject: "New Inquiry from the Rates Page (chadworks)",
-  submitLabel: "Send it to Chad",
-  successMessage:
-    "Got it. I read every one of these myself, and you'll hear back from me within a day with a straight answer on the number.",
-  fields: [
-    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
-    { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
-    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
-    { kind: "text", name: "business", label: "Business Name", span: "half" },
-    {
-      kind: "textarea",
-      name: "details",
-      label: "What are you building, and what's the budget you have in mind?",
-      required: true,
-      rows: 4,
-      placeholder: "The project, and roughly where you'd like the number to land.",
-    },
-    { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
-  ],
-};
-
-// --- JSON-LD (GEO checklist 2): WebPage + FAQPage + 2-level BreadcrumbList. ---
+// --- JSON-LD (GEO checklist 2): WebPage + 2-level BreadcrumbList. ---
 const webPageJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebPage",
@@ -166,16 +61,6 @@ const webPageJsonLd = {
   },
 };
 
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQS.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
-};
-
 const breadcrumbJsonLd = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
@@ -187,83 +72,11 @@ const breadcrumbJsonLd = {
 
 export default function RatesPage() {
   return (
-    <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd, faqJsonLd]}>
-      <HeroCapsule
-        className="rates-hero"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Rates" }]}
-        eyebrow="What this costs"
-        title="Rates"
-        lede="Work bills at $315 an hour. The smallest engagement is $3,200, and most websites land near $6,200. Those are the real numbers, on the table before we start, because you should get to see the math before you decide anything."
-        cta={{ href: "/contact/", buttonLabel: "Get a straight answer" }}
-      />
-
-      {/* SHOW THE MATH -- the glass price panel + the show-the-math ledger. */}
-      <PriceCapsule
-        variant="ledger"
-        ledger={LEDGER}
-        panelClassName="rates-panel"
-        headingFill
-        ctaHref="/contact/"
-        ctaLabel="Get a real number"
-        price={{
-          heading: "The numbers, with the math showing",
-          figure: "$315 / hour",
-          figureSub: "Everything bills from one rate",
-          body:
-            "Every number below is that hourly rate times the hours the work honestly takes. Nothing is padded or buried, and no surprise line item waits for you at the end of the project.",
-          disclaimer: (
-            <>
-              <strong>One promise about the number:</strong>{" "}the quote you get is
-              scoped to what you actually want, and it does not climb once you are
-              committed. If the scope grows, we talk about it before the price
-              does.
-            </>
-          ),
-        }}
-      />
-
-      {/* WHAT THE NUMBER BUYS -- value framing on the dark anchor. */}
-      <ApproachCapsule
-        scheme="inverted"
-        approach={{ heading: "What the number actually buys", steps: BUYS }}
-      />
-
-      {/* QUALIFICATION -- big-ticket posture on the grain band. */}
-      <QualificationCapsule
-        qualification={{
-          heading: "Whether the number fits",
-          fit: [
-            "You read a website as an investment that should return, and you would rather it be built right than built cheap.",
-            "You want the number on the table early, with the reasoning behind it, so you can decide with the full picture.",
-          ],
-          notFit: [
-            "The lowest bid is the thing that decides it. I am not the cheapest, deliberately, and I would rather tell you that now than after a proposal.",
-            "You need a template with a logo dropped in. That work exists, it costs less, and it is not what this rate is for.",
-          ],
-        }}
-      />
-
-      {/* FAQ -- light (the dark CTA follows; PageComposer demotes it, rule 9). */}
-      <FaqCapsule
-        scheme="inverted"
-        schemeAuto
-        heading="Questions about the money"
-        faqLead="The honest answers, including the ones most sites skip. If yours is not here, ask it directly and you will get the same straight read."
-        faqs={FAQS}
-      />
-
-      {/* CTA -- dark band, copy left, the page's own form right. */}
-      <CtaCapsule
-        scheme="inverted"
-        form={FORM}
-        cta={{
-          heading: "Want a number for your project?",
-          body:
-            "Tell me what you are building and roughly where you would like the number to land. You will get a straight answer from the person who would do the work, usually within a day.",
-          buttonLabel: "",
-          href: "/contact/",
-        }}
-      />
+    <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
+      {/* The shared rates band, with the heading in the standard hero-H1 style. */}
+      <RatesCapsule standalone />
+      {/* The contact CTA below it. */}
+      <MainContactCapsule />
     </PageComposer>
   );
 }

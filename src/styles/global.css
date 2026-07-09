@@ -6539,6 +6539,9 @@ html.cw-motion-paused *::after {
   font-size: var(--text-2xl);
   margin-top: var(--space-2xs);
 }
+/* Standalone /rates/ heading: the standard hero H1 (svc-hero__title) sitting
+   under the pricing eyebrow. */
+.cw-pricing__heading--hero { margin-top: var(--space-2xs); }
 .cw-pricing__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
