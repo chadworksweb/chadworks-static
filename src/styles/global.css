@@ -644,8 +644,6 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: none;
   cursor: pointer;
   color: var(--text-tertiary);
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 .site-footer__prefs-btn:hover { color: var(--text-primary); }
 
