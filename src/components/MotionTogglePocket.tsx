@@ -32,6 +32,9 @@ export function MotionTogglePocket() {
   const [offerStart, setOfferStart] = useState(false);
   // True while a hero that carries its own pause button is still in view.
   const [heroInView, setHeroInView] = useState(false);
+  // False until the hero check below has run once. Until then the pocket is held
+  // hidden (no transition) so it never flashes in and then stows on a hero page.
+  const [measured, setMeasured] = useState(false);
 
   useEffect(() => {
     setOfferStart(isReducedMotionUnforced());
@@ -51,10 +54,14 @@ export function MotionTogglePocket() {
         : null;
     if (!hero) {
       setHeroInView(false);
+      setMeasured(true);
       return;
     }
     const io = new IntersectionObserver(
-      ([entry]) => setHeroInView(entry.isIntersecting),
+      ([entry]) => {
+        setHeroInView(entry.isIntersecting);
+        setMeasured(true);
+      },
       { threshold: 0 }
     );
     io.observe(hero);
@@ -68,6 +75,7 @@ export function MotionTogglePocket() {
   const stowed = !offerStart && heroInView;
   const className =
     "svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket" +
+    (measured ? "" : " is-premeasure") +
     (stowed ? " is-stowed" : "");
 
   if (offerStart) {

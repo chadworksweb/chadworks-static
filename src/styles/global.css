@@ -441,8 +441,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
   20%  { transform: skewX(-4deg) translateX(2px); }
   40%  { transform: skewX(3deg) translateX(-1px); }
   60%  { transform: skewX(-1deg) translateX(1px); }
-  80%  { transform: none; clip-path: inset(20% 0 30% 0); }
-  100% { transform: none; clip-path: none; }
+  80%  { transform: skewX(1deg) translateX(-1px); }
+  100% { transform: none; }
 }
 @keyframes cw-logo-glitch-indigo {
   0%   { opacity: 0; }
@@ -6137,6 +6137,13 @@ p, li, dd, figcaption { text-wrap: pretty; }
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
+}
+/* Held hidden (instantly, no fade) until the hero visibility check runs once, so
+   the pocket never flashes in and then stows on a page with a hero toggle. */
+.cw-motion-toggle--pocket.is-premeasure {
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
 }
 
 /* When motion is globally paused, freeze every CSS animation. Canvas/WebGL

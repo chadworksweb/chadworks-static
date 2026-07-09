@@ -306,15 +306,8 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
 
     // Pointer field. The canvas is pointer-events:none, so track on window and
     // map to canvas-local coords; influence engages only within ~one orb radius
-    // of the canvas, and releases when the pointer leaves the document.
-    // Over the orb field the pointer is hidden -- the orb itself reads as the
-    // cursor. (cursor is inherited, so set it on <body>.)
-    let cursorOn = false;
-    const setCursor = (on: boolean) => {
-      if (on === cursorOn) return;
-      cursorOn = on;
-      document.body.style.cursor = on ? "none" : "";
-    };
+    // of the canvas, and releases when the pointer leaves the document. The
+    // cursor stays visible -- no cursor hiding over the hero.
     const onMove = (e: MouseEvent) => {
       const lx = e.clientX - rectL;
       const ly = e.clientY - rectT;
@@ -323,14 +316,9 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       const inZone =
         lx > -ORB_R && lx < cssW + ORB_R && ly > -ORB_R && ly < cssH + ORB_R;
       orbTargetStr = inZone ? 1 : 0;
-      // Hide the pointer ONLY while strictly over the hero canvas -- never let it
-      // bleed into the header above or the next section below the hero.
-      const overCanvas = lx >= 0 && lx <= cssW && ly >= 0 && ly <= cssH;
-      setCursor(overCanvas);
     };
     const onLeave = () => {
       orbTargetStr = 0;
-      setCursor(false);
     };
     const onScroll = () => {
       const b = canvas.getBoundingClientRect();
@@ -350,7 +338,6 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
       document.removeEventListener("mouseleave", onLeave);
-      document.body.style.cursor = "";
     };
   }, []);
 
