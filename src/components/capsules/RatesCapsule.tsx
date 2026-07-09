@@ -14,6 +14,13 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
   return (
     <SectionShell full className="cw-pricing">
       <div className="cw-pricing__head">
+        {standalone && (
+          <nav className="svc-crumbs" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">Rates</span>
+          </nav>
+        )}
         <p className="eyebrow">What it costs</p>
         {standalone ? (
           <h1 className="svc-hero__title cw-pricing__heading--hero">
