@@ -191,11 +191,6 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
         />
       </div>
 
-      {status === "success" && (
-        <div className="cw-form__message cw-form__message--success" role="status">
-          {config.successMessage}
-        </div>
-      )}
       {status === "error" && (
         <div className="cw-form__message cw-form__message--error" role="status">
           {mailtoHref ? (
@@ -240,6 +235,12 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
           {status === "sending" ? "Sending..." : config.submitLabel}
         </span>
       </button>
+
+      {status === "success" && (
+        <div className="cw-form__message cw-form__message--success" role="status">
+          {config.successMessage}
+        </div>
+      )}
     </form>
   );
 }

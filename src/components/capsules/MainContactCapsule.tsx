@@ -9,11 +9,10 @@ import { ContactCapsule } from "@/components/capsules/ContactCapsule";
 const EMAIL = "chad@chadworks.co";
 
 const QUICK: LeadFormConfig = {
-  source: "one-pager (quick)",
-  subject: "New Quick Contact from the One Pager (chadworks)",
+  source: "contact capsule (quick)",
+  subject: "New Quick Contact from the Contact Capsule (chadworks)",
   submitLabel: "Send message to Chad",
-  successMessage:
-    "Got it. This lands straight in my inbox and I read every one myself. You'll hear back within a day.",
+  successMessage: "Thank you, your message has been sent.",
   fields: [
     { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
     { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
@@ -29,11 +28,10 @@ const QUICK: LeadFormConfig = {
 };
 
 const DETAILED: LeadFormConfig = {
-  source: "one-pager (detailed)",
-  subject: "New Detailed Inquiry from the One Pager (chadworks)",
+  source: "contact capsule (detailed)",
+  subject: "New Detailed Inquiry from the Contact Capsule (chadworks)",
   submitLabel: "Send message to Chad",
-  successMessage:
-    "Got it, and thanks for the detail. I read every inquiry myself, and you'll hear back within a day with a straight answer on the number.",
+  successMessage: "Thank you, your message has been sent.",
   fields: [
     { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
     { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
