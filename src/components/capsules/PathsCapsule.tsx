@@ -21,30 +21,52 @@ export function PathsCapsule({ paths }: PathsCapsuleProps) {
         </p>
       )}
       <div className="svc-lanes">
-        {paths.items.map((p, i) => (
-          <Link
-            key={i}
-            href={p.href}
-            className="svc-lane"
-            style={
-              { "--lane-color": LANE_COLORS[i % LANE_COLORS.length] } as React.CSSProperties
-            }
-          >
-            <span className="svc-lane__num" aria-hidden="true">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span className="svc-lane__content">
-              <span className="svc-lane__title">{p.label}</span>
-              <span className="svc-lane__desc">
-                <W value={p.detail} />
+        {paths.items.map((p, i) => {
+          const style = {
+            "--lane-color": LANE_COLORS[i % LANE_COLORS.length],
+          } as React.CSSProperties;
+          const content = (
+            <>
+              <span className="svc-lane__num" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
               </span>
-              <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
-            </span>
-            {p.viz && (
-              <span className="svc-lane__viz" aria-hidden="true">{p.viz}</span>
-            )}
-          </Link>
-        ))}
+              <span className="svc-lane__content">
+                <span className="svc-lane__title">{p.label}</span>
+                <span className="svc-lane__desc">
+                  <W value={p.detail} />
+                </span>
+                {paths.comingSoon ? (
+                  <span
+                    className="svc-lane__arrow svc-lane__arrow--soon"
+                    tabIndex={0}
+                    aria-disabled="true"
+                  >
+                    Explore -&gt;
+                    <span className="svc-lane__tip" role="tooltip">
+                      coming soon
+                    </span>
+                  </span>
+                ) : (
+                  <span className="svc-lane__arrow" aria-hidden="true">
+                    Explore -&gt;
+                  </span>
+                )}
+              </span>
+              {p.viz && (
+                <span className="svc-lane__viz" aria-hidden="true">{p.viz}</span>
+              )}
+            </>
+          );
+          return paths.comingSoon ? (
+            <div key={i} className="svc-lane svc-lane--soon" style={style}>
+              {content}
+            </div>
+          ) : (
+            <Link key={i} href={p.href} className="svc-lane" style={style}>
+              {content}
+            </Link>
+          );
+        })}
       </div>
     </SectionShell>
   );

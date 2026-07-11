@@ -189,7 +189,9 @@ export type Service = {
   approach: { heading: string; steps: ServiceStep[] };
 
   // --- OPTIONAL funnel: route the reader to sub-options (hub pages) -----
-  paths?: { heading: string; intro?: Writable; items: ServicePath[] };
+  // `comingSoon` disables the lane links and greys the Explore button with a
+  // "coming soon" tooltip (used while the sub-pages are still being built).
+  paths?: { heading: string; intro?: Writable; items: ServicePath[]; comingSoon?: boolean };
 
   // --- OPTIONAL tiered offer: attainable entry module + stackable add-ons.
   // Product-style Situation pages only. Absent (and inert) on every existing

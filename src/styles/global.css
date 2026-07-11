@@ -464,10 +464,13 @@ p, li, dd, figcaption { text-wrap: pretty; }
   }
 }
 
-/* Mobile: the gem becomes a contained header band at the top, then the reveal
-   boxes stack top-to-bottom, then the gem sentence. Absolute positions go inert
-   (position: static). */
-@media (max-width: 768px) {
+/* Mobile + tablet: the gem becomes a contained header band at the top, then the
+   reveal boxes stack top-to-bottom, then the gem sentence. Absolute positions go
+   inert (position: static). The desktop scatter needs a wide gem to breathe;
+   below ~900px the % positions crowd the boxes over the gem and bury it, so the
+   stacked column takes over for the whole tablet range down through phones
+   (iPad portrait 768 landed in the broken desktop layout at the old 768 line). */
+@media (max-width: 900px) {
   .cw-gemreveal {
     min-height: 0;
     padding-block: 2.5rem;
@@ -1664,6 +1667,48 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: transform 0.4s var(--ease-smooth);
 }
 .svc-lane:hover .svc-lane__arrow { transform: translateX(0.4rem); }
+
+/* Coming-soon lanes: the sub-page isn't live yet, so the lane doesn't link.
+   The Explore button greys out and shows a "coming soon" tooltip on hover. */
+.svc-lane--soon { cursor: default; }
+.svc-lane--soon:hover .svc-lane__arrow--soon { transform: none; }
+.svc-lane__arrow--soon {
+  position: relative;
+  color: var(--text-tertiary);
+  cursor: default;
+}
+.svc-lane__tip {
+  position: absolute;
+  bottom: calc(100% + 0.55rem);
+  left: 0;
+  z-index: 3;
+  white-space: nowrap;
+  padding: 0.32rem 0.6rem;
+  border-radius: 7px;
+  background: var(--dark-bg);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease-smooth), transform 0.22s var(--ease-smooth);
+}
+.svc-lane__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 1rem;
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.svc-lane__arrow--soon:hover .svc-lane__tip,
+.svc-lane__arrow--soon:focus-visible .svc-lane__tip {
+  opacity: 1;
+  transform: translateY(0);
+}
 /* Right-column illustration (the septic industry_lane_viz pattern) */
 .svc-lane__viz {
   display: flex;
