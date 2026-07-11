@@ -29,8 +29,9 @@ const ARCHIVE: ArchiveItem[] = [
     alt: "Weather Map Generator app, designed and developed by chadworks",
     url: "map.tomtheweatherwizard.com",
     label: "Weather Map Generator",
+    href: "https://map.tomtheweatherwizard.com",
     blurb:
-      "A broadcast-style tool that turns a raw forecast into a clean, shareable weather map. You sketch the snow zones and drop the cities right on the map, then export a finished graphic ready to post.",
+      "Custom developed web and desktop app. A broadcast-style tool that turns a raw forecast into a clean, shareable weather map. You sketch the snow zones and drop the cities right on the map, then export a finished graphic ready to post.",
   },
   {
     key: "rslgo",
@@ -38,58 +39,9 @@ const ARCHIVE: ArchiveItem[] = [
     alt: "RSLgo website, designed and developed by chadworks",
     url: "rslgo.com",
     label: "RSLgo",
+    href: "https://rslgo.com",
     blurb:
       "A custom coded consulting practice website with ecommerce, custom-designed digital products and highly tailored landing/marketing pages.",
-  },
-  {
-    key: "aac",
-    slug: "aac",
-    alt: "AAC Event Catering website, designed and developed by chadworks",
-    url: "aaceventcatering.com",
-    label: "AAC Event Catering",
-    href: "https://aaceventcatering.com",
-    blurb:
-      "A catering brand that needed to look as polished as the events it runs. Booking-ready, and built to win the search.",
-  },
-  {
-    key: "edenscapes",
-    slug: "edenscapes",
-    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
-    url: "eden-scapes.com",
-    label: "EdenScapes",
-    href: "https://eden-scapes.com/japanese-garden-design-installation/",
-    blurb:
-      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
-  },
-  {
-    key: "massagepros",
-    slug: "massagepros",
-    alt: "Massage Professionals website, designed and developed by chadworks",
-    url: "massageprofessionalsllc.com",
-    label: "Massage Professionals",
-    href: "https://massageprofessionalsllc.com",
-    blurb:
-      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
-  },
-  {
-    key: "rozariolaw",
-    slug: "rozariolaw",
-    alt: "Rozario Law website, designed and developed by chadworks",
-    url: "rozariolaw.com",
-    label: "Rozario Law",
-    href: "https://rozariolaw.com",
-    blurb:
-      "A law practice has seconds to earn trust. This one opens steady and serious, and tells a visitor exactly what to do next.",
-  },
-  {
-    key: "thorobird",
-    slug: "thorobird",
-    alt: "Thorobird website, designed and developed by chadworks",
-    url: "thorobird.com",
-    label: "Thorobird",
-    href: "https://thorobird.com",
-    blurb:
-      "A brand site with a distinct point of view, custom built so it carries the personality the business actually has.",
   },
   {
     key: "chadlewine",
@@ -99,18 +51,67 @@ const ARCHIVE: ArchiveItem[] = [
     label: "Chad Lewine",
     href: "https://chadlewine.com",
     blurb:
-      "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
+      "Likely the world's most immersive and custom-developed artist website. Custom: ecommerce shop, content development, AI integration, API integration, email campaign manager, 3D graphics, effects, branding, CMS and much more.",
+  },
+  {
+    key: "aac",
+    slug: "aac",
+    alt: "AAC Event Catering website, designed and developed by chadworks",
+    url: "aaceventcatering.com",
+    label: "AAC Event Catering",
+    href: "https://aaceventcatering.com",
+    blurb:
+      "Custom WordPress-to-static catering company website with pixel-perfection and custom form spam blocking.",
+  },
+  {
+    key: "rozariolaw",
+    slug: "rozariolaw",
+    alt: "Rozario Law website, designed and developed by chadworks",
+    url: "rozariolaw.com",
+    label: "Rozario Law",
+    href: "https://rozariolaw.com",
+    blurb:
+      "WordPress website for NYC law firm with a custom homepage and custom blog system.",
+  },
+  {
+    key: "thorobird",
+    slug: "thorobird",
+    alt: "Thorobird website, designed and developed by chadworks",
+    url: "thorobird.com",
+    label: "Thorobird",
+    href: "https://thorobird.com",
+    blurb:
+      "WordPress website for NYC real estate brokerage firm with custom designed homepage.",
   },
 ];
+
+// The default flagship lede -- used everywhere unless a host page overrides it.
+const FEATURED_LEDE =
+  "The Rising Compass is a ground-up, custom web app that tracks and measures the messages contained in the lyrics of the world's most popular songs. I built and manage this 100%, top to bottom.";
 
 // `archiveHeading` names the archive-grid block, so each host page can title
 // it in its own context (the homepage frames it broadly, a service page frames
 // it to that service). The rest of the showroom is identical everywhere.
+//
+// OPTIONAL per-page copy overrides (leave both unset for the canonical
+// showroom): `featuredLede` swaps the flagship lede, and `blurbs` is a map
+// keyed by archive-item `key` (e.g. "rslgo") that replaces just those blurbs.
+// Any project not present in the map keeps its default blurb. Used by the
+// web-development page to speak to the development aspect of each build.
 export function PortfolioShowcaseCapsule({
   archiveHeading = "chadworks Project Showcase",
+  featuredLede,
+  blurbs,
 }: {
   archiveHeading?: string;
+  featuredLede?: string;
+  blurbs?: Record<string, string>;
 } = {}) {
+  const archive = blurbs
+    ? ARCHIVE.map((item) =>
+        blurbs[item.key] ? { ...item, blurb: blurbs[item.key] } : item
+      )
+    : ARCHIVE;
   return (
     <>
       {/* PORTFOLIO -- a centered titlebar: the section name flanked by two
@@ -132,12 +133,12 @@ export function PortfolioShowcaseCapsule({
           heading="Rising Compass"
           headingAs="h3"
           ctaUnderLede
-          lede="The Rising Compass is a ground-up, custom web app that tracks and measures the messages contained in the lyrics of the world's most popular songs. I built and manage this 100%, top to bottom."
+          lede={featuredLede ?? FEATURED_LEDE}
         />
       </SectionShell>
       <SectionShell className="cw-port-archive-shell">
         <h2 className="cw-port-archive__heading">{archiveHeading}</h2>
-        <ArchiveGrid items={ARCHIVE} />
+        <ArchiveGrid items={archive} />
         {isLaunched("/portfolio/") && (
           <div className="cw-port-archive__cta-row">
             <Link href="/portfolio/" className="svc-btn">

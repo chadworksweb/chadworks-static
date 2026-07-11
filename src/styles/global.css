@@ -246,6 +246,270 @@ p, li, dd, figcaption { text-wrap: pretty; }
   box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+/* =====================================================================
+   GEM PANEL (GemPanelCapsule) -- a full-bleed section backed by the spinning
+   CW gemstone with the copy in a frosted-glass card centered over it.
+   ===================================================================== */
+.cw-gempanel {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+  overflow: hidden;
+  min-height: min(94vh, 960px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.cw-gempanel__gemwrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+/* The CW mark is WIDE, so the host must carry the canonical wide 3/2 aspect box
+   (same framing the footer/titlebar gems use) or the C and W get clipped as it
+   spins. Sized to fit inside the section in BOTH dimensions with margin -- no
+   cutoff on any edge. Full-strength (no scrim: the frosted card is the only
+   overlay). */
+.cw-gempanel__gem {
+  width: min(76vw, 97vh, 810px);
+  aspect-ratio: 3 / 2;
+  height: auto;
+  opacity: 1;
+}
+.cw-gempanel__card {
+  width: min(calc(var(--measure-prose) * 1.44), calc(100% - 2rem));
+  margin-inline: auto;
+  padding: calc(var(--space-lg) * 0.5) var(--space-xl);
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 48px -24px rgba(36, 57, 137, 0.35);
+  text-align: center;
+}
+.cw-gempanel__text {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: calc(var(--text-lg) * 0.81);
+  line-height: calc(var(--leading-body) * 0.8);
+  font-weight: 500;
+}
+/* The parenthetical sign-off -- one weight lighter than the body. */
+.cw-gempanel__aside { display: block; margin-top: 0.65em; font-weight: 400; }
+
+/* =====================================================================
+   GEM REVEAL (GemRevealCapsule) -- four sentence boxes scattered over the
+   spinning CW gem, walked open one hint beacon at a time. Desktop = absolute
+   positioned (per-box CSS vars). Mobile = a stacked column.
+   ===================================================================== */
+.cw-gemreveal {
+  padding-block: clamp(1.3rem, 3.25vw, 2.6rem);
+  overflow: hidden;
+  min-height: min(94vh, 960px);
+  display: flex;
+}
+.cw-gr-stage { position: relative; width: 100%; flex: 1; }
+
+/* Static Lyric-Transformer cloud behind the gem, with the manifesto's top/bottom
+   fade so the section blends into the page. Sits beneath the gem (which paints
+   after it in the bg layer). */
+.cw-gr-cloud {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+}
+
+/* Absolutely placed items read their spot from the per-box vars. */
+.cw-gr-box,
+.cw-gr-hint {
+  position: absolute;
+  left: var(--bl);
+  top: var(--bt);
+  width: var(--bw);
+}
+
+.cw-gr-box {
+  /* position: absolute comes from the shared `.cw-gr-box, .cw-gr-hint` rule
+     above; an absolutely-positioned box is already the containing block for the
+     tile overlay, so we must NOT set position: relative here (that dropped the
+     boxes into normal flow and offset them vertically). */
+  overflow: hidden;
+  padding: 0.85rem 1.05rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 18px 40px -22px rgba(36, 57, 137, 0.4);
+}
+/* While the box materializes, it stays fully INVISIBLE (no shape at all) -- only
+   the tiles are seen, building up the field one by one over the gem/cloud. */
+.cw-gr-box[data-phase="arm"],
+.cw-gr-box[data-phase="materialize"] {
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.cw-gr-box[data-phase="arm"] .cw-gr-box__text,
+.cw-gr-box[data-phase="materialize"] .cw-gr-box__text { opacity: 0; }
+/* On reveal the final box snaps in (no transition) -- but it's under a FULL,
+   opaque tile cover at that instant, so the snap is invisible; the tiles then
+   dissolve out to uncover it. No flash. */
+
+/* Brand tile overlay -- a grid of super-small gradient tiles at an EXACT pixel
+   size (uniform to the pixel, no sub-pixel banding). They fade IN one by one to
+   build the field, then fade OUT to uncover the box (opacity only -- no scale,
+   so tiles never gap or change size). */
+.cw-gr-diss {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  pointer-events: none;
+}
+.cw-gr-diss__cell {
+  opacity: 0;
+  will-change: opacity;
+}
+.cw-gr-diss[data-phase="materialize"] .cw-gr-diss__cell {
+  animation: cw-gr-tile-in 0.28s ease both;
+  animation-delay: var(--d, 0ms);
+}
+.cw-gr-diss[data-phase="reveal"] .cw-gr-diss__cell {
+  animation: cw-gr-tile-out 0.28s ease both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes cw-gr-tile-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cw-gr-tile-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.cw-gr-box__text {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.035rem, 0.94rem + 0.46vw, 1.21rem);
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Hint beacon -- a pulsing dot + mono label; the reader clicks it to open the
+   sentence and summon the next one. */
+.cw-gr-hint {
+  /* Anchored at the box's spot, but sized to its own content (dot + label) so
+     only the actual button is clickable, not the full box-width area. */
+  width: max-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.cw-gr-hint__dot {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 rgba(124, 92, 246, 0.5);
+  animation: cw-gr-pulse 1.7s ease-out infinite;
+}
+@keyframes cw-gr-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(124, 92, 246, 0.55); }
+  70% { box-shadow: 0 0 0 15px rgba(124, 92, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 92, 246, 0); }
+}
+.cw-gr-hint__label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.cw-gr-hint:hover .cw-gr-hint__label,
+.cw-gr-hint:focus-visible .cw-gr-hint__label { color: var(--dark-bg); }
+
+/* The gem sentence -- static at the bottom of the section. */
+.cw-gr-gemline {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: calc(100% - 2rem);
+  text-align: center;
+  font-weight: 400;
+  color: var(--text-primary);
+  padding: 0.45rem 1rem;
+  font-size: clamp(0.85rem, 0.8rem + 0.3vw, 1rem);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .cw-gr-box { animation: none; }
+    .cw-gr-hint__dot { animation: none; }
+  }
+}
+
+/* Mobile: the gem becomes a contained header band at the top, then the reveal
+   boxes stack top-to-bottom, then the gem sentence. Absolute positions go inert
+   (position: static). */
+@media (max-width: 768px) {
+  .cw-gemreveal {
+    min-height: 0;
+    padding-block: 2.5rem;
+    flex-direction: column;
+  }
+  /* Gem: lift it out of the full-bleed background into a top header band. The
+     compound selector outranks the shared `.cw-shell--has-bg > .cw-shell__bg`. */
+  .cw-gemreveal.cw-shell--has-bg > .cw-shell__bg {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: min(32vh, 240px);
+    flex: 0 0 auto;
+    margin-bottom: 1.25rem;
+  }
+  .cw-gr-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+    flex: 1 1 auto;
+  }
+  .cw-gr-box,
+  .cw-gr-hint {
+    position: static;
+    left: auto;
+    top: auto;
+    width: 100%;
+  }
+  .cw-gr-hint { justify-content: center; }
+  .cw-gr-gemline {
+    position: static;
+    transform: none;
+    margin: 1.5rem auto 0;
+    white-space: normal;
+    max-width: 100%;
+  }
+}
+@media (max-width: 600px) {
+  .cw-gempanel__card { padding: var(--space-md); }
+}
+
 /* Screen-reader-only text -- visually hidden, present for AT and crawlers */
 .sr-only {
   position: absolute;
@@ -2257,6 +2521,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-nextstep__title { font-size: var(--text-lg); margin-bottom: var(--space-3xs); }
 .svc-nextstep__body { color: var(--text-secondary); }
+/* Web development page only: the 4 "what happens" step cards run 15% smaller
+   text with line-height at 80% of the shared value. */
+.cw-webdev-nextsteps .svc-nextstep__title {
+  font-size: calc(var(--text-lg) * 0.85);
+  line-height: calc(var(--leading-snug) * 0.8);
+}
+.cw-webdev-nextsteps .svc-nextstep__body {
+  font-size: calc(var(--text-base) * 0.85);
+  line-height: calc(var(--leading-body) * 0.8);
+}
 /* arrow-flow: a chevron sits in the gap between steps so the sequence reads as
    a flow. Shown only on big screens where the steps land in one row; on
    tablet/mobile (where cards wrap or stack) it would point the wrong way, so
@@ -5667,6 +5941,12 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: border-color 0.3s var(--ease-smooth), color 0.3s var(--ease-smooth);
 }
 .cw-port-feat__link:hover { border-color: var(--accent); }
+.cw-port-feat__link-icon {
+  width: 1em;
+  height: 1em;
+  display: inline-block;
+  vertical-align: -0.12em;
+}
 
 /* the layered stage: front piece over a counter-drifting back piece */
 .cw-port-feat__stage {
@@ -5790,6 +6070,71 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .cw-port-card__label a { color: inherit; text-decoration: none; }
 .cw-port-card__label a:hover { color: var(--accent); }
+/* Title + a "visit live site" arrow sitting just to the right of the title. */
+.cw-port-card__labelrow { display: flex; align-items: center; gap: 0.7rem; }
+.cw-port-card__visit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-decoration: none;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+.cw-port-card__visit:hover,
+.cw-port-card__visit:focus-visible { color: var(--accent); }
+.cw-port-card__visit-icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: block;
+  transition: transform 0.15s ease;
+}
+.cw-port-card__visit:hover .cw-port-card__visit-icon,
+.cw-port-card__visit:focus-visible .cw-port-card__visit-icon {
+  transform: translate(2px, -2px);
+}
+/* "Visit live site" tooltip -- pops above the icon on hover/focus. Reuses the
+   dark asterisk-tooltip treatment. */
+.cw-port-card__tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.5rem);
+  transform: translateX(-50%) translateY(4px);
+  width: max-content;
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+  box-shadow: 0 12px 30px rgba(36, 57, 137, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 6;
+  pointer-events: none;
+}
+.cw-port-card__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.cw-port-card__visit:hover .cw-port-card__tip,
+.cw-port-card__visit:focus-visible .cw-port-card__tip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
 .cw-port-card__blurb {
   color: var(--text-secondary);
   line-height: var(--leading-body);

@@ -11,14 +11,17 @@ export type NextStepsCapsuleProps = {
   // "arrow-flow" (default) draws a chevron between steps so it reads as a flow;
   // "numbered" is the plain numbered grid.
   variant?: "arrow-flow" | "numbered";
+  // Optional extra class on the section, for page-scoped tweaks.
+  className?: string;
 };
 
 export function NextStepsCapsule({
   nextSteps,
   variant = "arrow-flow",
+  className,
 }: NextStepsCapsuleProps) {
   return (
-    <SectionShell className="svc-block">
+    <SectionShell className={cx("svc-block", className)}>
       <h2 className="svc-block__heading">{nextSteps.heading}</h2>
       <ol className={cx("svc-nextsteps", variant === "arrow-flow" && "svc-nextsteps--flow")}>
         {nextSteps.steps.map((st, i) => (

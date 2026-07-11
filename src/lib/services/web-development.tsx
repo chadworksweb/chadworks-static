@@ -80,7 +80,7 @@ export const webDevelopment: Service = {
           higher quality development and code behind it.
         </>,
         <>
-          <strong>Security</strong>. Hacking is at an all time high. If your
+          <strong>Security</strong>. Hacking is at an all-time high. If your
           website isn&apos;t protected, you will be hacked eventually. It
           doesn&apos;t matter if you are a multinational brand or a hobbyist.
           Commercial-grade development practices are essential in defending
@@ -158,10 +158,8 @@ export const webDevelopment: Service = {
 
   paths: {
     heading: "Choose how it's built",
-    // NOTE (parked 2026-06-19): the homepage web-development definition lives
-    // here for now until it gets a proper home on this page.
-    intro:
-      "Web development is the code and technology behind the design. Development is the aspect that connects the server (the back end) to the browser (the front end). It is the translation between raw data on a hard drive in a data center and the websites and apps you interact with. Without development, the design would have nothing to sit on; it would be a flat image you couldn't interact with. Same service, four ways to build it. If you're not sure which is right, that's what the conversation is for. Here's the short version of each.",
+    // The web-development definition intro moved to its own gem-panel section
+    // (the `explainer` slot) between the process and this build-options funnel.
     items: [
       {
         label: "Custom Coded / Static",
@@ -190,24 +188,6 @@ export const webDevelopment: Service = {
     ],
   },
 
-  proof: {
-    heading: "Proof, not promises",
-    items: [
-      {
-        label: "Specialized design pages",
-        detail:
-          "Industry-specific builds, like the septic and foundation-repair pages, developed to rank and convert for one trade rather than everyone at once.",
-        href: "/my-industry-specialties/",
-      },
-      {
-        label: "The portfolio",
-        detail:
-          "Walk through a live build in the immersive portfolio instead of taking my word for any of this.",
-        href: "/portfolio/",
-      },
-    ],
-  },
-
   price: {
     heading: "What it costs, plainly",
     body:
@@ -217,23 +197,23 @@ export const webDevelopment: Service = {
   faqs: [
     {
       q: "Do I need a design before you start?",
-      a: "Not at all. If you have one, I'll develop straight to it. If you don't, we can create something together or start from the web design side, and I won't let a missing mockup stall your project.",
+      a: "If you have one, that's great, I'll develop it. If you don't, I'll create something spectacular that matches your vision for the project.",
     },
     {
       q: "What's the difference between this and the web design page?",
-      a: "Same end result, a website, approached from two directions. This page is about how the site gets built and made to perform. The web design page is about how it looks and feels. Most people need both, and I handle both, so start on whichever word matches how you already think about it.",
+      a: "The web design page describes the website process from the design side, while this page describes it more from the development side. Both design and development are equally needed for any web project, and most clients need both, but I offer them separately for special cases.",
     },
     {
       q: "Which build option should I pick?",
-      a: "Tell me what you're trying to do and I'll tell you straight. Custom is the move when speed and ownership lead. WordPress earns its place with content-heavy teams that want to self-manage. If you're selling, the ecommerce and Shopify routes are built for exactly that. You don't have to know going in, sorting that out is part of the job.",
+      a: "That depends on your project's overall technical needs. If you aren't selling anything, you wouldn't want to use Shopify. Or even if you are selling one or two items, still, Shopify might be overkill. If you aren't writing blogs regularly, you probably don't need WordPress, and a traditional, custom coded static site would be the way to go. You don't have to know before you contact me. That is part of what I help you determine.",
     },
     {
       q: "How long does a build take?",
-      a: "Most run a few weeks, and the real variable is usually how fast content and feedback come back from your side, not the coding itself. I scope the timeline with you up front so there are no quiet surprises halfway through.",
+      a: "Most projects take a few weeks. It all comes down to the ambition of your vision, your communication and decision-making speed, and the overall technical scope of the project. My proposal-agreement includes a timeline so you won't be left guessing once we begin.",
     },
     {
       q: "What happens if we stop working together?",
-      a: "You keep everything. The code and the hosting are already in your name, so there is no handover hostage situation and nothing of yours goes dark. I hand over working files without being asked, the same way I would want it done for me.",
+      a: "Beyond the terms of your project's agreement, I don't operate on long-term commitments. The only ongoing fee is hosting, which is billed monthly with no commitment. As far as your content, you own it all from the code to the copy to the images, so you are free to take your site elsewhere should you need to.",
     },
   ],
 
@@ -327,8 +307,8 @@ export const webDevelopment: Service = {
   },
 
   meta: {
-    title: "Web Development -- How Your Website Gets Built | chadworks",
+    title: "Website Development by chadworks | Code and tech behind the design",
     description:
-      "Web development is the technology behind your website: the code and structure that connect it to the server and make the design interactive. I custom-build fast, search-ready sites and help you choose how it's built.",
+      "chadworks can develop your idea into a reality using commercial grade development practices that get you ranked and cited.",
   },
 };

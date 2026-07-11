@@ -47,6 +47,7 @@ export type ServiceSlot =
   | "problem"
   | "problemArt"
   | "approach"
+  | "explainer"
   | "paths"
   | "tiers"
   | "proof"
@@ -104,6 +105,9 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
       <ProblemArtCapsule>{s.problemArt}</ProblemArtCapsule>
     ) : null,
     approach: <ApproachCapsule approach={s.approach} scheme="inverted" />,
+    // Optional interstitial section between the approach and the build-options
+    // funnel. No Service field feeds it; a page opts in via `overrides.explainer`.
+    explainer: null,
     paths: s.paths ? <PathsCapsule paths={s.paths} /> : null,
     tiers: s.tiers ? <TiersCapsule tiers={s.tiers} /> : null,
     proof: s.proof ? <ProofCapsule proof={s.proof} /> : null,
@@ -138,6 +142,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     "problem",
     "problemArt",
     "approach",
+    "explainer",
     "paths",
     "tiers",
     "proof",

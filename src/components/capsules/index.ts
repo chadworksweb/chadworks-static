@@ -8,6 +8,8 @@ export { KeyFactsCapsule } from "./KeyFactsCapsule";
 export { ProblemCapsule, ProblemArtCapsule } from "./ProblemCapsule";
 export { ApproachCapsule } from "./ApproachCapsule";
 export { ProcessCapsule } from "./ProcessCapsule";
+export { GemPanelCapsule } from "./GemPanelCapsule";
+export { GemRevealCapsule } from "./GemRevealCapsule";
 export { PathsCapsule } from "./PathsCapsule";
 export { TiersCapsule } from "./TiersCapsule";
 export { ProofCapsule } from "./ProofCapsule";
