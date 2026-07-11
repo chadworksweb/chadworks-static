@@ -28,7 +28,7 @@ export const webDevelopment: Service = {
     <>
       Web development is the technology behind a website: the code and the
       structural foundation that connects the site to the server and host and
-      makes the visual design interactive. I&apos;m Chad, and I&apos;ve been
+      makes the visual design interactive. I&apos;m Chad D.L., and I&apos;ve been
       developing websites for 20 years. Whether you
       already have a design in hand or you need one{" "}
       <Link href="/web-design/" className="svc-inline-link">
@@ -41,10 +41,11 @@ export const webDevelopment: Service = {
   heroArt: <WebDevHeroArt />,
 
   keyFactsHeading: "Web development, at a glance",
+  keyFactsIntroClassName: "cw-webdev-glance",
   keyFacts: [
-    "A site is only doing its job when it wins you customers, not just compliments -- so I build for speed, search, and conversion, not just looks.",
-    "I write custom code on a modern stack, so your site isn't carrying the weight of plugins and page-builder bloat it never needed.",
-    "How you want it built is your call. I'll walk you through every build option and tell you honestly which one fits, instead of pushing the one that pays me most.",
+    "A site is only doing its job when it wins you customers, not just compliments. I build for speed, search, and conversions.",
+    "I develop custom code on a modern stack, so your site isn't carrying the weight of plugins and page-builder bloat it never needed.",
+    "How you want it built is your call. I'll walk you through different build options and tell you honestly which one fits, instead of pushing the one that pays me most.",
     "Twenty years of building means I've already hit the problems your project will run into, so we get ahead of them instead of finding them at launch.",
   ],
 
@@ -52,59 +53,105 @@ export const webDevelopment: Service = {
     heading: "Why web development actually matters",
     subheading: "No one sees it, everyone feels it.",
     body:
-      "You choose a website by how it looks, but it's the development underneath that decides whether it loads fast, gets found by search and AI, and wins you customers, or quietly bleeds them while the homepage still looks perfect.",
+      "You choose a website by how it looks, but it's the development underneath that decides whether it loads fast, gets found by search and AI, and wins you customers.",
     // The prose opens in the frosted pop-down (off the ribbons). `body` leads
     // the panel; these paragraphs expand on it.
     more: {
       trigger: "More reasons it matters",
       paragraphs: [
         <>
-          <strong>Speed</strong>{" "}is the obvious one. A slow site loses people
-          before the design ever gets a chance to work on them, and search
-          engines notice the same thing your visitors do. The code underneath
-          decides that, not the colors.
+          <strong>Speed</strong>. If a site loads slowly, how long do you stick
+          around? A slow site loses people before the design ever gets to do its
+          part. Proper development ensures a fast site.
         </>,
         <>
-          <strong>Visibility</strong>{" "}is the quieter one. Search engines and
-          the AI tools people now ask for recommendations don&apos;t see your
-          site the way you do. They read the structure under it. Clean markup
-          gets found and quoted, while page-builder tangle gets skipped.
+          <strong>Visibility</strong>. Search engines and the AI search and
+          chatbots people now use for recommendations and shopping don&apos;t
+          see your site the way you do, they read the structure underneath. I
+          develop websites with comprehensive markup and structure that gets you
+          found, ranked and cited.
         </>,
         <>
-          <strong>Stability</strong>{" "}is the one you find out about later. A
-          custom-coded site and a page-builder site can look exactly the same
-          on day one. The difference shows up after that. One stays fast and
-          costs almost nothing to run. The other gets slower and more expensive
-          every year. Pick wrong and you end up paying for the same website
-          twice.
+          <strong>Stability</strong>. Any two websites can look exactly the same
+          on day one, but without proper development, one that is built on
+          fragile or rigged infrastructure can quickly become dilapidated,
+          leading to ongoing labor costs to fix and/or maintain the site, costs
+          that the more structurally-sound site doesn&apos;t incur because it has
+          higher quality development and code behind it.
         </>,
-        "That's why I walk you through the build options before any code gets written. Get the development right at the start, and the design gets to do its job for years.",
+        <>
+          <strong>Security</strong>. Hacking is at an all time high. If your
+          website isn&apos;t protected, you will be hacked eventually. It
+          doesn&apos;t matter if you are a multinational brand or a hobbyist.
+          Commercial-grade development practices are essential in defending
+          against hacking, spam and other bad actors lurking on the net.
+        </>,
       ],
     },
   },
 
   approach: {
-    heading: "How I develop it",
+    heading: "The chadworks™ Web Development Process",
+    // Development-leaning skin of the same project arc the web design page walks
+    // (Chad, 2026-07-11): the standard small-business build lifecycle, named by
+    // dev stage and language. Discovery -> architecture/stack -> design handoff
+    // -> front-end -> back-end/integrations -> performance & technical SEO ->
+    // QA -> deployment -> post-launch safety net.
     steps: [
       {
-        title: "I start under the hood",
+        title: "Discovery & Requirements",
         body:
-          "Before anything visual, I work out how the site needs to be structured to load fast and stay readable to search engines and AI. The architecture comes first, because it is the part that gets expensive to fix later.",
+          "Before any code, I pull the technical requirements out of your business: what the site has to do, what it needs to connect to, where the content will live, and which features actually earn their place.",
       },
       {
-        title: "I build to your design, or help you find one",
+        title: "Architecture & the Right Stack",
         body:
-          "If you already have a design, I develop straight to it. If you don't, we can build a clean one together or start from the web design side, so you are never stuck waiting because the visuals aren't ready.",
+          "With the requirements in hand, I map the site's structure and choose the stack it should be built on: a custom-coded build on a modern JavaScript framework, WordPress and PHP when your team needs to manage content itself, or an ecommerce setup when you're selling.",
       },
       {
-        title: "Performance and visibility are part of the build",
-        body:
-          "Fast load times and answer-first markup aren't a later phase. They are how I write the site in the first place, which is why the sites I build tend to rank without a separate rescue project.",
+        title: "Working From Your Design",
+        body: (
+          <>
+            If you already have a design, I develop straight to spec. If you
+            don&apos;t, I can{" "}
+            <Link href="/web-design/" className="svc-inline-link">
+              create a custom design
+            </Link>{" "}
+            for your project and develop around it, so you&apos;re never stuck
+            waiting on visuals to get started. Bring me the idea and
+            we&apos;ll get right to it.
+          </>
+        ),
       },
       {
-        title: "You own the result",
+        title: "Front-End Development",
         body:
-          "However we build it, the finished site and its hosting end up in your name. No platform holds your business hostage, and you can take it anywhere.",
+          "I build the interface itself in HTML, CSS, and JavaScript (or TypeScript and React on a custom build), turning the design into a fast, responsive, genuinely interactive site. The markup is clean and semantic from the first line, because that is what search engines and AI actually read.",
+      },
+      {
+        title: "Back-End Development & Integrations",
+        body:
+          "Then the machinery underneath: the server-side logic, the database, the CMS, the contact forms, and any third-party tools your site has to talk to. This is where PHP, SQL, and server code come in.",
+      },
+      {
+        title: "Performance & Technical SEO",
+        body:
+          "Speed and visibility aren't an add-on. I optimize assets, caching, and load times against Core Web Vitals, and I ensure search engines and AI scan clean structured data (JSON-LD schema), so your pages get found, ranked, and quoted instead of skipped.",
+      },
+      {
+        title: "Testing & QA",
+        body:
+          "Every page gets tested across browsers, devices, and screen sizes, and each feature gets checked to confirm it does exactly what it's supposed to. I squash bugs before your customers do.",
+      },
+      {
+        title: "Deployment & Launch",
+        body:
+          "When it's ready, I move the site from staging to the live production server, wire up your domain and SSL certificate, and run the final checks before it goes public.",
+      },
+      {
+        title: "Post-Launch Safety Net",
+        body:
+          "You get a week after launch where I fix any bug or issue we didn't catch, at no charge. After that I'm still here for whatever the site needs next, whenever you need it.",
       },
     ],
   },

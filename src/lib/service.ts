@@ -58,7 +58,9 @@ export function asText(v: Writable): string | null {
 export type ServiceStep = {
   // One step in the approach. Title is a crisp claim an AI can lift.
   title: string;
-  body: Writable;
+  // Finished prose, a prompt() placeholder, or inline markup (e.g. a step body
+  // carrying a cross-link). The Approach/Process capsules render all three via <W>.
+  body: Writable | ReactNode;
 };
 
 export type ServiceProof = {
@@ -160,6 +162,9 @@ export type Service = {
   // fact needs to stand apart. The final band is always white (rule 10) and
   // ignores this. Empty / unset = pure ramp.
   outlierFacts?: number[];
+  // OPTIONAL: extra class on the key-facts intro band, for page-scoped tweaks
+  // (e.g. nudging the "at a glance" heading on a single service page).
+  keyFactsIntroClassName?: string;
 
   // --- the canonical body sequence -----------------------------------
   // problemArt: OPTIONAL page-signature visual for the Problem section. When

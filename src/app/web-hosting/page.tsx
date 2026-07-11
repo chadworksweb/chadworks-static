@@ -1,12 +1,11 @@
-// Route: /web-development/ -- a Service page. Thin by design: import the
+// Route: /web-hosting/ -- a Service page. Thin by design: import the
 // Service data, set metadata from it, render the shared template. Every
 // Service page follows this exact 3-part pattern.
 
 import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
-import { webDevelopment as service } from "@/lib/services/web-development";
+import { webHosting as service } from "@/lib/services/web-hosting";
 import { serviceUrl } from "@/lib/service";
-import { ProcessCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -27,22 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function WebDevelopmentPage() {
-  // Render the "How I develop it" approach steps as the bold ProcessCapsule
-  // timeline (inverted), the same treatment web-design uses.
-  return (
-    <ServiceTemplate
-      service={service}
-      overrides={{
-        approach: (
-          <ProcessCapsule
-            pageName="web development"
-            heading={service.approach.heading}
-            steps={service.approach.steps}
-            scheme="inverted"
-          />
-        ),
-      }}
-    />
-  );
+export default function WebHostingPage() {
+  return <ServiceTemplate service={service} />;
 }

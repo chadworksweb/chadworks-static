@@ -907,6 +907,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   text-stroke-width: 0;
   paint-order: normal;
 }
+/* Web development page only: nudge the "at a glance" line up 1px from the
+   shared 8px. */
+.cw-webdev-glance .svc-statements__heading {
+  top: 7px;
+}
 /* The era-timeline heading (About) drops the white glyph outline the shared
    statements heading carries -- solid indigo only, no stroke. */
 .cw-era-intro .svc-statements__heading {

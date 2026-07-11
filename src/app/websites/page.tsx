@@ -85,6 +85,11 @@ const hub: HubConfig = {
       href: "/web-design-packages/",
     },
     {
+      label: "Web Hosting",
+      detail: "The ground it stands on: privately managed, cutting-edge servers built for uptime, so your site stays fast and always up.",
+      href: "/web-hosting/",
+    },
+    {
       label: "Custom Coded / Static",
       detail: "The purest build: custom code with nothing to update or break, and entirely yours.",
       href: "/custom-coded-static/",

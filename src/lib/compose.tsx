@@ -96,6 +96,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
         heading={s.keyFactsHeading}
         facts={s.keyFacts}
         outlierFacts={s.outlierFacts}
+        introClassName={s.keyFactsIntroClassName}
       />
     ),
     problem: <ProblemCapsule problem={s.problem} />,

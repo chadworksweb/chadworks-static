@@ -17,6 +17,7 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/web-design/", label: "Web Design" },
       { href: "/web-development/", label: "Web Development" },
       { href: "/web-design-packages/", label: "Web Design Packages" },
+      { href: "/web-hosting/", label: "Web Hosting" },
       { href: "/wordpress/", label: "WordPress" },
       { href: "/custom-coded-static/", label: "Custom Coded / Static" },
       { href: "/ecommerce/", label: "Ecommerce" },

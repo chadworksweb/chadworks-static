@@ -8,12 +8,13 @@
 // `scheme` is the fixed-inverted declaration PageComposer's rule-9 pass reads;
 // the capsule always renders its dark treatment.
 
+import type { ReactNode } from "react";
 import type { Writable } from "@/lib/service";
 import type { Scheme } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type ProcessStep = { title: string; body?: Writable };
+export type ProcessStep = { title: string; body?: Writable | ReactNode };
 
 export type ProcessCapsuleProps = {
   // Heading is "The <page> process" by default (e.g. "The web design process"),
