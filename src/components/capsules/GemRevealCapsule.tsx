@@ -206,7 +206,10 @@ export function GemRevealCapsule() {
         })}
 
         <p className="cw-gr-gemline">
-          (that gem behind this? that&apos;s not a video, that&apos;s code.)
+          (that gem{" "}
+          <span className="cw-gr-gemline__behind">behind</span>
+          <span className="cw-gr-gemline__above">above</span>{" "}
+          this? that&apos;s not a video, that&apos;s code.)
         </p>
       </div>
     </SectionShell>

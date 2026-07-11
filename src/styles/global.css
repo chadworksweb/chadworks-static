@@ -443,6 +443,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-gr-hint:focus-visible .cw-gr-hint__label { color: var(--dark-bg); }
 
 /* The gem sentence -- static at the bottom of the section. */
+/* On mobile/tablet the gem sits ABOVE the boxes (header band), so the caption
+   swaps "behind" -> "above" at the same 900px breakpoint. */
+.cw-gr-gemline__above { display: none; }
 .cw-gr-gemline {
   position: absolute;
   left: 50%;
@@ -486,6 +489,15 @@ p, li, dd, figcaption { text-wrap: pretty; }
     flex: 0 0 auto;
     margin-bottom: 1.25rem;
   }
+  /* Fit the gem to the band HEIGHT. By default it is width-driven (min(76vw...)),
+     so on shorter/wider viewports it grew past the height-capped band and the
+     band's overflow:hidden cropped its bottom. Height-drive it with margin so it
+     always sits fully inside the band. */
+  .cw-gempanel__gem {
+    width: auto;
+    height: min(24vh, 180px);
+    max-width: 86vw;
+  }
   .cw-gr-stage {
     display: flex;
     flex-direction: column;
@@ -500,6 +512,12 @@ p, li, dd, figcaption { text-wrap: pretty; }
     top: auto;
     width: 100%;
   }
+  /* Box is `relative` (not static) so its own tile overlay (.cw-gr-diss, which
+     is absolute inset:0) resolves against the box in its stacked-flow slot and
+     materializes IN PLACE. With static, the overlay escaped to .cw-gr-stage, so
+     every box's tiles built up at the stage top and then the box snapped down to
+     its flow slot when the tiles cleared. */
+  .cw-gr-box { position: relative; }
   .cw-gr-hint { justify-content: center; }
   .cw-gr-gemline {
     position: static;
@@ -508,6 +526,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
     white-space: normal;
     max-width: 100%;
   }
+  .cw-gr-gemline__behind { display: none; }
+  .cw-gr-gemline__above { display: inline; }
 }
 @media (max-width: 600px) {
   .cw-gempanel__card { padding: var(--space-md); }
