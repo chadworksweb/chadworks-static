@@ -7,12 +7,14 @@ import ServiceTemplate from "@/components/ServiceTemplate";
 import { webDevelopment as service } from "@/lib/services/web-development";
 import { webDesign } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { ProcessCapsule, GemRevealCapsule, PortfolioShowcaseCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  robots: { index: isLaunched("/web-development/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,
