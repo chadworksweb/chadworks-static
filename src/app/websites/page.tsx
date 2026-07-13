@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import type { ReactNode, CSSProperties } from "react";
 import HubTemplate, { type HubConfig } from "@/components/HubTemplate";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import {
   BrowserChip,
   CodeChip,
@@ -53,21 +54,17 @@ function WebsitesHubArt() {
 
 const hub: HubConfig = {
   slug: "websites",
-  eyebrow: "Lane one: the thing you own",
+  eyebrow: "chadworks Service Lane 01",
   title: "Websites",
   answer: (
     <>
       A website is the one piece of your business you fully own on the
-      internet. I&apos;m Chad, and I&apos;ve been designing and developing
+      internet. I&apos;m Chad D. L., and I&apos;ve been designing and developing
       websites for 20 years: the look, the code, the hosting, all custom
-      built and all in your name. Two angles to start from, four ways to
-      build, one person responsible for the whole thing.
+      built and all in your name.
     </>
   ),
   heroArt: <WebsitesHubArt />,
-  lanesHeading: "Pick your way in",
-  lanesIntro:
-    "Start from the angle that matches how you already think about it. Every route below ends in the same place: a fast site that looks like your business and belongs to you.",
   lanes: [
     {
       label: "Web Design",
@@ -155,12 +152,13 @@ const hub: HubConfig = {
 };
 
 export const metadata: Metadata = {
-  title: "Websites -- Custom Designed, Custom Built, Yours | chadworks",
+  title: "Websites: Custom, Static, WordPress & Ecommerce by chadworks",
   description:
-    "A website is the one piece of your business you fully own on the internet. I design and develop custom websites: the look, the code, and the hosting, all in your name. Four ways to build, two angles to start from.",
+    "chadworks designs, develops and maintains websites for motivated individuals, businesses and organizations.",
   alternates: { canonical: `${SITE_URL}/websites/` },
+  robots: { index: isLaunched("/websites/"), follow: true },
   openGraph: {
-    title: "Websites -- Custom Designed, Custom Built, Yours | chadworks",
+    title: "Websites: Custom, Static, WordPress & Ecommerce by chadworks",
     description:
       "Custom websites designed and developed by one person: the look, the code, and the hosting, all in your name.",
     url: `${SITE_URL}/websites/`,

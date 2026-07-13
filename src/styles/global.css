@@ -1605,43 +1605,73 @@ p, li, dd, figcaption { text-wrap: pretty; }
    surface, oversized faded numeral, 3px accent left border, staggered
    indents, baked-in lift + tinted glow) with the CF marketing-site lane
    hover (the accent wipes from the left border to a full-width glow). */
-.svc-lanes { display: flex; flex-direction: column; gap: 0.6rem; margin-top: var(--space-lg); }
+.svc-lanes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.2rem;
+  margin-top: var(--space-lg);
+}
 .svc-lane {
+  --lane-color: var(--accent);
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  gap: 2.4rem;
-  align-items: center;
-  padding: 2.6rem 2.4rem 2.6rem 2.6rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-content: start;
+  padding: 2.6rem 1.9rem 2rem 1.9rem;
   border: 1px solid var(--border-subtle);
-  border-left: 3px solid var(--lane-color);
+  /* bottom accent + hover wipe step through the band arc (--lane-color set inline) */
+  border-bottom: 3px solid var(--lane-color);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 18px rgba(128, 84, 188, 0.12);
-  transform: translateY(-2px);
   overflow: hidden;
-  transition: border-color 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth);
+  transition: border-color 0.4s var(--ease-smooth), box-shadow 0.4s var(--ease-smooth),
+    transform 0.4s var(--ease-smooth);
 }
-.svc-lane:nth-child(1) { margin-left: 0; }
-.svc-lane:nth-child(2) { margin-left: 6%; }
-.svc-lane:nth-child(3) { margin-left: 3%; }
-.svc-lane:nth-child(4) { margin-left: 8%; }
-/* CF lane hover: the left accent wipes across the lane as a faint glow field */
+/* Box 3 is the inverted contact CTA that jumps to the contact form below. */
+.svc-lane--cta {
+  --lane-color: var(--accent);
+  background: var(--dark-bg);
+  border-color: color-mix(in srgb, #fff 14%, transparent);
+  border-bottom-color: var(--accent);
+}
+.svc-lane--cta .svc-lane__title { color: #fff; }
+.svc-lane--cta .svc-lane__desc { color: rgba(255, 255, 255, 0.72); }
+.svc-lane--cta { cursor: default; }
+.svc-lane--cta .svc-lane__arrow {
+  color: #fff;
+  cursor: pointer;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid color-mix(in srgb, #fff 22%, transparent);
+  border-radius: 8px;
+  transition: transform 0.4s var(--ease-smooth), border-color 0.4s var(--ease-smooth),
+    background 0.4s var(--ease-smooth);
+}
+.svc-lane--cta:hover .svc-lane__arrow { border-color: color-mix(in srgb, #fff 45%, transparent); }
+.svc-lane--cta .svc-lane__arrow:hover {
+  background: color-mix(in srgb, #fff 14%, transparent);
+  border-color: color-mix(in srgb, #fff 60%, transparent);
+  transform: translateX(0.3rem);
+}
+.svc-lane--cta:hover { border-color: var(--accent); }
+/* CF lane hover: the bottom accent wipes UP the lane as a faint glow field */
 .svc-lane::before {
   content: "";
   position: absolute;
-  top: 0;
   left: 0;
-  width: 3px;
-  height: 100%;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
   opacity: 0.5;
   background: var(--lane-color);
-  transition: width 0.4s var(--ease-smooth), opacity 0.4s var(--ease-smooth);
+  transition: height 0.4s var(--ease-smooth), opacity 0.4s var(--ease-smooth);
   pointer-events: none;
 }
-.svc-lane:hover::before { width: 100%; opacity: 0.06; }
+.svc-lane:hover { transform: translateY(-2px); }
+.svc-lane:hover::before { height: 100%; opacity: 0.06; }
 .svc-lane:hover {
   border-color: var(--lane-color);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06),
@@ -1664,17 +1694,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   display: block;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   letter-spacing: -0.012em;
   color: var(--text-primary);
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.6rem;
 }
 .svc-lane__desc {
   display: block;
-  font-size: 1.05rem;
-  line-height: 1.72;
+  font-size: 1rem;
+  line-height: 1.66;
   color: var(--text-secondary);
-  max-width: 70ch;
 }
 .svc-lane__arrow {
   display: inline-block;
@@ -1739,15 +1768,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-lane__viz svg {
   width: 100%;
   height: auto;
-  max-width: 290px;
+  max-width: 180px;
   display: block;
   filter: drop-shadow(0 10px 24px rgba(36, 57, 137, 0.08));
 }
-@media (max-width: 900px) {
-  .svc-lane:nth-child(n) { margin-left: 0; }
-  .svc-lane { grid-template-columns: 1fr; gap: 1.4rem; padding: 2rem 1.6rem; }
-  .svc-lane__viz { justify-content: flex-start; }
-  .svc-lane__viz svg { max-width: 320px; }
+@media (max-width: 1024px) {
+  .svc-lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .svc-lanes { grid-template-columns: 1fr; }
+  .svc-lane { padding: 2rem 1.6rem; }
 }
 
 /* Portfolio shots -- THE sitewide water-ripple engine (RippleGrid /

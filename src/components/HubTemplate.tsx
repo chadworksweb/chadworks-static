@@ -11,8 +11,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
-import { LeadForm } from "@/components/forms/LeadForm";
 import type { LeadFormConfig } from "@/lib/forms";
+import { MainContactCapsule } from "@/components/capsules";
 import { SITE_URL, ORG } from "@/lib/service";
 
 export interface HubLane {
@@ -28,7 +28,7 @@ export interface HubConfig {
   title: string;
   answer: ReactNode;
   heroArt?: ReactNode;
-  lanesHeading: string;
+  lanesHeading?: string;
   lanesIntro?: string;
   lanes: HubLane[];
   thesis?: { heading: string; subheading?: string; paragraphs: ReactNode[] };
@@ -106,44 +106,75 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
 
       {/* LANES -- every service in the lane as an asymmetric hover lane. */}
       <section className="section svc-block reveal">
-        <h2 className="svc-block__heading">{hub.lanesHeading}</h2>
+        {hub.lanesHeading && (
+          <h2 className="svc-block__heading">{hub.lanesHeading}</h2>
+        )}
         {hub.lanesIntro && (
           <p className="svc-block__body measure-prose">{hub.lanesIntro}</p>
         )}
         <div className="svc-lanes">
-          {hub.lanes.map((l, i) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="svc-lane"
-              style={{ "--lane-color": LANE_COLORS[i % LANE_COLORS.length] } as React.CSSProperties}
-            >
-              <span className="svc-lane__num" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="svc-lane__content">
-                <span className="svc-lane__title">{l.label}</span>
-                <span className="svc-lane__desc">{l.detail}</span>
-                <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
-              </span>
-              {l.viz && <span className="svc-lane__viz" aria-hidden="true">{l.viz}</span>}
-            </Link>
-          ))}
+          {(() => {
+            const cards = hub.lanes.map((l, i) => {
+              const style = {
+                "--lane-color": LANE_COLORS[i % LANE_COLORS.length],
+              } as React.CSSProperties;
+              // Lanes 01 + 02 stay live; 03-08 are locked in the coming-soon
+              // style used by the "Development Platform Options" section.
+              const locked = i >= 2;
+              const inner = (
+                <>
+                  <span className="svc-lane__num" aria-hidden="true">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="svc-lane__content">
+                    <span className="svc-lane__title">{l.label}</span>
+                    <span className="svc-lane__desc">{l.detail}</span>
+                    {locked ? (
+                      <span
+                        className="svc-lane__arrow svc-lane__arrow--soon"
+                        tabIndex={0}
+                        aria-disabled="true"
+                      >
+                        Explore -&gt;
+                        <span className="svc-lane__tip" role="tooltip">coming soon</span>
+                      </span>
+                    ) : (
+                      <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
+                    )}
+                  </span>
+                  {/* lane viz kept in each hub's config but no longer rendered */}
+                </>
+              );
+              return locked ? (
+                <div key={l.href} className="svc-lane svc-lane--soon" style={style}>
+                  {inner}
+                </div>
+              ) : (
+                <Link key={l.href} href={l.href} className="svc-lane" style={style}>
+                  {inner}
+                </Link>
+              );
+            });
+            // Box 3: an inverted contact CTA that jumps to the contact form below.
+            cards.splice(2, 0, (
+              <a key="contact-cta" href="#contact" className="svc-lane svc-lane--cta">
+                <span className="svc-lane__content">
+                  <span className="svc-lane__title">Not sure which fits?</span>
+                  <span className="svc-lane__desc">
+                    Skip the routes and tell me about the project. I&apos;ll point
+                    you to the one that makes sense.
+                  </span>
+                  <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
+                </span>
+              </a>
+            ));
+            return cards;
+          })()}
         </div>
       </section>
 
-      {/* CTA -- dark band, copy left, the hub's form right. */}
-      <section className="section full band-dark svc-cta reveal">
-        <div className="svc-cta__panel">
-          <div className="svc-cta__split">
-            <div>
-              <h2 className="svc-cta__heading">{hub.cta.heading}</h2>
-              <p className="svc-cta__body">{hub.cta.body}</p>
-            </div>
-            <LeadForm config={hub.form} />
-          </div>
-        </div>
-      </section>
+      {/* CTA -- the global contact capsule (same as the homepage close). */}
+      <MainContactCapsule />
     </>
   );
 }
