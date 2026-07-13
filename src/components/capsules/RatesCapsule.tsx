@@ -32,18 +32,20 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
       </div>
       <div className="cw-pricing__grid">
         <div className="cw-price-card panel">
-          <p className="cw-price-card__label">Hourly</p>
-          <p className="cw-price-card__figure">$315<span className="cw-price-card__unit"> / hour</span></p>
+          <p className="cw-price-card__label">Per minute</p>
+          <p className="cw-price-card__figure">$5.25<span className="cw-price-card__unit"> / min</span></p>
           <p className="cw-price-card__note">
-            I work incredibly fast. I bill increments of 10 minutes. No
-            &quot;1 hour minimum&quot; invoices.
+            I have always worked and delivered at a blistering pace, and with the
+            onset of AI tools, charging by the hour is no longer an appropriate
+            metric. 10 minute minimum invoices.
           </p>
         </div>
         <div className="cw-price-card panel">
           <p className="cw-price-card__label">Flat-rate builds</p>
           <p className="cw-price-card__figure">From $3,200</p>
           <p className="cw-price-card__note">
-            Most sites land between $5,000 and $10,000.
+            Most sites land between $5,000 and $10,000. For more information
+            about flat rate projects, <Link href="/websites/">click here</Link>.
           </p>
         </div>
       </div>

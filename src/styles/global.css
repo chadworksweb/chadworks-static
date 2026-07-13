@@ -4345,6 +4345,80 @@ p, li, dd, figcaption { text-wrap: pretty; }
   .rates-ledger__num { justify-self: start; }
 }
 
+/* Minutely-rate explainer -- repurposes the FAQ inverted band. The left sticky
+   column carries the numbered "correspondence" steps; the right column holds
+   the task -> time ledger under its own heading. */
+
+/* The numbered steps that break out of the "why 10 min minimum" sentence. */
+.cw-rate-explainer__steps {
+  margin: var(--space-sm) 0;
+  padding-left: 1.4em;
+  list-style: decimal;
+  color: rgba(229, 210, 244, 0.9);
+}
+.cw-rate-explainer__steps li {
+  margin: 0.3rem 0;
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+.cw-rate-explainer__steps li::marker {
+  color: #c9b3ec;
+  font-family: var(--font-mono);
+}
+
+/* Frosted-glass surface behind the right column, sitting on the inverted band
+   (the FAQ band is svc-faq-section--dark, not svc-dark, so this carries its own
+   glass treatment). Padding keeps the ledger off the glass edges. */
+.cw-rate-explainer__body {
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(229, 210, 244, 0.14);
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  backdrop-filter: blur(10px) saturate(1.2);
+}
+
+/* The right column's "Examples..." heading (20% smaller than the section H2). */
+.cw-rate-explainer__eyebrow {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-display);
+  font-size: calc(var(--text-2xl) * 0.68);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+.cw-rate-explainer__note { margin-top: var(--space-lg); }
+
+/* Center the lane funnel's heading -- scoped to the rates page (the only lanes
+   block that follows the explainer), so other PathsCapsule uses are untouched. */
+.cw-rate-explainer ~ .svc-block:has(.svc-lanes) .svc-block__heading {
+  text-align: center;
+}
+/* Give the lane funnel real top padding: after the dark explainer band the
+   default lanes rule (line ~1618) collapses the top to 15% of the rhythm, which
+   crowds it against the band. Restore the full section rhythm. Specificity here
+   must beat .section.svc-block.reveal:has(.svc-lanes). */
+.cw-rate-explainer ~ .section.svc-block.reveal:has(.svc-lanes) {
+  padding-top: var(--section-pad-y);
+}
+
+/* Ledger on the dark band: labels/figures/rules flip to the inverted palette,
+   matching the FAQ accordion's dark overrides. In this section the figures run
+   a touch smaller so the task labels stay the emphasis. */
+.svc-faq-section--dark .rates-ledger__row { border-top-color: rgba(229, 210, 244, 0.16); }
+/* Task name lavender, duration white (the reverse of the light-band ledger). */
+.svc-faq-section--dark .rates-ledger__label { color: #e5d2f4; }
+.cw-rate-explainer .rates-ledger__num {
+  font-size: clamp(1rem, 0.82rem + 0.7vw, 1.3rem);
+  background: none;
+  -webkit-text-fill-color: #fff;
+  color: #fff;
+}
+.svc-faq-section--dark .cw-rate-explainer__note a { color: #e5d2f4; }
+.svc-faq-section--dark .cw-rate-explainer__note a:hover { color: #fff; }
+
 /* =====================================================================
    FAQS PAGE -- scoped adjustments only. The four groups reuse the
    svc-faq layout (sticky theme column + accordion) and the

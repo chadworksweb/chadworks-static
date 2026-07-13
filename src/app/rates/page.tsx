@@ -1,18 +1,35 @@
 // Route: /rates/ -- standalone page. Value-based pricing with the math
-// showing. Real numbers only ($315/hr, $3,200 floor, $6,200 typical, $550
+// showing. Real numbers only ($5.25/min, $3,200 floor, $6,200 typical, $550
 // every 6 months for WordPress care). Signature moment (CWS-CREATIVE-ARSENAL):
 // the glass price panel + scanning border + a show-the-math ledger. Copy in
 // Chad's public voice, big-ticket posture (never apologize for the number).
 // JSON-LD: WebPage + FAQPage + BreadcrumbList.
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
-import { PageComposer, RatesCapsule, MainContactCapsule } from "@/components/capsules";
+import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
+import { SectionShell } from "@/components/capsules/SectionShell";
+
+// The minutely-rate explainer: real task -> real time, shown in the page's
+// existing show-the-math ledger (label + mono figure per row).
+const RATE_EXAMPLES: { task: string; time: string }[] = [
+  { task: "Swapping an image", time: "60 seconds" },
+  { task: "Changing text on a page", time: "60 seconds" },
+  { task: "Create a new page", time: "10 minutes" },
+  { task: "Create a new template", time: "30 minutes" },
+  { task: "Minor bug fixing", time: "10-20 minutes" },
+  { task: "Image editing", time: "5 minutes" },
+  { task: "On-page optimization", time: "5-10 min per page" },
+  { task: "Existing client consultation phone call", time: "10-30 min" },
+  { task: "Recovering hacked website", time: "60-120 minutes" },
+  { task: "Changing the colors of the site's text or single UI element", time: "120 seconds" },
+];
 
 const PAGE_URL = `${SITE_URL}/rates/`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
-  "Work bills at $315 an hour. The smallest engagement is $3,200, and most websites land near $6,200. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
+  "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land near $6,200. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -75,6 +92,81 @@ export default function RatesPage() {
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
       {/* The shared rates band, with the heading in the standard hero-H1 style. */}
       <RatesCapsule standalone />
+      {/* Explainer for the per-minute rate. Repurposes the FAQ inverted band:
+          sticky intro column (heading + the "why 10 min minimum") on the left,
+          the task -> time ledger + closing note on the right. */}
+      <SectionShell
+        full
+        className="svc-block svc-faq-section cw-rate-explainer"
+        trailingClassName="svc-faq-section--dark"
+      >
+        <div className="svc-faq__layout">
+          <div className="svc-faq__intro">
+            <h2 className="svc-block__heading svc-fill">
+              Explanation of the minutely rate
+            </h2>
+            <p className="svc-faq__lead">
+              Invoices are a 10 minute minimum because a request is not just the
+              end result. To fulfill a client request, the process usually
+              includes:
+            </p>
+            <ol className="cw-rate-explainer__steps">
+              <li>Discover the task</li>
+              <li>Plan the task</li>
+              <li>Load the working environment</li>
+              <li>Make the actual change</li>
+              <li>Publish the change</li>
+              <li>Test the change</li>
+            </ol>
+          </div>
+          <div className="cw-rate-explainer__body">
+            <h3 className="cw-rate-explainer__eyebrow">
+              Example of common web design/development tasks and how long they
+              take:
+            </h3>
+            <dl className="rates-ledger">
+              {RATE_EXAMPLES.map((ex) => (
+                <div key={ex.task} className="rates-ledger__row">
+                  <dt className="rates-ledger__label">{ex.task}</dt>
+                  <dd className="rates-ledger__num">{ex.time}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="svc-faq__lead cw-rate-explainer__note">
+              Keep in mind, this is not clicking a button and letting AI do it
+              from start to finish, this is directing AI to perform very specific
+              tasks for a very specific outcome, all guided by a{" "}
+              <Link href="/about/">20 year web design and marketing veteran</Link>.
+            </p>
+          </div>
+        </div>
+      </SectionShell>
+      {/* Standard lane modules out to the service lanes + about. */}
+      <PathsCapsule
+        paths={{
+          heading: "Explore what you get for these rates:",
+          items: [
+            {
+              label: "Websites",
+              detail:
+                "The one piece of your business you fully own on the internet: the look, the code, the hosting, all custom built and all in your name.",
+              href: "/websites/",
+            },
+            {
+              label: "Visibility",
+              detail:
+                "Being found and chosen: in Google, in the AI assistants people now ask instead of Google, and in the inbox.",
+              href: "/visibility/",
+            },
+            {
+              label: "About",
+              detail:
+                "chadworks is one person: Chad, designing since age 11 and custom-building client websites since 2008. The person you email is the person who writes the code.",
+              href: "/about/",
+            },
+          ],
+        }}
+      />
       {/* The contact CTA below it. */}
       <MainContactCapsule />
     </PageComposer>
