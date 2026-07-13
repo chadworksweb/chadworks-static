@@ -735,6 +735,19 @@
 }
 
 /* ---- Enter control: a single "enter the showroom" ellipse below the gem ---- */
+/* Registered so the ellipse's two colour stops can INTERPOLATE on hover (a plain
+   radial-gradient background can't transition -- that was the jumpy flicker). Both
+   stops keep their alpha; only the hue shifts (dark-blue brand -> lavender). */
+@property --enter-c0 {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgba(36, 57, 137, 0.95);
+}
+@property --enter-c1 {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: rgba(36, 57, 137, 0.72);
+}
 .enter {
   position: absolute;
   left: 50%;
@@ -751,7 +764,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #eae4fb;
-  transition: color 0.3s ease, letter-spacing 0.3s ease;
+  transition: color 0.4s ease;
 }
 /* Dark-blue brand ellipse behind the label so it reads over the busy grid. */
 .enter::before {
@@ -765,30 +778,23 @@
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
-    rgba(36, 57, 137, 0.95) 0%,
-    rgba(36, 57, 137, 0.72) 42%,
+    var(--enter-c0) 0%,
+    var(--enter-c1) 42%,
     rgba(36, 57, 137, 0) 72%
   );
   z-index: -1;
   pointer-events: none;
-  transition: transform 0.32s ease, background 0.32s ease;
+  transition: --enter-c0 0.4s ease, --enter-c1 0.4s ease;
 }
+/* Hover: the ellipse fades from brand blue to lavender -- colour only, same alpha. */
 .enter:hover,
 .enter:focus-visible {
   color: #fff;
-  letter-spacing: 0.26em;
 }
-/* Hover: the brand ellipse brightens and swells, with a lavender core lift. */
 .enter:hover::before,
 .enter:focus-visible::before {
-  transform: translate(-50%, -50%) scale(1.14);
-  background: radial-gradient(
-    ellipse at center,
-    rgba(120, 96, 208, 0.55) 0%,
-    rgba(48, 72, 162, 0.92) 34%,
-    rgba(36, 57, 137, 0.6) 58%,
-    rgba(36, 57, 137, 0) 76%
-  );
+  --enter-c0: rgba(126, 100, 214, 0.95);
+  --enter-c1: rgba(126, 100, 214, 0.72);
 }
 
 /* ---- The frame: a solid 15px lavender gap on all sides of the showroom ---- */
