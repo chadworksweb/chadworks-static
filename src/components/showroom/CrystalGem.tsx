@@ -138,45 +138,77 @@ function buildCWOutline(cxg: number, cyg: number, sc: number, hd: number): Float
     }
   }
 
-  // ---- W: mitred stroke outline (same params as buildCW) ----
+  // ---- W: EXACT union boundary of the 4 overlapping bars (same params as buildCW) ----
+  // Stroking the zigzag path self-intersects at the sharp reflex turns, so instead we
+  // build the true boundary of the union of the 4 bar rectangles: split every rectangle
+  // edge at its crossings with the other rectangles, then keep only the sub-segments
+  // whose midpoint is NOT strictly inside another rectangle (i.e. the visible outline).
   const xs = 1.06, Wd = 0.95, ty = 0.5, hw = 0.205 / 2;
   const X = (k: number) => xs + Wd * k;
-  const P: [number, number][] = [[X(0), ty], [X(0.3), -ty], [X(0.5), ty], [X(0.7), -ty], [X(1.0), ty]];
-  const dir: [number, number][] = [], leftN: [number, number][] = [];
+  const WP: [number, number][] = [[X(0), ty], [X(0.3), -ty], [X(0.5), ty], [X(0.7), -ty], [X(1.0), ty]];
+  type Rect = { p0: [number, number]; d: [number, number]; n: [number, number]; len: number; c: [number, number][] };
+  const rects: Rect[] = [];
   for (let i = 0; i < 4; i++) {
-    const dx = P[i + 1][0] - P[i][0], dy = P[i + 1][1] - P[i][1], l = Math.hypot(dx, dy) || 1;
-    dir.push([dx / l, dy / l]);
-    leftN.push([-dy / l, dx / l]);
+    const dx = WP[i + 1][0] - WP[i][0], dy = WP[i + 1][1] - WP[i][1], len = Math.hypot(dx, dy) || 1;
+    const d: [number, number] = [dx / len, dy / len];
+    const n: [number, number] = [-d[1], d[0]];
+    rects.push({
+      p0: WP[i], d, n, len,
+      c: [
+        [WP[i][0] + hw * n[0], WP[i][1] + hw * n[1]],
+        [WP[i + 1][0] + hw * n[0], WP[i + 1][1] + hw * n[1]],
+        [WP[i + 1][0] - hw * n[0], WP[i + 1][1] - hw * n[1]],
+        [WP[i][0] - hw * n[0], WP[i][1] - hw * n[1]],
+      ],
+    });
   }
-  const isect = (pa: [number, number], da: [number, number], pb: [number, number], db: [number, number]): [number, number] => {
-    const den = da[0] * -db[1] - da[1] * -db[0];
-    if (Math.abs(den) < 1e-6) return pa;
-    const t = ((pb[0] - pa[0]) * -db[1] - (pb[1] - pa[1]) * -db[0]) / den;
-    return [pa[0] + t * da[0], pa[1] + t * da[1]];
+  const strictInside = (p: [number, number], R: Rect) => {
+    const dx = p[0] - R.p0[0], dy = p[1] - R.p0[1];
+    const al = dx * R.d[0] + dy * R.d[1], ac = dx * R.n[0] + dy * R.n[1], m = 1e-3;
+    return al > m && al < R.len - m && ac > -hw + m && ac < hw - m;
   };
-  // Offset each side of the path by s*hw. At an interior joint, use the miter
-  // (intersection of the two offset edges) when it's tight, but BEVEL sharp corners
-  // (two bar-corner points) past a miter limit -- both avoids runaway spikes and
-  // matches the crystal, whose bars end at each joint rather than mitring through.
-  const MITER = 1.8;
-  const sideV = (s: number): [number, number][] => {
-    const V: [number, number][] = [[P[0][0] + s * hw * leftN[0][0], P[0][1] + s * hw * leftN[0][1]]];
-    for (let i = 1; i < 4; i++) {
-      const pa: [number, number] = [P[i][0] + s * hw * leftN[i - 1][0], P[i][1] + s * hw * leftN[i - 1][1]];
-      const pb: [number, number] = [P[i][0] + s * hw * leftN[i][0], P[i][1] + s * hw * leftN[i][1]];
-      const m = isect(pa, dir[i - 1], pb, dir[i]);
-      if (Math.hypot(m[0] - P[i][0], m[1] - P[i][1]) > MITER * hw) { V.push(pa); V.push(pb); }
-      else V.push(m);
+  const crossT = (a: [number, number], b: [number, number], c: [number, number], dd: [number, number]) => {
+    const rx = b[0] - a[0], ry = b[1] - a[1], sx = dd[0] - c[0], sy = dd[1] - c[1];
+    const den = rx * sy - ry * sx;
+    if (Math.abs(den) < 1e-9) return null;
+    const t = ((c[0] - a[0]) * sy - (c[1] - a[1]) * sx) / den;
+    const u = ((c[0] - a[0]) * ry - (c[1] - a[1]) * rx) / den;
+    return t > 1e-6 && t < 1 - 1e-6 && u > 1e-6 && u < 1 - 1e-6 ? t : null;
+  };
+  const wSegs: [number, number][][] = [];
+  const conn: [number, number][] = [];
+  for (let i = 0; i < 4; i++) {
+    for (let e = 0; e < 4; e++) {
+      const a = rects[i].c[e], b = rects[i].c[(e + 1) % 4];
+      const ts = [0, 1];
+      for (let j = 0; j < 4; j++) {
+        if (j === i) continue;
+        for (let f = 0; f < 4; f++) {
+          const t = crossT(a, b, rects[j].c[f], rects[j].c[(f + 1) % 4]);
+          if (t !== null) ts.push(t);
+        }
+      }
+      ts.sort((x, y) => x - y);
+      for (let k = 0; k < ts.length - 1; k++) {
+        const t0 = ts[k], t1 = ts[k + 1];
+        if (t1 - t0 < 1e-5) continue;
+        const tm = (t0 + t1) / 2;
+        const mid: [number, number] = [a[0] + (b[0] - a[0]) * tm, a[1] + (b[1] - a[1]) * tm];
+        let interior = false;
+        for (let j = 0; j < 4; j++) if (j !== i && strictInside(mid, rects[j])) { interior = true; break; }
+        if (!interior) {
+          wSegs.push([[a[0] + (b[0] - a[0]) * t0, a[1] + (b[1] - a[1]) * t0], [a[0] + (b[0] - a[0]) * t1, a[1] + (b[1] - a[1]) * t1]]);
+        }
+      }
     }
-    V.push([P[4][0] + s * hw * leftN[3][0], P[4][1] + s * hw * leftN[3][1]]);
-    return V;
-  };
-  const outline2D = [...sideV(1), ...sideV(-1).reverse()]; // 10-vertex closed loop
-  for (const z of [hd, -hd]) {
-    const poly = outline2D.map((p) => T(p[0], p[1], z));
-    for (let i = 0; i < poly.length; i++) push(poly[i], poly[(i + 1) % poly.length]);
+    for (const corner of rects[i].c) {
+      let inside = false;
+      for (let j = 0; j < 4; j++) if (j !== i && strictInside(corner, rects[j])) { inside = true; break; }
+      if (!inside) conn.push(corner);
+    }
   }
-  for (const p of outline2D) push(T(p[0], p[1], hd), T(p[0], p[1], -hd));
+  for (const z of [hd, -hd]) for (const s of wSegs) push(T(s[0][0], s[0][1], z), T(s[1][0], s[1][1], z));
+  for (const c of conn) push(T(c[0], c[1], hd), T(c[0], c[1], -hd));
 
   return new Float32Array(seg);
 }
