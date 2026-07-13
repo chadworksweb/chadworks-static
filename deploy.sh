@@ -2,6 +2,7 @@
 # Deploy chadworks-static to le-projects-01. Two environments:
 #   bash deploy.sh            -> PRODUCTION  (branch master  -> /srv/chadworks         -> https://chadworks.co)
 #   bash deploy.sh staging    -> STAGING     (branch staging -> /srv/chadworks-staging -> https://staging.chadworks.co)
+#   bash deploy.sh config     -> NGINX VHOST (deploy/*.conf  -> le-nginx conf.d, test + reload; content untouched)
 #
 # Terminology: local/development = `npm run dev` on the staging branch; staging =
 # the deployed staging site; master = production. Both are served by the shared
@@ -22,8 +23,32 @@ case "$ENV" in
     DOCROOT="/srv/chadworks"; BASE="https://chadworks.co"; EXPECT="master";;
   staging|stage)
     DOCROOT="/srv/chadworks-staging"; BASE="https://staging.chadworks.co"; EXPECT="staging";;
+  config)
+    # Push the prod nginx vhost (redirects + security headers) from deploy/ to
+    # le-nginx's conf.d and reload. Content is NOT touched. Backs up the current
+    # vhost, tests the new config, and auto-restores if the test fails.
+    cd "$(dirname "$0")"
+    echo "Syncing deploy/chadworks.conf + deploy/security-headers.conf -> ${SERVER}"
+    scp deploy/chadworks.conf deploy/security-headers.conf "$SERVER":/tmp/
+    ssh "$SERVER" 'set -e
+      TS=$(date +%Y%m%d%H%M%S); D=/root/proxy/nginx/conf.d
+      sudo cp $D/chadworks.conf $D/chadworks.conf.bak-before-redirects-$TS
+      [ -f $D/security-headers.conf ] && sudo cp $D/security-headers.conf $D/security-headers.conf.bak-$TS || true
+      sudo cp /tmp/chadworks.conf $D/chadworks.conf
+      sudo cp /tmp/security-headers.conf $D/security-headers.conf
+      if sudo docker exec le-nginx nginx -t; then
+        sudo docker exec le-nginx nginx -s reload
+        echo "nginx reloaded (rollback: chadworks.conf.bak-before-redirects-$TS)"
+      else
+        echo "nginx -t FAILED -- restoring previous vhost"
+        sudo cp $D/chadworks.conf.bak-before-redirects-$TS $D/chadworks.conf
+        [ -f $D/security-headers.conf.bak-$TS ] && sudo cp $D/security-headers.conf.bak-$TS $D/security-headers.conf || true
+        exit 1
+      fi'
+    echo "Done. Verify: curl -sI https://chadworks.co/blog"
+    exit 0;;
   *)
-    echo "usage: bash deploy.sh [prod|staging]"; exit 1;;
+    echo "usage: bash deploy.sh [prod|staging|config]"; exit 1;;
 esac
 
 cd "$(dirname "$0")"
