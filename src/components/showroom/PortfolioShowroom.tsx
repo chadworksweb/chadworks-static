@@ -1,0 +1,356 @@
+"use client";
+
+// Portfolio showroom shell (Track A). The CW crystal sits at the XY center. On
+// load the page is NOT locked: the gem floats as the entry, glowing on hover.
+// Clicking it enters the immersive showroom (locks the viewport) and triggers the
+// cold open the first time. Inside: the reel slides vertically behind the gem and
+// refracts through it; a tap promotes the centered item to the front; a right
+// rail navigates. Esc releases the lock back to normal page flow; clicking the
+// gem re-enters. Picks WebGL vs a lite gallery; always keeps a crawlable list.
+
+import { Suspense, useEffect, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Reel } from "./Reel";
+import { TileWall } from "./TileWall";
+import { CrystalGem } from "./CrystalGem";
+import { SHOWROOM_ITEMS, type ShowroomItem } from "./showroom-data";
+import { useShowroomMode } from "./useShowroomMode";
+import { intro, startIntro, skipIntro, INTRO_DURATION } from "./showroom-intro";
+import { prefersReducedMotion } from "@/lib/motion";
+import styles from "./showroom.module.css";
+
+function IntroController() {
+  useFrame((_, delta) => {
+    if (!intro.playing) return;
+    intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
+    if (intro.p >= 1) intro.playing = false;
+  });
+  return null;
+}
+
+export function PortfolioShowroom() {
+  const items = SHOWROOM_ITEMS;
+  const { mode } = useShowroomMode();
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [interacted, setInteracted] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
+  const [closing, setClosing] = useState(false);
+
+  const total = items.length;
+  const sel = selected != null ? items[selected] : null;
+  const immersive = mode === "webgl" && entered;
+
+  const goTo = (i: number) => setCommand((c) => ({ index: i, nonce: c.nonce + 1 }));
+
+  // Fade the focus modal back out through the gem, then unmount.
+  const requestClose = () => {
+    if (closing) return;
+    if (prefersReducedMotion()) {
+      setSelected(null);
+      return;
+    }
+    setClosing(true);
+    window.setTimeout(() => {
+      setSelected(null);
+      setClosing(false);
+    }, 520);
+  };
+
+  const enter = () => {
+    setEntered(true);
+    setInteracted(true);
+    try {
+      const played = sessionStorage.getItem("cw-showroom-intro") === "1";
+      if (!played && !prefersReducedMotion()) {
+        sessionStorage.setItem("cw-showroom-intro", "1");
+        startIntro();
+      }
+    } catch {}
+  };
+
+  // Leaving the showroom always drops any focused project too, so the modal never
+  // lingers over the exited state.
+  const exitShowroom = () => {
+    setSelected(null);
+    setClosing(false);
+    setEntered(false);
+  };
+
+  // Lock the page to the viewport while immersive.
+  useEffect(() => {
+    if (!immersive) return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prev;
+    };
+  }, [immersive]);
+
+  // Esc: skip the intro, then close an open project, then exit the showroom.
+  useEffect(() => {
+    if (mode !== "webgl") return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (intro.playing) skipIntro();
+      else if (selected != null) requestClose();
+      else if (entered) exitShowroom();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, selected, entered, closing]);
+
+  return (
+    <div
+      className={`${styles.wrap} ${immersive ? styles.locked : ""}`}
+      aria-label="chadworks portfolio showroom"
+    >
+      {immersive && (
+        <button type="button" className={styles.escBtn} onClick={exitShowroom}>
+          <span className={styles.escKey}>Esc</span>
+          <span className={styles.escLabel}>exit showroom</span>
+        </button>
+      )}
+
+      {mode === "webgl" && (
+        <div className={styles.canvasWrap}>
+          <Canvas
+            camera={{ position: [0, 0, 6], fov: 38 }}
+            dpr={[1, 2]}
+            gl={{ antialias: true, alpha: true }}
+            onPointerDown={() => {
+              if (immersive) skipIntro();
+            }}
+          >
+            <IntroController />
+            <Suspense fallback={null}>
+              {/* Pre-click: a tiled wall of all the work. Once immersive, the reel
+                  takes over the same plane. */}
+              <TileWall items={items} visible={!immersive} />
+              <Reel
+                items={items}
+                active={immersive}
+                command={command}
+                onIndexChange={setIndex}
+                onSelect={setSelected}
+              />
+            </Suspense>
+            <CrystalGem immersive={immersive} />
+          </Canvas>
+
+          {/* Entry: click the gem to enter (and trigger the cold open). */}
+          {!entered && (
+            <button type="button" className={styles.enter} onClick={enter}>
+              Enter the showroom
+            </button>
+          )}
+
+          {immersive && (
+            <>
+              <div className={styles.stageFrame} aria-hidden="true" />
+              <RightRail
+                items={items}
+                index={index}
+                focused={selected != null}
+                onGo={goTo}
+                onOpen={setSelected}
+              />
+
+              <div className={styles.feature}>
+                <button
+                  type="button"
+                  className={styles.featureCard}
+                  onClick={() => setSelected(index)}
+                  aria-label={`Bring ${items[index]?.label} into focus`}
+                >
+                  <span key={index} className={styles.featureTitle}>
+                    {items[index]?.label}
+                  </span>
+                  <span className={styles.featureMeta}>
+                    <span>Platform: {items[index]?.platform ?? "TBD"}</span>
+                    <span>Year: {items[index]?.year ?? "TBD"}</span>
+                    <span>Live: {items[index]?.url}</span>
+                  </span>
+                </button>
+              </div>
+
+              <div className={styles.hud}>
+                <div className={styles.progress}>
+                  <span className={styles.progNum}>{String(index + 1).padStart(2, "0")}</span>
+                  <span className={styles.progSep}>/</span>
+                  <span className={styles.progTot}>{String(total).padStart(2, "0")}</span>
+                </div>
+                <div className={`${styles.hint} ${interacted ? styles.hintGone : ""}`}>
+                  scroll &middot; up / down &middot; click the title to focus
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {mode === "lite" && <LiteGallery items={items} onSelect={setSelected} />}
+
+      {/* Crawlable fallback: shown pre-hydration and with no JS. */}
+      <ul className={styles.seo} data-shown={mode === null}>
+        {items.map((it) => (
+          <li key={it.key}>
+            <a href={it.href}>{it.label}</a> - {it.blurb}
+          </li>
+        ))}
+      </ul>
+
+      {sel && <SelectedFrame item={sel} closing={closing} onClose={requestClose} />}
+    </div>
+  );
+}
+
+function RightRail({
+  items,
+  index,
+  focused,
+  onGo,
+  onOpen,
+}: {
+  items: ShowroomItem[];
+  index: number;
+  focused: boolean;
+  onGo: (i: number) => void;
+  onOpen: (i: number) => void;
+}) {
+  // Normal: click the centered item to open it, any other to slide to it. While a
+  // project is focused, a click switches the focus straight to the clicked item
+  // (and slides the reel behind so it stays in sync on close).
+  const onClick = (i: number) => {
+    if (focused) {
+      onGo(i);
+      onOpen(i);
+    } else if (i === index) {
+      onOpen(i);
+    } else {
+      onGo(i);
+    }
+  };
+  return (
+    <nav className={styles.rail} aria-label="Projects">
+      <span className={styles.railScroll} aria-hidden="true">
+        <span className={styles.railScrollArrow}>&#8963;</span>
+        <span className={styles.railScrollText}>scroll</span>
+        <span className={styles.railScrollArrow}>&#8964;</span>
+      </span>
+      {items.map((it, i) => (
+        <button
+          key={it.key}
+          type="button"
+          className={`${styles.railItem} ${i === index ? styles.railActive : ""}`}
+          aria-current={i === index}
+          onClick={() => onClick(i)}
+        >
+          <span className={styles.railTitle}>{it.label}</span>
+          <img src={`/portfolio/${it.slug}-desktop.jpg`} alt={it.label} loading="lazy" />
+          <span className={styles.railBr} aria-hidden="true" />
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function LiteGallery({
+  items,
+  onSelect,
+}: {
+  items: ShowroomItem[];
+  onSelect: (i: number) => void;
+}) {
+  return (
+    <div className={styles.lite}>
+      <div className={styles.liteCrystal} aria-hidden="true" />
+      <ul className={styles.liteTrack}>
+        {items.map((it, i) => (
+          <li key={it.key} className={styles.liteCard}>
+            <button type="button" className={styles.liteBtn} onClick={() => onSelect(i)}>
+              <img src={`/portfolio/${it.slug}-desktop.jpg`} alt={it.alt} loading="lazy" />
+              <span className={styles.liteLabel}>{it.label}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SelectedFrame({
+  item,
+  closing,
+  onClose,
+}: {
+  item: ShowroomItem;
+  closing: boolean;
+  onClose: () => void;
+}) {
+  const [hidden, setHidden] = useState(false);
+  const invert = item.key === "risingcompass" || item.key === "chadlewine";
+  return (
+    <div
+      className={`${styles.selected} ${closing ? styles.selectedClosing : ""}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.label}
+    >
+      <div className={`${styles.frame} ${closing ? styles.frameClosing : ""}`}>
+        <span className={styles.frameBr} aria-hidden="true" />
+        <img className={styles.shot} src={`/portfolio/${item.slug}-desktop.jpg`} alt={item.alt} />
+
+        <div
+          className={`${styles.meta} ${invert ? styles.metaInvert : ""} ${
+            hidden ? styles.metaCollapsed : ""
+          }`}
+          role="button"
+          tabIndex={0}
+          aria-expanded={!hidden}
+          aria-label={hidden ? `Show ${item.label} details` : `Hide ${item.label} details`}
+          onClick={() => setHidden((h) => !h)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setHidden((h) => !h);
+            }
+          }}
+        >
+          <span className={styles.metaHide} aria-hidden="true">
+            {hidden ? "Show ▲" : "Hide ▼"}
+          </span>
+          <p className={styles.metaKick}>{item.url}</p>
+          <h2 className={styles.metaTitle}>{item.label}</h2>
+          <div className={styles.metaBody}>
+            <p className={styles.metaRow}>
+              <span>Platform: {item.platform ?? "TBD"}</span>
+              <span>Year: {item.year ?? "TBD"}</span>
+              <span>By: chadworks</span>
+            </p>
+            <ul className={styles.bursts}>
+              {item.bursts.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
+            </ul>
+            <a
+              className={styles.visit}
+              href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Visit live site <span aria-hidden="true">&#8599;</span>
+            </a>
+          </div>
+        </div>
+
+        <button type="button" className={`${styles.close} ${invert ? styles.closeInvert : ""}`} onClick={onClose} aria-label="Close">
+          &times;
+        </button>
+      </div>
+    </div>
+  );
+}

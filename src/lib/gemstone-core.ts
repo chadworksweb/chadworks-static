@@ -228,6 +228,13 @@ export function buildCW(hd: number) {
     pos: new Float32Array(pos),
     nrm: new Float32Array(nrm),
     count: pos.length / 3,
+    // The center+scale transform applied above (transformed = (raw - c) * sc) and the
+    // half-depth, so callers can build matching geometry (e.g. a clean edge outline) in
+    // the SAME space as the mesh.
+    cxg,
+    cyg,
+    sc,
+    hd,
   };
 }
 

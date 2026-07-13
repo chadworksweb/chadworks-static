@@ -1,0 +1,809 @@
+/* Portfolio showroom (Track A). Full-bleed, ~100dvh cinematic stage. The 3D
+   drum draws into the canvas; this module owns the chrome (HUD, selected frame,
+   lite gallery, SEO fallback). Brand palette pulled from GemstoneCW / CodeFall. */
+
+.wrap {
+  position: relative;
+  width: 100%;
+  /* Fill the screen BELOW the sticky nav so the gem + CTA sit centered above the
+     fold (var(--fold) = 100dvh - nav). The immersive .locked state overrides this
+     to a full-viewport fixed layer. */
+  min-height: var(--fold);
+  overflow: hidden;
+  color: #eef0fb;
+  background:
+    radial-gradient(120% 90% at 50% 42%, rgba(102, 41, 188, 0.18) 0%, rgba(8, 8, 15, 0) 58%),
+    radial-gradient(90% 70% at 82% 88%, rgba(36, 57, 137, 0.28) 0%, rgba(8, 8, 15, 0) 60%),
+    #08080f;
+}
+
+/* Immersive lock: pin the whole showroom to the viewport, over the site chrome,
+   so nothing scrolls until the Esc control releases it. */
+.wrap.locked {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+/* Esc / exit control -- top-left, clearly a way out. Absolute in the wrap, so it
+   pins to the viewport while locked and rides with the section once released. */
+.escBtn {
+  position: absolute;
+  top: clamp(1.7rem, 2.6vw, 2.1rem);
+  left: clamp(1.7rem, 2.6vw, 2.1rem);
+  z-index: 210;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.7rem 0.5rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(8, 8, 15, 0.62);
+  border: 1px solid rgba(174, 185, 234, 0.42);
+  color: #eef0fb;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-mono, monospace);
+  transition: border-color 0.18s, background 0.18s;
+}
+.escBtn:hover {
+  border-color: #cbb4f5;
+  background: rgba(8, 8, 15, 0.82);
+}
+.escKey {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  padding: 0.18rem 0.4rem;
+  border: 1px solid rgba(174, 185, 234, 0.55);
+  border-radius: 6px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.escLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.82;
+  padding-right: 0.2rem;
+}
+
+.canvasWrap {
+  position: absolute;
+  inset: 0;
+  touch-action: none; /* the reel owns drag on touch devices that hit webgl */
+}
+.canvasWrap canvas {
+  display: block;
+}
+
+/* ---- HUD ---- */
+.hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: clamp(1.7rem, 3vw, 2.6rem);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  pointer-events: none;
+}
+.progress {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+.progNum {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 600;
+  color: #cbb4f5;
+}
+.progSep,
+.progTot {
+  font-size: 1rem;
+  color: #7f85a8;
+}
+.progLabel {
+  margin-left: 0.7rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b8bede;
+  align-self: center;
+}
+.hint {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7f85a8;
+  transition: opacity 0.5s ease;
+}
+.hintGone {
+  opacity: 0;
+}
+
+/* ---- SEO / no-JS fallback ---- */
+.seo {
+  margin: 0;
+  padding: clamp(2rem, 8vh, 6rem) clamp(1.5rem, 5vw, 4rem);
+  list-style: none;
+  display: none;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 70ch;
+}
+.seo[data-shown="true"] {
+  display: flex;
+}
+.seo a {
+  color: #cbb4f5;
+  font-weight: 600;
+}
+
+/* ---- Selected state: full-bleed takeover, inset stylized frame ---- */
+.selected {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(4, 4, 10, 0.74); /* dim the stage behind */
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: fade 0.45s ease both;
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.frame {
+  position: relative;
+  width: min(76vw, 1500px);
+  height: min(80vh, 880px); /* ~75% of the viewport, dim stage around it */
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(174, 185, 234, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(8, 8, 15, 0.8),
+    0 40px 110px -30px rgba(102, 41, 188, 0.75),
+    inset 0 0 0 1px rgba(229, 210, 244, 0.14);
+  background: #05050c;
+  animation: cw-promote 0.7s cubic-bezier(0.22, 0.7, 0.2, 1) both;
+}
+/* Fade/emerge through the gem: blur-to-sharp + a gentle scale, no pop. */
+@keyframes cw-promote {
+  from { opacity: 0; transform: scale(0.9); filter: blur(12px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+/* Close: fade back out through the gem (reverse of the promote). */
+.selected.selectedClosing {
+  animation: cw-fadeout 0.5s ease forwards;
+}
+@keyframes cw-fadeout {
+  to { opacity: 0; }
+}
+.frame.frameClosing {
+  animation: cw-demote 0.5s cubic-bezier(0.4, 0, 0.7, 0.15) forwards;
+}
+@keyframes cw-demote {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to { opacity: 0; transform: scale(0.9); filter: blur(12px); }
+}
+/* Viewfinder corner-brackets on the active frame. */
+.frameBr {
+  position: absolute;
+  inset: 12px;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    linear-gradient(#e5d2f4, #e5d2f4) top left / 26px 2px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) top left / 2px 26px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) top right / 26px 2px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) top right / 2px 26px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) bottom left / 26px 2px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) bottom left / 2px 26px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) bottom right / 26px 2px no-repeat,
+    linear-gradient(#e5d2f4, #e5d2f4) bottom right / 2px 26px no-repeat;
+  opacity: 0.5;
+}
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0;
+  margin: 0 0 1rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #aeb9ea;
+}
+.metaRow span { white-space: nowrap; }
+/* Clear vertical divider between fields so they don't run together. */
+.metaRow span:not(:last-child) {
+  margin-right: 0.9rem;
+  padding-right: 0.9rem;
+  border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+}
+.shot {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* gentle bottom vignette; the frosted meta card now carries the text contrast */
+  background: linear-gradient(0deg, rgba(4, 4, 10, 0.5), transparent 45%);
+}
+.meta {
+  position: absolute;
+  left: clamp(1.4rem, 4vw, 3.4rem);
+  bottom: clamp(1.4rem, 5vh, 3.4rem);
+  z-index: 2;
+  /* Fixed width so the collapsed heading keeps the full card's width. */
+  width: min(42ch, calc(100% - 2 * clamp(1.4rem, 4vw, 3.4rem)));
+  padding: 1.25rem 1.6rem 1.35rem;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 2px 8px rgba(150, 110, 230, 0.6),
+    0 4px 12px rgba(128, 84, 188, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: bottom 0.5s cubic-bezier(0.22, 0.7, 0.2, 1), border-radius 0.4s ease;
+}
+/* Inverted (light) card -- used for the dark-screenshot items (Rising Compass,
+   Chad Lewine) so the panel reads against the dark shot instead of blending in. */
+.metaInvert {
+  background: linear-gradient(160deg, rgba(240, 238, 250, 0.92) 0%, rgba(221, 213, 243, 0.85) 100%);
+  border-color: rgba(60, 40, 100, 0.2);
+  color: #1a1526;
+}
+.metaInvert .metaKick { color: #6629bc; }
+.metaInvert .metaTitle { color: #1a1526; }
+.metaInvert .metaRow { color: #4a3d6e; }
+.metaInvert .bursts li { color: #2a2340; }
+.metaInvert .visit {
+  color: #3a1d6e;
+  border-bottom-color: rgba(58, 29, 110, 0.4);
+}
+.metaInvert .visit:hover { color: #6629bc; border-color: #6629bc; }
+/* Hide/show control -- a tactile drag-handle ridge (grabber) at the top center of
+   the card, not a capsule button. Label text is hidden; the ridge is the affordance
+   and its color follows the card (adapts to the inverted variant via currentColor). */
+.metaHide {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.8rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  color: inherit;
+  opacity: 0.62;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  /* Just a state label -- the whole box is the trigger, so clicks pass through. */
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.28);
+  transition: opacity 0.16s ease;
+}
+/* Braille-style dot grid so it reads as a raised, tactile control. Two layered
+   radial gradients: a soft top-left highlight on each dot + the dot itself. */
+.metaHide::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.55) 0.5px, transparent 0.9px),
+    radial-gradient(circle, currentColor 1.3px, transparent 1.7px);
+  background-size: 4.5px 4.5px, 4.5px 4.5px;
+  background-position: center, center;
+  opacity: 0.85;
+}
+/* The whole caption box is the open/close trigger -- a tactile clickable area. */
+.meta { cursor: pointer; }
+.meta:hover .metaHide { opacity: 1; }
+.meta:active { transform: translateY(1px); }
+/* Collapsible body: everything below the title folds away smoothly. */
+.metaBody {
+  overflow: hidden;
+  max-height: 24rem;
+  opacity: 1;
+  transition: max-height 0.5s cubic-bezier(0.22, 0.7, 0.2, 1), opacity 0.4s ease;
+}
+/* Collapsed: fold the body away and dock the heading flush to the frame bottom,
+   keeping the card width and (if set) the inverted colors. */
+.metaCollapsed {
+  bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.metaCollapsed .metaBody {
+  max-height: 0;
+  opacity: 0;
+}
+.metaCollapsed .metaTitle {
+  margin-bottom: 0;
+  /* 65% smaller than the full-card title while docked. */
+  font-size: clamp(0.63rem, 1.75vw, 1.19rem);
+}
+.metaKick {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #aeb9ea;
+}
+.metaTitle {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  transition:
+    margin-bottom 0.5s cubic-bezier(0.22, 0.7, 0.2, 1),
+    font-size 0.5s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+.bursts {
+  list-style: none;
+  margin: 0 0 1.3rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.bursts li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: #dfe2f5;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+}
+.bursts li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.5em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #aeb9ea, #6629bc);
+  box-shadow: 0 0 10px rgba(102, 41, 188, 0.6);
+}
+.visit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  padding-bottom: 2px;
+}
+.visit:hover {
+  border-color: #cbb4f5;
+  color: #cbb4f5;
+}
+.close {
+  position: absolute;
+  top: clamp(0.8rem, 2vw, 1.4rem);
+  right: clamp(0.8rem, 2vw, 1.4rem);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  font-size: 1.6rem;
+  line-height: 1;
+  color: #eef0fb;
+  background: rgba(8, 8, 15, 0.6);
+  border: 1px solid rgba(174, 185, 234, 0.3);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.close:hover {
+  border-color: #cbb4f5;
+}
+/* Inverted close -- light disc + dark glyph so the button reads against a dark
+   screenshot, matching the inverted (light) meta card on the same items. */
+.closeInvert {
+  color: #1a1526;
+  background: linear-gradient(160deg, rgba(240, 238, 250, 0.92) 0%, rgba(221, 213, 243, 0.85) 100%);
+  border-color: rgba(60, 40, 100, 0.2);
+}
+.closeInvert:hover {
+  border-color: #6629bc;
+}
+
+/* ---- Cinematic feature dressing (big title + metadata over the browse view) ---- */
+.feature {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 15%;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 1.5rem;
+  pointer-events: none;
+  text-align: center;
+}
+/* Frosted glass block behind the slide title (DBM proliferator caption style).
+   Now an interactive control: click to bring the centered project into focus. */
+.featureCard {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.05rem 2.4rem 0.95rem;
+  border-radius: 18px;
+  max-width: min(92vw, 1100px);
+  background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  pointer-events: auto;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  color: inherit;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 0.7, 0.2, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+/* Ornate hover: a masked gradient-ring frame that ignites around the card. */
+.featureCard::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 21px;
+  padding: 2px;
+  background: linear-gradient(135deg, #cbb4f5 0%, #6629bc 38%, #243989 68%, #cbb4f5 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+/* ...and viewfinder corner flourishes inside the frame. */
+.featureCard::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 12px;
+  background:
+    linear-gradient(#cbb4f5, #cbb4f5) top left / 15px 1px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top left / 1px 15px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top right / 15px 1px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top right / 1px 15px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom left / 15px 1px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom left / 1px 15px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom right / 15px 1px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom right / 1px 15px no-repeat;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+.featureCard:hover,
+.featureCard:focus-visible {
+  transform: translateY(-3px);
+  border-color: rgba(203, 180, 245, 0.45);
+  box-shadow:
+    0 26px 74px rgba(102, 41, 188, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  outline: none;
+}
+.featureCard:hover::before,
+.featureCard:focus-visible::before,
+.featureCard:hover::after,
+.featureCard:focus-visible::after {
+  opacity: 1;
+}
+.featureTitle {
+  margin: 0;
+  font-size: clamp(2rem, 6.4vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #fff;
+  text-wrap: balance;
+  text-shadow: 0 6px 44px rgba(0, 0, 0, 0.55);
+  animation: cw-fade-up 0.5s ease both;
+}
+.featureMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3rem 1.2rem;
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(223, 226, 245, 0.86);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+@keyframes cw-fade-up {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- Lite gallery (mobile / low-capability) ---- */
+.lite {
+  position: relative;
+  min-height: var(--fold);
+  display: flex;
+  flex-direction: column;
+}
+.liteCrystal {
+  height: 34vh;
+  min-height: 200px;
+  background:
+    radial-gradient(60% 60% at 50% 45%, rgba(229, 210, 244, 0.5), transparent 62%),
+    radial-gradient(40% 40% at 50% 45%, rgba(102, 41, 188, 0.6), transparent 70%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent);
+  mask-image: radial-gradient(closest-side, #000 60%, transparent);
+}
+.liteTrack {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 1.2rem 3rem;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.liteCard {
+  flex: 0 0 82%;
+  scroll-snap-align: center;
+}
+.liteBtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(174, 185, 234, 0.25);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #10101f;
+  color: #eef0fb;
+  cursor: pointer;
+}
+.liteBtn img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top center;
+}
+.liteLabel {
+  display: block;
+  padding: 0.7rem 0.9rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+/* ---- Right-edge project rail (Colombel-style reel selector) ---- */
+.rail {
+  position: absolute;
+  top: 50%;
+  right: clamp(1.7rem, 2.6vw, 2.4rem);
+  transform: translateY(-50%);
+  /* Above the focus-modal overlay (.selected, z 60) so the navigator stays
+     visible and clickable even while a project is loaded. */
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 86vh;
+}
+/* Scroll cue sitting just left of the thumb rail: the reel moves up/down. */
+.railScroll {
+  position: absolute;
+  right: calc(100% + clamp(0.9rem, 1.5vw, 1.5rem));
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  pointer-events: none;
+  color: rgba(206, 214, 244, 0.62);
+}
+.railScrollText {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+.railScrollArrow {
+  font-size: 0.85rem;
+  line-height: 1;
+  animation: railScrollBob 1.9s ease-in-out infinite;
+}
+.railScrollArrow:last-child {
+  animation-delay: 0.95s;
+}
+@keyframes railScrollBob {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(2px); }
+}
+
+.railItem {
+  position: relative;
+  width: clamp(60px, 7vw, 92px);
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  opacity: 0.48;
+  filter: saturate(0.85);
+  transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+.railItem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 6px;
+}
+.railItem:hover {
+  opacity: 0.85;
+}
+.railActive {
+  opacity: 1;
+  transform: scale(1.09);
+  filter: none;
+}
+.railTitle {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) translateX(6px);
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(8, 8, 15, 0.72);
+  border: 1px solid rgba(174, 185, 234, 0.35);
+  padding: 0.32rem 0.6rem;
+  border-radius: 6px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.railItem:hover .railTitle,
+.railItem:focus-visible .railTitle {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+.railBr {
+  display: none;
+}
+.railActive .railBr {
+  display: block;
+  position: absolute;
+  inset: -5px;
+  pointer-events: none;
+  background:
+    linear-gradient(#cbb4f5, #cbb4f5) top left / 12px 2px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top left / 2px 12px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top right / 12px 2px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) top right / 2px 12px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom left / 12px 2px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom left / 2px 12px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom right / 12px 2px no-repeat,
+    linear-gradient(#cbb4f5, #cbb4f5) bottom right / 2px 12px no-repeat;
+}
+
+/* ---- Enter control: a single "enter the showroom" ellipse below the gem ---- */
+.enter {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + min(22vh, 200px));
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  padding: 0.55rem 1.6rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #eae4fb;
+  transition: color 0.3s ease, letter-spacing 0.3s ease;
+}
+/* Dark-blue brand ellipse behind the label so it reads over the busy grid. */
+.enter::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 180%;
+  height: 320%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(36, 57, 137, 0.95) 0%,
+    rgba(36, 57, 137, 0.72) 42%,
+    rgba(36, 57, 137, 0) 72%
+  );
+  z-index: -1;
+  pointer-events: none;
+  transition: transform 0.32s ease, background 0.32s ease;
+}
+.enter:hover,
+.enter:focus-visible {
+  color: #fff;
+  letter-spacing: 0.26em;
+}
+/* Hover: the brand ellipse brightens and swells, with a lavender core lift. */
+.enter:hover::before,
+.enter:focus-visible::before {
+  transform: translate(-50%, -50%) scale(1.14);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(120, 96, 208, 0.55) 0%,
+    rgba(48, 72, 162, 0.92) 34%,
+    rgba(36, 57, 137, 0.6) 58%,
+    rgba(36, 57, 137, 0) 76%
+  );
+}
+
+/* ---- The frame: a solid 15px lavender gap on all sides of the showroom ---- */
+.stageFrame {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  border: 15px solid #cbb4f5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selected { animation: none; }
+  .frame { animation: none; }
+  .featureTitle { animation: none; }
+  .railItem { transition: none; }
+  .railScrollArrow { animation: none; }
+}
