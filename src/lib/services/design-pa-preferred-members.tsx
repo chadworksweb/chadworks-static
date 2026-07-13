@@ -10,7 +10,7 @@ export const paPreferredMembers: Service = {
   slug: "web-design-for-pa-preferred-members",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for PA-grown and PA-made",
   title: "Web Design for PA Preferred Members",
   intent:

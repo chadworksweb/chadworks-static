@@ -9,7 +9,7 @@ export const bandsMusicians: Service = {
   slug: "website-design-for-bands-musicians",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for the phone at the show",
   title: "Website Design for Bands and Musicians",
   intent:

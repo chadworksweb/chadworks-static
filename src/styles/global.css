@@ -15,6 +15,11 @@
   --measure-narrow: 720px;
 
   --nav-height: 4.5rem;
+  /* Height of one viewport MINUS the sticky nav band. Any section meant to fill the
+     first screen (a full-height hero / cinematic stage) should size to var(--fold),
+     not 100dvh -- otherwise the sticky nav pushes it down and its centered content
+     lands below the fold. This is the default offset for future full-height sections. */
+  --fold: calc(100dvh - var(--nav-height));
 
   /* ---- BREAKPOINTS (reference only; @media uses the literals) -------- */
   /* 1200 = laptop / tablet landscape | 900 = tablet vertical | 600 = mobile */
@@ -1159,6 +1164,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   }
 }
 .svc-hero__title { font-size: var(--text-3xl); max-width: 16ch; }
+/* Index-page heroes (industry hub, service areas): let the H1 use the full
+   content width so a short title stays on one line instead of wrapping at 16ch. */
+.svc-hero--index .svc-hero__title { max-width: none; }
 /* FAQs hero: force the H1 onto a single line at any width. Drop the 16ch cap and
    drive size off the viewport so "Frequently Asked Questions" never wraps and
    never overflows on mobile (caps at the normal 4rem on desktop). */
@@ -1605,6 +1613,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
    surface, oversized faded numeral, 3px accent left border, staggered
    indents, baked-in lift + tinted glow) with the CF marketing-site lane
    hover (the accent wipes from the left border to a full-width glow). */
+/* Lanes section: cut the section's top padding by 85% (15% of the base) to
+   pull the routes up under whatever precedes them. */
+.section.svc-block.reveal:has(.svc-lanes) {
+  padding-top: calc(var(--section-pad-y) * 0.15);
+}
 .svc-lanes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5466,6 +5479,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-score-help { font-size: 1.05rem; line-height: 1.7; color: #e5d2f4; margin: 0; }
 
 /* Scorecard, adapted to the dark band */
+.cw-art-score-section .cw-score { background: rgba(255, 255, 255, 0.03); border-color: rgba(229, 210, 244, 0.16); box-shadow: none; }
 .cw-art-score-section .cw-score__label { color: rgba(229, 210, 244, 0.70); }
 .cw-art-score-section .cw-score__title { color: #ffffff; }
 .cw-art-score-section .cw-score__reset { color: rgba(229, 210, 244, 0.75); border-color: rgba(229, 210, 244, 0.22); }
@@ -5792,23 +5806,26 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-thread__full .cw-art-thread__msg { padding: 1rem 1.4rem 1.1rem; }
 .cw-art-thread__full .cw-art-thread__msg .cw-art-thread__text { font-size: 0.92rem; margin-bottom: 0.4rem; }
 
-/* ---- cross-industry grid ---- */
-.cw-art-others__eyebrow { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: #243989; margin-bottom: 1rem; opacity: 0.85; }
-.cw-art-others__heading { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.025rem, 4.32vw, 2.97rem); line-height: 1.22; letter-spacing: -0.012em; color: var(--text-primary); margin-bottom: 2rem; }
-.cw-art-others__lead { font-size: 1.02rem; line-height: 1.65; color: var(--text-secondary); max-width: 700px; margin-bottom: 2.4rem; }
-.cw-art-others__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; }
-.cw-art-others__card { display: block; padding: 0.95rem 1rem 0.9rem; background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-subtle); border-radius: var(--radius); text-decoration: none; color: var(--text-primary); position: relative; overflow: hidden; transition: border-color 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth); }
-.cw-art-others__card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); transition: width 0.3s var(--ease-smooth); }
-.cw-art-others__card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(128, 84, 188, 0.10); }
-.cw-art-others__card:hover::before { width: 2px; }
-.cw-art-others__name { font-family: var(--font-display); font-weight: 500; font-size: 0.95rem; letter-spacing: -0.005em; margin-bottom: 0.15rem; color: var(--text-primary); }
-.cw-art-others__desc { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
-.cw-art-others__card--active { background: rgba(128, 84, 188, 0.06); border-color: rgba(128, 84, 188, 0.12); pointer-events: none; }
-.cw-art-others__card--active::before { width: 2px; }
-.cw-art-others__card--disabled { opacity: 0.32; cursor: not-allowed; pointer-events: none; }
-.cw-art-others__card--disabled::before { display: none; }
-.cw-art-others__card--active .cw-art-others__name { color: #243989; }
-@media (max-width: 720px) { .cw-art-others__desc { font-size: 0.7rem; } }
+/* ---- industries roster (hub grid) + industry hub CTA ---- */
+/* No top padding: this band sits directly under the hero/preceding section and
+   carries its own spacing, so the inherited .section top pad is dropped. */
+.cw-industries { padding-top: 0; }
+.cw-industries__eyebrow { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: #243989; margin-bottom: 1rem; opacity: 0.85; }
+.cw-industries__heading { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.025rem, 4.32vw, 2.97rem); line-height: 1.22; letter-spacing: -0.012em; color: var(--text-primary); margin-bottom: 2rem; }
+.cw-industries__lead { font-size: 1.02rem; line-height: 1.65; color: var(--text-secondary); max-width: 700px; margin-bottom: 2.4rem; }
+.cw-industries__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; }
+.cw-industries__card { display: block; padding: 0.95rem 1rem 0.9rem; background: rgba(255, 255, 255, 0.55); border: 1px solid var(--border-subtle); border-radius: var(--radius); text-decoration: none; color: var(--text-primary); position: relative; overflow: hidden; transition: border-color 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth); }
+.cw-industries__card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); transition: width 0.3s var(--ease-smooth); }
+.cw-industries__card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(128, 84, 188, 0.10); }
+.cw-industries__card:hover::before { width: 2px; }
+.cw-industries__name { font-family: var(--font-display); font-weight: 500; font-size: 0.95rem; letter-spacing: -0.005em; margin-bottom: 0.15rem; color: var(--text-primary); }
+.cw-industries__desc { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+.cw-industries__card--active { background: rgba(128, 84, 188, 0.06); border-color: rgba(128, 84, 188, 0.12); pointer-events: none; }
+.cw-industries__card--active::before { width: 2px; }
+.cw-industries__card--disabled { opacity: 0.32; cursor: not-allowed; pointer-events: none; }
+.cw-industries__card--disabled::before { display: none; }
+.cw-industries__card--active .cw-industries__name { color: #243989; }
+@media (max-width: 720px) { .cw-industries__desc { font-size: 0.7rem; } }
 
 /* =====================================================================
    PORTFOLIO SHOWROOM (cw-port-*) -- the signature /portfolio/ experience.

@@ -46,7 +46,7 @@ export const septic: Service = {
   slug: "website-design-for-septic-services",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for the 11pm panic call",
   title: "Website Design for Septic Companies",
   intent:
@@ -61,7 +61,7 @@ export const septic: Service = {
       trade businesses since the MySpace days. I&apos;m Chad. Every page is fast
       on a phone, leads with your license and insurance, and is written so Google
       and the assistants name you for{" "}
-      <Link href="/my-industry-specialties/">your town and your service</Link>. Want it found in
+      <Link href="/industries-served/">your town and your service</Link>. Want it found in
       AI answers too?{" "}
       <Link href="/ai-viz/">AI visibility</Link> rides on top of the same build.
     </>
@@ -179,7 +179,6 @@ export const septic: Service = {
     intro:
       "Trade service, event hospitality, specialty landscape, and a solo wellness practice. Click anywhere on a shot to send a ripple through it.",
     items: [
-      { label: "Russ Tree Service", img: "/portfolio/russtree.webp", alt: "Russ Tree Service homepage", href: "https://russtreeservice.com" },
       { label: "AAC Event Catering", img: "/portfolio/aac.webp", alt: "AAC Event Catering homepage", href: "https://aaceventcatering.com" },
       { label: "EdenScapes", img: "/portfolio/edenscapes.webp", alt: "EdenScapes Japanese garden design page", href: "https://eden-scapes.com/japanese-garden-design-installation/" },
       { label: "Massage Professionals", img: "/portfolio/massagepros.webp", alt: "Massage Professionals LLC homepage", href: "https://massageprofessionalsllc.com" },

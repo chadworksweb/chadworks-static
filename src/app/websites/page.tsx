@@ -68,13 +68,19 @@ const hub: HubConfig = {
   lanes: [
     {
       label: "Web Design",
-      detail: "The visual half: layout, color, type, and the path that turns a stranger into a customer. Never from a theme.",
+      detail: "The way a website looks and feels, the layout, the navigation and the branding.",
       href: "/web-design/",
     },
     {
       label: "Web Development",
-      detail: "The code half: the structure that makes a site fast, findable, and stable for years.",
+      detail: "The structure and technology under the design: the code, the stack and the server.",
       href: "/web-development/",
+    },
+    {
+      label: "Custom Coded / Static",
+      detail: "The purest build: custom code with nothing to update or break, and entirely yours.",
+      href: "/custom-coded-static/",
+      viz: <CustomCodedViz />,
     },
     {
       label: "Web Design Packages",
@@ -85,12 +91,6 @@ const hub: HubConfig = {
       label: "Web Hosting",
       detail: "The ground it stands on: privately managed, cutting-edge servers built for uptime, so your site stays fast and always up.",
       href: "/web-hosting/",
-    },
-    {
-      label: "Custom Coded / Static",
-      detail: "The purest build: custom code with nothing to update or break, and entirely yours.",
-      href: "/custom-coded-static/",
-      viz: <CustomCodedViz />,
     },
     {
       label: "WordPress",

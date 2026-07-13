@@ -1,6 +1,6 @@
 // Route: /my-service-areas/ -- the LOCATION index (local PA web design by town).
 // Successor to the old chadworks /my-service-areas/ page. Locations only;
-// industries live separately at /my-industry-specialties/. A compact card grid.
+// industries live separately at /industries-served/. A compact card grid.
 
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/service";

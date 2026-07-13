@@ -9,7 +9,7 @@ export const authors: Service = {
   slug: "web-design-for-authors",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for the next launch",
   title: "Website Design for Authors",
   intent:

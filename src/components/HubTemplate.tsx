@@ -161,8 +161,8 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
                 <span className="svc-lane__content">
                   <span className="svc-lane__title">Not sure which fits?</span>
                   <span className="svc-lane__desc">
-                    Skip the routes and tell me about the project. I&apos;ll point
-                    you to the one that makes sense.
+                    Cut right to it and tell me your idea. I&apos;ll tell you what
+                    I&apos;d do for you.
                   </span>
                   <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
                 </span>

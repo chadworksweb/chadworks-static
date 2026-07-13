@@ -129,7 +129,7 @@ export type Service = {
   laneLabel: string;       // human label of the lane (breadcrumb)
   // OPTIONAL: override the middle breadcrumb crumb (the parent index) for pages
   // that do NOT sit under their lane hub. The flat-root design pages set this to
-  // point at /my-industry-specialties/ or /my-service-areas/ instead of /lane/.
+  // point at /industries-served/ or /my-service-areas/ instead of /lane/.
   breadcrumbParent?: { label: string; href: string };
   eyebrow: string;         // mono kicker
   title: string;           // the H1 -- matches the intent, one per page

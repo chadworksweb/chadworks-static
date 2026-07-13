@@ -45,7 +45,7 @@ import {
 import { FoundationBrandKit, FoundationSampleCopy } from "@/components/foundation/FoundationBrandSample";
 import { FoundationVisibility } from "@/components/foundation/FoundationVisibility";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
-import { FoundationOthers } from "@/components/foundation/FoundationOthers";
+import { IndustryHubCta } from "@/components/IndustryHubCta";
 import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
@@ -207,7 +207,7 @@ export default function FoundationDesignPage() {
       <CtaCapsule cta={service.cta} form={service.form} scheme="inverted" />
 
       {/* Cross-industry network grid (full-bleed). */}
-      <FoundationOthers />
+      <IndustryHubCta />
     </PageComposer>
   );
 }

@@ -40,7 +40,7 @@ import {
 import { SepticBrandKit, SepticSampleCopy } from "@/components/septic/SepticBrandSample";
 import { SepticVisibility } from "@/components/septic/SepticVisibility";
 import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
-import { SepticOthers } from "@/components/septic/SepticOthers";
+import { IndustryHubCta } from "@/components/IndustryHubCta";
 import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
@@ -199,8 +199,8 @@ export default function SepticDesignPage() {
 
       <CtaCapsule cta={service.cta} form={service.form} scheme="inverted" />
 
-      {/* Cross-industry network grid (full-bleed). */}
-      <SepticOthers />
+      {/* Closing CTA back to the industry hub (full-bleed). */}
+      <IndustryHubCta />
     </PageComposer>
   );
 }

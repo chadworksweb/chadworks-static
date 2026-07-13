@@ -1,16 +1,13 @@
 // Route: /portfolio/ -- the signature showroom. A short hero intro, then the
-// FeaturedShowcase (Mode A: the flagship piece with a scroll-driven zoom that
-// degrades to a clean static render on phones and for reduced-motion), then the
-// ArchiveGrid (Mode B: the rest of the work). Every site is shown through a
-// DeviceMockup -- a desktop / tablet / mobile toggle over real captures of the
-// live site at each breakpoint (/portfolio/<slug>-<device>.jpg) inside a CSS/SVG
-// device frame. No stock photos, no live capture at runtime.
+// ArchiveGrid (the work). Every site is shown through a DeviceMockup -- a
+// desktop / tablet / mobile toggle over real captures of the live site at each
+// breakpoint (/portfolio/<slug>-<device>.jpg) inside a CSS/SVG device frame.
+// No stock photos, no live capture at runtime.
 
 import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
 import { PageComposer } from "@/components/capsules/PageComposer";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { FeaturedShowcase } from "@/components/portfolio/FeaturedShowcase";
 import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
 
 const PAGE_URL = `${SITE_URL}/portfolio/`;
@@ -37,16 +34,7 @@ export const metadata: Metadata = {
   },
 };
 
-// ---- The flagship piece (Mode A) -----------------------------------------
-const featured = {
-  slug: "russtree",
-  alt: "Russ Tree Service website, designed and developed by chadworks",
-  url: "russtreeservice.com",
-  label: "Russ Tree Service",
-  href: "https://russtreeservice.com",
-};
-
-// ---- The archive (Mode B) -------------------------------------------------
+// ---- The archive -------------------------------------------------
 const archive: ArchiveItem[] = [
   {
     key: "aac",
@@ -150,10 +138,7 @@ const breadcrumbJsonLd = {
   ],
 };
 
-const works = [
-  { name: featured.label, url: featured.href, slug: featured.slug },
-  ...archive.map((a) => ({ name: a.label, url: a.href, slug: a.slug })),
-];
+const works = archive.map((a) => ({ name: a.label, url: a.href, slug: a.slug }));
 
 const collectionJsonLd = {
   "@context": "https://schema.org",
@@ -195,18 +180,7 @@ export default function PortfolioPage() {
         </p>
       </SectionShell>
 
-      {/* MODE A -- the flagship piece, with a scroll-driven zoom that drops to
-          a clean static render on phones and for reduced-motion. */}
-      <SectionShell className="cw-port-feat-shell">
-        <FeaturedShowcase
-          primary={featured}
-          eyebrow="Featured build"
-          heading="Russ Tree Service"
-          lede="A tree service that needed to look established and rank where the calls come from. I built it to load fast, read clear on a phone, and turn a local search into a booked job. Flip it between desktop, tablet, and mobile below."
-        />
-      </SectionShell>
-
-      {/* MODE B -- the archive, lazy below the fold. */}
+      {/* The archive, lazy below the fold. */}
       <SectionShell>
         <p className="eyebrow">The archive</p>
         <h2 className="cw-port-archive__heading">More sites I&apos;ve custom built</h2>

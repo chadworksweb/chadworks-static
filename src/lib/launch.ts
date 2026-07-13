@@ -22,6 +22,7 @@ const LAUNCHED = new Set<string>([
   "/web-development/", // launched 2026-07-11 (dev page: gem-reveal explainer + platform options)
   "/show-up-on-chatgpt/",
   "/advertising-on-chatgpt/",
+  "/industries-served/", // launched 2026-07-13 (industry hub -- de-orphans septic + foundation)
   "/website-design-for-septic-services/",
   "/website-design-for-foundation-repair/",
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)

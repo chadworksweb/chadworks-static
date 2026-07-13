@@ -17,7 +17,7 @@ export const foundationRepair: Service = {
   slug: "website-design-for-foundation-repair",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for the basement-flood call",
   title: "Website Design for Foundation Repair Contractors",
   intent:
@@ -149,7 +149,6 @@ export const foundationRepair: Service = {
     intro:
       "Trade service, event hospitality, specialty landscape, and a solo wellness practice. Click anywhere on a shot to send a ripple through it.",
     items: [
-      { label: "Russ Tree Service", img: "/portfolio/russtree.webp", alt: "Russ Tree Service homepage", href: "https://russtreeservice.com" },
       { label: "AAC Event Catering", img: "/portfolio/aac.webp", alt: "AAC Event Catering homepage", href: "https://aaceventcatering.com" },
       { label: "EdenScapes", img: "/portfolio/edenscapes.webp", alt: "EdenScapes Japanese garden design page", href: "https://eden-scapes.com/japanese-garden-design-installation/" },
       { label: "Massage Professionals", img: "/portfolio/massagepros.webp", alt: "Massage Professionals LLC homepage", href: "https://massageprofessionalsllc.com" },

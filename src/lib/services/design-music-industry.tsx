@@ -9,7 +9,7 @@ export const musicIndustry: Service = {
   slug: "music-industry-web-design",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Specialized design for the business of music",
   title: "Web Design for the Music Industry",
   intent:

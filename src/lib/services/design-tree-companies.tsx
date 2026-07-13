@@ -9,7 +9,7 @@ export const treeCompanies: Service = {
   slug: "website-design-for-tree-companies",
   lane: "design",
   laneLabel: "Design",
-  breadcrumbParent: { label: "Industry Web Design", href: "/my-industry-specialties/" },
+  breadcrumbParent: { label: "Industries Served", href: "/industries-served/" },
   eyebrow: "Built for the storm-down call",
   title: "Website Design for Tree Companies",
   intent:
