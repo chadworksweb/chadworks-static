@@ -129,18 +129,23 @@
   opacity: 0;
 }
 
-/* ---- SEO / no-JS fallback ---- */
+/* ---- SEO / crawlable fallback ----
+   Kept in the DOM for crawlers, but ALWAYS visually hidden (sr-only). On SSR/first
+   paint the mode is undecided; showing this list was flashing a text list of projects
+   before the WebGL stage mounted. Hiding it means the dark stage paints immediately and
+   the gem fades straight in -- no text flash. */
 .seo {
-  margin: 0;
-  padding: clamp(2rem, 8vh, 6rem) clamp(1.5rem, 5vw, 4rem);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
   list-style: none;
-  display: none;
-  flex-direction: column;
-  gap: 0.8rem;
-  max-width: 70ch;
-}
-.seo[data-shown="true"] {
-  display: flex;
 }
 .seo a {
   color: #cbb4f5;
@@ -795,6 +800,15 @@
 .enter:focus-visible::before {
   --enter-c0: rgba(126, 100, 214, 0.95);
   --enter-c1: rgba(126, 100, 214, 0.72);
+}
+/* The label lifts slightly on hover (the ellipse pool stays put as the anchor). */
+.enterText {
+  display: inline-block;
+  transition: transform 0.35s ease;
+}
+.enter:hover .enterText,
+.enter:focus-visible .enterText {
+  transform: translateY(-3px);
 }
 
 /* ---- The frame: a solid 15px lavender gap on all sides of the showroom ---- */

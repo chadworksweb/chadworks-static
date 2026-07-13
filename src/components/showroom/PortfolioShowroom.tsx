@@ -143,7 +143,7 @@ export function PortfolioShowroom() {
           {/* Entry: click the gem to enter (and trigger the cold open). */}
           {!entered && (
             <button type="button" className={styles.enter} onClick={enter}>
-              Enter the showroom
+              <span className={styles.enterText}>Enter the showroom</span>
             </button>
           )}
 
