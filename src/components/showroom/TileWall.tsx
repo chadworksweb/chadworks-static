@@ -15,7 +15,7 @@ import type { ShowroomItem } from "./showroom-data";
 
 const WALL_Z = -1.4; // same plane as the reel
 const TILE_PX = 175; // rough target row height in CSS px (a range, not exact)
-const GAP_PX = 10;
+const GAP_PX = 5;
 
 const TILE_VERT = `
   varying vec2 vUv;
@@ -111,11 +111,13 @@ export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: b
     };
 
     const cells: { x: number; y: number; w: number; tex: number }[] = [];
+    // Equal brick stagger: alternating rows start half a tile offset (constant, not
+    // random) so the rows are evenly offset -- the images are what's randomized, not
+    // the offset amount.
+    const brick = tileH * 0.8; // ~half a 16:10 tile
     for (let r = 0; r < rows; r++) {
       const y = startY - r * stepY;
-      // Stagger each row's start by a random amount (covered by the side overscan) so
-      // tiles don't align into rigid columns -- offset back, but randomized (no march).
-      let x = -halfW - rand() * (tileH * 1.9);
+      let x = -halfW - (r % 2) * brick;
       let prev = -1;
       while (x < halfW) {
         const tex = draw(prev);
