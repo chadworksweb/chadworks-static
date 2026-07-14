@@ -10,8 +10,7 @@
 // reduced-motion / global pause.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { useThree, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
 import { intro } from "./showroom-intro";
@@ -93,7 +92,13 @@ export function Reel({
     () => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`),
     [items]
   );
-  const textures = useTexture(urls);
+  // useLoader, NOT drei's useTexture: useTexture calls gl.initTexture() on every
+  // texture the instant it loads, forcing the whole set onto the GPU up front. At
+  // 2880x1800 that is ~55ms of blocking texSubImage2D EACH -- ~900ms of main-thread
+  // jank (the gem freezes with it) for planes that are invisible until entry, since
+  // this group is visible={active}. Loading them the plain way lets the upload
+  // happen at first render, so only the items actually on screen ever pay it.
+  const textures = useLoader(THREE.TextureLoader, urls);
 
   const dims = useMemo(() => {
     const cam = camera as THREE.PerspectiveCamera;

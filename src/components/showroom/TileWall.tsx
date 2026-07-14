@@ -4,9 +4,14 @@
 // desaturated under a dark-blue wash so it reads as a muted wall of work behind
 // the gem. Shown only before entering; the Reel takes over immersive.
 //
-// LOAD-IN: while the shots download, a single STATIC grain VEIL covers the whole
-// stage (one plane -- no per-tile grout). The moment they're all in, that veil
-// runs the grain FILM DISSOLVE once, all at once, uncovering the finished wall.
+// LOAD-IN: the wall paints NOTHING until every tile is in -- no wash, no veil.
+// The stage stays dark, so the gem (which refracts whatever is behind it) reads as
+// an unlit crystal on an unlit stage rather than an untextured hole in a bright
+// blue field. The moment the shots are all in, the tiles, the wash and the veil
+// arrive in one commit and the veil runs the grain FILM DISSOLVE once, all at
+// once, uncovering the finished wall. Keep the wash + veil INSIDE the suspending
+// subtree: rendering them while the tiles were still loading is what exposed the
+// gem mid-load.
 //
 // No image is ever placed touching a duplicate of itself -- each tile avoids the
 // image to its left AND any image in the row above that overlaps it.
@@ -19,6 +24,7 @@ import type { ShowroomItem } from "./showroom-data";
 import { REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
 
 const REVEAL_MS = 620; // grain -> wall dissolve, all at once, after everything loads
+const GRAIN_PX = 1.5; // veil grain cell, in DEVICE px (smaller = finer grain)
 const WALL_Z = -1.4; // same plane as the reel
 const TILE_PX = 175; // rough target row height in CSS px (a range, not exact)
 const GAP_PX = 5;
@@ -38,7 +44,7 @@ const TILE_FRAG = `
     gl_FragColor = vec4(vec3(l), 1.0);
   }
 `;
-// The veil: a solid grain field. uReveal (0..1) dissolves it away -- each ~2px cell
+// The veil: a solid grain field. uReveal (0..1) dissolves it away -- each cell
 // discards once uReveal passes its random threshold, uncovering the wall beneath.
 const VEIL_FRAG = `
   precision highp float;
@@ -49,7 +55,7 @@ const VEIL_FRAG = `
     return fract(p.x * p.y);
   }
   void main() {
-    vec2 cell = floor(gl_FragCoord.xy / 2.0); // teeny (2px) grains
+    vec2 cell = floor(gl_FragCoord.xy / ${GRAIN_PX.toFixed(1)}); // teeny grains
     if (hash(cell) < uReveal) discard;        // this cell has dissolved -> reveal wall
     float n = hash(cell + 7.13);
     gl_FragColor = vec4(vec3(0.05 + 0.16 * n), 1.0);
@@ -58,7 +64,16 @@ const VEIL_FRAG = `
 
 type Cell = { x: number; y: number; w: number; tex: number };
 
-export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: boolean }) {
+export function TileWall({
+  items,
+  visible,
+  onRevealed,
+}: {
+  items: ShowroomItem[];
+  visible: boolean;
+  /** Fires once the veil has fully dissolved and the wall is on screen. */
+  onRevealed?: () => void;
+}) {
   const { camera } = useThree();
   // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
   // enter/exit canvas resize never recomputes (and visibly re-tiles) the wall.
@@ -72,7 +87,12 @@ export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: b
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  const urls = useMemo(() => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`), [items]);
+  // Flat, pre-baked wall tiles (scripts/build-wall-tiles.mjs) -- NOT the full-res
+  // -desktop.jpg. Those are 2880x1800, so the wall was paying ~20MB of GPU upload
+  // per shot (~415MB across the set) to draw 175px tiles, which is what made it
+  // slow to appear. These are grayscale (TILE_FRAG reduces to luminance anyway,
+  // so it looks identical) and 16:10, matching TILE_ASPECT.
+  const urls = useMemo(() => items.map((it) => `/portfolio/wall/${it.slug}.jpg`), [items]);
 
   // A fresh random seed per mount so the wall shuffles differently every load
   // (stable within a session so a resize doesn't reshuffle).
@@ -149,35 +169,43 @@ export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: b
     return { cells, tileH, wallW: halfW * 2 + tileH * 2, wallH: rows * stepY + stepY };
   }, [camera, vp.w, vp.h, items.length]);
 
-  // Flips true once every shot has decoded; kicks off the one-shot veil dissolve.
-  const [ready, setReady] = useState(false);
-
   return (
     <group position={[0, 0, WALL_Z]} visible={visible}>
       <Suspense fallback={null}>
-        <Tiles urls={urls} cells={layout.cells} tileH={layout.tileH} onReady={() => setReady(true)} />
+        <WallBody layout={layout} urls={urls} onRevealed={onRevealed} />
       </Suspense>
+    </group>
+  );
+}
+
+// Everything the wall draws, in ONE suspending unit: Tiles calls useTexture, so the
+// whole body -- tiles, wash and veil together -- stays unmounted until every shot
+// has decoded, then commits in a single frame. Nothing here may be hoisted out to
+// render early: the wash painting on its own during load is what left the gem
+// looking like an untextured hole.
+function WallBody({
+  layout,
+  urls,
+  onRevealed,
+}: {
+  layout: { cells: Cell[]; tileH: number; wallW: number; wallH: number };
+  urls: string[];
+  onRevealed?: () => void;
+}) {
+  return (
+    <>
+      <Tiles urls={urls} cells={layout.cells} tileH={layout.tileH} />
       {/* Blue wash over the shots (brand #243989), matching the reel. */}
       <mesh position={[0, 0, 0.02]}>
         <planeGeometry args={[layout.wallW, layout.wallH]} />
         <meshBasicMaterial color="#243989" transparent opacity={0.82} depthWrite={false} toneMapped={false} />
       </mesh>
-      <Veil wallW={layout.wallW} wallH={layout.wallH} ready={ready} />
-    </group>
+      <Veil wallW={layout.wallW} wallH={layout.wallH} onRevealed={onRevealed} />
+    </>
   );
 }
 
-function Tiles({
-  urls,
-  cells,
-  tileH,
-  onReady,
-}: {
-  urls: string[];
-  cells: Cell[];
-  tileH: number;
-  onReady: () => void;
-}) {
+function Tiles({ urls, cells, tileH }: { urls: string[]; cells: Cell[]; tileH: number }) {
   const textures = useTexture(urls);
   const materials = useMemo(() => {
     const arr = Array.isArray(textures) ? textures : [textures];
@@ -192,10 +220,6 @@ function Tiles({
     });
   }, [textures]);
   useEffect(() => () => materials.forEach((m) => m.dispose()), [materials]);
-  // useTexture suspends until every shot is decoded, so mounting == all loaded.
-  useEffect(() => {
-    onReady();
-  }, [onReady]);
   return (
     <>
       {cells.map((cell, i) => (
@@ -207,7 +231,18 @@ function Tiles({
   );
 }
 
-function Veil({ wallW, wallH, ready }: { wallW: number; wallH: number; ready: boolean }) {
+// Mounts only once the tiles have decoded (it lives inside the suspending body), so
+// it starts solid and immediately runs its one-shot dissolve -- there is no "waiting"
+// state to hold.
+function Veil({
+  wallW,
+  wallH,
+  onRevealed,
+}: {
+  wallW: number;
+  wallH: number;
+  onRevealed?: () => void;
+}) {
   const mat = useMemo(
     () =>
       new THREE.ShaderMaterial({
@@ -226,11 +261,13 @@ function Veil({ wallW, wallH, ready }: { wallW: number; wallH: number; ready: bo
   const done = useRef(false);
   useFrame(() => {
     if (done.current) return;
-    if (!ready) return; // hold the static grain veil until the shots are in
     if (start.current === 0) start.current = performance.now();
     const p = Math.min(1, (performance.now() - start.current) / REVEAL_MS);
     mat.uniforms.uReveal.value = p;
-    if (p >= 1) done.current = true;
+    if (p >= 1) {
+      done.current = true; // guards against firing twice
+      onRevealed?.();
+    }
   });
   return (
     <mesh

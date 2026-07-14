@@ -8,7 +8,7 @@
 // rail navigates. Esc releases the lock back to normal page flow; clicking the
 // gem re-enters. Picks WebGL vs a lite gallery; always keeps a crawlable list.
 
-import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Reel } from "./Reel";
@@ -109,9 +109,12 @@ export function PortfolioShowroom() {
   const [selected, setSelected] = useState<number | null>(null);
   const [interacted, setInteracted] = useState(false);
   const [entered, setEntered] = useState(false);
+  const [wallRevealed, setWallRevealed] = useState(false);
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
   const [closing, setClosing] = useState(false);
   const [motionGate, setMotionGate] = useState(false);
+  // Stable: TileWall calls this from a useFrame, so it must not change identity.
+  const onWallRevealed = useCallback(() => setWallRevealed(true), []);
 
   const total = items.length;
   const sel = selected != null ? items[selected] : null;
@@ -220,18 +223,33 @@ export function PortfolioShowroom() {
                 move) so the gem stays on the optical axis and its orbit reads flat,
                 while the gem + reel appear raised to center with the title module. */}
             <StageShift immersive={immersive} />
+            {/* Pre-click: a tiled wall of all the work. Once immersive, the reel
+                takes over the same plane. Each gets its OWN Suspense boundary --
+                shared, the reel's full-res shots suspended the boundary and blanked
+                the wall (veil included) until every reel texture had decoded, so
+                the pre-click stage sat empty on first load. */}
             <Suspense fallback={null}>
-              {/* Pre-click: a tiled wall of all the work. Once immersive, the reel
-                  takes over the same plane. */}
-              <TileWall items={items} visible={!immersive} />
-              <Reel
-                items={items}
-                active={immersive}
-                command={command}
-                onIndexChange={setIndex}
-                onSelect={setSelected}
-              />
+              <TileWall items={items} visible={!immersive} onRevealed={onWallRevealed} />
             </Suspense>
+            {/* The reel pulls the full-res shots (~5.7MB, and ~20MB of GPU upload
+                EACH once decoded) and is invisible until entry, so mounting it up
+                front starved the wall's own tiles of bandwidth. Mounting it the
+                moment the wall was ready was no better: the decode/upload stall
+                then landed right on top of the veil dissolve and froze it. So wait
+                for the dissolve to FINISH, and let the reel preload into the quiet
+                afterwards -- or mount it straight away if the visitor beats it and
+                clicks enter first. */}
+            {(wallRevealed || entered) && (
+              <Suspense fallback={null}>
+                <Reel
+                  items={items}
+                  active={immersive}
+                  command={command}
+                  onIndexChange={setIndex}
+                  onSelect={setSelected}
+                />
+              </Suspense>
+            )}
             <CrystalGem immersive={immersive} />
           </Canvas>
 
