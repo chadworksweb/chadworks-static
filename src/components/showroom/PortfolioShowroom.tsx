@@ -266,8 +266,14 @@ export function PortfolioShowroom() {
       className={`${styles.wrap} ${immersive ? styles.locked : ""}`}
       aria-label="chadworks portfolio showroom"
     >
-      {immersive && (
-        <button type="button" className={styles.escBtn} onClick={exitShowroom}>
+      {/* On the chrome's lifecycle, not on `immersive` -- that unmounts in one frame,
+          which is why it had no exit to play. */}
+      {chromeUp && (
+        <button
+          type="button"
+          className={`${styles.escBtn} ${immersive ? "" : styles.escBtnOut}`}
+          onClick={exitShowroom}
+        >
           <span className={styles.escKey}>Esc</span>
           <span className={styles.escLabel}>exit showroom</span>
         </button>

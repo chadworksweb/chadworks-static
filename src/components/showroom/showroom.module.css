@@ -40,6 +40,12 @@
 /* Esc / exit control -- top-left, clearly a way out. Absolute in the wrap, so it
    pins to the viewport while locked and rides with the section once released. */
 .escBtn {
+  /* Slides in from the left edge, and only AFTER the room has finished arriving: it
+     is the way out, so it should turn up once there is something to leave, not race
+     the thing it sits on top of. Hence the --stage-ms delay -- one gem-turn behind
+     the frame, rail and module, which all land ON the gem's clock. `both` holds it
+     off-screen through the delay rather than flashing in place first. */
+  animation: cw-esc-in 0.42s var(--stage-ease) var(--stage-ms) both;
   position: absolute;
   top: clamp(1.7rem, 2.6vw, 2.1rem);
   left: clamp(1.7rem, 2.6vw, 2.1rem);
@@ -58,6 +64,20 @@
   font-family: var(--font-mono, monospace);
   transition: border-color 0.18s, background 0.18s;
 }
+/* Leaves the way it came: back out to the left, no delay -- on the way out it should
+   go first, not linger over a room that is already dissolving. */
+.escBtnOut {
+  animation: cw-esc-out 0.42s var(--stage-ease) both;
+}
+@keyframes cw-esc-in {
+  from { opacity: 0; transform: translateX(calc(-100% - 2.4rem)); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cw-esc-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateX(calc(-100% - 2.4rem)); }
+}
+
 .escBtn:hover {
   border-color: #cbb4f5;
   background: rgba(8, 8, 15, 0.82);
@@ -899,6 +919,7 @@
   .selected { animation: none; }
   .frame { animation: none; }
   .stageFrame { animation: none; }
+  .escBtn { animation: none; }
   .featureTitle { animation: none; }
   .rail { transition: none; }
   .railItem { transition: none; }
