@@ -18,7 +18,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
-import { stage } from "./showroom-intro";
+import { stage, intro } from "./showroom-intro";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
@@ -197,7 +197,17 @@ function useWallHide(groupRef: React.RefObject<THREE.Group | null>) {
   useFrame(() => {
     const g = groupRef.current;
     if (!g) return;
-    g.visible = stage.p < 0.999;
+    // Hide it ONLY once the reel is fully up and definitely covering it -- verified:
+    // forced visible, the settled immersive shows no bricks at all, so the reel is
+    // opaque over the whole viewport. Then dropping the wall is invisible, and it is
+    // purely a draw-cost win rather than something you can see.
+    //
+    // stage alone was not enough. The reel's brightness also rides `intro` (the 2.9s
+    // cold open) on a first entry, so at stage.p=1 the reel could still be translucent
+    // -- and the wall vanishing under it took its WASH with it, a big flat blue plane
+    // snapping off. That is the wash going last on the way in and coming back first on
+    // the way out. Both gates, and it never shows.
+    g.visible = !(stage.p >= 0.999 && intro.p >= 0.999);
   });
 }
 
