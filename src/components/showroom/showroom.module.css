@@ -3,6 +3,13 @@
    lite gallery, SEO fallback). Brand palette pulled from GemstoneCW / CodeFall. */
 
 .wrap {
+  /* THE GEM IS THE NORTH STAR. Its dark->light crossfade (showroom-intro's `stage`,
+     STAGE_SECONDS) is the one clock the immersive chrome starts and ends on -- the
+     frame, the rail, the module. Keep these two in step with STAGE_SECONDS and
+     easeInOutCubic there; they are the same curve expressed in CSS. */
+  --stage-ms: 900ms;
+  --stage-ease: cubic-bezier(0.65, 0, 0.35, 1);
+
   position: relative;
   width: 100%;
   /* Full viewport height, pulled up UNDER the sticky nav, so the canvas is the
@@ -452,6 +459,9 @@
 
 /* ---- Cinematic feature dressing (big title + metadata over the browse view) ---- */
 .feature {
+  /* On the gem's clock, with the frame and the rail: the module rises in as the
+     crystal turns light, and sinks back out as it goes dark. */
+  animation: cw-module-in var(--stage-ms) var(--stage-ease) both;
   position: absolute;
   left: 0;
   right: 0;
@@ -639,7 +649,13 @@
   /* The active thumb is pinned to the vertical center; --rail-shift (set per index
      in JS) slides the strip up one item at a time so earlier items ride off top. */
   transform: translateY(var(--rail-shift, -50%));
-  transition: transform 0.42s cubic-bezier(0.22, 0.7, 0.2, 1);
+  /* Two jobs on one transform. NAVIGATION stays snappy at 0.42s. The EXIT retimes to
+     the gem's clock (see .railOut) so the strip rises and fades with the crossfade
+     rather than finishing early and popping out. Opacity is always on the gem's
+     clock: the rail must fade AS it rises, not translate and then vanish. */
+  transition:
+    transform var(--rail-dur, 0.42s) var(--rail-ease, cubic-bezier(0.22, 0.7, 0.2, 1)),
+    opacity var(--stage-ms) var(--stage-ease);
   /* Above the focus-modal overlay (.selected, z 60) so the navigator stays
      visible and clickable even while a project is loaded. */
   z-index: 70;
@@ -647,6 +663,19 @@
   flex-direction: column;
   gap: 0.6rem;
 }
+/* Leaving: the rail rises (--rail-shift reverts to the -50% fallback, so the same
+   transition runs it out the way it came in) and fades WHILE it rises -- both retimed
+   onto the gem's clock, so the strip and the crystal finish together. */
+.railOut {
+  --rail-dur: var(--stage-ms);
+  --rail-ease: var(--stage-ease);
+  opacity: 0;
+}
+.railScrollOut {
+  opacity: 0;
+  transition: opacity var(--stage-ms) var(--stage-ease);
+}
+
 /* Scroll cue sitting just left of the thumb rail. Anchored to the viewport (not
    the translating rail) at vertical center, so it holds y-0 while the strip slides
    behind it. Its right edge clears the rail: rail offset + rail width + a gap. */
@@ -836,11 +865,40 @@
   z-index: 100;
   pointer-events: none;
   border: 15px solid #cbb4f5;
+  /* On the GEM's clock, like everything else in here: the frame arrives as the
+     crystal turns light and leaves as it goes dark, instead of snapping in a beat
+     ahead of what it is meant to frame. `both` holds it at 0 until it starts, so it
+     never flashes first. */
+  animation: cw-frame-in var(--stage-ms) var(--stage-ease) both;
+}
+.stageFrameOut {
+  animation: cw-frame-out var(--stage-ms) var(--stage-ease) both;
+}
+@keyframes cw-frame-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes cw-frame-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* The module: rises in, sinks out -- the mirror, on the gem's clock. */
+.featureOut {
+  animation: cw-module-out var(--stage-ms) var(--stage-ease) both;
+}
+@keyframes cw-module-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes cw-module-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(18px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .selected { animation: none; }
   .frame { animation: none; }
+  .stageFrame { animation: none; }
   .featureTitle { animation: none; }
   .rail { transition: none; }
   .railItem { transition: none; }

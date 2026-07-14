@@ -24,9 +24,8 @@ import {
   entrance,
   startEntrance,
   skipEntrance,
-  stage,
   advanceStage,
-  easeInOutCubic,
+  STAGE_SECONDS,
   ENTRANCE_DURATION,
 } from "./showroom-intro";
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
@@ -81,11 +80,15 @@ function FitText({
   );
 }
 
-// Entered-state upward shift as a FRACTION of viewport height, applied as a camera
-// lens-shift (projection offset) -- not a world move -- so the gem stays on the
-// optical axis and its orbit stays flat, while the gem + reel appear raised to
-// center with the title module. Tune alongside .feature `bottom` in the CSS.
-const STAGE_SHIFT_FRAC = 0.1;
+// The entered-state lift lives on the GEM now (see CrystalGem's STAGE_SHIFT_FRAC). It
+// used to be a camera lens-shift here, but that shifts the whole projection: the wall
+// and the reel rode up with the mark. Only the mark is supposed to move.
+
+// How long the immersive chrome stays mounted after the lock releases, so it can play
+// its exit. THE GEM IS THE NORTH STAR: this is its crossfade (STAGE_SECONDS) plus a
+// hair, so the frame, the rail and the module all finish with the crystal rather than
+// being cut off mid-move. Keep in step with --stage-ms in the CSS.
+const CHROME_OUT_MS = STAGE_SECONDS * 1000 + 60;
 
 // Advances the clocks: `entrance` (the gem's reverse-shatter, on load), `intro` (the
 // reel's ramp, on enter) -- both one-shots, deliberately separate, see showroom-intro
@@ -106,23 +109,13 @@ function IntroController({ immersive }: { immersive: boolean }) {
   return null;
 }
 
-// Lens-shift the camera up while immersive so the entered composition sits higher
-// on screen without moving any object off the optical axis (which would perspective-
-// distort the gem's orbit). setViewOffset shifts the projection uniformly; the gem's
-// FBO refraction reads the same shifted projection, so it stays consistent.
+// The camera never shifts now -- clear any offset a previous build left on it, so the
+// wall and the reel hold still while the mark rides the crossfade up and down.
 function StageShift() {
-  const { camera, size } = useThree();
+  const { camera } = useThree();
   useFrame(() => {
     const cam = camera as THREE.PerspectiveCamera;
-    // Rides the crossfade, so the mark SLIDES between the two compositions instead of
-    // cutting to the entered one the frame you click.
-    const t = easeInOutCubic(stage.p);
-    if (t > 0.0001) {
-      const dy = Math.round(size.height * STAGE_SHIFT_FRAC * t);
-      cam.setViewOffset(size.width, size.height, 0, dy, size.width, size.height);
-    } else if (cam.view?.enabled) {
-      cam.clearViewOffset();
-    }
+    if (cam.view?.enabled) cam.clearViewOffset();
   });
   return null;
 }
@@ -157,6 +150,21 @@ export function PortfolioShowroom() {
   const total = items.length;
   const sel = selected != null ? items[selected] : null;
   const immersive = mode === "webgl" && entered;
+
+  // The immersive chrome has to OUTLIVE the exit. `{immersive && ...}` tore it off the
+  // screen the same frame you hit Esc, so nothing it does on the way out is ever seen
+  // -- there was no way to animate an exit, only to delete one. Keep it mounted for
+  // the length of the rail's slide, marked as exiting, and drop it once it has left.
+  const [chromeUp, setChromeUp] = useState(false);
+  useEffect(() => {
+    if (immersive) {
+      setChromeUp(true);
+      return;
+    }
+    if (!chromeUp) return;
+    const t = window.setTimeout(() => setChromeUp(false), CHROME_OUT_MS);
+    return () => window.clearTimeout(t);
+  }, [immersive, chromeUp]);
 
   const goTo = (i: number) => setCommand((c) => ({ index: i, nonce: c.nonce + 1 }));
 
@@ -319,18 +327,22 @@ export function PortfolioShowroom() {
             </button>
           )}
 
-          {immersive && (
+          {chromeUp && (
             <>
-              <div className={styles.stageFrame} aria-hidden="true" />
+              <div
+                className={`${styles.stageFrame} ${immersive ? "" : styles.stageFrameOut}`}
+                aria-hidden="true"
+              />
               <RightRail
                 items={items}
                 index={index}
                 focused={selected != null}
+                exiting={!immersive}
                 onGo={goTo}
                 onOpen={setSelected}
               />
 
-              <div className={styles.feature}>
+              <div className={`${styles.feature} ${immersive ? "" : styles.featureOut}`}>
                 <button
                   type="button"
                   className={styles.featureCard}
@@ -410,12 +422,14 @@ function RightRail({
   items,
   index,
   focused,
+  exiting,
   onGo,
   onOpen,
 }: {
   items: ShowroomItem[];
   index: number;
   focused: boolean;
+  exiting: boolean;
   onGo: (i: number) => void;
   onOpen: (i: number) => void;
 }) {
@@ -435,10 +449,21 @@ function RightRail({
 
   // Keep the active thumb pinned at the vertical center: shift the whole rail up
   // one item at a time as the index advances, so earlier items ride off the top.
+  //
+  // This is also what slides the rail IN. It mounts on the CSS fallback (-50%) and
+  // this sets a pixel shift a frame later, so `transition: transform` animates the
+  // difference -- the entrance is emergent from that gap, not authored. Which hands
+  // us the exit: put --rail-shift back to the fallback and the same transition runs
+  // it out, on the same curve, in reverse. That slide is the grounding every other
+  // piece of immersive chrome now times against.
   const navRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const nav = navRef.current;
     if (!nav) return;
+    if (exiting) {
+      nav.style.removeProperty("--rail-shift"); // back to -50%: slides out the way it came
+      return;
+    }
     const setShift = () => {
       const first = nav.querySelector("button");
       if (!first) return;
@@ -451,18 +476,25 @@ function RightRail({
     setShift();
     window.addEventListener("resize", setShift);
     return () => window.removeEventListener("resize", setShift);
-  }, [index, items.length]);
+  }, [index, items.length, exiting]);
 
   return (
     <>
       {/* Scroll cue: anchored to the viewport center (NOT inside the rail), so it
           stays put while the rail strip slides behind it. */}
-      <span className={styles.railScroll} aria-hidden="true">
+      <span
+        className={`${styles.railScroll} ${exiting ? styles.railScrollOut : ""}`}
+        aria-hidden="true"
+      >
         <span className={styles.railScrollArrow}>&#8963;</span>
         <span className={styles.railScrollText}>scroll</span>
         <span className={styles.railScrollArrow}>&#8964;</span>
       </span>
-      <nav ref={navRef} className={styles.rail} aria-label="Projects">
+      <nav
+        ref={navRef}
+        className={`${styles.rail} ${exiting ? styles.railOut : ""}`}
+        aria-label="Projects"
+      >
       {items.map((it, i) => (
         <button
           key={it.key}

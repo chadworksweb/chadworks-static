@@ -26,6 +26,9 @@ import {
 import { useMotionPausedRef } from "./useMotionPaused";
 
 const GEM_Z = 0.8;
+// How far the entered composition lifts the mark, as a fraction of viewport height.
+// Tune alongside .feature `bottom` in the CSS.
+const STAGE_SHIFT_FRAC = 0.1;
 // Scratch for the per-frame projection of the mark's screen box (project() mutates).
 const tmpA = new THREE.Vector3();
 const tmpB = new THREE.Vector3();
@@ -651,10 +654,21 @@ export function CrystalGem({
       // stays solid through a full turn.
       side: THREE.DoubleSide,
       // Push the crystal's depth back a hair so the coincident neon EDGE lines win the
-      // depth test on the near surface while the crystal still occludes the far edges.
+      // depth test on the near surface while the crystal still occludes the far ones.
+      //
+      // A CONSTANT push, not a sloped one. polygonOffsetFactor scales with the
+      // polygon's depth slope, and when the mark turns near-perpendicular that slope
+      // explodes: factor 1 shoved the crystal so far back it stopped occluding the
+      // wire's FAR edges, which lit up as spokes shining through the letters.
+      //
+      // But the slope term was doing real work -- on an angled face the depth varies
+      // across the polygon, so a 1-unit bias is not enough for the near edge to win
+      // and the outline thins out. Hence a bigger CONSTANT: enough headroom for the
+      // near edges at any angle, while staying nowhere near the far ones, which sit a
+      // full mark-depth back (~0.3 world units = thousands of depth steps away).
       polygonOffset: true,
-      polygonOffsetFactor: 1,
-      polygonOffsetUnits: 1,
+      polygonOffsetFactor: 0,
+      polygonOffsetUnits: 64,
       uniforms: {
         uProj: { value: new THREE.Matrix4() },
         uView: { value: new THREE.Matrix4() },
@@ -784,6 +798,15 @@ export function CrystalGem({
     settled.uniforms.uSelf.value = selfSpin.current * mix;
     mesh.rotation.y = rotY.current;
     mesh.rotation.x = rotX.current;
+    // The entered composition sits higher. Lift the MARK, not the room: this used to
+    // be a camera lens-shift, which moves the projection and so carried the wall and
+    // the reel up with it -- invisible while it snapped, obvious once it eases. A
+    // world lift moves only the gem (and the neon, its child), and works out to
+    // exactly STAGE_SHIFT_FRAC of the viewport at the gem's depth.
+    const pcam = camera as THREE.PerspectiveCamera;
+    const dist = Math.abs(pcam.position.z - GEM_Z);
+    const visH = 2 * dist * Math.tan((pcam.fov * Math.PI) / 360);
+    mesh.position.y = visH * STAGE_SHIFT_FRAC * mix;
     // Micro scale-bounce as the shards slam home; otherwise the mark holds BASE.
     const pop = entrance.p < 1 ? 1 + 0.06 * Math.sin(e * Math.PI) : 1;
     mesh.scale.setScalar(BASE * pop);

@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useThree, useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
-import { intro } from "./showroom-intro";
+import { intro, stage, easeInOutCubic } from "./showroom-intro";
 import { useMotionPausedRef } from "./useMotionPaused";
 
 const ITEM_Z = -1.4;
@@ -73,6 +73,7 @@ export function Reel({
   const { gl, camera } = useThree();
   const N = items.length;
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const groupRef = useRef<THREE.Group>(null);
   const paused = useMotionPausedRef();
 
   // Size the planes off the STABLE viewport, not the R3F canvas size. Entering /
@@ -235,7 +236,13 @@ export function Reel({
       }
     }
 
-    const lit = active ? 0.35 + 0.65 * smoothstep(0.1, 0.9, intro.p) : 0.42;
+    // Fade with the GEM, not with the boolean. The reel used to flip on and off the
+    // frame the lock toggled, while the crystal took ~0.9s to turn -- so the room it
+    // was refracting changed instantly underneath it. Riding the same clock, the slide
+    // arrives as the gem goes light and leaves as it goes dark.
+    const s = easeInOutCubic(stage.p);
+    const lit = (active ? 0.35 + 0.65 * smoothstep(0.1, 0.9, intro.p) : 0.42) * s;
+    if (groupRef.current) groupRef.current.visible = s > 0.003;
     for (let i = 0; i < N; i++) {
       const m = meshRefs.current[i];
       if (!m) continue;
@@ -257,7 +264,7 @@ export function Reel({
   });
 
   return (
-    <group visible={active}>
+    <group ref={groupRef}>
       {items.map((it, i) => (
         <mesh
           key={it.key}

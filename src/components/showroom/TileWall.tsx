@@ -18,6 +18,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
+import { stage, easeInOutCubic } from "./showroom-intro";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
@@ -37,11 +38,12 @@ const TILE_VERT = `
 const TILE_FRAG = `
   precision highp float;
   uniform sampler2D map;
+  uniform float uFade;
   varying vec2 vUv;
   void main() {
     vec4 c = texture2D(map, vUv);
     float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-    gl_FragColor = vec4(vec3(l), 1.0);
+    gl_FragColor = vec4(vec3(l), uFade);
   }
 `;
 // The veil: a solid grain field. uReveal (0..1) dissolves it away -- each cell
@@ -75,6 +77,8 @@ export function TileWall({
   onRevealed?: () => void;
 }) {
   const { camera } = useThree();
+  const groupRef = useRef<THREE.Group>(null);
+  useWallFade(groupRef, visible);
   // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
   // enter/exit canvas resize never recomputes (and visibly re-tiles) the wall.
   const [vp, setVp] = useState(() => ({
@@ -170,12 +174,35 @@ export function TileWall({
   }, [camera, vp.w, vp.h, items.length]);
 
   return (
-    <group position={[0, 0, WALL_Z]} visible={visible}>
+    <group ref={groupRef} position={[0, 0, WALL_Z]}>
       <Suspense fallback={null}>
         <WallBody layout={layout} urls={urls} onRevealed={onRevealed} />
       </Suspense>
     </group>
   );
+}
+
+// Fades the whole wall on the GEM's clock. It used to flip on `visible` the frame the
+// lock toggled, so the room swapped under the crystal while the crystal was still
+// mid-turn. Walks the group rather than threading a prop through every mesh: the wall
+// is tiles (uFade) plus the blue wash (material opacity), and both have to go together.
+function useWallFade(groupRef: React.RefObject<THREE.Group | null>, visible: boolean) {
+  useFrame(() => {
+    const g = groupRef.current;
+    if (!g) return;
+    // 1 when exited (the wall IS the room), 0 once the showroom has taken over.
+    const f = visible ? 1 - easeInOutCubic(stage.p) : 0;
+    g.visible = f > 0.003;
+    if (!g.visible) return;
+    g.traverse((o) => {
+      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
+      if (!m) return;
+      const sm = m as THREE.ShaderMaterial;
+      if (sm.uniforms?.uFade) sm.uniforms.uFade.value = f;
+      else if (sm.uniforms?.uReveal) return; // the veil owns its own dissolve
+      else m.opacity = (m.userData.baseOpacity ??= m.opacity) * f;
+    });
+  });
 }
 
 // Everything the wall draws, in ONE suspending unit: Tiles calls useTexture, so the
@@ -215,7 +242,8 @@ function Tiles({ urls, cells, tileH }: { urls: string[]; cells: Cell[]; tileH: n
       return new THREE.ShaderMaterial({
         vertexShader: TILE_VERT,
         fragmentShader: TILE_FRAG,
-        uniforms: { map: { value: t } },
+        uniforms: { map: { value: t }, uFade: { value: 1 } },
+        transparent: true,
       });
     });
   }, [textures]);
