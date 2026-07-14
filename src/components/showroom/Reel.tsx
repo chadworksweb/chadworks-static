@@ -9,7 +9,7 @@
 // Textures are cropped to each site's hero. Reveals during the cold open; honors
 // reduced-motion / global pause.
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
@@ -71,10 +71,23 @@ export function Reel({
   onIndexChange?: (i: number) => void;
   onSelect?: (i: number) => void;
 }) {
-  const { gl, camera, size } = useThree();
+  const { gl, camera } = useThree();
   const N = items.length;
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
   const paused = useMotionPausedRef();
+
+  // Size the planes off the STABLE viewport, not the R3F canvas size. Entering /
+  // exiting the showroom resizes the canvas (fold height <-> full viewport); keying
+  // plane geometry off that made the first slide "resize twice" as the lock settled.
+  const [vp, setVp] = useState(() => ({
+    w: typeof window !== "undefined" ? window.innerWidth : 1440,
+    h: typeof window !== "undefined" ? window.innerHeight : 900,
+  }));
+  useEffect(() => {
+    const onResize = () => setVp({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const urls = useMemo(
     () => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`),
@@ -87,7 +100,7 @@ export function Reel({
     const dist = cam.position.z - ITEM_Z;
     const vFov = (cam.fov * Math.PI) / 180;
     const visH = 2 * Math.tan(vFov / 2) * dist;
-    const visW = visH * (size.width / size.height);
+    const visW = visH * (vp.w / vp.h);
     let h = visH * 1.06;
     let w = h * (16 / 9);
     if (w < visW * 1.06) {
@@ -95,7 +108,7 @@ export function Reel({
       h = w * (9 / 16);
     }
     return { w, h, spacing: h * GAP };
-  }, [camera, size.width, size.height]);
+  }, [camera, vp.w, vp.h]);
 
   // one bulge material per item (program is shared internally by three)
   const materials = useMemo(

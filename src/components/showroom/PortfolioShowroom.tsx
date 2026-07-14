@@ -8,22 +8,96 @@
 // rail navigates. Esc releases the lock back to normal page flow; clicking the
 // gem re-enters. Picks WebGL vs a lite gallery; always keeps a crawlable list.
 
-import { Suspense, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import * as THREE from "three";
 import { Reel } from "./Reel";
 import { TileWall } from "./TileWall";
 import { CrystalGem } from "./CrystalGem";
 import { SHOWROOM_ITEMS, type ShowroomItem } from "./showroom-data";
 import { useShowroomMode } from "./useShowroomMode";
 import { intro, startIntro, skipIntro, INTRO_DURATION } from "./showroom-intro";
-import { prefersReducedMotion } from "@/lib/motion";
+import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
 import styles from "./showroom.module.css";
+
+// Shrink a title until it fits its container on one line -- never wraps. Sets a
+// `--fit-fs` custom property the CSS uses as the font-size (falling back to the
+// CSS clamp when the text already fits). Re-runs on text change and on resize.
+function useFitText(dep: string) {
+  const ref = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const box = el.parentElement ?? el;
+    const fit = () => {
+      el.style.setProperty("--fit-fs", ""); // reset to the CSS default, then measure
+      const cs = getComputedStyle(box);
+      const pad = parseFloat(cs.paddingLeft || "0") + parseFloat(cs.paddingRight || "0");
+      const avail = box.clientWidth - pad;
+      const natural = el.scrollWidth;
+      if (avail > 0 && natural > avail) {
+        const base = parseFloat(getComputedStyle(el).fontSize);
+        el.style.setProperty("--fit-fs", `${Math.max(10, base * (avail / natural))}px`);
+      }
+    };
+    fit();
+    const raf = requestAnimationFrame(fit); // fonts/layout can settle a frame late
+    const ro = new ResizeObserver(fit);
+    ro.observe(box);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [dep]);
+  return ref;
+}
+
+function FitText({
+  as: Tag = "span",
+  className,
+  text,
+}: {
+  as?: "span" | "h2";
+  className?: string;
+  text: string;
+}) {
+  const ref = useFitText(text);
+  return (
+    <Tag ref={ref as React.Ref<HTMLHeadingElement & HTMLSpanElement>} className={className}>
+      {text}
+    </Tag>
+  );
+}
+
+// Entered-state upward shift as a FRACTION of viewport height, applied as a camera
+// lens-shift (projection offset) -- not a world move -- so the gem stays on the
+// optical axis and its orbit stays flat, while the gem + reel appear raised to
+// center with the title module. Tune alongside .feature `bottom` in the CSS.
+const STAGE_SHIFT_FRAC = 0.1;
 
 function IntroController() {
   useFrame((_, delta) => {
     if (!intro.playing) return;
     intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
     if (intro.p >= 1) intro.playing = false;
+  });
+  return null;
+}
+
+// Lens-shift the camera up while immersive so the entered composition sits higher
+// on screen without moving any object off the optical axis (which would perspective-
+// distort the gem's orbit). setViewOffset shifts the projection uniformly; the gem's
+// FBO refraction reads the same shifted projection, so it stays consistent.
+function StageShift({ immersive }: { immersive: boolean }) {
+  const { camera, size } = useThree();
+  useFrame(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    if (immersive) {
+      const dy = Math.round(size.height * STAGE_SHIFT_FRAC);
+      cam.setViewOffset(size.width, size.height, 0, dy, size.width, size.height);
+    } else if (cam.view?.enabled) {
+      cam.clearViewOffset();
+    }
   });
   return null;
 }
@@ -37,6 +111,7 @@ export function PortfolioShowroom() {
   const [entered, setEntered] = useState(false);
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
   const [closing, setClosing] = useState(false);
+  const [motionGate, setMotionGate] = useState(false);
 
   const total = items.length;
   const sel = selected != null ? items[selected] : null;
@@ -58,7 +133,7 @@ export function PortfolioShowroom() {
     }, 520);
   };
 
-  const enter = () => {
+  const doEnter = () => {
     setEntered(true);
     setInteracted(true);
     try {
@@ -68,6 +143,22 @@ export function PortfolioShowroom() {
         startIntro();
       }
     } catch {}
+  };
+
+  // The reel is driven by the motion loop; entering with motion paused just freezes
+  // it on the gem. If paused, gate entry behind a dialog that turns motion back on.
+  const enter = () => {
+    if (isMotionPaused()) {
+      setMotionGate(true);
+      return;
+    }
+    doEnter();
+  };
+
+  const proceedThroughGate = () => {
+    setMotionPaused(false);
+    setMotionGate(false);
+    doEnter();
   };
 
   // Leaving the showroom always drops any focused project too, so the modal never
@@ -125,6 +216,10 @@ export function PortfolioShowroom() {
             }}
           >
             <IntroController />
+            {/* Lens-shift the entered view up (projection offset, NOT a world
+                move) so the gem stays on the optical axis and its orbit reads flat,
+                while the gem + reel appear raised to center with the title module. */}
+            <StageShift immersive={immersive} />
             <Suspense fallback={null}>
               {/* Pre-click: a tiled wall of all the work. Once immersive, the reel
                   takes over the same plane. */}
@@ -165,9 +260,7 @@ export function PortfolioShowroom() {
                   onClick={() => setSelected(index)}
                   aria-label={`Bring ${items[index]?.label} into focus`}
                 >
-                  <span key={index} className={styles.featureTitle}>
-                    {items[index]?.label}
-                  </span>
+                  <FitText key={index} className={styles.featureTitle} text={items[index]?.label ?? ""} />
                   <span className={styles.featureMeta}>
                     <span>Platform: {items[index]?.platform ?? "TBD"}</span>
                     <span>Year: {items[index]?.year ?? "TBD"}</span>
@@ -203,6 +296,35 @@ export function PortfolioShowroom() {
       </ul>
 
       {sel && <SelectedFrame item={sel} closing={closing} onClose={requestClose} />}
+
+      {/* Motion gate: the showroom needs live motion, so if the visitor has paused
+          it, ask to turn it back on before entering (reuses the motion-invite card). */}
+      {motionGate && (
+        <div
+          className="cw-motion-invite"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cw-showroom-motion-title"
+        >
+          <div className="cw-motion-invite__card">
+            <h2 id="cw-showroom-motion-title" className="cw-motion-invite__title">
+              You have paused motion, the showroom requires it
+            </h2>
+            <p className="cw-motion-invite__body">
+              Click the button below to proceed to the showroom.
+            </p>
+            <div className="cw-motion-invite__actions">
+              <button
+                type="button"
+                className="cw-motion-invite__btn cw-motion-invite__btn--go"
+                onClick={proceedThroughGate}
+              >
+                PROCEED TO THE SHOWROOM
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -233,13 +355,37 @@ function RightRail({
       onGo(i);
     }
   };
+
+  // Keep the active thumb pinned at the vertical center: shift the whole rail up
+  // one item at a time as the index advances, so earlier items ride off the top.
+  const navRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const setShift = () => {
+      const first = nav.querySelector("button");
+      if (!first) return;
+      const cs = getComputedStyle(nav);
+      const gap = parseFloat(cs.rowGap || cs.gap || "0") || 0;
+      const h = (first as HTMLElement).offsetHeight;
+      const step = h + gap;
+      nav.style.setProperty("--rail-shift", `${-(index * step + h / 2)}px`);
+    };
+    setShift();
+    window.addEventListener("resize", setShift);
+    return () => window.removeEventListener("resize", setShift);
+  }, [index, items.length]);
+
   return (
-    <nav className={styles.rail} aria-label="Projects">
+    <>
+      {/* Scroll cue: anchored to the viewport center (NOT inside the rail), so it
+          stays put while the rail strip slides behind it. */}
       <span className={styles.railScroll} aria-hidden="true">
         <span className={styles.railScrollArrow}>&#8963;</span>
         <span className={styles.railScrollText}>scroll</span>
         <span className={styles.railScrollArrow}>&#8964;</span>
       </span>
+      <nav ref={navRef} className={styles.rail} aria-label="Projects">
       {items.map((it, i) => (
         <button
           key={it.key}
@@ -253,7 +399,8 @@ function RightRail({
           <span className={styles.railBr} aria-hidden="true" />
         </button>
       ))}
-    </nav>
+      </nav>
+    </>
   );
 }
 
@@ -291,7 +438,12 @@ function SelectedFrame({
   onClose: () => void;
 }) {
   const [hidden, setHidden] = useState(false);
-  const invert = item.key === "risingcompass" || item.key === "chadlewine";
+  const invert =
+    item.key === "risingcompass" ||
+    item.key === "chadlewine" ||
+    item.key === "scinet" ||
+    item.key === "aes" ||
+    item.key === "jeremyhayes";
   return (
     <div
       className={`${styles.selected} ${closing ? styles.selectedClosing : ""}`}
@@ -323,7 +475,7 @@ function SelectedFrame({
             {hidden ? "Show ▲" : "Hide ▼"}
           </span>
           <p className={styles.metaKick}>{item.url}</p>
-          <h2 className={styles.metaTitle}>{item.label}</h2>
+          <FitText as="h2" className={styles.metaTitle} text={item.label} />
           <div className={styles.metaBody}>
             <p className={styles.metaRow}>
               <span>Platform: {item.platform ?? "TBD"}</span>

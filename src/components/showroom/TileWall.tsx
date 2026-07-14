@@ -1,27 +1,33 @@
 "use client";
 
-// Pre-click background: instead of one big reel image, a wall of ALL portfolio
-// shots tiled across the viewport, cycling to fill and repeating as needed. Rows
-// share one height (~175px CSS as a rough target, 10px gap); each tile's WIDTH is
-// its image's NATURAL aspect ratio, so no shot is stretched. Each is DESATURATED and
-// the whole wall carries a 75% dark-blue overlay, so it reads as a muted blue wall
-// of work behind the gem. Shown only before entering; the Reel takes over immersive.
+// Pre-click background: a wall of ALL portfolio shots tiled across the viewport,
+// desaturated under a dark-blue wash so it reads as a muted wall of work behind
+// the gem. Shown only before entering; the Reel takes over immersive.
+//
+// LOAD-IN: while the shots download, a single STATIC grain VEIL covers the whole
+// stage (one plane -- no per-tile grout). The moment they're all in, that veil
+// runs the grain FILM DISSOLVE once, all at once, uncovering the finished wall.
+//
+// No image is ever placed touching a duplicate of itself -- each tile avoids the
+// image to its left AND any image in the row above that overlaps it.
 
-import { useEffect, useMemo } from "react";
-import { useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useThree, useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
+import { REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
 
+const REVEAL_MS = 620; // grain -> wall dissolve, all at once, after everything loads
 const WALL_Z = -1.4; // same plane as the reel
 const TILE_PX = 175; // rough target row height in CSS px (a range, not exact)
 const GAP_PX = 5;
+const TILE_ASPECT = 16 / 10; // fixed so the layout never depends on load
 
 const TILE_VERT = `
   varying vec2 vUv;
   void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
 `;
-// Desaturate each shot to grayscale; the blue overlay plane tints the wall.
 const TILE_FRAG = `
   precision highp float;
   uniform sampler2D map;
@@ -32,12 +38,147 @@ const TILE_FRAG = `
     gl_FragColor = vec4(vec3(l), 1.0);
   }
 `;
+// The veil: a solid grain field. uReveal (0..1) dissolves it away -- each ~2px cell
+// discards once uReveal passes its random threshold, uncovering the wall beneath.
+const VEIL_FRAG = `
+  precision highp float;
+  uniform float uReveal;
+  float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+  }
+  void main() {
+    vec2 cell = floor(gl_FragCoord.xy / 2.0); // teeny (2px) grains
+    if (hash(cell) < uReveal) discard;        // this cell has dissolved -> reveal wall
+    float n = hash(cell + 7.13);
+    gl_FragColor = vec4(vec3(0.05 + 0.16 * n), 1.0);
+  }
+`;
+
+type Cell = { x: number; y: number; w: number; tex: number };
 
 export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: boolean }) {
-  const { camera, size } = useThree();
-  const urls = useMemo(() => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`), [items]);
-  const textures = useTexture(urls);
+  const { camera } = useThree();
+  // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
+  // enter/exit canvas resize never recomputes (and visibly re-tiles) the wall.
+  const [vp, setVp] = useState(() => ({
+    w: typeof window !== "undefined" ? window.innerWidth : 1440,
+    h: typeof window !== "undefined" ? window.innerHeight : 900,
+  }));
+  useEffect(() => {
+    const onResize = () => setVp({ w: window.innerWidth, h: window.innerHeight });
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
+  const urls = useMemo(() => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`), [items]);
+
+  // A fresh random seed per mount so the wall shuffles differently every load
+  // (stable within a session so a resize doesn't reshuffle).
+  const seedRef = useRef((((Math.random() * 0xffffffff) >>> 0) | 1) >>> 0);
+
+  const layout = useMemo(() => {
+    const cam = camera as THREE.PerspectiveCamera;
+    const dist = cam.position.z - WALL_Z;
+    const vFov = (cam.fov * Math.PI) / 180;
+    const visH = 2 * Math.tan(vFov / 2) * dist;
+    const visW = visH * (vp.w / vp.h);
+    const perPx = visH / Math.max(1, vp.h);
+    const tileH = TILE_PX * perPx;
+    const gap = GAP_PX * perPx;
+    const stepY = tileH + gap;
+    const rows = Math.ceil(visH / stepY) + 2;
+    const startY = ((rows - 1) * stepY) / 2;
+    const halfW = visW / 2 + tileH * 2;
+    const tileW = tileH * TILE_ASPECT;
+
+    // Seeded "bag": draw each image once per pass (even distribution), reshuffle when
+    // empty. Random per load, stable per session.
+    const n = Math.max(1, items.length);
+    let seed = seedRef.current;
+    const rand = () => {
+      seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    let bag: number[] = [];
+    const refill = () => {
+      bag = Array.from({ length: n }, (_, k) => k);
+      for (let k = n - 1; k > 0; k--) {
+        const j = Math.floor(rand() * (k + 1));
+        [bag[k], bag[j]] = [bag[j], bag[k]];
+      }
+    };
+    // Draw an image not in `avoid` (the left + overlapping-above neighbours), so no
+    // duplicate ever touches itself.
+    const draw = (avoid: Set<number>) => {
+      for (let attempt = 0; attempt < 2; attempt++) {
+        if (bag.length === 0) refill();
+        for (let a = bag.length - 1; a >= 0; a--) {
+          if (!avoid.has(bag[a])) return bag.splice(a, 1)[0];
+        }
+        bag = []; // all remaining were avoided -> force a fresh bag and retry
+      }
+      return Math.floor(rand() * n);
+    };
+
+    const cells: Cell[] = [];
+    let prevRow: { x0: number; x1: number; tex: number }[] = [];
+    const brick = tileH * 0.8; // constant half-tile stagger between rows
+    for (let r = 0; r < rows; r++) {
+      const y = startY - r * stepY;
+      let x = -halfW - (r % 2) * brick;
+      let prevTex = -1;
+      const row: { x0: number; x1: number; tex: number }[] = [];
+      while (x < halfW) {
+        const x0 = x;
+        const x1 = x + tileW;
+        const avoid = new Set<number>();
+        if (prevTex >= 0) avoid.add(prevTex);
+        for (const pc of prevRow) if (pc.x1 > x0 && pc.x0 < x1) avoid.add(pc.tex);
+        const tex = draw(avoid);
+        prevTex = tex;
+        cells.push({ x: x0 + tileW / 2, y, w: tileW, tex });
+        row.push({ x0, x1, tex });
+        x += tileW + gap;
+      }
+      prevRow = row;
+    }
+    return { cells, tileH, wallW: halfW * 2 + tileH * 2, wallH: rows * stepY + stepY };
+  }, [camera, vp.w, vp.h, items.length]);
+
+  // Flips true once every shot has decoded; kicks off the one-shot veil dissolve.
+  const [ready, setReady] = useState(false);
+
+  return (
+    <group position={[0, 0, WALL_Z]} visible={visible}>
+      <Suspense fallback={null}>
+        <Tiles urls={urls} cells={layout.cells} tileH={layout.tileH} onReady={() => setReady(true)} />
+      </Suspense>
+      {/* Blue wash over the shots (brand #243989), matching the reel. */}
+      <mesh position={[0, 0, 0.02]}>
+        <planeGeometry args={[layout.wallW, layout.wallH]} />
+        <meshBasicMaterial color="#243989" transparent opacity={0.82} depthWrite={false} toneMapped={false} />
+      </mesh>
+      <Veil wallW={layout.wallW} wallH={layout.wallH} ready={ready} />
+    </group>
+  );
+}
+
+function Tiles({
+  urls,
+  cells,
+  tileH,
+  onReady,
+}: {
+  urls: string[];
+  cells: Cell[];
+  tileH: number;
+  onReady: () => void;
+}) {
+  const textures = useTexture(urls);
   const materials = useMemo(() => {
     const arr = Array.isArray(textures) ? textures : [textures];
     return arr.map((t) => {
@@ -50,98 +191,56 @@ export function TileWall({ items, visible }: { items: ShowroomItem[]; visible: b
       });
     });
   }, [textures]);
-
   useEffect(() => () => materials.forEach((m) => m.dispose()), [materials]);
-
-  // Natural aspect ratio per texture (width / height of the source capture), so a
-  // tile's plane matches its image and nothing is stretched.
-  const aspects = useMemo(() => {
-    const arr = Array.isArray(textures) ? textures : [textures];
-    return arr.map((t) => {
-      const img = t.image as { naturalWidth?: number; naturalHeight?: number; width?: number; height?: number } | undefined;
-      const w = img?.naturalWidth || img?.width || 16;
-      const h = img?.naturalHeight || img?.height || 10;
-      return w / Math.max(1, h);
-    });
-  }, [textures]);
-
-  const layout = useMemo(() => {
-    const cam = camera as THREE.PerspectiveCamera;
-    const dist = cam.position.z - WALL_Z;
-    const vFov = (cam.fov * Math.PI) / 180;
-    const visH = 2 * Math.tan(vFov / 2) * dist;
-    const visW = visH * (size.width / size.height);
-    const perPx = visH / Math.max(1, size.height);
-    const tileH = TILE_PX * perPx;
-    const gap = GAP_PX * perPx;
-    const stepY = tileH + gap;
-    // Overscan a row above/below and pad the sides so no wall edge shows.
-    const rows = Math.ceil(visH / stepY) + 2;
-    const startY = ((rows - 1) * stepY) / 2;
-    const halfW = visW / 2 + tileH * 2;
-
-    // Random-but-even image distribution: a seeded "bag" that draws each image once
-    // per pass (so every shot appears equally often), reshuffled when it empties, and
-    // never repeats the tile immediately to its left. Seeded so it is stable across
-    // frames/resizes but reads as random -- no marching pattern, no phase offset.
-    const n = Math.max(1, aspects.length);
-    let seed = 0x9e3779b9;
-    const rand = () => {
-      seed = (seed + 0x6d2b79f5) | 0;
-      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-    let bag: number[] = [];
-    const draw = (avoid: number) => {
-      if (bag.length === 0) {
-        bag = Array.from({ length: n }, (_, k) => k);
-        for (let k = n - 1; k > 0; k--) {
-          const j = Math.floor(rand() * (k + 1));
-          [bag[k], bag[j]] = [bag[j], bag[k]];
-        }
-      }
-      let pick = bag.length - 1;
-      for (let a = 0; a < bag.length; a++) {
-        if (bag[bag.length - 1 - a] !== avoid) { pick = bag.length - 1 - a; break; }
-      }
-      const tex = bag[pick];
-      bag.splice(pick, 1);
-      return tex;
-    };
-
-    const cells: { x: number; y: number; w: number; tex: number }[] = [];
-    // Equal brick stagger: alternating rows start half a tile offset (constant, not
-    // random) so the rows are evenly offset -- the images are what's randomized, not
-    // the offset amount.
-    const brick = tileH * 0.8; // ~half a 16:10 tile
-    for (let r = 0; r < rows; r++) {
-      const y = startY - r * stepY;
-      let x = -halfW - (r % 2) * brick;
-      let prev = -1;
-      while (x < halfW) {
-        const tex = draw(prev);
-        prev = tex;
-        const w = tileH * aspects[tex];
-        cells.push({ x: x + w / 2, y, w, tex });
-        x += w + gap;
-      }
-    }
-    return { cells, tileH, wallW: halfW * 2 + tileH * 2, wallH: rows * stepY + stepY };
-  }, [camera, size.width, size.height, aspects]);
-
+  // useTexture suspends until every shot is decoded, so mounting == all loaded.
+  useEffect(() => {
+    onReady();
+  }, [onReady]);
   return (
-    <group position={[0, 0, WALL_Z]} visible={visible}>
-      {layout.cells.map((cell, i) => (
+    <>
+      {cells.map((cell, i) => (
         <mesh key={i} position={[cell.x, cell.y, 0]} material={materials[cell.tex]}>
-          <planeGeometry args={[cell.w, layout.tileH]} />
+          <planeGeometry args={[cell.w, tileH]} />
         </mesh>
       ))}
-      {/* 75% dark-blue overlay (brand #243989), matching the reel wash. */}
-      <mesh position={[0, 0, 0.02]}>
-        <planeGeometry args={[layout.wallW, layout.wallH]} />
-        <meshBasicMaterial color="#243989" transparent opacity={0.75} depthWrite={false} toneMapped={false} />
-      </mesh>
-    </group>
+    </>
+  );
+}
+
+function Veil({ wallW, wallH, ready }: { wallW: number; wallH: number; ready: boolean }) {
+  const mat = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        fragmentShader: VEIL_FRAG,
+        vertexShader: TILE_VERT,
+        // depthTest ON: the crystal (GEM_Z, well in front of the wall) occludes the
+        // veil, so the gem always reads on top of the grain / dissolve.
+        depthTest: true,
+        depthWrite: false,
+        uniforms: { uReveal: { value: 0 } },
+      }),
+    []
+  );
+  useEffect(() => () => mat.dispose(), [mat]);
+  const start = useRef(0);
+  const done = useRef(false);
+  useFrame(() => {
+    if (done.current) return;
+    if (!ready) return; // hold the static grain veil until the shots are in
+    if (start.current === 0) start.current = performance.now();
+    const p = Math.min(1, (performance.now() - start.current) / REVEAL_MS);
+    mat.uniforms.uReveal.value = p;
+    if (p >= 1) done.current = true;
+  });
+  return (
+    <mesh
+      // On the refraction-exclude layer so the gem's FBO never captures the veil.
+      ref={(m) => m?.layers.set(REFRACT_EXCLUDE_LAYER)}
+      position={[0, 0, 0.06]}
+      material={mat}
+      renderOrder={10}
+    >
+      <planeGeometry args={[wallW, wallH]} />
+    </mesh>
   );
 }

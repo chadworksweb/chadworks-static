@@ -356,10 +356,12 @@ export default function Home() {
       {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
       <ProblemCapsule problem={PROBLEM} />
 
-      {/* 5. PORTFOLIO -- the full showroom (gemstone titlebar, flagship piece,
-          archive grid + CTA), now the shared global PortfolioShowcaseCapsule so
-          the homepage and the service pages render it identically. */}
-      <PortfolioShowcaseCapsule />
+      {/* 5. PORTFOLIO -- the shared global PortfolioShowcaseCapsule. The homepage
+          shows a curated subset (a few client/demo builds are held back to the
+          full /portfolio archive); /portfolio and service pages render it all. */}
+      <PortfolioShowcaseCapsule
+        exclude={["edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample"]}
+      />
 
       {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
           in on scroll. Sits between the portfolio and the about block. */}

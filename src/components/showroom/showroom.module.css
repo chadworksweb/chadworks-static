@@ -5,10 +5,12 @@
 .wrap {
   position: relative;
   width: 100%;
-  /* Fill the screen BELOW the sticky nav so the gem + CTA sit centered above the
-     fold (var(--fold) = 100dvh - nav). The immersive .locked state overrides this
-     to a full-viewport fixed layer. */
-  min-height: var(--fold);
+  /* Full viewport height, pulled up UNDER the sticky nav, so the canvas is the
+     exact same size as the immersive .locked state (also full viewport). Keeping
+     the canvas size identical across enter/exit is what stops the WebGL stage from
+     rescaling every time the lock toggles (the "measurement jump"). */
+  min-height: 100dvh;
+  margin-top: calc(-1 * var(--nav-height));
   overflow: hidden;
   color: #eef0fb;
   background:
@@ -22,6 +24,9 @@
 .wrap.locked {
   position: fixed;
   inset: 0;
+  /* Reset the exited-state negative pull; inset:0 alone should span the viewport
+     (a leftover margin-top would push the fixed layer past 100dvh). */
+  margin-top: 0;
   z-index: 200;
 }
 
@@ -364,10 +369,13 @@
 }
 .metaTitle {
   margin: 0 0 0.9rem;
-  font-size: clamp(1.8rem, 5vw, 3.4rem);
+  /* One line, always (useFitText sets --fit-fs). The collapsed rule below still
+     wins by specificity, so the docked heading keeps its own smaller size. */
+  font-size: var(--fit-fs, clamp(1.8rem, 5vw, 3.4rem));
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
+  white-space: nowrap;
   transition:
     margin-bottom 0.5s cubic-bezier(0.22, 0.7, 0.2, 1),
     font-size 0.5s cubic-bezier(0.22, 0.7, 0.2, 1);
@@ -447,7 +455,9 @@
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 15%;
+  /* Raised to follow the entered-state gem lift (STAGE_LIFT) so the gem + this
+     module read as one vertically-centered group. Tune with STAGE_LIFT. */
+  bottom: 26%;
   z-index: 12;
   display: flex;
   flex-direction: column;
@@ -461,13 +471,15 @@
    Now an interactive control: click to bring the centered project into focus. */
 .featureCard {
   position: relative;
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
   padding: 1.05rem 2.4rem 0.95rem;
   border-radius: 18px;
-  max-width: min(92vw, 1100px);
+  /* Fixed width so the module never grows to fit a long title -- the title's font
+     shrinks to fit this box instead (see .featureTitle / useFitText). */
+  width: min(92vw, 820px);
   background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
   backdrop-filter: blur(14px) saturate(1.15);
@@ -535,13 +547,14 @@
 }
 .featureTitle {
   margin: 0;
-  font-size: clamp(2rem, 6.4vw, 5rem);
+  /* One line, always: useFitText shrinks via --fit-fs when the title would wrap. */
+  font-size: var(--fit-fs, clamp(2rem, 6.4vw, 5rem));
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 0.95;
   text-transform: uppercase;
   color: #fff;
-  text-wrap: balance;
+  white-space: nowrap;
   text-shadow: 0 6px 44px rgba(0, 0, 0, 0.55);
   animation: cw-fade-up 0.5s ease both;
 }
@@ -623,21 +636,26 @@
   position: absolute;
   top: 50%;
   right: clamp(1.7rem, 2.6vw, 2.4rem);
-  transform: translateY(-50%);
+  /* The active thumb is pinned to the vertical center; --rail-shift (set per index
+     in JS) slides the strip up one item at a time so earlier items ride off top. */
+  transform: translateY(var(--rail-shift, -50%));
+  transition: transform 0.42s cubic-bezier(0.22, 0.7, 0.2, 1);
   /* Above the focus-modal overlay (.selected, z 60) so the navigator stays
      visible and clickable even while a project is loaded. */
   z-index: 70;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  max-height: 86vh;
 }
-/* Scroll cue sitting just left of the thumb rail: the reel moves up/down. */
+/* Scroll cue sitting just left of the thumb rail. Anchored to the viewport (not
+   the translating rail) at vertical center, so it holds y-0 while the strip slides
+   behind it. Its right edge clears the rail: rail offset + rail width + a gap. */
 .railScroll {
   position: absolute;
-  right: calc(100% + clamp(0.9rem, 1.5vw, 1.5rem));
+  right: calc(clamp(1.7rem, 2.6vw, 2.4rem) + clamp(60px, 7vw, 92px) + clamp(0.9rem, 1.5vw, 1.5rem));
   top: 50%;
   transform: translateY(-50%);
+  z-index: 70;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -824,6 +842,7 @@
   .selected { animation: none; }
   .frame { animation: none; }
   .featureTitle { animation: none; }
+  .rail { transition: none; }
   .railItem { transition: none; }
   .railScrollArrow { animation: none; }
 }

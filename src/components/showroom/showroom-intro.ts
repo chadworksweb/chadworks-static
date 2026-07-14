@@ -6,6 +6,11 @@
 export const intro = { p: 1, playing: false };
 export const INTRO_DURATION = 2.9; // seconds
 
+// Objects on this camera layer are drawn in the MAIN pass but excluded from the
+// crystal's refraction FBO -- so the gem never refracts the load veil / dissolve
+// grain (which lives on this layer). CrystalGem toggles it around the FBO pass.
+export const REFRACT_EXCLUDE_LAYER = 1;
+
 export function startIntro() {
   intro.p = 0;
   intro.playing = true;

@@ -22,7 +22,19 @@ const FEATURED: FeaturedItem = {
   href: "https://risingcompass.net",
 };
 
-const ARCHIVE: ArchiveItem[] = [
+// Exported so the /portfolio page renders the exact same list (homepage is the
+// single source of truth; trim the homepage via `maxItems` without affecting it).
+export const ARCHIVE: ArchiveItem[] = [
+  {
+    key: "scinet",
+    slug: "scinet",
+    alt: "SciNet Industries website, designed and developed by chadworks",
+    url: "scinet-industries.vercel.app",
+    label: "SciNet Industries",
+    href: "https://scinet-industries.vercel.app",
+    blurb:
+      "A brand and product site for SciNet Industries, a microbiome-therapeutics concept. The hard science sits up front and still reads clearly to an investor or a first-time visitor.",
+  },
   {
     key: "tomweather",
     slug: "tomweather",
@@ -42,6 +54,16 @@ const ARCHIVE: ArchiveItem[] = [
     href: "https://rslgo.com",
     blurb:
       "A custom coded consulting practice website with ecommerce, custom-designed digital products and highly tailored landing/marketing pages.",
+  },
+  {
+    key: "sweatshop",
+    slug: "sweatshop",
+    alt: "Sweatshop website, designed and developed by chadworks",
+    url: "sweatshop-studio.vercel.app",
+    label: "Sweatshop",
+    href: "https://sweatshop-studio.vercel.app",
+    blurb:
+      "A concept launch site for Sweatshop, an infrared fitness studio, with motion and heat worked into the design so the page carries the feel of the room.",
   },
   {
     key: "chadlewine",
@@ -83,6 +105,106 @@ const ARCHIVE: ArchiveItem[] = [
     blurb:
       "WordPress website for NYC real estate brokerage firm with custom designed homepage.",
   },
+  {
+    key: "edenscapes",
+    slug: "edenscapes",
+    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
+    url: "eden-scapes.com",
+    label: "EdenScapes",
+    href: "https://eden-scapes.com/japanese-garden-design-installation/",
+    blurb:
+      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
+  },
+  {
+    key: "massagepros",
+    slug: "massagepros",
+    alt: "Massage Professionals website, designed and developed by chadworks",
+    url: "massageprofessionalsllc.com",
+    label: "Massage Professionals",
+    href: "https://massageprofessionalsllc.com",
+    blurb:
+      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
+  },
+  {
+    key: "adsautomation",
+    slug: "adsautomation",
+    alt: "ADS Automation website, designed and developed by chadworks",
+    url: "adsautomation.com",
+    label: "ADS Automation",
+    href: "https://adsautomation.com",
+    blurb:
+      "Industrial automation is technical work, so the site reads clear and credible without drowning a visitor in jargon.",
+  },
+  {
+    key: "abracadabragems",
+    slug: "abracadabragems",
+    alt: "Abracadabra Gems website, designed and developed by chadworks",
+    url: "abracadabragems.com",
+    label: "Abracadabra Gems",
+    href: "https://abracadabragems.com",
+    blurb:
+      "Gemstones want color and light. The layout puts the product first and lets each piece carry the page.",
+  },
+  {
+    key: "aes",
+    slug: "aes",
+    alt: "Artist Empowerment Suite website, designed and developed by chadworks",
+    url: "artistempowermentsuite.com",
+    label: "Artist Empowerment Suite",
+    href: "https://artistempowermentsuite.com",
+    blurb:
+      "A platform site for Artist Empowerment Suite, a toolkit that lets recording artists run their music and their fan base from one place instead of renting it back from the big-tech platforms. Custom hero, custom store, custom throughout.",
+  },
+  {
+    key: "jeremyhayes",
+    slug: "jeremyhayes",
+    alt: "Jeremy John Hayes website, designed and developed by chadworks",
+    url: "jeremy-john-hayes.vercel.app",
+    label: "Jeremy John Hayes",
+    href: "https://jeremy-john-hayes.vercel.app",
+    blurb:
+      "A book-launch site for horror author Jeremy John Hayes and his collection The Possessing Hour, custom built to pull a reader into the mood of the book and carry them to the buy button.",
+  },
+  {
+    key: "detrixhe",
+    slug: "detrixhe",
+    alt: "Dr. Jonathan Detrixhe website, designed and developed by chadworks",
+    url: "jonathandetrixhe.com",
+    label: "Dr. Jonathan Detrixhe",
+    href: "https://jonathandetrixhe.com",
+    blurb:
+      "A practice site for Dr. Jonathan Detrixhe, a clinical psychologist in Greenpoint, Brooklyn, structured so a nervous new patient and an AI search engine both find the answer they came for.",
+  },
+  {
+    key: "salpattica",
+    slug: "salpattica",
+    alt: "Salpattica website, designed and developed by chadworks",
+    url: "salpattica.com",
+    label: "Salpattica",
+    href: "https://www.salpattica.com",
+    blurb:
+      "An online shop for Salpattica Creative Design Co., a stationery and fine-art studio, with the handmade character of the work carried through the storefront and the product kept front and center.",
+  },
+  {
+    key: "ttww",
+    slug: "ttww",
+    alt: "Tom the Weather Wizard website, designed and developed by chadworks",
+    url: "tomtheweatherwizard.com",
+    label: "Tom the Weather Wizard",
+    href: "https://tomtheweatherwizard.com",
+    blurb:
+      "A personality-forward brand and merch site for broadcast meteorologist Tom the Weather Wizard, custom built to turn a running joke about Midwest spring into a page people share and a shirt they buy.",
+  },
+  {
+    key: "therapistexample",
+    slug: "therapistexample",
+    alt: "Mara Calloway, LPC therapy website, designed and developed by chadworks",
+    url: "mara-calloway-lpc.vercel.app",
+    label: "Mara Calloway, LPC",
+    href: "https://mara-calloway-lpc.vercel.app",
+    blurb:
+      "An example build for a private therapy practice. Calm, credible, and organized so a first-time visitor knows within seconds they are in the right place, with the booking path never more than a tap away.",
+  },
 ];
 
 // The default flagship lede -- used everywhere unless a host page overrides it.
@@ -98,20 +220,36 @@ const FEATURED_LEDE =
 // keyed by archive-item `key` (e.g. "rslgo") that replaces just those blurbs.
 // Any project not present in the map keeps its default blurb. Used by the
 // web-development page to speak to the development aspect of each build.
+// `maxItems` caps how many archive tiles render (the homepage shows a curated
+// few, the /portfolio page and service pages show the full set). `showroomCta`
+// swaps the "view full portfolio" button for a "view the showroom" button that
+// links to /showroom/ -- used on the homepage, where the trimmed grid points a
+// visitor to the full interactive showroom instead of the classic archive page.
 export function PortfolioShowcaseCapsule({
   archiveHeading = "chadworks Project Showcase",
   featuredLede,
   blurbs,
+  maxItems,
+  exclude,
+  showroomCta = false,
 }: {
   archiveHeading?: string;
   featuredLede?: string;
   blurbs?: Record<string, string>;
+  maxItems?: number;
+  exclude?: string[];
+  showroomCta?: boolean;
 } = {}) {
-  const archive = blurbs
+  const withBlurbs = blurbs
     ? ARCHIVE.map((item) =>
         blurbs[item.key] ? { ...item, blurb: blurbs[item.key] } : item
       )
     : ARCHIVE;
+  const filtered = exclude?.length
+    ? withBlurbs.filter((item) => !exclude.includes(item.key))
+    : withBlurbs;
+  const archive =
+    typeof maxItems === "number" ? filtered.slice(0, maxItems) : filtered;
   return (
     <>
       {/* PORTFOLIO -- a centered titlebar: the section name flanked by two
@@ -139,15 +277,26 @@ export function PortfolioShowcaseCapsule({
       <SectionShell className="cw-port-archive-shell">
         <h2 className="cw-port-archive__heading">{archiveHeading}</h2>
         <ArchiveGrid items={archive} />
-        {isLaunched("/portfolio/") && (
+        {showroomCta ? (
           <div className="cw-port-archive__cta-row">
-            <Link href="/portfolio/" className="svc-btn">
-              <span className="svc-btn__label">View full portfolio</span>
+            <Link href="/showroom/" className="svc-btn">
+              <span className="svc-btn__label">View the showroom</span>
               <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
                 <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
               </svg>
             </Link>
           </div>
+        ) : (
+          isLaunched("/portfolio/") && (
+            <div className="cw-port-archive__cta-row">
+              <Link href="/portfolio/" className="svc-btn">
+                <span className="svc-btn__label">View full portfolio</span>
+                <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
+                  <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+                </svg>
+              </Link>
+            </div>
+          )
         )}
       </SectionShell>
     </>

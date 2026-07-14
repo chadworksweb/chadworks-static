@@ -9,6 +9,7 @@ import { SITE_URL, ORG } from "@/lib/service";
 import { PageComposer } from "@/components/capsules/PageComposer";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
+import { ARCHIVE } from "@/components/capsules/PortfolioShowcaseCapsule";
 
 const PAGE_URL = `${SITE_URL}/portfolio/`;
 const TITLE = "Portfolio: Real Client Sites by chadworks | chadworks";
@@ -35,98 +36,21 @@ export const metadata: Metadata = {
 };
 
 // ---- The archive -------------------------------------------------
-const archive: ArchiveItem[] = [
-  {
-    key: "aac",
-    slug: "aac",
-    alt: "AAC Event Catering website, designed and developed by chadworks",
-    url: "aaceventcatering.com",
-    label: "AAC Event Catering",
-    href: "https://aaceventcatering.com",
-    blurb:
-      "A catering brand that needed to look as polished as the events it runs. Booking-ready, and built to win the search.",
-  },
-  {
-    key: "edenscapes",
-    slug: "edenscapes",
-    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
-    url: "eden-scapes.com",
-    label: "EdenScapes",
-    href: "https://eden-scapes.com/japanese-garden-design-installation/",
-    blurb:
-      "Japanese garden design deserves a quiet, deliberate site. I gave the craft room to breathe and the work room to sell itself.",
-  },
-  {
-    key: "massagepros",
-    slug: "massagepros",
-    alt: "Massage Professionals website, designed and developed by chadworks",
-    url: "massageprofessionalsllc.com",
-    label: "Massage Professionals",
-    href: "https://massageprofessionalsllc.com",
-    blurb:
-      "A calm, trustworthy front door for a local practice, with the booking path one tap away on a phone.",
-  },
-  {
-    key: "adsautomation",
-    slug: "adsautomation",
-    alt: "ADS Automation website, designed and developed by chadworks",
-    url: "adsautomation.com",
-    label: "ADS Automation",
-    href: "https://adsautomation.com",
-    blurb:
-      "Industrial automation is technical work, so the site reads clear and credible without drowning a visitor in jargon.",
-  },
-  {
-    key: "thorobird",
-    slug: "thorobird",
-    alt: "Thorobird website, designed and developed by chadworks",
-    url: "thorobird.com",
-    label: "Thorobird",
-    href: "https://thorobird.com",
-    blurb:
-      "A brand site with a distinct point of view, custom built so it carries the personality the business actually has.",
-  },
-  {
-    key: "abracadabragems",
-    slug: "abracadabragems",
-    alt: "Abracadabra Gems website, designed and developed by chadworks",
-    url: "abracadabragems.com",
-    label: "Abracadabra Gems",
-    href: "https://abracadabragems.com",
-    blurb:
-      "Gemstones want color and light. The layout puts the product first and lets each piece carry the page.",
-  },
-  {
-    key: "rozariolaw",
-    slug: "rozariolaw",
-    alt: "Rozario Law website, designed and developed by chadworks",
-    url: "rozariolaw.com",
-    label: "Rozario Law",
-    href: "https://rozariolaw.com",
-    blurb:
-      "A law practice has seconds to earn trust. This one opens steady and serious, and tells a visitor exactly what to do next.",
-  },
-  {
-    key: "risingcompass",
-    slug: "risingcompass",
-    alt: "Rising Compass website, designed and developed by chadworks",
-    url: "risingcompass.net",
-    label: "Rising Compass",
-    href: "https://risingcompass.net",
-    blurb:
-      "One of my own builds: a data-driven product with a custom interface, designed and shipped the same way I ship client work.",
-  },
-  {
-    key: "chadlewine",
-    slug: "chadlewine",
-    alt: "chadlewine.com website, designed and developed by chadworks",
-    url: "chadlewine.com",
-    label: "Chad",
-    href: "https://chadlewine.com",
-    blurb:
-      "My musician-first site, where I push the interaction further than a client brief usually allows. Proof of where the work can go.",
-  },
-];
+// Renders the exact same list as the homepage: the shared ARCHIVE is the single
+// source of truth (homepage is ground truth). Rising Compass, the homepage
+// flagship, leads the grid here since this page has no separate flagship block.
+const RISING_COMPASS: ArchiveItem = {
+  key: "risingcompass",
+  slug: "risingcompass",
+  alt: "Rising Compass website, designed and developed by chadworks",
+  url: "risingcompass.net",
+  label: "Rising Compass",
+  href: "https://risingcompass.net",
+  blurb:
+    "One of my own builds: a data-driven product with a custom interface, designed and shipped the same way I ship client work.",
+};
+
+const archive: ArchiveItem[] = [RISING_COMPASS, ...ARCHIVE];
 
 // ---- Structured data ------------------------------------------------------
 const breadcrumbJsonLd = {

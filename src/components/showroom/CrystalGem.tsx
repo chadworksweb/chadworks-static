@@ -15,7 +15,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { buildCW, LOCKED, gemFrag } from "@/lib/gemstone-core";
-import { intro, easeOutCubic } from "./showroom-intro";
+import { intro, easeOutCubic, REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
 import { useMotionPausedRef } from "./useMotionPaused";
 
 const GEM_Z = 0.8;
@@ -504,10 +504,14 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     // the shatter/dance).
     wire.seg.visible = exited;
 
-    // pass 1: reel (and everything but the gem) into the FBO
+    // pass 1: reel (and everything but the gem) into the FBO. Exclude the load veil
+    // / dissolve grain (REFRACT_EXCLUDE_LAYER) so the gem never refracts it.
+    camera.layers.enable(REFRACT_EXCLUDE_LAYER); // main pass shows the veil
     mesh.visible = false;
+    camera.layers.disable(REFRACT_EXCLUDE_LAYER); // ...but the FBO does not
     gl.setRenderTarget(fbo);
     gl.render(scene, camera);
+    camera.layers.enable(REFRACT_EXCLUDE_LAYER);
 
     // pass 2: full scene to screen, gem refracting the FBO
     mesh.visible = true;
