@@ -241,7 +241,14 @@ export function Reel({
     // was refracting changed instantly underneath it. Riding the same clock, the slide
     // arrives as the gem goes light and leaves as it goes dark.
     const s = easeInOutCubic(stage.p);
-    const lit = (active ? 0.35 + 0.65 * smoothstep(0.1, 0.9, intro.p) : 0.42) * s;
+    // NOTHING here may key off `active`. It flips in one frame, and the old
+    // `active ? ramp : 0.42` was a CLIFF: hit Esc and lit fell ~1.0 -> 0.42 instantly,
+    // dropping 60% of the room's light before any fade began. That was invisible while
+    // the reel was simply not drawn when inactive, and became the "it gets really dark"
+    // the moment it started fading instead. `s` is the only gate: at 0 the reel is out,
+    // so the dim branch has nothing left to do.
+    const ramp = 0.35 + 0.65 * smoothstep(0.1, 0.9, intro.p);
+    const lit = ramp * s;
     if (groupRef.current) groupRef.current.visible = s > 0.003;
     for (let i = 0; i < N; i++) {
       const m = meshRefs.current[i];

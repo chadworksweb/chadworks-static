@@ -18,7 +18,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
-import { stage, easeInOutCubic } from "./showroom-intro";
+import { stage } from "./showroom-intro";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
@@ -38,12 +38,11 @@ const TILE_VERT = `
 const TILE_FRAG = `
   precision highp float;
   uniform sampler2D map;
-  uniform float uFade;
   varying vec2 vUv;
   void main() {
     vec4 c = texture2D(map, vUv);
     float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-    gl_FragColor = vec4(vec3(l) * uFade, 1.0);
+    gl_FragColor = vec4(vec3(l), 1.0);
   }
 `;
 // The veil: a solid grain field. uReveal (0..1) dissolves it away -- each cell
@@ -76,7 +75,7 @@ export function TileWall({
 }) {
   const { camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
-  useWallFade(groupRef);
+  useWallHide(groupRef);
   // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
   // enter/exit canvas resize never recomputes (and visibly re-tiles) the wall.
   const [vp, setVp] = useState(() => ({
@@ -180,33 +179,25 @@ export function TileWall({
   );
 }
 
-// Fades the whole wall -- shots AND the blue wash over them -- on the GEM's clock.
+// The wall does NOT fade. It is the BACKDROP.
 //
-// The clock is the ONLY input. Gating on an `immersive` boolean is what made it flick:
-// that flips in one frame, so the wall vanished on entry and slammed back on exit
-// while the reel was still fading, which blinks. `stage` is the one thing that knows
-// how far through the turn we are, in either direction.
+// Fading a backdrop together with the thing in FRONT of it multiplies the two: half a
+// reel over a half-dim wall is a quarter of the light, so the middle of the turn goes
+// dark and then climbs back out. Worse, the wash covers the GAPS as well as the shots,
+// so grout is pure wash while a brick is wash-over-shot -- fade them and the grout
+// arrives out of step with its own bricks. Both faults were one mistake: fading the
+// thing that is only ever behind everything else.
 //
-// The shots dim rather than dissolve to alpha. They must stay OPAQUE: the veil above
-// them is depthWrite:false, so transparent tiles move to the transparent pass, draw
-// AFTER the veil, and paint straight over the load dissolve. The wall is the backmost
-// thing on the stage, so dimming to the near-black backdrop reads the same as fading.
-function useWallFade(groupRef: React.RefObject<THREE.Group | null>) {
+// So it holds at full and the reel dissolves on and off it (see Reel's own fade). The
+// only thing the clock decides is when to stop drawing it -- once the reel has it
+// covered, which is also what keeps it off the GPU while immersive. That is the old
+// `visible={!immersive}` behaviour minus the flick: it now leaves at the END of the
+// turn rather than on the frame the boolean flipped.
+function useWallHide(groupRef: React.RefObject<THREE.Group | null>) {
   useFrame(() => {
     const g = groupRef.current;
     if (!g) return;
-    // 1 = exited (the wall IS the room), 0 = the showroom has taken over.
-    const f = 1 - easeInOutCubic(stage.p);
-    g.visible = f > 0.003;
-    if (!g.visible) return;
-    g.traverse((o) => {
-      const m = (o as THREE.Mesh).material as THREE.Material | undefined;
-      if (!m) return;
-      const sm = m as THREE.ShaderMaterial;
-      if (sm.uniforms?.uReveal) return; // the veil owns its own dissolve; never touch it
-      if (sm.uniforms?.uFade) sm.uniforms.uFade.value = f;
-      else m.opacity = (m.userData.baseOpacity ??= m.opacity) * f;
-    });
+    g.visible = stage.p < 0.999;
   });
 }
 
@@ -247,7 +238,7 @@ function Tiles({ urls, cells, tileH }: { urls: string[]; cells: Cell[]; tileH: n
       return new THREE.ShaderMaterial({
         vertexShader: TILE_VERT,
         fragmentShader: TILE_FRAG,
-        uniforms: { map: { value: t }, uFade: { value: 1 } },
+        uniforms: { map: { value: t } },
       });
     });
   }, [textures]);
