@@ -15,6 +15,27 @@ export const INTRO_DURATION = 2.9; // seconds
 export const entrance = { p: 1, playing: false };
 export const ENTRANCE_DURATION = 2.9; // seconds
 
+// The ENTER/EXIT crossfade: 0 = the exit gem (dark, refracting the room, still),
+// 1 = the entered gem (its own pink, dancing). Unlike `intro` and `entrance` this one
+// runs BOTH ways -- it is a state the showroom holds, not a one-shot -- so it eases
+// toward the target every frame rather than playing to an end. Everything that
+// differs between the two gems rides on this single value, so the look, the dance and
+// the lens shift all arrive together instead of cutting at their own moments.
+export const stage = { p: 0 };
+export const STAGE_SECONDS = 0.9;
+
+export function advanceStage(target: number, dt: number) {
+  const step = dt / STAGE_SECONDS;
+  if (stage.p < target) stage.p = Math.min(target, stage.p + step);
+  else if (stage.p > target) stage.p = Math.max(target, stage.p - step);
+}
+
+// Ease both directions: the crossfade should leave and arrive gently, since it is
+// reversible and can be interrupted mid-way.
+export function easeInOutCubic(x: number) {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
 export function startEntrance() {
   entrance.p = 0;
   entrance.playing = true;

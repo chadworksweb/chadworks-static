@@ -24,6 +24,9 @@ import {
   entrance,
   startEntrance,
   skipEntrance,
+  stage,
+  advanceStage,
+  easeInOutCubic,
   ENTRANCE_DURATION,
 } from "./showroom-intro";
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
@@ -84,9 +87,11 @@ function FitText({
 // center with the title module. Tune alongside .feature `bottom` in the CSS.
 const STAGE_SHIFT_FRAC = 0.1;
 
-// Advances both clocks: `entrance` (the gem's reverse-shatter, on load) and `intro`
-// (the reel's ramp, on enter). They are deliberately separate -- see showroom-intro.
-function IntroController() {
+// Advances the clocks: `entrance` (the gem's reverse-shatter, on load), `intro` (the
+// reel's ramp, on enter) -- both one-shots, deliberately separate, see showroom-intro
+// -- and `stage`, the reversible enter/exit crossfade, which eases toward whichever
+// state we are in rather than playing to an end.
+function IntroController({ immersive }: { immersive: boolean }) {
   useFrame((_, delta) => {
     if (entrance.playing) {
       entrance.p = Math.min(1, entrance.p + delta / ENTRANCE_DURATION);
@@ -96,6 +101,7 @@ function IntroController() {
       intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
       if (intro.p >= 1) intro.playing = false;
     }
+    advanceStage(immersive ? 1 : 0, Math.min(delta, 0.05));
   });
   return null;
 }
@@ -104,12 +110,15 @@ function IntroController() {
 // on screen without moving any object off the optical axis (which would perspective-
 // distort the gem's orbit). setViewOffset shifts the projection uniformly; the gem's
 // FBO refraction reads the same shifted projection, so it stays consistent.
-function StageShift({ immersive }: { immersive: boolean }) {
+function StageShift() {
   const { camera, size } = useThree();
   useFrame(() => {
     const cam = camera as THREE.PerspectiveCamera;
-    if (immersive) {
-      const dy = Math.round(size.height * STAGE_SHIFT_FRAC);
+    // Rides the crossfade, so the mark SLIDES between the two compositions instead of
+    // cutting to the entered one the frame you click.
+    const t = easeInOutCubic(stage.p);
+    if (t > 0.0001) {
+      const dy = Math.round(size.height * STAGE_SHIFT_FRAC * t);
       cam.setViewOffset(size.width, size.height, 0, dy, size.width, size.height);
     } else if (cam.view?.enabled) {
       cam.clearViewOffset();
@@ -266,11 +275,11 @@ export function PortfolioShowroom() {
               if (immersive) skipIntro();
             }}
           >
-            <IntroController />
+            <IntroController immersive={immersive} />
             {/* Lens-shift the entered view up (projection offset, NOT a world
                 move) so the gem stays on the optical axis and its orbit reads flat,
                 while the gem + reel appear raised to center with the title module. */}
-            <StageShift immersive={immersive} />
+            <StageShift />
             {/* Pre-click: a tiled wall of all the work. Once immersive, the reel
                 takes over the same plane. Each gets its OWN Suspense boundary --
                 shared, the reel's full-res shots suspended the boundary and blanked

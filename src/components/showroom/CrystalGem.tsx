@@ -16,7 +16,13 @@ import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { buildCW, LOCKED, gemFrag, fsTri, bgFrag } from "@/lib/gemstone-core";
 import { buildFacetShards } from "./facet-shards";
-import { entrance, easeOutCubic, REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
+import {
+  entrance,
+  easeOutCubic,
+  easeInOutCubic,
+  stage,
+  REFRACT_EXCLUDE_LAYER,
+} from "./showroom-intro";
 import { useMotionPausedRef } from "./useMotionPaused";
 
 const GEM_Z = 0.8;
@@ -136,32 +142,55 @@ const GRAD_FRAG = bgFrag.replace("#version 300 es", "").trim();
 // DANCE_FRAG), which is what reproduces the master's look.
 const GRAD_VERT = fsTri.replace("#version 300 es", "").trim();
 
-// ===== The ENTERED gem = the homepage master + the binary dance. Nothing else. ====
+// ===== The SETTLED gem: the exit gem and the entered gem, and the fade between. ====
 //
-// The master's canvas IS the gem's box: uv spans the gem, so gemFrag's
-// off = N.xy*uRefract shifts the refraction by ~a THIRD of the gem, and each facet
-// lands somewhere genuinely different in the gradient. That displacement is the
-// whole effect -- the mark has no texture, it only has what it bends.
+// The mark has no texture. Every pixel of it is refracted uBg, so whatever it bends
+// IS its colour -- which means the enter/exit crossfade is not an opacity trick, it
+// is a fade between two SOURCES. Fading it any other way would need transparency,
+// and a transparent gem stops depth-writing, blends its own back faces through, and
+// brings back the see-through this whole sequence was built to kill.
 //
-// The showroom's canvas is the full viewport with the mark ~15% of it, so the same
-// off lands about two gem-widths away. Every facet then samples effectively the same
-// far-off patch: no facets on the flat faces, and the front caps show the gradient's
-// own bands nearly undisplaced, like a decal masked to the letter.
+// The two sources are read in different FRAMES, and that is the crux:
+//   EXIT    the room, measured across the viewport, as it always was.
+//   ENTERED the brand gradient, measured across the MARK's own box.
+// The master's canvas IS its gem's box, so uv spans the gem and off = N.xy*uRefract
+// displaces the sample by ~a THIRD of the gem -- each facet lands somewhere genuinely
+// different in the gradient, and that displacement is the entire faceted effect. The
+// showroom's canvas is the full viewport with the mark ~15% of it, so that same off
+// would land ~2 gem-widths away: every facet samples the same far patch, the flat
+// faces lose their facets, and the front caps show the gradient's own bands
+// undisplaced -- a decal masked to the letter rather than a crystal.
 //
-// So give the frag the mark's box as its frame: uv measured from the box origin and
-// normalised by the box size. uRes IS that box size, so gemFrag's aspect
-// (uRes.x/uRes.y) comes out as the box's aspect for free, and off is once again a
-// third of the MARK. One patched line; everything else is gemFrag verbatim.
-const DANCE_FRAG = (() => {
+// So each source keeps its own frame and its own aspect, and only the RESULTS mix.
+// uMix 0 is the exit gem verbatim, 1 is the entered gem verbatim: both ends are
+// exactly the gems that were there before, and only the crossfade between is new.
+const SETTLED_FRAG = (() => {
   const decl = "in vec3 vPos; out vec4 frag;";
-  const uvSrc = "vec2 uv=gl_FragCoord.xy/uRes;";
-  if (!SHOWROOM_FRAG.includes(decl) || !SHOWROOM_FRAG.includes(uvSrc)) {
+  // gemFrag's whole refraction block. Matched on a tolerant pattern (the checkout is
+  // CRLF) and asserted, so a gemFrag edit fails loudly instead of quietly dropping
+  // the crossfade.
+  const block =
+    /vec2 uv=gl_FragCoord\.xy\/uRes;[\s\S]*?vec3 refr=vec3\(r,g,b\)\*uTint;/;
+  if (!SHOWROOM_FRAG.includes(decl) || !block.test(SHOWROOM_FRAG)) {
     throw new Error(
-      "CrystalGem: gemFrag no longer matches the box-uv patch; re-check DANCE_FRAG."
+      "CrystalGem: gemFrag no longer matches the crossfade patch; re-check SETTLED_FRAG."
     );
   }
-  return SHOWROOM_FRAG.replace(decl, "in vec3 vPos; uniform vec2 uBoxOrigin; out vec4 frag;")
-    .replace(uvSrc, "vec2 uv=(gl_FragCoord.xy-uBoxOrigin)/uRes;");
+  return SHOWROOM_FRAG.replace(
+    decl,
+    "in vec3 vPos; uniform sampler2D uBgB; uniform vec2 uBoxOrigin, uBoxSize; uniform float uMix; out vec4 frag;"
+  ).replace(
+    block,
+    `vec2 uvA=gl_FragCoord.xy/uRes; float apA=uRes.x/uRes.y;
+  vec2 offA=N.xy*uRefract; offA.x/=apA; offA+=uCursor*0.11;
+  float dA=uRefract*uDisp; vec2 ddA=N.xy*dA; ddA.x/=apA;
+  vec3 cA=vec3(texture(uBg,uvA+offA+ddA).r, texture(uBg,uvA+offA).g, texture(uBg,uvA+offA-ddA).b);
+  vec2 uvB=(gl_FragCoord.xy-uBoxOrigin)/uBoxSize; float apB=uBoxSize.x/uBoxSize.y;
+  vec2 offB=N.xy*uRefract; offB.x/=apB; offB+=uCursor*0.11;
+  float dB=uRefract*uDisp; vec2 ddB=N.xy*dB; ddB.x/=apB;
+  vec3 cB=vec3(texture(uBgB,uvB+offB+ddB).r, texture(uBgB,uvB+offB).g, texture(uBgB,uvB+offB-ddB).b);
+  vec3 refr=mix(cA,cB,uMix)*uTint;`
+  );
 })();
 
 // PLAIN_VERT (the master's gemVert) with ONE addition: the binary dance. No shatter,
@@ -603,24 +632,40 @@ export function CrystalGem({
     });
   }, [fbo]);
 
-  // The ENTERED-state material: the homepage master with the dance added and NOTHING
-  // else taken away. Same gemFrag (only its uv reframed to the mark's box), same
-  // DoubleSide, and the master's own brand gradient as uBg -- so the mark holds its
-  // pink, keeps its facets, and the room cannot be read through it.
-  const danceMaterial = useMemo(() => {
+  // The SETTLED material: the homepage master, plus the dance, plus the source
+  // crossfade -- and nothing else. It is BOTH gems and the dissolve between them:
+  //
+  //   uMix 0, uOrbit/uSelf 0  ->  the master refracting the room  (the exit gem)
+  //   uMix 1, dance running   ->  the master refracting its own gradient (entered)
+  //
+  // Both ends are identities, so neither gem changed; only the 0.9s between them is
+  // new. It replaces the separate plain/dance materials because a crossfade cannot be
+  // done by drawing one over the other: transparency costs the depth write that keeps
+  // the mark solid.
+  const settled = useMemo(() => {
     return new THREE.RawShaderMaterial({
       glslVersion: THREE.GLSL3,
       vertexShader: DANCE_VERT,
-      fragmentShader: DANCE_FRAG,
-      side: THREE.DoubleSide, // as the master: CULL_FACE off, so it stays solid all the way round
+      fragmentShader: SETTLED_FRAG,
+      // As the master: CULL_FACE off, so the closed-but-not-uniformly-wound crystal
+      // stays solid through a full turn.
+      side: THREE.DoubleSide,
+      // Push the crystal's depth back a hair so the coincident neon EDGE lines win the
+      // depth test on the near surface while the crystal still occludes the far edges.
+      polygonOffset: true,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
       uniforms: {
         uProj: { value: new THREE.Matrix4() },
         uView: { value: new THREE.Matrix4() },
         uModel: { value: new THREE.Matrix4() },
         uNormal: { value: new THREE.Matrix3() },
-        uBg: { value: grad.rt.texture },
-        uRes: { value: new THREE.Vector2(2, 2) }, // the MARK's box, not the viewport
+        uBg: { value: fbo.texture }, // the room, in viewport frame
+        uBgB: { value: grad.rt.texture }, // the brand gradient, in the mark's frame
+        uRes: { value: new THREE.Vector2(2, 2) },
         uBoxOrigin: { value: new THREE.Vector2(0, 0) },
+        uBoxSize: { value: new THREE.Vector2(2, 2) },
+        uMix: { value: 0 },
         uRefract: { value: LOCKED.refract },
         uDisp: { value: LOCKED.disp },
         uTint: { value: new THREE.Vector3(...LOCKED.tint) },
@@ -632,43 +677,7 @@ export function CrystalGem({
         uBary: { value: new THREE.Vector3() },
       },
     });
-  }, [grad]);
-
-  // The exited-state material: the homepage gem (PLAIN_VERT + the same gemFrag),
-  // sharing the reel FBO so it refracts the showroom background at the showroom size.
-  const plainMaterial = useMemo(() => {
-    return new THREE.RawShaderMaterial({
-      glslVersion: THREE.GLSL3,
-      vertexShader: PLAIN_VERT,
-      fragmentShader: SHOWROOM_FRAG,
-      // The homepage gem (raw WebGL2) renders with CULL_FACE off, so its closed-
-      // but-not-uniformly-wound crystal stays solid through a full 360 spin.
-      // RawShaderMaterial defaults to FrontSide, which culls back faces and makes
-      // the mark hollow/mangled for the half-turn it faces away. DoubleSide matches
-      // the homepage exactly.
-      side: THREE.DoubleSide,
-      // Push the crystal's depth back a hair so the coincident neon EDGE lines win the
-      // depth test on the near surface (stay visible) while the crystal still occludes
-      // the far edges. Refraction (uBg sampling) is unaffected.
-      polygonOffset: true,
-      polygonOffsetFactor: 1,
-      polygonOffsetUnits: 1,
-      uniforms: {
-        uProj: { value: new THREE.Matrix4() },
-        uView: { value: new THREE.Matrix4() },
-        uModel: { value: new THREE.Matrix4() },
-        uNormal: { value: new THREE.Matrix3() },
-        uBg: { value: fbo.texture },
-        uRes: { value: new THREE.Vector2(2, 2) },
-        uRefract: { value: LOCKED.refract },
-        uDisp: { value: LOCKED.disp },
-        uTint: { value: new THREE.Vector3(...LOCKED.tint) },
-        uFacet: { value: LOCKED.facet },
-        uCursor: { value: new THREE.Vector2(0, 0) },
-        uSpecDamp: { value: 0 },
-      },
-    });
-  }, [fbo]);
+  }, [fbo, grad]);
 
   // Neon wireframe: the CW's structural edges as clean lavender lines. Native
   // LineSegments (not fat lines) so there are NO round segment-caps stacking into dots
@@ -698,8 +707,8 @@ export function CrystalGem({
   // dance shader once the geometry is built.
   useEffect(() => {
     material.uniforms.uBary.value.copy(geo.userData.bary as THREE.Vector3);
-    danceMaterial.uniforms.uBary.value.copy(geo.userData.bary as THREE.Vector3);
-  }, [material, geo]);
+    settled.uniforms.uBary.value.copy(geo.userData.bary as THREE.Vector3);
+  }, [material, settled, geo]);
 
   useEffect(() => () => {
     fbo.dispose();
@@ -707,12 +716,11 @@ export function CrystalGem({
     grad.mat.dispose();
     grad.geo.dispose();
     material.dispose();
-    plainMaterial.dispose();
-    danceMaterial.dispose();
+    settled.dispose();
     geo.dispose();
     wire.edges.dispose();
     wire.m.dispose();
-  }, [fbo, grad, material, danceMaterial, plainMaterial, geo, wire]);
+  }, [fbo, grad, material, settled, geo, wire]);
 
   // Take over rendering (priority 1): reel -> FBO with the gem hidden, then the
   // full scene -> screen with the gem sampling that FBO.
@@ -726,13 +734,25 @@ export function CrystalGem({
     // shader as this climbs 0 -> 1 (default 1 = solid gem for return visits).
     material.uniforms.uAssemble.value = entrance.p;
 
-    // On leaving the showroom, wrap the accumulated dance angles into [-PI, PI]
-    // once so the ease-to-zero below unwinds the short way back to the clean CW.
+    // The crossfade: 0 = the exit gem, 1 = the entered gem. Everything that differs
+    // between them rides this one value, so the look, the dance and the lens shift
+    // arrive together instead of each cutting at its own moment.
+    const mix = easeInOutCubic(stage.p);
+
+    // On leaving the showroom, wrap the accumulated dance angles into [-PI, PI] once
+    // so the unwind below takes the short way back to the clean CW.
     if (wasImmersive.current && !immersive) {
       orbit.current = wrap(orbit.current);
       selfSpin.current = wrap(selfSpin.current);
     }
     wasImmersive.current = immersive;
+    // Once the fade has fully landed back on the exit gem, the dance is at rest and
+    // its angles mean nothing: zero them so a re-entry spins up from the clean mark
+    // rather than replaying its way back to wherever it left off.
+    if (!immersive && stage.p <= 0) {
+      orbit.current = 0;
+      selfSpin.current = 0;
+    }
 
     if (entrance.p < 1) {
       // Compiling: the mark does NOT turn. It used to ease rotY down to 0 across the
@@ -750,15 +770,18 @@ export function CrystalGem({
       rotY.current += (0 - rotY.current) * k;
       rotX.current += (0 - rotX.current) * k;
     } else if (!paused.current) {
-      // Exited / CTA state: the homepage gem's slow Y-spin, drawn with plainMaterial
-      // (no dance shader). No cursor interaction -- it just runs.
+      // Exited / CTA state: the homepage gem's slow Y-spin. No cursor interaction --
+      // it just runs.
       rotY.current += LOCKED.spin * dt * 0.9;
       rotX.current += (0 - rotX.current) * Math.min(1, dt * 4);
     }
+    // Scale the dance BY the crossfade rather than easing it separately: leaving, the
+    // letters unwind home as the look fades back; arriving, they spin up out of the
+    // clean mark. At mix=0 both terms are identity and this is the master, untouched.
     material.uniforms.uOrbit.value = orbit.current;
     material.uniforms.uSelf.value = selfSpin.current;
-    danceMaterial.uniforms.uOrbit.value = orbit.current;
-    danceMaterial.uniforms.uSelf.value = selfSpin.current;
+    settled.uniforms.uOrbit.value = orbit.current * mix;
+    settled.uniforms.uSelf.value = selfSpin.current * mix;
     mesh.rotation.y = rotY.current;
     mesh.rotation.x = rotX.current;
     // Micro scale-bounce as the shards slam home; otherwise the mark holds BASE.
@@ -766,14 +789,13 @@ export function CrystalGem({
     mesh.scale.setScalar(BASE * pop);
     mesh.updateMatrixWorld();
 
-    // Exited draws the dance-free homepage gem (plainMaterial); intro + immersive draw
-    // the shatter/dance gem. Only the active one is ever rendered.
-    const exited = entrance.p >= 1 && !immersive;
-    // Three distinct gems, one mesh. EXITED: the master, refracting the room.
-    // ENTERED: the master + the dance, refracting its own brand gradient. COMPILING:
-    // the shatter, whose seated-seat shading only makes sense while chips are flying.
-    const active = exited ? plainMaterial : immersive ? danceMaterial : material;
+    // Two gems, one mesh. COMPILING: the shatter, whose seated-seat shading only makes
+    // sense while chips are in flight. SETTLED: the master, which IS the exit gem at
+    // uMix=0 and the entered gem at uMix=1, dissolving between the two.
+    const compiling = entrance.p < 1;
+    const active = compiling ? material : settled;
     if (mesh.material !== active) mesh.material = active;
+    settled.uniforms.uMix.value = mix;
 
     const dpr = gl.getPixelRatio();
     const w = Math.max(2, Math.floor(size.width * dpr));
@@ -781,26 +803,31 @@ export function CrystalGem({
     if (fbo.width !== w || fbo.height !== h) fbo.setSize(w, h);
     if (grad.rt.width !== w || grad.rt.height !== h) grad.rt.setSize(w, h);
 
-    // Neon wireframe: only in the exited state (its edges match the assembled CW, not
-    // the shatter/dance). It STRIKES on the frame the gem finishes compiling, then
-    // holds -- formedAt latches once, so leaving and re-entering the showroom brings
-    // the tube back already lit rather than re-striking it.
-    wire.seg.visible = exited && show;
-    if (exited && show && formedAt.current === 0) formedAt.current = performance.now();
+    // Neon wireframe: it belongs to the EXIT gem (its edges match the assembled CW,
+    // not the shatter or the dance), so it dims out on the crossfade as the showroom
+    // takes over and comes back up on the way out -- one clock, one move. It STRIKES
+    // on the frame the gem finishes compiling, then holds: formedAt latches once, so
+    // leaving and re-entering brings the tube back already lit rather than re-striking.
+    const lit = !compiling && mix < 1;
+    wire.seg.visible = lit && show;
+    if (lit && show && formedAt.current === 0) formedAt.current = performance.now();
     wire.m.opacity =
-      NEON_OPACITY * (formedAt.current ? neonStrike(performance.now() - formedAt.current) : 0);
+      NEON_OPACITY *
+      (1 - mix) *
+      (formedAt.current ? neonStrike(performance.now() - formedAt.current) : 0);
 
-    // pass 1: whatever the gem is about to refract -- which IS its colour.
-    if (immersive) {
-      // Entered: the homepage master's brand gradient, so the mark holds its own
-      // pink and the room cannot be read through it. A fullscreen triangle, so
-      // this also skips the second full scene render the reel FBO costs.
+    // pass 1: whatever the gem is about to refract -- which IS its colour. Mid-fade it
+    // is bending BOTH, so both have to be drawn; at either end only one is, so the
+    // settled states each cost exactly what they did before.
+    if (mix > 0) {
+      // The brand gradient: the master's own colour, so the mark holds its pink and
+      // the room cannot be read through it. Just a fullscreen triangle.
       grad.mat.uniforms.uTime.value = state.clock.elapsedTime;
       grad.mat.uniforms.uRes.value.set(w, h);
       gl.setRenderTarget(grad.rt);
       gl.render(grad.scene, grad.cam);
-      // The mark's screen box in PIXELS -- the frame the entered frag measures uv in,
-      // stading in for the master's canvas. From the bounding SPHERE so the box holds
+      // The mark's screen box in PIXELS -- the frame the gradient is measured in,
+      // standing in for the master's canvas. From the bounding SPHERE so the box holds
       // still while the letters turn inside it (a box tracking the silhouette would
       // drag the gradient along and freeze the sweep).
       const r = (geo.boundingSphere?.radius ?? 1.4) * BASE;
@@ -808,12 +835,13 @@ export function CrystalGem({
       const cx0 = c.x, cy0 = c.y;
       const hw = Math.abs(tmpB.set(r, 0, GEM_Z).project(camera).x - cx0);
       const hh = Math.abs(tmpC.set(0, r, GEM_Z).project(camera).y - cy0);
-      const du = danceMaterial.uniforms;
-      du.uRes.value.set(Math.max(2, hw * w), Math.max(2, hh * h));
-      du.uBoxOrigin.value.set(((cx0 - hw) * 0.5 + 0.5) * w, ((cy0 - hh) * 0.5 + 0.5) * h);
-    } else {
-      // Exit / compiling: the reel (and everything but the gem) into the FBO, so
-      // the mark refracts the room it sits in. Exclude the load veil / dissolve
+      const su = settled.uniforms;
+      su.uBoxSize.value.set(Math.max(2, hw * w), Math.max(2, hh * h));
+      su.uBoxOrigin.value.set(((cx0 - hw) * 0.5 + 0.5) * w, ((cy0 - hh) * 0.5 + 0.5) * h);
+    }
+    if (mix < 1) {
+      // The room: the reel (and everything but the gem) into the FBO, so the mark
+      // refracts what it stands in. Exclude the load veil / dissolve
       // grain (REFRACT_EXCLUDE_LAYER) so the gem never refracts it.
       camera.layers.enable(REFRACT_EXCLUDE_LAYER); // main pass shows the veil
       mesh.visible = false;
@@ -823,7 +851,7 @@ export function CrystalGem({
       camera.layers.enable(REFRACT_EXCLUDE_LAYER);
     }
 
-    // pass 2: full scene to screen, gem refracting the FBO
+    // pass 2: full scene to screen, gem refracting what pass 1 drew
     mesh.visible = show; // held until the wall it refracts exists
     const u = active.uniforms;
     u.uProj.value.copy(camera.projectionMatrix);
@@ -831,10 +859,9 @@ export function CrystalGem({
     u.uModel.value.copy(mesh.matrixWorld);
     const mv = new THREE.Matrix4().multiplyMatrices(camera.matrixWorldInverse, mesh.matrixWorld);
     u.uNormal.value.getNormalMatrix(mv);
-    // uRes is the frag's frame of reference, and the entered gem's frame is the
-    // MARK's box (set in pass 1), not the viewport -- so leave it alone there.
-    if (!immersive) u.uRes.value.set(w, h);
-    u.uBg.value = immersive ? grad.rt.texture : fbo.texture;
+    // uRes stays the VIEWPORT: it frames the room. The gradient carries its own frame
+    // (uBoxOrigin/uBoxSize), so the two sources never fight over one uniform.
+    u.uRes.value.set(w, h);
     gl.setRenderTarget(null);
     gl.render(scene, camera);
   }, 1);
