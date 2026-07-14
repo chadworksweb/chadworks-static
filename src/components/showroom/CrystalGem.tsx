@@ -240,7 +240,9 @@ const NEON_OPACITY = 0.9; // the tube's settled brightness
 const NEON_STRIKE_MS = 700;
 const NEON_STRIKE: [number, number][] = [
   [45, 1], [75, 0], [115, 0.9], [155, 0.05], [195, 1], [235, 0.15],
-  [285, 0.85], [325, 0], [385, 1], [425, 0.45], [NEON_STRIKE_MS, 1],
+  // ...and it catches: full from 325 on. (There was one last dip to 0.45 at 385-425;
+  // the gas has caught by then, so a flicker there read as a fault, not a strike.)
+  [285, 0.85], [325, 0], [NEON_STRIKE_MS, 1],
 ];
 function neonStrike(t: number) {
   if (t >= NEON_STRIKE_MS) return 1;
@@ -574,6 +576,12 @@ export function CrystalGem({
       glslVersion: THREE.GLSL3,
       vertexShader: SHATTER_VERT,
       fragmentShader: SHATTER_FRAG,
+      // The SAME solidity the finished gem has. buildCW's crystal is closed but not
+      // uniformly wound, so FrontSide (RawShaderMaterial's default) culls real outer
+      // faces and leaves the mark hollow -- you see through it to the W's four bars,
+      // and then it pops solid the instant it lands and swaps to plainMaterial. The
+      // shatter has to compile into the ACTUAL finished gem, so it renders like it.
+      side: THREE.DoubleSide,
       uniforms: {
         uProj: { value: new THREE.Matrix4() },
         uView: { value: new THREE.Matrix4() },
