@@ -26,7 +26,14 @@ import { REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
 
 const REVEAL_MS = 620; // grain -> wall dissolve, all at once, after everything loads
 const GRAIN_PX = 1.5; // veil grain cell, in DEVICE px (smaller = finer grain)
-const WALL_Z = -1.4; // same plane as the reel
+// BEHIND the reel (ITEM_Z = -1.4), not on it. The wall is the backdrop: the reel has
+// to be able to cover it. These used to be the same plane, and the wash sits +0.02
+// INSIDE this group -- so the wash's world z was -1.38, two centimetres in FRONT of
+// the reel. It therefore painted over the immersive slide: flicking on the moment the
+// wall became visible on exit, and hanging over the reel on the way in until the wall
+// finally dropped at the end of the cold open, then flicking off. The gap has to
+// exceed the wash's own offset.
+const WALL_Z = -1.6;
 const TILE_PX = 175; // rough target row height in CSS px (a range, not exact)
 const GAP_PX = 5;
 const TILE_ASPECT = 16 / 10; // fixed so the layout never depends on load
