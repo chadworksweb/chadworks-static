@@ -294,7 +294,7 @@ export function PortfolioShowroom() {
                 the wall (veil included) until every reel texture had decoded, so
                 the pre-click stage sat empty on first load. */}
             <Suspense fallback={null}>
-              <TileWall items={items} visible={!immersive} onRevealed={onWallRevealed} />
+              <TileWall items={items} onRevealed={onWallRevealed} />
             </Suspense>
             {/* The reel pulls the full-res shots (~5.7MB, and ~20MB of GPU upload
                 EACH once decoded) and is invisible until entry, so mounting it up

@@ -43,7 +43,7 @@ const TILE_FRAG = `
   void main() {
     vec4 c = texture2D(map, vUv);
     float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
-    gl_FragColor = vec4(vec3(l), uFade);
+    gl_FragColor = vec4(vec3(l) * uFade, 1.0);
   }
 `;
 // The veil: a solid grain field. uReveal (0..1) dissolves it away -- each cell
@@ -68,17 +68,15 @@ type Cell = { x: number; y: number; w: number; tex: number };
 
 export function TileWall({
   items,
-  visible,
   onRevealed,
 }: {
   items: ShowroomItem[];
-  visible: boolean;
   /** Fires once the veil has fully dissolved and the wall is on screen. */
   onRevealed?: () => void;
 }) {
   const { camera } = useThree();
   const groupRef = useRef<THREE.Group>(null);
-  useWallFade(groupRef, visible);
+  useWallFade(groupRef);
   // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
   // enter/exit canvas resize never recomputes (and visibly re-tiles) the wall.
   const [vp, setVp] = useState(() => ({
@@ -182,24 +180,31 @@ export function TileWall({
   );
 }
 
-// Fades the whole wall on the GEM's clock. It used to flip on `visible` the frame the
-// lock toggled, so the room swapped under the crystal while the crystal was still
-// mid-turn. Walks the group rather than threading a prop through every mesh: the wall
-// is tiles (uFade) plus the blue wash (material opacity), and both have to go together.
-function useWallFade(groupRef: React.RefObject<THREE.Group | null>, visible: boolean) {
+// Fades the whole wall -- shots AND the blue wash over them -- on the GEM's clock.
+//
+// The clock is the ONLY input. Gating on an `immersive` boolean is what made it flick:
+// that flips in one frame, so the wall vanished on entry and slammed back on exit
+// while the reel was still fading, which blinks. `stage` is the one thing that knows
+// how far through the turn we are, in either direction.
+//
+// The shots dim rather than dissolve to alpha. They must stay OPAQUE: the veil above
+// them is depthWrite:false, so transparent tiles move to the transparent pass, draw
+// AFTER the veil, and paint straight over the load dissolve. The wall is the backmost
+// thing on the stage, so dimming to the near-black backdrop reads the same as fading.
+function useWallFade(groupRef: React.RefObject<THREE.Group | null>) {
   useFrame(() => {
     const g = groupRef.current;
     if (!g) return;
-    // 1 when exited (the wall IS the room), 0 once the showroom has taken over.
-    const f = visible ? 1 - easeInOutCubic(stage.p) : 0;
+    // 1 = exited (the wall IS the room), 0 = the showroom has taken over.
+    const f = 1 - easeInOutCubic(stage.p);
     g.visible = f > 0.003;
     if (!g.visible) return;
     g.traverse((o) => {
       const m = (o as THREE.Mesh).material as THREE.Material | undefined;
       if (!m) return;
       const sm = m as THREE.ShaderMaterial;
+      if (sm.uniforms?.uReveal) return; // the veil owns its own dissolve; never touch it
       if (sm.uniforms?.uFade) sm.uniforms.uFade.value = f;
-      else if (sm.uniforms?.uReveal) return; // the veil owns its own dissolve
       else m.opacity = (m.userData.baseOpacity ??= m.opacity) * f;
     });
   });
@@ -243,7 +248,6 @@ function Tiles({ urls, cells, tileH }: { urls: string[]; cells: Cell[]; tileH: n
         vertexShader: TILE_VERT,
         fragmentShader: TILE_FRAG,
         uniforms: { map: { value: t }, uFade: { value: 1 } },
-        transparent: true,
       });
     });
   }, [textures]);
