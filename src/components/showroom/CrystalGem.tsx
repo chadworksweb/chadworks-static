@@ -15,7 +15,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { buildCW, LOCKED, gemFrag } from "@/lib/gemstone-core";
-import { intro, easeOutCubic, REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
+import { buildFacetShards } from "./facet-shards";
+import { entrance, easeOutCubic, REFRACT_EXCLUDE_LAYER } from "./showroom-intro";
 import { useMotionPausedRef } from "./useMotionPaused";
 
 const GEM_Z = 0.8;
@@ -40,7 +41,7 @@ in vec3 position; in vec3 normal;
 in vec3 aCentroid; in vec3 aShardDir; in vec3 aShardAxis; in vec3 aShardRnd; in vec3 aLetterC; in float aSelfDir;
 uniform mat4 uProj, uView, uModel; uniform mat3 uNormal;
 uniform float uAssemble, uOrbit, uSelf; uniform vec3 uBary;
-out vec3 vN; out vec3 vViewPos; out vec3 vPos;
+out vec3 vN; out vec3 vViewPos; out vec3 vPos; out vec4 vHomeClip;
 mat3 axisRot(vec3 ax, float ang){
   float s = sin(ang), c = cos(ang), t = 1.0 - c; vec3 a = normalize(ax);
   return mat3(
@@ -63,15 +64,34 @@ void main(){
   vec3 local = R * (position - aCentroid);
   vec3 disp = aShardDir * (sh * aShardRnd.z);
   vec3 P = aCentroid + local + disp;
-  vec3 Nn = R * normal;
+  // The chip TUMBLES, but it is SHADED as its seated self (see vViewPos/vHomeClip
+  // below), so its normal must stay the seated one -- rotating it here would swing
+  // dot(N,V) and reintroduce the fresnel blow-out.
+  vec3 Nn = normal;
   // 2. binary dance: revolve each letter around the barycenter, spin on own axis
   vec3 letterNow = uBary + rotYm(uOrbit) * (aLetterC - uBary);
   mat3 S = rotYm(uSelf * aSelfDir);
   P = letterNow + S * (P - aLetterC);
   Nn = S * Nn;
-  vPos = P;
-  vec4 wp = uModel * vec4(P, 1.0);
-  vec4 vp = uView * wp; vViewPos = vp.xyz;
+  // Every shard is SHADED AS ITS SEATED SELF, and only its geometry flies. The frag
+  // shades from vViewPos (the view vector -> fresnel) and samples the refraction at
+  // the fragment's screen spot. Fed the FLYING values, a chip 2-5 units off-axis has
+  // a steeply grazing V, so dot(N,V) -> 0 drives fresnel to 1, and the frag's
+  // mix(refr, refl, 0.10 + 0.5*fres) hands 60% of the pixel to envSky -- whose top is
+  // pure white. That is why the shatter was white confetti: not the tumble, not the
+  // normals, just shading evaluated where the shard IS instead of where it LANDS.
+  //
+  // So hand the frag the home seat: vPos (facet cell), vViewPos (view vector) and
+  // vHomeClip (refraction sample point) are all computed from home, never from P.
+  // Each chip therefore carries the exact dark refraction of the gem it is compiling
+  // into, the whole way in. All three converge on the real thing at uAssemble=1,
+  // where the shatter term is zero and home == P, so there is no pop on landing.
+  vec3 home = letterNow + S * (position - aLetterC);
+  vPos = home;
+  vec4 homeVp = uView * uModel * vec4(home, 1.0);
+  vViewPos = homeVp.xyz;
+  vHomeClip = uProj * homeVp;
+  vec4 vp = uView * uModel * vec4(P, 1.0);
   vN = normalize(uNormal * Nn);
   gl_Position = uProj * vp;
 }`;
@@ -96,8 +116,64 @@ void main(){
 // is a real wireframe (LineSegments child of the gem), not a shader term.
 const SHOWROOM_FRAG = gemFrag.replace("#version 300 es", "").trim();
 
+// The shatter's frag is the same gemFrag with ONE deviation: it samples the
+// refraction at the shard's SEATED screen spot (vHomeClip) instead of the flying
+// fragment's (gl_FragCoord), so a chip refracts the wall it will land in front of
+// rather than whatever it is passing over. Paired with the seated vViewPos from
+// SHATTER_VERT, that makes every chip the gem's real dark refraction in flight.
+//
+// Interpolating the home CLIP position and dividing per-fragment (rather than
+// interpolating an already-divided uv) is what keeps this exact: at uAssemble=1,
+// home == P, so vHomeClip.xy/w resolves to precisely gl_FragCoord.xy/uRes and the
+// swap to plainMaterial's unpatched frag is seamless.
+//
+// Patched by string surgery so gemFrag stays the single source of truth for the
+// glass; assert the shape so a gemFrag edit fails loudly instead of silently
+// dropping the deviation.
+const SHATTER_FRAG = (() => {
+  const decl = "in vec3 vPos; out vec4 frag;";
+  const uvSrc = "vec2 uv=gl_FragCoord.xy/uRes;";
+  const nSrc = "vec3 N=normalize(vN); vec3 V=normalize(-vViewPos);";
+  if (
+    !SHOWROOM_FRAG.includes(decl) ||
+    !SHOWROOM_FRAG.includes(uvSrc) ||
+    !SHOWROOM_FRAG.includes(nSrc)
+  ) {
+    throw new Error(
+      "CrystalGem: gemFrag no longer matches the seated-shading patch; re-check SHATTER_FRAG."
+    );
+  }
+  return SHOWROOM_FRAG.replace(decl, "in vec3 vPos; in vec4 vHomeClip; out vec4 frag;")
+    .replace(uvSrc, "vec2 uv=vHomeClip.xy/vHomeClip.w*0.5+0.5;")
+    // Two-sided: flip the normal to face the viewer. THIS is what made the shatter
+    // white. In the seated gem each facet's BACK cap is buried inside a closed solid
+    // and never shaded; in flight the chips separate and those back faces turn to
+    // camera. Their normal points away from V, so clamp(dot(N,V),0,1) pins to 0 and
+    // fres = pow(1-0,3) = 1 -- the maximum -- handing 60% of the pixel to envSky's
+    // white top plus another +0.25. Back faces were not merely prone to white, they
+    // were guaranteed it, which is why seating the view vector alone changed nothing.
+    // A no-op for the seated gem, whose back faces are all depth-culled anyway.
+    .replace(nSrc, `${nSrc} if(dot(N,V)<0.0) N=-N;`);
+})();
+
 // Neon wireframe colour (lavender-violet, ss13 look).
 const NEON = 0xc47bff;
+const NEON_OPACITY = 0.9; // the tube's settled brightness
+
+// A neon tube STRIKING, once the mark has finished compiling: a few hard blinks as
+// the gas catches, then it holds. Deterministic (not random) -- the mark is brand
+// furniture, so it lights the same way every load. Returns a 0..1 multiplier on
+// NEON_OPACITY for `t` ms since the gem formed.
+const NEON_STRIKE_MS = 700;
+const NEON_STRIKE: [number, number][] = [
+  [45, 1], [75, 0], [115, 0.9], [155, 0.05], [195, 1], [235, 0.15],
+  [285, 0.85], [325, 0], [385, 1], [425, 0.45], [NEON_STRIKE_MS, 1],
+];
+function neonStrike(t: number) {
+  if (t >= NEON_STRIKE_MS) return 1;
+  for (const [end, v] of NEON_STRIKE) if (t < end) return v;
+  return 1;
+}
 
 // Build the CW's CLEAN edge outline as line-segment endpoints, in the mesh's exact
 // space (transform = (raw - c) * sc). Deriving edges from the triangle mesh emits the
@@ -219,7 +295,15 @@ const ORBIT_RATE = 0.3;
 const SELF_RATE = 0.6;
 
 
-export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
+export function CrystalGem({
+  immersive = false,
+  show = true,
+}: {
+  immersive?: boolean;
+  /** Held false until the wall is up: the gem refracts the wall, so appearing
+   *  before it exists would show an untextured silhouette. */
+  show?: boolean;
+}) {
   const { gl, scene, camera, size } = useThree();
   const meshRef = useRef<THREE.Mesh>(null);
   const rotY = useRef(0);
@@ -227,6 +311,8 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
   const orbit = useRef(0);
   const selfSpin = useRef(0);
   const wasImmersive = useRef(false);
+  // Latched on the frame the mark finishes compiling; drives the neon tube's strike.
+  const formedAt = useRef(0);
   const paused = useMotionPausedRef();
 
   const fbo = useMemo(() => {
@@ -239,16 +325,22 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
   const geo = useMemo(() => {
     const m = buildCW(LOCKED.depth);
     const g = new THREE.BufferGeometry();
-    // three derives the draw count from `position`; name them conventionally.
-    g.setAttribute("position", new THREE.BufferAttribute(m.pos, 3));
-    g.setAttribute("normal", new THREE.BufferAttribute(m.nrm, 3));
 
-    // Per-triangle shard attributes: all 3 verts of a face share one centroid /
-    // fly-direction / spin so the face moves as a single rigid shard. buildCW is
-    // non-indexed, so verts [3t, 3t+1, 3t+2] are exactly triangle t.
-    const P = m.pos;
+    // Shard by FACET, not by triangle. buildCW's triangles are extrusion slivers
+    // with no relation to the facets the frag shader shades, so one-shard-per-face
+    // threw spikes; this subdivides and regroups the soup so each shard is exactly
+    // one visible facet cell. See facet-shards.ts.
+    const fs = buildFacetShards(m.pos, m.nrm);
+    // three derives the draw count from `position`; name them conventionally.
+    g.setAttribute("position", new THREE.BufferAttribute(fs.pos, 3));
+    g.setAttribute("normal", new THREE.BufferAttribute(fs.nrm, 3));
+
+    // Shard attributes: every vert of every triangle in a facet shares one centroid
+    // / fly-direction / spin, so the whole facet moves as one rigid chip.
+    const P = fs.pos;
     const vcount = P.length / 3;
     const tcount = vcount / 3;
+    const scount = fs.shardCount;
     const cen = new Float32Array(vcount * 3);
     const dir = new Float32Array(vcount * 3);
     const axis = new Float32Array(vcount * 3);
@@ -259,24 +351,31 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
       const s = Math.sin(x * 127.1 + 311.7) * 43758.5453;
       return s - Math.floor(s);
     };
-    // Pass 1: centroids + max radius (drives the outward-in stagger).
-    const cx = new Float32Array(tcount);
-    const cy = new Float32Array(tcount);
-    const cz = new Float32Array(tcount);
-    let maxR = 1e-6;
+    // Pass 1: per-FACET centroids (mean of the facet's triangle centroids) + max
+    // radius (drives the outward-in stagger).
+    const cx = new Float32Array(scount);
+    const cy = new Float32Array(scount);
+    const cz = new Float32Array(scount);
+    const cn = new Float32Array(scount);
     for (let t = 0; t < tcount; t++) {
       const o = t * 9;
-      const ax = (P[o] + P[o + 3] + P[o + 6]) / 3;
-      const ay = (P[o + 1] + P[o + 4] + P[o + 7]) / 3;
-      const az = (P[o + 2] + P[o + 5] + P[o + 8]) / 3;
-      cx[t] = ax; cy[t] = ay; cz[t] = az;
-      maxR = Math.max(maxR, Math.hypot(ax, ay));
+      const s = fs.shard[t];
+      cx[s] += (P[o] + P[o + 3] + P[o + 6]) / 3;
+      cy[s] += (P[o + 1] + P[o + 4] + P[o + 7]) / 3;
+      cz[s] += (P[o + 2] + P[o + 5] + P[o + 8]) / 3;
+      cn[s]++;
+    }
+    let maxR = 1e-6;
+    for (let s = 0; s < scount; s++) {
+      const k = cn[s] || 1;
+      cx[s] /= k; cy[s] /= k; cz[s] /= k;
+      maxR = Math.max(maxR, Math.hypot(cx[s], cy[s]));
     }
 
     // Split the mark into its two letters (C, then W) by the widest x-gap between
-    // triangle centroids -- the gap between the C's opening and the W's first
-    // stroke is far larger than any within-letter gap. Then each letter's centroid
-    // and the shared barycenter (midpoint) drive the orbital dance.
+    // facet centroids -- the gap between the C's opening and the W's first stroke
+    // is far larger than any within-letter gap. Then each letter's centroid and the
+    // shared barycenter (midpoint) drive the orbital dance.
     const xsSorted = Array.from(cx).sort((a, b) => a - b);
     let widest = -1, boundary = 0;
     for (let i = 1; i < xsSorted.length; i++) {
@@ -284,17 +383,23 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
       if (g > widest) { widest = g; boundary = (xsSorted[i] + xsSorted[i - 1]) / 2; }
     }
     let lax = 0, lay = 0, laz = 0, ln = 0, wax = 0, way = 0, waz = 0, wn = 0;
-    for (let t = 0; t < tcount; t++) {
-      if (cx[t] < boundary) { lax += cx[t]; lay += cy[t]; laz += cz[t]; ln++; }
-      else { wax += cx[t]; way += cy[t]; waz += cz[t]; wn++; }
+    for (let s = 0; s < scount; s++) {
+      if (cx[s] < boundary) { lax += cx[s]; lay += cy[s]; laz += cz[s]; ln++; }
+      else { wax += cx[s]; way += cy[s]; waz += cz[s]; wn++; }
     }
     lax /= ln || 1; lay /= ln || 1; laz /= ln || 1;
     wax /= wn || 1; way /= wn || 1; waz /= wn || 1;
     const bary = new THREE.Vector3((lax + wax) / 2, (lay + way) / 2, (laz + waz) / 2);
 
-    for (let t = 0; t < tcount; t++) {
-      const ccx = cx[t], ccy = cy[t], ccz = cz[t];
-      const seed = t + 1;
+    // Per-facet fly/spin...
+    const sDir = new Float32Array(scount * 3);
+    const sAxis = new Float32Array(scount * 3);
+    const sRnd = new Float32Array(scount * 3);
+    const sLetterC = new Float32Array(scount * 3);
+    const sSelf = new Float32Array(scount);
+    for (let s = 0; s < scount; s++) {
+      const ccx = cx[s], ccy = cy[s];
+      const seed = s + 1;
       const h1 = hash(seed), h2 = hash(seed * 1.7 + 5), h3 = hash(seed * 2.3 + 11);
       const h4 = hash(seed * 3.1 + 7), h5 = hash(seed * 0.7 + 2), h6 = hash(seed * 1.3 + 13);
       // Radial-outward fly direction in xy, jittered, with a random z so some
@@ -310,19 +415,30 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
       const al = Math.hypot(rx, ry, rz) || 1;
       rx /= al; ry /= al; rz /= al;
       const radiusNorm = Math.hypot(ccx, ccy) / maxR;
-      const delay = Math.min(1, radiusNorm * 0.6 + h1 * 0.4);
-      const spin = (h5 * 2 + 0.6) * Math.PI * (h6 < 0.5 ? -1 : 1);
-      const dist = 2 + h2 * 3.2;
-      const isC = cx[t] < boundary;
-      const lcx = isC ? lax : wax, lcy = isC ? lay : way, lcz = isC ? laz : waz;
+      const isC = ccx < boundary;
+      sDir[s * 3] = dx; sDir[s * 3 + 1] = dy; sDir[s * 3 + 2] = dz;
+      sAxis[s * 3] = rx; sAxis[s * 3 + 1] = ry; sAxis[s * 3 + 2] = rz;
+      sRnd[s * 3] = Math.min(1, radiusNorm * 0.6 + h1 * 0.4); // delay
+      sRnd[s * 3 + 1] = (h5 * 2 + 0.6) * Math.PI * (h6 < 0.5 ? -1 : 1); // spin
+      sRnd[s * 3 + 2] = 2 + h2 * 3.2; // distance
+      sLetterC[s * 3] = isC ? lax : wax;
+      sLetterC[s * 3 + 1] = isC ? lay : way;
+      sLetterC[s * 3 + 2] = isC ? laz : waz;
+      sSelf[s] = isC ? 1 : -1; // W self-spins opposite the C
+    }
+
+    // ...splatted onto every vert of every triangle in that facet, so the whole
+    // chip moves rigidly.
+    for (let t = 0; t < tcount; t++) {
+      const s = fs.shard[t];
       for (let k = 0; k < 3; k++) {
         const vi = (t * 3 + k) * 3;
-        cen[vi] = ccx; cen[vi + 1] = ccy; cen[vi + 2] = ccz;
-        dir[vi] = dx; dir[vi + 1] = dy; dir[vi + 2] = dz;
-        axis[vi] = rx; axis[vi + 1] = ry; axis[vi + 2] = rz;
-        rnd[vi] = delay; rnd[vi + 1] = spin; rnd[vi + 2] = dist;
-        letterC[vi] = lcx; letterC[vi + 1] = lcy; letterC[vi + 2] = lcz;
-        selfDir[t * 3 + k] = isC ? 1 : -1; // W self-spins opposite the C
+        cen[vi] = cx[s]; cen[vi + 1] = cy[s]; cen[vi + 2] = cz[s];
+        dir[vi] = sDir[s * 3]; dir[vi + 1] = sDir[s * 3 + 1]; dir[vi + 2] = sDir[s * 3 + 2];
+        axis[vi] = sAxis[s * 3]; axis[vi + 1] = sAxis[s * 3 + 1]; axis[vi + 2] = sAxis[s * 3 + 2];
+        rnd[vi] = sRnd[s * 3]; rnd[vi + 1] = sRnd[s * 3 + 1]; rnd[vi + 2] = sRnd[s * 3 + 2];
+        letterC[vi] = sLetterC[s * 3]; letterC[vi + 1] = sLetterC[s * 3 + 1]; letterC[vi + 2] = sLetterC[s * 3 + 2];
+        selfDir[t * 3 + k] = sSelf[s];
       }
     }
     g.setAttribute("aCentroid", new THREE.BufferAttribute(cen, 3));
@@ -344,7 +460,7 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     return new THREE.RawShaderMaterial({
       glslVersion: THREE.GLSL3,
       vertexShader: SHATTER_VERT,
-      fragmentShader: SHOWROOM_FRAG,
+      fragmentShader: SHATTER_FRAG,
       uniforms: {
         uProj: { value: new THREE.Matrix4() },
         uView: { value: new THREE.Matrix4() },
@@ -447,11 +563,11 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     const mesh = meshRef.current;
     if (!mesh) return;
     const dt = Math.min(delta, 0.05);
-    const e = easeOutCubic(intro.p);
+    const e = easeOutCubic(entrance.p);
 
     // Drive the reverse-shatter: shards fly in and reassemble in the vertex
     // shader as this climbs 0 -> 1 (default 1 = solid gem for return visits).
-    material.uniforms.uAssemble.value = intro.p;
+    material.uniforms.uAssemble.value = entrance.p;
 
     // On leaving the showroom, wrap the accumulated dance angles into [-PI, PI]
     // once so the ease-to-zero below unwinds the short way back to the clean CW.
@@ -461,10 +577,12 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     }
     wasImmersive.current = immersive;
 
-    if (intro.p < 1) {
-      // Reverse-shatter entrance: keep the mark nearly steady so the reassembly
-      // reads (the shatter is the entrance, not a spin/zoom); the dance holds.
-      rotY.current = (1 - e) * 0.6;
+    if (entrance.p < 1) {
+      // Compiling: the mark does NOT turn. It used to ease rotY down to 0 across the
+      // entrance, which then had to reverse into the exited spin the moment it
+      // landed -- a direction flip right at the handover, read as a jitter. Held at
+      // 0, the spin below starts from rest.
+      rotY.current = 0;
       rotX.current = 0;
     } else if (!paused.current && immersive) {
       // Inside the showroom the gem does not respond to the cursor; the binary
@@ -485,13 +603,13 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     mesh.rotation.y = rotY.current;
     mesh.rotation.x = rotX.current;
     // Micro scale-bounce as the shards slam home; otherwise the mark holds BASE.
-    const pop = intro.p < 1 ? 1 + 0.06 * Math.sin(e * Math.PI) : 1;
+    const pop = entrance.p < 1 ? 1 + 0.06 * Math.sin(e * Math.PI) : 1;
     mesh.scale.setScalar(BASE * pop);
     mesh.updateMatrixWorld();
 
     // Exited draws the dance-free homepage gem (plainMaterial); intro + immersive draw
     // the shatter/dance gem. Only the active one is ever rendered.
-    const exited = intro.p >= 1 && !immersive;
+    const exited = entrance.p >= 1 && !immersive;
     const active = exited ? plainMaterial : material;
     if (mesh.material !== active) mesh.material = active;
 
@@ -501,8 +619,13 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     if (fbo.width !== w || fbo.height !== h) fbo.setSize(w, h);
 
     // Neon wireframe: only in the exited state (its edges match the assembled CW, not
-    // the shatter/dance).
-    wire.seg.visible = exited;
+    // the shatter/dance). It STRIKES on the frame the gem finishes compiling, then
+    // holds -- formedAt latches once, so leaving and re-entering the showroom brings
+    // the tube back already lit rather than re-striking it.
+    wire.seg.visible = exited && show;
+    if (exited && show && formedAt.current === 0) formedAt.current = performance.now();
+    wire.m.opacity =
+      NEON_OPACITY * (formedAt.current ? neonStrike(performance.now() - formedAt.current) : 0);
 
     // pass 1: reel (and everything but the gem) into the FBO. Exclude the load veil
     // / dissolve grain (REFRACT_EXCLUDE_LAYER) so the gem never refracts it.
@@ -514,7 +637,7 @@ export function CrystalGem({ immersive = false }: { immersive?: boolean }) {
     camera.layers.enable(REFRACT_EXCLUDE_LAYER);
 
     // pass 2: full scene to screen, gem refracting the FBO
-    mesh.visible = true;
+    mesh.visible = show; // held until the wall it refracts exists
     const u = active.uniforms;
     u.uProj.value.copy(camera.projectionMatrix);
     u.uView.value.copy(camera.matrixWorldInverse);

@@ -16,7 +16,16 @@ import { TileWall } from "./TileWall";
 import { CrystalGem } from "./CrystalGem";
 import { SHOWROOM_ITEMS, type ShowroomItem } from "./showroom-data";
 import { useShowroomMode } from "./useShowroomMode";
-import { intro, startIntro, skipIntro, INTRO_DURATION } from "./showroom-intro";
+import {
+  intro,
+  startIntro,
+  skipIntro,
+  INTRO_DURATION,
+  entrance,
+  startEntrance,
+  skipEntrance,
+  ENTRANCE_DURATION,
+} from "./showroom-intro";
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
 import styles from "./showroom.module.css";
 
@@ -75,11 +84,18 @@ function FitText({
 // center with the title module. Tune alongside .feature `bottom` in the CSS.
 const STAGE_SHIFT_FRAC = 0.1;
 
+// Advances both clocks: `entrance` (the gem's reverse-shatter, on load) and `intro`
+// (the reel's ramp, on enter). They are deliberately separate -- see showroom-intro.
 function IntroController() {
   useFrame((_, delta) => {
-    if (!intro.playing) return;
-    intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
-    if (intro.p >= 1) intro.playing = false;
+    if (entrance.playing) {
+      entrance.p = Math.min(1, entrance.p + delta / ENTRANCE_DURATION);
+      if (entrance.p >= 1) entrance.playing = false;
+    }
+    if (intro.playing) {
+      intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
+      if (intro.p >= 1) intro.playing = false;
+    }
   });
   return null;
 }
@@ -110,11 +126,24 @@ export function PortfolioShowroom() {
   const [interacted, setInteracted] = useState(false);
   const [entered, setEntered] = useState(false);
   const [wallRevealed, setWallRevealed] = useState(false);
+  const [gemAssembled, setGemAssembled] = useState(false);
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
   const [closing, setClosing] = useState(false);
   const [motionGate, setMotionGate] = useState(false);
-  // Stable: TileWall calls this from a useFrame, so it must not change identity.
-  const onWallRevealed = useCallback(() => setWallRevealed(true), []);
+  // The load sequence: the grid dissolves in, THEN the gem shatters together out of
+  // its facets, THEN the enter button appears. The gem waits for the wall because it
+  // has no texture of its own -- it refracts the wall, so arriving first would show a
+  // hollow silhouette. Stable identity: TileWall calls this from a useFrame.
+  const onWallRevealed = useCallback(() => {
+    setWallRevealed(true);
+    if (prefersReducedMotion() || isMotionPaused()) {
+      skipEntrance(); // gem simply appears, assembled
+      setGemAssembled(true);
+      return;
+    }
+    startEntrance();
+    window.setTimeout(() => setGemAssembled(true), ENTRANCE_DURATION * 1000);
+  }, []);
 
   const total = items.length;
   const sel = selected != null ? items[selected] : null;
@@ -250,11 +279,13 @@ export function PortfolioShowroom() {
                 />
               </Suspense>
             )}
-            <CrystalGem immersive={immersive} />
+            <CrystalGem immersive={immersive} show={wallRevealed} />
           </Canvas>
 
-          {/* Entry: click the gem to enter (and trigger the cold open). */}
-          {!entered && (
+          {/* Entry: click the gem to enter (and trigger the cold open). Held back
+              until the gem has finished compiling out of its shards -- inviting a
+              click at a half-assembled gem would cut its own entrance short. */}
+          {!entered && gemAssembled && (
             <button type="button" className={styles.enter} onClick={enter}>
               <span className={styles.enterText}>Enter the showroom</span>
             </button>
