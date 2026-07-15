@@ -486,14 +486,17 @@ export function PortfolioShowroom() {
                       strokeWidth="2.5"
                       strokeLinecap="round"
                     />
-                    {/* The carrot, nudged down a hair. Moved by transform rather than by
-                        editing d, so the path stays the asset's own. Mind the frame: the
-                        svg is turned 290deg as a whole, so screen "down" is NOT +y here.
-                        One screen px down is translate(-1.22 0.44) in these units, so
-                        this is roughly 2px. That vector is the knob. */}
+                    {/* The carrot, nudged down a hair and turned 10deg. Moved by transform
+                        rather than by editing d, so the path stays the asset's own. Mind
+                        the frame: the svg is turned 290deg as a whole, so screen "down" is
+                        NOT +y here. One screen px down is translate(-1.22 0.44) in these
+                        units, so this is roughly 2px. The rotate pivots on the carrot's
+                        own vertex, so it turns in place; that 290deg is a pure rotation
+                        (scale(-1) is both axes, not a mirror), so it preserves handedness
+                        and a negative angle reads counter-clockwise on screen too. */}
                     <path
                       d="M23 32 L 34 34 L 30 23"
-                      transform="translate(-2.4 0.9)"
+                      transform="translate(-2.4 0.9) rotate(-10 34 34)"
                       stroke="currentColor"
                       strokeWidth="2.5"
                       strokeLinecap="round"

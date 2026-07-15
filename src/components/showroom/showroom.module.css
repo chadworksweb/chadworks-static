@@ -750,6 +750,14 @@
 }
 .featureTitle {
   margin: 0;
+  /* STRETCH, and it is load-bearing. This is a flex item in a column that CENTRES its
+     items, so left alone its box shrinks to its own text: clientWidth would always equal
+     scrollWidth, useFitText could never see an overflow, and the title would never shrink
+     -- it would just spill past the card. Stretching hands it the card's content width to
+     measure against. The look does not change: text-align below still centres the words.
+     This card and the opened panel measure DIFFERENT boxes on purpose (the panel's title
+     is a block whose own margin reserves the corner). Do not merge the two. */
+  align-self: stretch;
   /* One line, always: useFitText shrinks via --fit-fs when the title would wrap. */
   font-size: var(--fit-fs, clamp(2rem, 6.4vw, 5rem));
   font-weight: 800;
