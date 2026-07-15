@@ -22,6 +22,8 @@
   /* ONE inset for the whole stage. Everything floating over the object uses it,
      so the rail's bottom gap equals its top gap and the box is contained by the
      stage height instead of running off it. */
+  /* VERTICAL only. Left and right sit flush on the content column, so the rail
+     and the number line up with the header and every other band on the site. */
   --stage-inset: clamp(0.9rem, 2.4vh, 1.6rem);
   /* One token for the rail width: the canvas and the finish line both have to
      know where the rail ends, so it cannot be a magic number in three places. */
@@ -61,7 +63,7 @@
   position: absolute;
   top: var(--nav-height);
   bottom: 0;
-  left: calc(var(--gutter) + var(--stage-inset) + var(--rail-w));
+  left: calc(var(--gutter) + var(--rail-w));
   right: var(--gutter);
   z-index: 0;
 }
@@ -104,7 +106,7 @@
   position: absolute;
   z-index: 2;
   top: var(--stage-inset);
-  right: var(--stage-inset);
+  right: 0;
   text-align: right;
   pointer-events: none;
 }
@@ -131,7 +133,7 @@
   /* Contained by the stage: the SAME inset top and bottom. The box scrolls
      internally; it never runs past the stage. */
   top: var(--stage-inset);
-  left: var(--stage-inset);
+  left: 0;
   bottom: var(--stage-inset);
   width: var(--rail-w);
   padding: 0.5rem;
@@ -338,8 +340,8 @@
   z-index: 4;
   bottom: var(--stage-inset);
   /* The rail owns the left edge; centre within what is left of the stage. */
-  left: calc(var(--stage-inset) + var(--rail-w));
-  right: var(--stage-inset);
+  left: var(--rail-w);
+  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -399,7 +401,7 @@
     bottom: auto;
     width: auto;
     max-width: none;
-    margin: 0 var(--stage-inset);
+    margin: 0;
   }
 
   .readout {
