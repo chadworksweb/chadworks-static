@@ -1,0 +1,322 @@
+/* PACKAGE BUILDER -- the self-contained, full-screen scope stage.
+   Layout reference: Robin Payot's Issey Miyake "Le sel d'Issey" salt-crystal
+   builder (Screenshot_5). That LAYOUT, not its palette:
+     - the object dead center and large, everything else floating over it
+     - a right rail of compact UPPERCASE micro-type: numbered chips, not sliders
+       with paragraphs under them
+     - a left card that explains ONLY the layer you are currently touching
+     - one understated finish line, bottom center
+   The rail stays terse because the left card carries the meaning. That is the
+   trick that keeps thirteen parameters from reading as a tax form.
+
+   PALETTE IS INVERTED from the reference: the salt builder is near-black, and
+   chadworks is not. The stage is the site's lavender surface with a white
+   center bloom, and the OBJECT carries the dark (indigo -> brand -> lilac), so
+   the thing you are building is the darkest mass on the page.
+
+   Container contract mirrors the showroom: ~100dvh, pulled up under the nav. */
+
+.wrap {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  margin-top: calc(-1 * var(--nav-height));
+  overflow: hidden;
+  color: #243989; /* --dark-bg */
+  background:
+    radial-gradient(88% 68% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 62%),
+    radial-gradient(70% 60% at 82% 86%, rgba(128, 84, 188, 0.12) 0%, rgba(237, 231, 246, 0) 60%),
+    #ede7f6; /* --bg-surface */
+  font-size: 16px;
+}
+
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.canvasLayer :global(.cw-pkgscreen),
+.canvasLayer :global(.cw-pkgscreen__canvas) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Shared micro-type: the reference's whole voice is in this rule. */
+.micro {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ---- the number (top right) ---- */
+/* Left is the scope you set; right is what it costs you. Cause on one side,
+   consequence on the other. */
+.readout {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--nav-height) + clamp(1rem, 4vh, 2.6rem));
+  right: clamp(1.4rem, 4vw, 3.2rem);
+  text-align: right;
+  pointer-events: none;
+}
+
+.readoutLabel {
+  composes: micro;
+  opacity: 0.55;
+  margin: 0 0 0.5rem;
+}
+
+.figure {
+  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the card: the ACTIVE layer, and nothing else. Sits under the number,
+   on the consequence side, because it explains what you just moved. ---- */
+.info {
+  position: absolute;
+  z-index: 2;
+  right: clamp(1.4rem, 4vw, 3.2rem);
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(19rem, 26vw);
+  padding: 1rem 1.1rem;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(36, 57, 137, 0.16);
+  backdrop-filter: blur(6px);
+}
+
+.infoTitle {
+  composes: micro;
+  margin: 0 0 0.55rem;
+}
+
+.infoBody {
+  font-size: 0.78rem;
+  line-height: 1.55;
+  opacity: 0.72;
+  margin: 0;
+}
+
+.infoValue {
+  composes: micro;
+  display: block;
+  margin-top: 0.7rem;
+  color: #8054bc; /* --accent */
+}
+
+/* ---- the left rail: terse by design, and its own scroll box ---- */
+.rail {
+  position: absolute;
+  z-index: 3;
+  top: calc(var(--nav-height) + clamp(1rem, 4vh, 2.6rem));
+  left: clamp(1.4rem, 4vw, 3.2rem);
+  bottom: clamp(4.5rem, 9vh, 6rem);
+  width: min(21rem, 28vw);
+  padding: clamp(0.9rem, 2vh, 1.3rem) clamp(1rem, 1.6vw, 1.3rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 1.05rem;
+  align-content: start;
+  /* A real box: the scope is a panel you scroll, not copy bleeding off-stage. */
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(36, 57, 137, 0.16);
+  backdrop-filter: blur(6px);
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 84, 188, 0.55) rgba(36, 57, 137, 0.08);
+}
+
+/* WebKit/Blink: the same bar, drawn by hand. */
+.rail::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rail::-webkit-scrollbar-track {
+  background: rgba(36, 57, 137, 0.08);
+  border-radius: 999px;
+}
+
+.rail::-webkit-scrollbar-thumb {
+  background: rgba(128, 84, 188, 0.55);
+  border-radius: 999px;
+}
+
+.rail::-webkit-scrollbar-thumb:hover {
+  background: #8054bc;
+}
+
+.param {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.paramLabel {
+  composes: micro;
+  opacity: 0.6;
+  margin: 0;
+  cursor: default;
+}
+
+.paramOn .paramLabel {
+  opacity: 1;
+}
+
+/* numbered chips -- the reference's "CHOOSE A CYMATICS 1 2 3 4 5" */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+.chip {
+  width: 1.65rem;
+  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(36, 57, 137, 0.26);
+  background: rgba(255, 255, 255, 0.55);
+  color: #243989;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.chip:hover {
+  border-color: #8054bc;
+}
+
+.chipOn {
+  background: #8054bc;
+  border-color: #8054bc;
+  color: #fff;
+}
+
+/* count rows: a slim slider where a chip row would run too long */
+.count {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.range {
+  flex: 1;
+  accent-color: #8054bc;
+  cursor: pointer;
+  height: 1rem;
+}
+
+.countValue {
+  composes: micro;
+  min-width: 2.2rem;
+  text-align: right;
+  color: #8054bc;
+}
+
+/* ---- bottom center: the reference's "Finish your piece" ---- */
+.finish {
+  position: absolute;
+  z-index: 4;
+  bottom: clamp(1.4rem, 4vh, 2.6rem);
+  /* The rail owns the left edge; center within what is left of the stage. */
+  left: min(23rem, 31vw);
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.finishLink {
+  composes: micro;
+  color: #243989;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(36, 57, 137, 0.5);
+  padding-bottom: 0.28rem;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.finishLink:hover {
+  color: #8054bc;
+  border-bottom-color: #8054bc;
+}
+
+.reset {
+  composes: micro;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reset:hover {
+  opacity: 1;
+}
+
+/* ---- narrow: stack it. The object keeps the top, the rail becomes a sheet. */
+@media (max-width: 900px) {
+  .wrap {
+    min-height: auto;
+    margin-top: 0;
+    padding-bottom: 2.5rem;
+  }
+
+  .canvasLayer {
+    position: relative;
+    inset: auto;
+    height: 46vh;
+    min-height: 240px;
+  }
+
+  .readout,
+  .info,
+  .rail,
+  .finish {
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    transform: none;
+    width: auto;
+    max-width: none;
+    padding-left: clamp(1.2rem, 5vw, 2rem);
+    padding-right: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .readout {
+    padding-top: 1.2rem;
+  }
+
+  .info {
+    margin: 1rem clamp(1.2rem, 5vw, 2rem) 0;
+    padding: 1rem 1.1rem;
+    width: auto;
+  }
+
+  .rail {
+    overflow: visible;
+    background: none;
+    border: none;
+    backdrop-filter: none;
+    padding-top: 1.4rem;
+    padding-bottom: 0;
+  }
+
+  .finish {
+    justify-content: flex-start;
+    padding-top: 1.6rem;
+  }
+}
