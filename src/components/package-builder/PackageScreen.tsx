@@ -181,19 +181,8 @@ export function PackageScreen({
     let raf = 0, running = false, t0 = 0, prevTs = 0;
     let curStrata = target.current.strata; // eased so layers fade in, not pop
 
-    // Cursor lean: the object turns toward the pointer while it is over the
-    // stage, and returns to rest when it leaves.
-    let tgtX = 0, tgtY = 0, leanX = 0, leanY = 0;
-    const onMove = (e: PointerEvent) => {
-      const r = host.getBoundingClientRect();
-      const inside =
-        e.clientX >= r.left && e.clientX <= r.right &&
-        e.clientY >= r.top && e.clientY <= r.bottom;
-      if (!inside) { tgtX = 0; tgtY = 0; return; }
-      tgtX = ((e.clientX - r.left) / Math.max(1, r.width)) * 2 - 1;
-      tgtY = ((e.clientY - r.top) / Math.max(1, r.height)) * 2 - 1;
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
+    // NO cursor interaction. The object is staged and floats; the scope is the
+    // only thing that moves it.
 
     const draw = (now: number) => {
       if (!t0) { t0 = now; prevTs = now; }
@@ -223,9 +212,6 @@ export function PackageScreen({
         rebuild(cur.depth, cur.bevel);
       }
 
-      leanX = ease(leanX, tgtX, Math.min(1, dt * 4));
-      leanY = ease(leanY, tgtY, Math.min(1, dt * 4));
-
       const w = canvas.width, h = canvas.height;
       gl.viewport(0, 0, w, h);
       gl.clearColor(0, 0, 0, 0);
@@ -242,9 +228,10 @@ export function PackageScreen({
       const amp = 0.018 + cur.spin * 0.055;
       const bobY = Math.sin(time * 0.6) * amp;
       const bobRot = Math.sin(time * 0.43 + 1.1) * amp * 0.5;
-      const spinY = SCREEN.restRotY + bobRot + leanX * 0.42;
-      const tiltX = SCREEN.restTiltX + leanY * 0.22 + bobY;
-      const orient = Mat.mul(Mat.rotY(spinY), Mat.rotX(tiltX));
+      const orient = Mat.mul(
+        Mat.rotY(SCREEN.restRotY + bobRot),
+        Mat.rotX(SCREEN.restTiltX + bobY)
+      );
 
       gl.uniformMatrix4fv(us.proj, false, proj);
       gl.uniformMatrix4fv(us.view, false, view);
@@ -355,7 +342,6 @@ export function PackageScreen({
       unsub();
       io.disconnect();
       ro.disconnect();
-      window.removeEventListener("pointermove", onMove);
       host.removeEventListener("cw-repaint", repaint);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
