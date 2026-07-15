@@ -14,6 +14,8 @@ import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import { JsonLd } from "@/components/capsules/PageComposer";
+import { MainContactCapsule } from "@/components/capsules/MainContactCapsule";
+import { PageMotion } from "@/components/PageMotion";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { ArchiveGrid } from "@/components/portfolio/ArchiveGrid";
 import { ShowroomRoute } from "@/components/showroom/ShowroomRoute";
@@ -71,32 +73,42 @@ const collectionJsonLd = {
 // card carries its own desktop / tablet / mobile toggle, so the sites are still
 // shown at every breakpoint -- the showroom's job, done without the showroom.
 //
-// `reveal={false}` is load-bearing, not a style call. SectionShell's default adds
-// `.reveal`, which is `opacity: 0` until PageMotion's observer adds `.is-visible` --
-// and PageMotion is mounted by PageComposer, which this route has never used. With
-// the reveal left on, the archive renders at the right size with every card in the
-// DOM and paints nothing at all: a blank page on every phone and tablet. This page
-// also has no scroll-in to animate; the archive is simply what the page is.
+// This route does not use PageComposer, so nothing mounts PageMotion for it -- and
+// `.reveal` is `opacity: 0` until PageMotion's observer adds `.is-visible`. That
+// makes the reveal decisions below load-bearing rather than stylistic: get one
+// wrong and the element renders at full size, in the DOM, painting nothing.
+// The archive opts OUT (it is the page's own above-the-fold content, not something
+// you scroll into); the contact band cannot opt out, so PageMotion mounts here for
+// it.
 function ShowroomArchive() {
   return (
-    <SectionShell reveal={false} className="cw-showroom-archive">
-      <p className="eyebrow">Selected work</p>
-      <h1 className="svc-hero__title">
-        <span className="text-gradient">Project Showroom</span>
-      </h1>
-      {/* Only a phone or a tablet ever reads this, so the last line can point at
-          the desktop without ever showing up on the machine it points to. */}
-      <p className="svc-lede measure-prose">
-        Real client sites I designed and developed, each one fast, findable, and
-        owned outright by the business it serves. Switch any card between desktop,
-        tablet, and mobile, or open it live. View this page on desktop for the full
-        experience.
-      </p>
+    <>
+      {/* Inside the archive branch, so it ships only to the devices that render
+          the archive -- the desktop showroom has nothing to reveal. */}
+      <PageMotion />
+      <SectionShell reveal={false} className="cw-showroom-archive">
+        <p className="eyebrow">Selected work</p>
+        <h1 className="svc-hero__title">
+          <span className="text-gradient">Project Showroom</span>
+        </h1>
+        {/* Only a phone or a tablet ever reads this, so the last line can point
+            at the desktop without ever showing up on the machine it points to. */}
+        <p className="svc-lede measure-prose">
+          Real client sites I designed and developed, each one fast, findable, and
+          owned outright by the business it serves. Switch any card between
+          desktop, tablet, and mobile, or open it live. View this page on desktop
+          for the full experience.
+        </p>
       {/* h2, not the default h3: the only heading above these is the page h1, so
           h3 would skip a level. /portfolio/ and the homepage keep h3 -- there the
           grid sits under their own h2. */}
-      <ArchiveGrid items={SHOWROOM_ITEMS} headingLevel="h2" />
-    </SectionShell>
+        <ArchiveGrid items={SHOWROOM_ITEMS} headingLevel="h2" />
+      </SectionShell>
+      {/* The same contact band every other page closes on. Inside the archive
+          branch, so the desktop showroom (which owns the whole viewport) never
+          gets it. */}
+      <MainContactCapsule />
+    </>
   );
 }
 

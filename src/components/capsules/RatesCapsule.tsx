@@ -37,7 +37,7 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
           <p className="cw-price-card__note">
             I have always worked and delivered at a blistering pace, and with the
             onset of AI tools, charging by the hour is no longer an appropriate
-            metric. 10 minute minimum invoices.
+            metric.
           </p>
         </div>
         <div className="cw-price-card panel">

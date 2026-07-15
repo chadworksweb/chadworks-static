@@ -106,9 +106,8 @@ export default function RatesPage() {
               Explanation of the minutely rate
             </h2>
             <p className="svc-faq__lead">
-              Invoices are a 10 minute minimum because a request is not just the
-              end result. To fulfill a client request, the process usually
-              includes:
+              A request is not just the end result. To fulfill a client request,
+              the process usually includes:
             </p>
             <ol className="cw-rate-explainer__steps">
               <li>Discover the task</li>
