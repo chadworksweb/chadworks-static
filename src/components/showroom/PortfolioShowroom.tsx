@@ -166,6 +166,21 @@ export function PortfolioShowroom() {
     return () => window.clearTimeout(t);
   }, [immersive, chromeUp]);
 
+  // The CTA is the MIRROR of that: it belongs to the exit state, so it has to outlive
+  // the ENTRY long enough to leave as the room arrives, and come back as the room
+  // goes. It waits for the gem to finish compiling before it ever shows -- inviting a
+  // click at a half-assembled gem would cut its own entrance short.
+  const [ctaUp, setCtaUp] = useState(false);
+  useEffect(() => {
+    if (!immersive) {
+      if (gemAssembled) setCtaUp(true);
+      return;
+    }
+    if (!ctaUp) return;
+    const t = window.setTimeout(() => setCtaUp(false), CHROME_OUT_MS);
+    return () => window.clearTimeout(t);
+  }, [immersive, ctaUp, gemAssembled]);
+
   const goTo = (i: number) => setCommand((c) => ({ index: i, nonce: c.nonce + 1 }));
 
   // Fade the focus modal back out through the gem, then unmount.
@@ -327,8 +342,12 @@ export function PortfolioShowroom() {
           {/* Entry: click the gem to enter (and trigger the cold open). Held back
               until the gem has finished compiling out of its shards -- inviting a
               click at a half-assembled gem would cut its own entrance short. */}
-          {!entered && gemAssembled && (
-            <button type="button" className={styles.enter} onClick={enter}>
+          {ctaUp && (
+            <button
+              type="button"
+              className={`${styles.enter} ${immersive ? styles.enterOut : ""}`}
+              onClick={enter}
+            >
               <span className={styles.enterText}>Enter the showroom</span>
             </button>
           )}

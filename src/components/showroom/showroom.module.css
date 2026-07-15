@@ -821,6 +821,11 @@
   initial-value: rgba(36, 57, 137, 0.72);
 }
 .enter {
+  /* In the cascade with everything else, on the gem's clock. It belongs to the EXIT
+     state (like the neon), so it reads inverted: it leaves as the room arrives and
+     comes back as the room goes. NOTE the keyframes must carry the -50%/-50%
+     centring below, or animating transform throws it off centre. */
+  animation: cw-cta-in var(--stage-ms) var(--stage-ease) both;
   position: absolute;
   left: 50%;
   top: calc(50% + min(22vh, 200px));
@@ -837,6 +842,19 @@
   text-transform: uppercase;
   color: #eae4fb;
   transition: color 0.4s ease;
+}
+
+/* Leaves as the room arrives; returns as it goes. Same clock, same curve. */
+.enterOut {
+  animation: cw-cta-out var(--stage-ms) var(--stage-ease) both;
+}
+@keyframes cw-cta-in {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 14px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes cw-cta-out {
+  from { opacity: 1; transform: translate(-50%, -50%); }
+  to { opacity: 0; transform: translate(-50%, calc(-50% + 14px)); }
 }
 /* Dark-blue brand ellipse behind the label so it reads over the busy grid. */
 .enter::before {
@@ -920,6 +938,7 @@
   .frame { animation: none; }
   .stageFrame { animation: none; }
   .escBtn { animation: none; }
+  .enter { animation: none; }
   .featureTitle { animation: none; }
   .rail { transition: none; }
   .railItem { transition: none; }
