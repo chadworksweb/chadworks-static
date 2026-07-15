@@ -23,15 +23,23 @@
      so the rail's bottom gap equals its top gap and the box is contained by the
      stage height instead of running off it. */
   --stage-inset: clamp(0.9rem, 2.4vh, 1.6rem);
+  /* One token for the rail width: the canvas and the finish line both have to
+     know where the rail ends, so it cannot be a magic number in three places. */
+  --rail-w: min(19rem, 22vw);
+  /* The gutter between the viewport edge and the content column. The band
+     bleeds, so `100%` here is the viewport. */
+  --gutter: calc((100% - var(--site-width)) / 2);
 
   position: relative;
   width: 100%;
-  /* --fold = 100dvh - nav-height: the stage fills the first screen exactly,
-     without the negative nav pull a full-bleed breakout needs. */
-  height: var(--fold);
+  /* The BACKGROUND bleeds edge to edge; the CONTENT re-anchors to site width
+     via .inner. Same contract every full-width band on the site uses: pad
+     inside the max-width box, never let content ride the bleed.
+     Header offset is the showroom's: pull the band up UNDER the sticky nav so
+     the wash runs behind it, then hold the height at a full viewport. */
+  height: 100dvh;
+  margin-top: calc(-1 * var(--nav-height));
   overflow: hidden;
-  border: 1px solid rgba(36, 57, 137, 0.14);
-  border-radius: 6px;
   color: #243989; /* --dark-bg */
   background:
     radial-gradient(88% 68% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 62%),
@@ -40,10 +48,39 @@
   font-size: 16px;
 }
 
+/* The object centres in the FREE AREA, not in the band. Two corrections:
+   - Vertically: the wash runs behind the nav, but the nav still covers the top
+     --nav-height, so a canvas at inset:0 centres the shape half a nav-height
+     too high. Insetting the top puts it on the true optical middle.
+   - Horizontally: the rail occupies the left of the content column, so a
+     full-width canvas centres the shape under the rail. Starting the canvas at
+     the rail's right edge centres it in the space actually left over.
+   The canvas is transparent, so bounding it moves the SHAPE without touching
+   the background bleed. */
 .canvasLayer {
   position: absolute;
-  inset: 0;
+  top: var(--nav-height);
+  bottom: 0;
+  left: calc(var(--gutter) + var(--stage-inset) + var(--rail-w));
+  right: var(--gutter);
   z-index: 0;
+}
+
+/* The content rail: bleeds nothing, re-anchored to the global site width and
+   centred, matching every other band on the site. */
+.inner {
+  position: absolute;
+  inset: var(--nav-height) 0 0 0;
+  width: var(--site-width);
+  margin-inline: auto;
+  z-index: 2;
+  /* The band is a stage, not a form: let clicks through to it and re-arm only
+     the controls that need them. */
+  pointer-events: none;
+}
+
+.inner > * {
+  pointer-events: auto;
 }
 
 .canvasLayer :global(.cw-pkgscreen),
@@ -96,7 +133,7 @@
   top: var(--stage-inset);
   left: var(--stage-inset);
   bottom: var(--stage-inset);
-  width: min(19rem, 34%);
+  width: var(--rail-w);
   padding: 0.5rem;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -159,8 +196,13 @@
   background: rgba(128, 84, 188, 0.07);
 }
 
+/* Not `composes: micro` -- the header label is deliberately a step up from the
+   rest of the micro-type, because it is the thing you scan. */
 .headLabel {
-  composes: micro;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   opacity: 0.62;
   flex: 1;
 }
@@ -186,10 +228,48 @@
   flex: none;
 }
 
+/* Sleek open/close. `grid-template-rows: 0fr -> 1fr` animates to the content's
+   OWN height, which max-height guessing never does: no magic number, no clip at
+   tall panels, no dead easing on short ones. Needs the body always mounted, so
+   the panel toggles a class instead of unmounting. */
 .body {
   display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.22s ease;
+}
+
+.bodyOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* The row that actually collapses. Overflow hidden is what makes 0fr read as
+   closed rather than as squashed content. */
+.bodyInner {
+  overflow: hidden;
+  display: grid;
   gap: 0.55rem;
-  padding: 0.1rem 0.4rem 0.75rem;
+  padding: 0 0.4rem;
+}
+
+.bodyOpen .bodyInner {
+  padding-bottom: 0.75rem;
+  transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.caret {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .bodyInner,
+  .caret {
+    transition: none;
+  }
 }
 
 .hint {
@@ -258,7 +338,7 @@
   z-index: 4;
   bottom: var(--stage-inset);
   /* The rail owns the left edge; centre within what is left of the stage. */
-  left: calc(var(--stage-inset) + min(19rem, 34%));
+  left: calc(var(--stage-inset) + var(--rail-w));
   right: var(--stage-inset);
   display: flex;
   justify-content: center;

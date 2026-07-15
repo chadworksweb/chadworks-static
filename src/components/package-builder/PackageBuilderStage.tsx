@@ -42,102 +42,115 @@ function valueLabel(p: Param, v: number): string {
 
 export function PackageBuilderStage() {
   const [scope, setScope] = useState<Scope>(FLOOR);
-  // Accordion: one panel at a time. The open panel is the layer you are on.
-  const [open, setOpen] = useState<keyof Scope | null>("pages");
+  // Not an accordion: any number of panels can be open, so two layers can be
+  // compared without one closing the other.
+  const [open, setOpen] = useState<ReadonlySet<keyof Scope>>(new Set(["pages"]));
 
   const set = (k: keyof Scope, v: number) => setScope((prev) => ({ ...prev, [k]: v }));
+
+  const toggle = (k: keyof Scope) =>
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(k)) next.add(k);
+      return next;
+    });
 
   const ch = useMemo(() => channels(scope), [scope]);
   const total = price(scope);
   const dirty = JSON.stringify(scope) !== JSON.stringify(FLOOR);
 
   return (
-    <div className={s.wrap}>
+    // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
+    // content back on the site width.
+    <div className={`full ${s.wrap}`}>
       {/* the object */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />
       </div>
 
-      {/* the number */}
-      <div className={s.readout}>
-        <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
-        <p className={s.figure}>{money(total)}</p>
-      </div>
+      <div className={s.inner}>
+        {/* the number */}
+        <div className={s.readout}>
+          <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
+          <p className={s.figure}>{money(total)}</p>
+        </div>
 
-      {/* the scope */}
-      <div className={s.rail}>
-        {PARAMS.map((p) => {
-          const v = scope[p.key];
-          const isOpen = open === p.key;
-          const panelId = `pkg-panel-${p.key}`;
-          return (
-            <div key={p.key} className={`${s.param}${isOpen ? ` ${s.paramOpen}` : ""}`}>
-              <button
-                type="button"
-                className={s.head}
-                aria-expanded={isOpen}
-                aria-controls={panelId}
-                onClick={() => setOpen(isOpen ? null : p.key)}
-              >
-                <span className={s.headLabel}>{p.label}</span>
-                <span className={s.headValue}>{valueLabel(p, v)}</span>
-                <span className={s.caret} aria-hidden="true">
-                  {isOpen ? "-" : "+"}
-                </span>
-              </button>
+        {/* the scope */}
+        <div className={s.rail}>
+          {PARAMS.map((p) => {
+            const v = scope[p.key];
+            const isOpen = open.has(p.key);
+            const panelId = `pkg-panel-${p.key}`;
+            return (
+              <div key={p.key} className={`${s.param}${isOpen ? ` ${s.paramOpen}` : ""}`}>
+                <button
+                  type="button"
+                  className={s.head}
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => toggle(p.key)}
+                >
+                  <span className={s.headLabel}>{p.label}</span>
+                  <span className={s.headValue}>{valueLabel(p, v)}</span>
+                  <span className={s.caret} aria-hidden="true">
+                    {isOpen ? "-" : "+"}
+                  </span>
+                </button>
 
-              {isOpen ? (
-                <div className={s.body} id={panelId}>
-                  <p className={s.hint}>{p.hint}</p>
+                {/* Always mounted so it can animate open and shut. */}
+                <div className={`${s.body}${isOpen ? ` ${s.bodyOpen}` : ""}`} id={panelId}>
+                  <div className={s.bodyInner} inert={!isOpen ? true : undefined}>
+                    <p className={s.hint}>{p.hint}</p>
 
-                  {AS_COUNT.has(p.key) ? (
-                    <div className={s.count}>
-                      <input
-                        className={s.range}
-                        type="range"
-                        min={p.min}
-                        max={p.max}
-                        step={1}
-                        value={v}
-                        aria-label={p.label}
-                        onChange={(e) => set(p.key, Number(e.target.value))}
-                      />
-                      <span className={s.countValue}>{v}</span>
-                    </div>
-                  ) : (
-                    <div className={s.chips} role="group" aria-label={p.label}>
-                      {p.options?.map((opt, i) => (
-                        <button
-                          key={opt}
-                          type="button"
-                          className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
-                          aria-pressed={i === v}
-                          aria-label={`${p.label}: ${opt}`}
-                          title={opt}
-                          onClick={() => set(p.key, i)}
-                        >
-                          {i + 1}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                    {AS_COUNT.has(p.key) ? (
+                      <div className={s.count}>
+                        <input
+                          className={s.range}
+                          type="range"
+                          min={p.min}
+                          max={p.max}
+                          step={1}
+                          value={v}
+                          aria-label={p.label}
+                          onChange={(e) => set(p.key, Number(e.target.value))}
+                        />
+                        <span className={s.countValue}>{v}</span>
+                      </div>
+                    ) : (
+                      <div className={s.chips} role="group" aria-label={p.label}>
+                        {p.options?.map((opt, i) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
+                            aria-pressed={i === v}
+                            aria-label={`${p.label}: ${opt}`}
+                            title={opt}
+                            onClick={() => set(p.key, i)}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
+              </div>
+            );
+          })}
+        </div>
 
-      {/* the finish line */}
-      <div className={s.finish}>
-        <a className={s.finishLink} href="/contact/">
-          Send this scope to Chad
-        </a>
-        {dirty ? (
-          <button type="button" className={s.reset} onClick={() => setScope(FLOOR)}>
-            Reset
-          </button>
-        ) : null}
+        {/* the finish line */}
+        <div className={s.finish}>
+          <a className={s.finishLink} href="/contact/">
+            Send this scope to Chad
+          </a>
+          {dirty ? (
+            <button type="button" className={s.reset} onClick={() => setScope(FLOOR)}>
+              Reset
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
   );
