@@ -178,7 +178,7 @@ export function PackageScreen({
     };
 
     const reduce = prefersReducedMotion();
-    let raf = 0, running = false, t0 = 0, prevTs = 0, rotY = 0;
+    let raf = 0, running = false, t0 = 0, prevTs = 0;
     let curStrata = target.current.strata; // eased so layers fade in, not pop
 
     // Cursor lean: the object turns toward the pointer while it is over the
@@ -223,7 +223,6 @@ export function PackageScreen({
         rebuild(cur.depth, cur.bevel);
       }
 
-      rotY += cur.spin * dt;
       leanX = ease(leanX, tgtX, Math.min(1, dt * 4));
       leanY = ease(leanY, tgtY, Math.min(1, dt * 4));
 
@@ -237,9 +236,14 @@ export function PackageScreen({
 
       const proj = Mat.persp((SCREEN.fov * Math.PI) / 180, w / Math.max(1, h), 0.1, 100);
       const view = Mat.trans(0, 0, SCREEN.camZ);
-      const bob = Math.sin(time * 0.6) * 0.02; // the float
-      const spinY = rotY + leanX * 0.42;
-      const tiltX = SCREEN.restTiltX + leanY * 0.22 + bob;
+      // FLOAT ONLY, no spin: the object holds its staged angle and breathes.
+      // `motion` (cur.spin) now drives how much it floats rather than how fast
+      // it turns, so the channel still reads on the object.
+      const amp = 0.018 + cur.spin * 0.055;
+      const bobY = Math.sin(time * 0.6) * amp;
+      const bobRot = Math.sin(time * 0.43 + 1.1) * amp * 0.5;
+      const spinY = SCREEN.restRotY + bobRot + leanX * 0.42;
+      const tiltX = SCREEN.restTiltX + leanY * 0.22 + bobY;
       const orient = Mat.mul(Mat.rotY(spinY), Mat.rotX(tiltX));
 
       gl.uniformMatrix4fv(us.proj, false, proj);

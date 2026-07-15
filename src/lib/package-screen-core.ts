@@ -334,6 +334,11 @@ export const SCREEN = {
   bevel: 0.035,
   camZ: -4.6,
   fov: 34,
-  restTiltX: -0.16, // the float: a slight lean so the bevel catches light
+  // The object is STAGED, not spun: it holds a light three-quarter angle so the
+  // bevel and the thickness both read, and only floats. Chad's call, and it is
+  // also what the salt-crystal reference does -- the object is presented, and
+  // the cursor is what moves it.
+  restRotY: -0.42,
+  restTiltX: -0.19,
   maxStrata: 8,
 };

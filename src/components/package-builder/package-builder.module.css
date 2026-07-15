@@ -17,9 +17,18 @@
    Container contract mirrors the showroom: ~100dvh, pulled up under the nav. */
 
 .wrap {
+  /* ONE inset for the whole stage. Everything floating over the object uses it,
+     so the rail's bottom gap equals its top gap and the box is contained by the
+     stage height instead of running off it. */
+  --stage-inset: clamp(1rem, 4vh, 2.6rem);
+  --stage-side: clamp(1.4rem, 4vw, 3.2rem);
+
   position: relative;
   width: 100%;
-  min-height: 100dvh;
+  /* The stage is pulled UP under the nav, so it has to be taller than the
+     viewport by exactly that much to still reach the bottom of it. A plain
+     100dvh here ends one nav-height short and leaves a dead strip. */
+  height: calc(100dvh + var(--nav-height));
   margin-top: calc(-1 * var(--nav-height));
   overflow: hidden;
   color: #243989; /* --dark-bg */
@@ -57,8 +66,8 @@
 .readout {
   position: absolute;
   z-index: 2;
-  top: calc(var(--nav-height) + clamp(1rem, 4vh, 2.6rem));
-  right: clamp(1.4rem, 4vw, 3.2rem);
+  top: calc(var(--nav-height) + var(--stage-inset));
+  right: var(--stage-side);
   text-align: right;
   pointer-events: none;
 }
@@ -83,7 +92,7 @@
 .info {
   position: absolute;
   z-index: 2;
-  right: clamp(1.4rem, 4vw, 3.2rem);
+  right: var(--stage-side);
   top: 50%;
   transform: translateY(-50%);
   width: min(19rem, 26vw);
@@ -116,9 +125,11 @@
 .rail {
   position: absolute;
   z-index: 3;
-  top: calc(var(--nav-height) + clamp(1rem, 4vh, 2.6rem));
-  left: clamp(1.4rem, 4vw, 3.2rem);
-  bottom: clamp(4.5rem, 9vh, 6rem);
+  /* Contained by the stage: nav + inset at the top, the SAME inset at the
+     bottom. The box scrolls internally; it never runs past the stage. */
+  top: calc(var(--nav-height) + var(--stage-inset));
+  left: var(--stage-side);
+  bottom: var(--stage-inset);
   width: min(21rem, 28vw);
   padding: clamp(0.9rem, 2vh, 1.3rem) clamp(1rem, 1.6vw, 1.3rem);
   overflow-y: auto;
@@ -226,10 +237,10 @@
 .finish {
   position: absolute;
   z-index: 4;
-  bottom: clamp(1.4rem, 4vh, 2.6rem);
+  bottom: var(--stage-inset);
   /* The rail owns the left edge; center within what is left of the stage. */
-  left: min(23rem, 31vw);
-  right: 0;
+  left: calc(var(--stage-side) + min(21rem, 28vw));
+  right: var(--stage-side);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -267,6 +278,7 @@
 /* ---- narrow: stack it. The object keeps the top, the rail becomes a sheet. */
 @media (max-width: 900px) {
   .wrap {
+    height: auto;
     min-height: auto;
     margin-top: 0;
     padding-bottom: 2.5rem;
