@@ -405,11 +405,15 @@ const SELF_RATE = 0.6;
 export function CrystalGem({
   immersive = false,
   show = true,
+  focused = false,
 }: {
   immersive?: boolean;
   /** Held false until the wall is up: the gem refracts the wall, so appearing
    *  before it exists would show an untextured silhouette. */
   show?: boolean;
+  /** A project is open over the stage. The overlay only dims and blurs, so the
+   *  mark is still there to be seen -- and to be seen moving. */
+  focused?: boolean;
 }) {
   const { gl, scene, camera, size } = useThree();
   const meshRef = useRef<THREE.Mesh>(null);
@@ -775,7 +779,13 @@ export function CrystalGem({
       // 0, the spin below starts from rest.
       rotY.current = 0;
       rotX.current = 0;
-    } else if (!paused.current && immersive) {
+    } else if (paused.current || focused) {
+      // At rest. FOCUSED: a project is open over the stage, which only dims and blurs
+      // it -- the mark is still legible behind that, so its dance reads as motion
+      // under the overlay. Worse, the angles would keep accumulating out of sight and
+      // hand back a drifted mark on close. Every angle holds where it stands, so the
+      // gem is exactly where you left it, and starts from rest when the stage returns.
+    } else if (immersive) {
       // Inside the showroom the gem does not respond to the cursor; the binary
       // dance (orbit + self-spin, in the shader) is the only motion. Hold upright.
       orbit.current += ORBIT_RATE * dt;
@@ -783,7 +793,7 @@ export function CrystalGem({
       const k = Math.min(1, dt * 6);
       rotY.current += (0 - rotY.current) * k;
       rotX.current += (0 - rotX.current) * k;
-    } else if (!paused.current) {
+    } else {
       // Exited / CTA state: the homepage gem's slow Y-spin. No cursor interaction --
       // it just runs.
       rotY.current += LOCKED.spin * dt * 0.9;
