@@ -4,9 +4,11 @@
 //   1. price(scope)  -> the number
 //   2. channels(scope) -> the screen augmentation each scope layer drives
 // Kept pure so the pricing can be tuned (and eventually tested) without
-// touching the renderer. SPIKE: every number in TUNING is a placeholder
-// posture, not locked economics. The only locked figures are the $3,200
-// floor and the ~$6,200 typical (see lib/services/web-design-packages).
+// touching the renderer.
+//
+// NUMBERS: this model owns its own. Nothing in TUNING is inherited from, or
+// answerable to, the figures quoted on any other page. Do not "reconcile" it
+// against them. Chad tunes these here; every value is open.
 // =====================================================================
 
 // ---------------------------------------------------------------------
