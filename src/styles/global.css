@@ -6256,6 +6256,39 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .cw-port-card__label a { color: inherit; text-decoration: none; }
 .cw-port-card__label a:hover { color: var(--accent); }
+
+/* ---- /showroom/'s archive only ----
+   The card styles above are SHARED: the homepage runs 12 of these cards and
+   /portfolio/ runs 19. Everything here is therefore scoped under
+   .cw-showroom-archive and must stay that way -- unscoped, each of these lands on
+   both of those pages.
+   On /showroom/ the archive is not a section of a page, it IS the page (the
+   showroom itself is desktop-only), so it carries a centered, larger treatment the
+   in-page grids do not want. */
+.cw-showroom-archive .svc-lede {
+  text-align: center;
+  /* .measure-prose caps the lede's width; centering the TEXT inside a box still
+     pinned to the left just moves the ragged edge. Center the box too. */
+  margin-inline: auto;
+}
+.cw-showroom-archive .cw-port-card__label {
+  font-size: var(--text-xl);
+}
+/* The row holds the title AND its visit arrow, so centering belongs here -- on the
+   label alone the pair would still sit left with the text centered inside it. */
+.cw-showroom-archive .cw-port-card__labelrow {
+  justify-content: center;
+}
+.cw-showroom-archive .cw-port-card__blurb {
+  text-align: center;
+}
+/* Space between the mockup card and the project title. On __meta (the whole text
+   block below the card) rather than the title, so the card's own gap rhythm
+   between title, blurb and cta is left alone. */
+.cw-showroom-archive .cw-port-card__meta {
+  margin-top: var(--space-sm);
+}
+
 /* Title + a "visit live site" arrow sitting just to the right of the title. */
 .cw-port-card__labelrow { display: flex; align-items: center; gap: 0.7rem; }
 .cw-port-card__visit {

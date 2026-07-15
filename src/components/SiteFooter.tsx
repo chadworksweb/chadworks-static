@@ -54,7 +54,7 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
     links: [
       { href: "/about/", label: "About" },
       { href: "/rates/", label: "Rates" },
-      { href: "/portfolio/", label: "Portfolio" },
+      { href: "/showroom/", label: "Showroom" },
       { href: "/faqs/", label: "FAQs" },
       { href: "/contact/", label: "Contact" },
     ],

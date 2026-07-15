@@ -15,7 +15,7 @@ import { Reel } from "./Reel";
 import { TileWall } from "./TileWall";
 import { CrystalGem } from "./CrystalGem";
 import { SHOWROOM_ITEMS, type ShowroomItem } from "./showroom-data";
-import { useShowroomMode } from "./useShowroomMode";
+import type { ShowroomMode } from "./useShowroomMode";
 import {
   intro,
   startIntro,
@@ -189,9 +189,12 @@ function StageShift() {
   return null;
 }
 
-export function PortfolioShowroom() {
+// Desktop-class only: ShowroomRoute owns the mode decision and mounts this lazily,
+// so by the time we are here the mode is settled and is never "static". Taking it as
+// a prop rather than reading the hook again is what lets the route keep three.js off
+// the wire for the devices that never render this at all.
+export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "static"> }) {
   const items = SHOWROOM_ITEMS;
-  const { mode } = useShowroomMode();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [interacted, setInteracted] = useState(false);
@@ -523,14 +526,10 @@ export function PortfolioShowroom() {
 
       {mode === "lite" && <LiteGallery items={items} onSelect={setSelected} />}
 
-      {/* Crawlable fallback: shown pre-hydration and with no JS. */}
-      <ul className={styles.seo} data-shown={mode === null}>
-        {items.map((it) => (
-          <li key={it.key}>
-            <a href={it.href}>{it.label}</a> - {it.blurb}
-          </li>
-        ))}
-      </ul>
+      {/* The crawlable list that used to sit here is gone: the route now renders the
+          real portfolio archive on the server for exactly the cases it covered (no
+          JS, pre-decision, phone, tablet), and this component no longer mounts in
+          any of them. */}
 
       {sel && <SelectedFrame item={sel} closing={closing} onClose={requestClose} />}
 

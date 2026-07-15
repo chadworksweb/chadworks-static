@@ -147,7 +147,7 @@ export const wordpress: Service = {
       {
         label: "Live client sites",
         detail: "I run WordPress builds for trade businesses, firms, and shops right now, hosted and maintained under the same roof.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
       {
         label: "The maintenance plan",

@@ -111,10 +111,10 @@ export const godaddyToStatic: Service = {
         href: "/custom-coded-static/",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail:
           "Real, live custom builds you can click through, none of them assembled from a template anyone else can rent.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

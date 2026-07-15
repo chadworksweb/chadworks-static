@@ -8,7 +8,7 @@ import { isLaunched } from "@/lib/launch";
 const LINKS = [
   { href: "/websites/", label: "Websites" },
   { href: "/visibility/", label: "Visibility" },
-  { href: "/portfolio/", label: "Portfolio" },
+  { href: "/showroom/", label: "Showroom" },
   { href: "/about/", label: "About" },
   { href: "/rates/", label: "Rates" },
   { href: "/contact/", label: "Contact" },

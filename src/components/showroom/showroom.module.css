@@ -249,27 +249,25 @@
   opacity: 0;
 }
 
-/* ---- SEO / crawlable fallback ----
-   Kept in the DOM for crawlers, but ALWAYS visually hidden (sr-only). On SSR/first
-   paint the mode is undecided; showing this list was flashing a text list of projects
-   before the WebGL stage mounted. Hiding it means the dark stage paints immediately and
-   the gem fades straight in -- no text flash. */
-.seo {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-  list-style: none;
-}
-.seo a {
-  color: #cbb4f5;
-  font-weight: 600;
+/* ---- The archive: what the server ships, and what non-desktop keeps ----
+   A phone or a tablet never leaves this, so it is real page content, not a fallback
+   -- no sr-only, no hiding.
+   On a desktop-class device the showroom replaces it, but that decision is made in
+   JS, which cannot run until after first paint and then still has to fetch the
+   showroom's chunk. Left to JS alone, the whole archive grid paints and is yanked
+   away -- a far louder version of the text flash this page has always guarded
+   against.
+   So the CSS answers first. This query is the SAME question useShowroomMode asks
+   (see the gate there); asked here, it is answered at first paint: if this device is
+   going to get the showroom, never paint the archive at all. The two conditions must
+   stay in step -- if you move the gate, move this with it.
+   It stays in the DOM either way, so crawlers still read it. Google indexes
+   mobile-first, at a coarse-pointer viewport, where this query does not match and
+   the archive is plainly visible. */
+@media (min-width: 901px) and (pointer: fine) and (hover: hover) {
+  .archive {
+    display: none;
+  }
 }
 
 /* ---- Selected state: full-bleed takeover, inset stylized frame ---- */

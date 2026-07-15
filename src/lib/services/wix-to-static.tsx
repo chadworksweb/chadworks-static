@@ -111,10 +111,10 @@ export const wixToStatic: Service = {
         href: "/custom-coded-static/",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail:
           "Real, live custom builds you can click through, every one of them owned outright by the business it was made for.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

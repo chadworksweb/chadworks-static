@@ -112,10 +112,10 @@ export const squarespaceToStatic: Service = {
         href: "/custom-coded-static/",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail:
           "Real, live custom builds you can click through, none of them started from a template anyone else can buy.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

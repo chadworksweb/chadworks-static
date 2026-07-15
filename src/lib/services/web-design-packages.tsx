@@ -146,9 +146,9 @@ export const webDesignPackages: Service = {
     heading: "Proof, not promises",
     items: [
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail: "Scoped builds that shipped: walk through the live work and judge the craft yourself.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
       {
         label: "The rates page",
