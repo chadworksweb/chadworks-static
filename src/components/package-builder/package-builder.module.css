@@ -1,36 +1,37 @@
-/* PACKAGE BUILDER -- the self-contained, full-screen scope stage.
+/* PACKAGE BUILDER -- the scope stage.
    Layout reference: Robin Payot's Issey Miyake "Le sel d'Issey" salt-crystal
    builder (Screenshot_5). That LAYOUT, not its palette:
      - the object dead center and large, everything else floating over it
-     - a right rail of compact UPPERCASE micro-type: numbered chips, not sliders
-       with paragraphs under them
-     - a left card that explains ONLY the layer you are currently touching
+     - a rail of compact UPPERCASE micro-type
      - one understated finish line, bottom center
-   The rail stays terse because the left card carries the meaning. That is the
-   trick that keeps thirteen parameters from reading as a tax form.
+   Each parameter is an expand panel carrying its own description, so the rail
+   stays terse at thirteen of them and the open panel IS the active layer.
 
    PALETTE IS INVERTED from the reference: the salt builder is near-black, and
    chadworks is not. The stage is the site's lavender surface with a white
-   center bloom, and the OBJECT carries the dark (indigo -> brand -> lilac), so
+   centre bloom, and the OBJECT carries the dark (indigo -> brand -> lilac), so
    the thing you are building is the darkest mass on the page.
 
-   Container contract mirrors the showroom: ~100dvh, pulled up under the nav. */
+   WIDTH: contained to the global content column, NOT full-bleed. The wrap is a
+   plain grid child, so it inherits `grid-column: content` (--site-width) from
+   the page shell. Nothing inside it shrinks; only the box is bounded. Height is
+   --fold, the token the design system defines for exactly this (a full-height
+   cinematic stage sitting under the nav). */
 
 .wrap {
   /* ONE inset for the whole stage. Everything floating over the object uses it,
      so the rail's bottom gap equals its top gap and the box is contained by the
      stage height instead of running off it. */
-  --stage-inset: clamp(1rem, 4vh, 2.6rem);
-  --stage-side: clamp(1.4rem, 4vw, 3.2rem);
+  --stage-inset: clamp(0.9rem, 2.4vh, 1.6rem);
 
   position: relative;
   width: 100%;
-  /* The stage is pulled UP under the nav, so it has to be taller than the
-     viewport by exactly that much to still reach the bottom of it. A plain
-     100dvh here ends one nav-height short and leaves a dead strip. */
-  height: calc(100dvh + var(--nav-height));
-  margin-top: calc(-1 * var(--nav-height));
+  /* --fold = 100dvh - nav-height: the stage fills the first screen exactly,
+     without the negative nav pull a full-bleed breakout needs. */
+  height: var(--fold);
   overflow: hidden;
+  border: 1px solid rgba(36, 57, 137, 0.14);
+  border-radius: 6px;
   color: #243989; /* --dark-bg */
   background:
     radial-gradient(88% 68% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 62%),
@@ -61,13 +62,12 @@
 }
 
 /* ---- the number (top right) ---- */
-/* Left is the scope you set; right is what it costs you. Cause on one side,
-   consequence on the other. */
+/* Left is the scope you set; right is what it costs you. */
 .readout {
   position: absolute;
   z-index: 2;
-  top: calc(var(--nav-height) + var(--stage-inset));
-  right: var(--stage-side);
+  top: var(--stage-inset);
+  right: var(--stage-inset);
   text-align: right;
   pointer-events: none;
 }
@@ -79,7 +79,7 @@
 }
 
 .figure {
-  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+  font-size: clamp(2rem, 3.6vw, 3rem);
   font-weight: 300;
   line-height: 0.95;
   letter-spacing: -0.02em;
@@ -87,59 +87,25 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* ---- the card: the ACTIVE layer, and nothing else. Sits under the number,
-   on the consequence side, because it explains what you just moved. ---- */
-.info {
-  position: absolute;
-  z-index: 2;
-  right: var(--stage-side);
-  top: 50%;
-  transform: translateY(-50%);
-  width: min(19rem, 26vw);
-  padding: 1rem 1.1rem;
-  background: rgba(255, 255, 255, 0.66);
-  border: 1px solid rgba(36, 57, 137, 0.16);
-  backdrop-filter: blur(6px);
-}
-
-.infoTitle {
-  composes: micro;
-  margin: 0 0 0.55rem;
-}
-
-.infoBody {
-  font-size: 0.78rem;
-  line-height: 1.55;
-  opacity: 0.72;
-  margin: 0;
-}
-
-.infoValue {
-  composes: micro;
-  display: block;
-  margin-top: 0.7rem;
-  color: #8054bc; /* --accent */
-}
-
-/* ---- the left rail: terse by design, and its own scroll box ---- */
+/* ---- the rail: its own scroll box ---- */
 .rail {
   position: absolute;
   z-index: 3;
-  /* Contained by the stage: nav + inset at the top, the SAME inset at the
-     bottom. The box scrolls internally; it never runs past the stage. */
-  top: calc(var(--nav-height) + var(--stage-inset));
-  left: var(--stage-side);
+  /* Contained by the stage: the SAME inset top and bottom. The box scrolls
+     internally; it never runs past the stage. */
+  top: var(--stage-inset);
+  left: var(--stage-inset);
   bottom: var(--stage-inset);
-  width: min(21rem, 28vw);
-  padding: clamp(0.9rem, 2vh, 1.3rem) clamp(1rem, 1.6vw, 1.3rem);
+  width: min(19rem, 34%);
+  padding: 0.5rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   display: grid;
-  gap: 1.05rem;
+  gap: 0.3rem;
   align-content: start;
-  /* A real box: the scope is a panel you scroll, not copy bleeding off-stage. */
   background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(36, 57, 137, 0.16);
+  border: 1px solid rgba(36, 57, 137, 0.14);
+  border-radius: 4px;
   backdrop-filter: blur(6px);
   /* Firefox */
   scrollbar-width: thin;
@@ -165,20 +131,72 @@
   background: #8054bc;
 }
 
+/* ---- expand panels: one parameter each ---- */
 .param {
-  display: grid;
-  gap: 0.4rem;
+  border-bottom: 1px solid rgba(36, 57, 137, 0.1);
 }
 
-.paramLabel {
+.param:last-child {
+  border-bottom: none;
+}
+
+.head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.4rem;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.head:hover {
+  background: rgba(128, 84, 188, 0.07);
+}
+
+.headLabel {
   composes: micro;
-  opacity: 0.6;
-  margin: 0;
-  cursor: default;
+  opacity: 0.62;
+  flex: 1;
 }
 
-.paramOn .paramLabel {
+.paramOpen .headLabel {
   opacity: 1;
+}
+
+.headValue {
+  composes: micro;
+  color: #8054bc;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+/* The caret: a plain +/- rather than an icon dep. */
+.caret {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  opacity: 0.45;
+  width: 0.7rem;
+  text-align: center;
+  flex: none;
+}
+
+.body {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.1rem 0.4rem 0.75rem;
+}
+
+.hint {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.66;
+  margin: 0;
 }
 
 /* numbered chips -- the reference's "CHOOSE A CYMATICS 1 2 3 4 5" */
@@ -224,23 +242,24 @@
   accent-color: #8054bc;
   cursor: pointer;
   height: 1rem;
+  min-width: 0;
 }
 
 .countValue {
   composes: micro;
-  min-width: 2.2rem;
+  min-width: 2rem;
   text-align: right;
   color: #8054bc;
 }
 
-/* ---- bottom center: the reference's "Finish your piece" ---- */
+/* ---- bottom: the reference's "Finish your piece" ---- */
 .finish {
   position: absolute;
   z-index: 4;
   bottom: var(--stage-inset);
-  /* The rail owns the left edge; center within what is left of the stage. */
-  left: calc(var(--stage-side) + min(21rem, 28vw));
-  right: var(--stage-side);
+  /* The rail owns the left edge; centre within what is left of the stage. */
+  left: calc(var(--stage-inset) + min(19rem, 34%));
+  right: var(--stage-inset);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -275,24 +294,21 @@
   opacity: 1;
 }
 
-/* ---- narrow: stack it. The object keeps the top, the rail becomes a sheet. */
+/* ---- narrow: stack it. The object keeps the top, the rail follows. ---- */
 @media (max-width: 900px) {
   .wrap {
     height: auto;
-    min-height: auto;
-    margin-top: 0;
-    padding-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
   }
 
   .canvasLayer {
     position: relative;
     inset: auto;
-    height: 46vh;
-    min-height: 240px;
+    height: 42vh;
+    min-height: 230px;
   }
 
   .readout,
-  .info,
   .rail,
   .finish {
     position: relative;
@@ -301,34 +317,23 @@
     left: auto;
     right: auto;
     bottom: auto;
-    transform: none;
     width: auto;
     max-width: none;
-    padding-left: clamp(1.2rem, 5vw, 2rem);
-    padding-right: clamp(1.2rem, 5vw, 2rem);
+    margin: 0 var(--stage-inset);
   }
 
   .readout {
-    padding-top: 1.2rem;
-  }
-
-  .info {
-    margin: 1rem clamp(1.2rem, 5vw, 2rem) 0;
-    padding: 1rem 1.1rem;
-    width: auto;
+    text-align: left;
+    margin-bottom: 1rem;
   }
 
   .rail {
     overflow: visible;
-    background: none;
-    border: none;
-    backdrop-filter: none;
-    padding-top: 1.4rem;
-    padding-bottom: 0;
+    max-height: none;
   }
 
   .finish {
     justify-content: flex-start;
-    padding-top: 1.6rem;
+    margin-top: 1.2rem;
   }
 }

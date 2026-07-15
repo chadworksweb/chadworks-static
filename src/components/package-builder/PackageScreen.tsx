@@ -222,16 +222,25 @@ export function PackageScreen({
 
       const proj = Mat.persp((SCREEN.fov * Math.PI) / 180, w / Math.max(1, h), 0.1, 100);
       const view = Mat.trans(0, 0, SCREEN.camZ);
-      // FLOAT ONLY, no spin: the object holds its staged angle and breathes.
-      // `motion` (cur.spin) now drives how much it floats rather than how fast
-      // it turns, so the channel still reads on the object.
-      const amp = 0.018 + cur.spin * 0.055;
-      const bobY = Math.sin(time * 0.6) * amp;
-      const bobRot = Math.sin(time * 0.43 + 1.1) * amp * 0.5;
+      // FLOAT ONLY, no spin. The object is suspended, so it has to DRIFT, not
+      // just tilt: translation is what sells weightlessness, and a lone bob on
+      // one axis reads as a loop. Four sines on deliberately unrelated periods
+      // (0.42 / 0.29 / 0.37 / 0.51) never line back up inside a visit, so the
+      // motion stays alive instead of ticking.
+      const m = 1 + cur.spin * 1.4; // `motion` scales the float, never stops it
+      const driftY = Math.sin(time * 0.42) * 0.09 * m;
+      const driftX = Math.sin(time * 0.29 + 2.1) * 0.05 * m;
+      const swayY = Math.sin(time * 0.37 + 1.1) * 0.07 * m;
+      const swayX = Math.sin(time * 0.51 + 0.4) * 0.05 * m;
+
+      // Drift is applied OUTSIDE the orientation so the object travels through
+      // space rather than orbiting its own centre. The strata inherit `posed`,
+      // so the whole stack floats as one body.
       const orient = Mat.mul(
-        Mat.rotY(SCREEN.restRotY + bobRot),
-        Mat.rotX(SCREEN.restTiltX + bobY)
+        Mat.rotY(SCREEN.restRotY + swayY),
+        Mat.rotX(SCREEN.restTiltX + swayX)
       );
+      const posed = Mat.mul(Mat.trans(driftX, driftY, 0), orient);
 
       gl.uniformMatrix4fv(us.proj, false, proj);
       gl.uniformMatrix4fv(us.view, false, view);

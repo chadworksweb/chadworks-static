@@ -1,18 +1,19 @@
 "use client";
 
 // =====================================================================
-// PACKAGE BUILDER STAGE -- the self-contained, full-screen scope tool.
+// PACKAGE BUILDER STAGE -- the self-contained scope tool.
 //
 // Reference: the Issey Miyake "Le sel d'Issey" salt-crystal builder. The object
-// is the page; the chrome floats over it. The rail stays terse (numbered chips,
-// uppercase micro-type) because the left card carries the meaning of whichever
-// layer you are touching. Thirteen parameters only survive at this density.
+// is the stage; the chrome floats over it. Each parameter is an EXPAND PANEL
+// carrying its own description, so the rail stays terse at thirteen of them and
+// the open panel is the active layer. That is why there is no separate
+// explainer card any more: the description lives in the panel it belongs to.
 //
-// Rides the `hero` slot on /build-your-website-package/, so the stock capsules
-// (postures, FAQ, assurance, CTA) follow underneath without being disturbed.
+// Contained to the global content column, not full-bleed: the wrap is a plain
+// grid child, so the page shell gives it `grid-column: content` for free.
 //
 // The object is PackageScreen: a standalone engine that shares nothing with the
-// CW gem. The ledger and the object are two views of ONE model
+// CW gem. The number and the object are two views of ONE model
 // (lib/package-builder), never two implementations of it.
 // =====================================================================
 
@@ -41,20 +42,17 @@ function valueLabel(p: Param, v: number): string {
 
 export function PackageBuilderStage() {
   const [scope, setScope] = useState<Scope>(FLOOR);
-  const [active, setActive] = useState<keyof Scope>("pages");
+  // Accordion: one panel at a time. The open panel is the layer you are on.
+  const [open, setOpen] = useState<keyof Scope | null>("pages");
 
-  const set = (k: keyof Scope, v: number) => {
-    setScope((prev) => ({ ...prev, [k]: v }));
-    setActive(k);
-  };
+  const set = (k: keyof Scope, v: number) => setScope((prev) => ({ ...prev, [k]: v }));
 
   const ch = useMemo(() => channels(scope), [scope]);
   const total = price(scope);
   const dirty = JSON.stringify(scope) !== JSON.stringify(FLOOR);
-  const activeParam = PARAMS.find((p) => p.key === active) ?? PARAMS[0];
 
   return (
-    <div className={`full ${s.wrap}`}>
+    <div className={s.wrap}>
       {/* the object */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />
@@ -62,62 +60,69 @@ export function PackageBuilderStage() {
 
       {/* the number */}
       <div className={s.readout}>
-        <p className={s.readoutLabel}>{dirty ? "This scope" : "The floor"}</p>
+        <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
         <p className={s.figure}>{money(total)}</p>
       </div>
-
-      {/* the active layer, explained -- the reference's ingredient card */}
-      <aside className={s.info}>
-        <p className={s.infoTitle}>{activeParam.label}</p>
-        <p className={s.infoBody}>{activeParam.hint}</p>
-        <span className={s.infoValue}>{valueLabel(activeParam, scope[activeParam.key])}</span>
-      </aside>
 
       {/* the scope */}
       <div className={s.rail}>
         {PARAMS.map((p) => {
           const v = scope[p.key];
-          const on = active === p.key;
+          const isOpen = open === p.key;
+          const panelId = `pkg-panel-${p.key}`;
           return (
-            <div
-              key={p.key}
-              className={`${s.param}${on ? ` ${s.paramOn}` : ""}`}
-              onMouseEnter={() => setActive(p.key)}
-              onFocus={() => setActive(p.key)}
-            >
-              <p className={s.paramLabel}>{p.label}</p>
+            <div key={p.key} className={`${s.param}${isOpen ? ` ${s.paramOpen}` : ""}`}>
+              <button
+                type="button"
+                className={s.head}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                onClick={() => setOpen(isOpen ? null : p.key)}
+              >
+                <span className={s.headLabel}>{p.label}</span>
+                <span className={s.headValue}>{valueLabel(p, v)}</span>
+                <span className={s.caret} aria-hidden="true">
+                  {isOpen ? "-" : "+"}
+                </span>
+              </button>
 
-              {AS_COUNT.has(p.key) ? (
-                <div className={s.count}>
-                  <input
-                    className={s.range}
-                    type="range"
-                    min={p.min}
-                    max={p.max}
-                    step={1}
-                    value={v}
-                    aria-label={p.label}
-                    onChange={(e) => set(p.key, Number(e.target.value))}
-                  />
-                  <span className={s.countValue}>{v}</span>
+              {isOpen ? (
+                <div className={s.body} id={panelId}>
+                  <p className={s.hint}>{p.hint}</p>
+
+                  {AS_COUNT.has(p.key) ? (
+                    <div className={s.count}>
+                      <input
+                        className={s.range}
+                        type="range"
+                        min={p.min}
+                        max={p.max}
+                        step={1}
+                        value={v}
+                        aria-label={p.label}
+                        onChange={(e) => set(p.key, Number(e.target.value))}
+                      />
+                      <span className={s.countValue}>{v}</span>
+                    </div>
+                  ) : (
+                    <div className={s.chips} role="group" aria-label={p.label}>
+                      {p.options?.map((opt, i) => (
+                        <button
+                          key={opt}
+                          type="button"
+                          className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
+                          aria-pressed={i === v}
+                          aria-label={`${p.label}: ${opt}`}
+                          title={opt}
+                          onClick={() => set(p.key, i)}
+                        >
+                          {i + 1}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className={s.chips} role="group" aria-label={p.label}>
-                  {p.options?.map((opt, i) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
-                      aria-pressed={i === v}
-                      aria-label={`${p.label}: ${opt}`}
-                      title={opt}
-                      onClick={() => set(p.key, i)}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-              )}
+              ) : null}
             </div>
           );
         })}
