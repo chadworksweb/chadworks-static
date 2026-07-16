@@ -1,7 +1,11 @@
-// Data for the portfolio showroom (Track A). Mirrors the entries the current
-// /portfolio route ships, so the showroom and the classic page describe the same
-// work. Captures live at /public/portfolio/<slug>-*.jpg. Order is the reel order
-// (top to bottom): Rising Compass leads, AAC Event Catering sits at the bottom.
+// Data for the portfolio showroom (Track A) -- THE portfolio page since 2026-07-15.
+// Carries the same work as PortfolioShowcaseCapsule's ARCHIVE (what the homepage and
+// the service pages render), plus Rising Compass, which that capsule holds separately
+// as its flagship instead of in the grid. Those two lists have to be kept in step by
+// hand: add a project to one and it silently goes missing from the other, which is
+// how rslgo dropped out of the showroom for a while. Captures live at
+// /public/portfolio/<slug>-*.jpg. Order is the reel order (top to bottom): Rising
+// Compass leads, AAC Event Catering sits at the bottom.
 
 export type ShowroomItem = {
   key: string;
@@ -18,6 +22,18 @@ export type ShowroomItem = {
 };
 
 export const SHOWROOM_ITEMS: ShowroomItem[] = [
+  {
+    key: "risingcompass",
+    slug: "risingcompass",
+    label: "Rising Compass",
+    url: "risingcompass.net",
+    href: "https://risingcompass.net",
+    alt: "Rising Compass website, designed and developed by chadworks",
+    blurb: "One of my own builds: a data-driven product with a custom interface.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["Custom interface, real data.", "Shipped the way client work ships."],
+  },
   {
     key: "scinet",
     slug: "scinet",
@@ -43,18 +59,6 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     bursts: ["Motion that matches the workout.", "Concept site, launch-ready."],
   },
   {
-    key: "risingcompass",
-    slug: "risingcompass",
-    label: "Rising Compass",
-    url: "risingcompass.net",
-    href: "https://risingcompass.net",
-    alt: "Rising Compass website, designed and developed by chadworks",
-    blurb: "One of my own builds: a data-driven product with a custom interface.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Custom interface, real data.", "Shipped the way client work ships."],
-  },
-  {
     key: "chadlewine",
     slug: "chadlewine",
     label: "Chad Lewine",
@@ -65,6 +69,30 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     platform: "100% Custom Coded",
     year: "2026",
     bursts: ["Proof of where the work can go.", "Interaction past a client brief."],
+  },
+  {
+    key: "audioplayer",
+    slug: "audioplayer",
+    label: "Streaming Audio Player",
+    url: "demos.chadworks.co/sap",
+    href: "https://demos.chadworks.co/sap",
+    alt: "Streaming Audio Player interface example, designed and developed by chadworks",
+    blurb: "An interface example: a rack-unit audio player with a live spectrum visualizer and a ten band EQ.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["Spectrum bars run on real Web Audio.", "Ten band EQ, wired to the output."],
+  },
+  {
+    key: "rslgo",
+    slug: "rslgo",
+    label: "RSLgo",
+    url: "rslgo.com",
+    href: "https://rslgo.com",
+    alt: "RSLgo website, designed and developed by chadworks",
+    blurb: "A consulting practice with a real storefront, custom coded down to the landing pages.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["Consulting work that actually sells.", "Every landing page built to fit."],
   },
   {
     key: "abracadabragems",
@@ -89,6 +117,18 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     platform: "WordPress x Avada",
     year: "2025",
     bursts: ["Opens steady and serious.", "Tells a visitor what to do next."],
+  },
+  {
+    key: "videofeed",
+    slug: "videofeed",
+    label: "Short Form Vertical Video",
+    url: "demos.chadworks.co/sfvv",
+    href: "https://demos.chadworks.co/sfvv",
+    alt: "Short form vertical video feed interface example, designed and developed by chadworks",
+    blurb: "An interface example: a vertical feed that snaps clip to clip, where only the clip you land on plays.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["Only the clip you land on plays.", "Sponsored cards fold into the run."],
   },
   {
     key: "thorobird",
@@ -150,6 +190,18 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     platform: "WP-to-Static",
     year: "2026",
     bursts: ["Own it all, not rent it back.", "Custom store, custom throughout."],
+  },
+  {
+    key: "videoplayer",
+    slug: "videoplayer",
+    label: "Traditional Video Player",
+    url: "demos.chadworks.co/tvp",
+    href: "https://demos.chadworks.co/tvp",
+    alt: "Traditional Video Player interface example, designed and developed by chadworks",
+    blurb: "An interface example: a CRT video player with a searchable library and nested category playlists.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["A CRT monitor you can actually play.", "Search the library, browse the playlists."],
   },
   {
     key: "jeremyhayes",
