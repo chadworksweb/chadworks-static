@@ -4,7 +4,8 @@
 //
 // Owns the CANONICAL chadworks portfolio (the Rising Compass flagship + the
 // archive of client builds) so every page that renders it stays identical
-// line for line. Three parts: a gemstone titlebar, the FeaturedShowcase
+// line for line -- the selection is fixed here (see HELD_BACK) and no caller
+// can vary it. Three parts: a gemstone titlebar, the FeaturedShowcase
 // flagship, then the ArchiveGrid with the "view full portfolio" CTA.
 
 import Link from "next/link";
@@ -22,8 +23,20 @@ const FEATURED: FeaturedItem = {
   href: "https://risingcompass.net",
 };
 
-// Exported so the /portfolio page renders the exact same list (homepage is the
-// single source of truth; trim the homepage via `maxItems` without affecting it).
+// Held back from the showcase everywhere. This list is applied unconditionally
+// and there is no prop to override it: the capsule renders ONE selection on
+// every surface it appears on (Chad, 2026-07-16). It used to be an `exclude`
+// prop passed by the homepage alone, which is why the homepage showed 10 cards
+// while /web-design and /web-development showed all 21 -- the capsule's own
+// "identical line for line" promise above was not true. To change what the
+// showcase holds back, edit THIS list and every surface moves together.
+const HELD_BACK = [
+  "edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample",
+  "videofeed", "abracadabragems", "videoplayer", "jeremyhayes", "rozariolaw",
+];
+
+// Exported so any other surface renders the exact same list. Note this is the
+// FULL archive; consumers get the curated selection via the capsule itself.
 export const ARCHIVE: ArchiveItem[] = [
   {
     key: "scinet",
@@ -264,7 +277,6 @@ export function PortfolioShowcaseCapsule({
   featuredLede,
   blurbs,
   maxItems,
-  exclude,
   showroomCta = false,
   revealEarly = false,
 }: {
@@ -272,7 +284,6 @@ export function PortfolioShowcaseCapsule({
   featuredLede?: string;
   blurbs?: Record<string, string>;
   maxItems?: number;
-  exclude?: string[];
   showroomCta?: boolean;
   revealEarly?: boolean;
 } = {}) {
@@ -285,9 +296,7 @@ export function PortfolioShowcaseCapsule({
         blurbs[item.key] ? { ...item, blurb: blurbs[item.key] } : item
       )
     : ARCHIVE;
-  const filtered = exclude?.length
-    ? withBlurbs.filter((item) => !exclude.includes(item.key))
-    : withBlurbs;
+  const filtered = withBlurbs.filter((item) => !HELD_BACK.includes(item.key));
   const archive =
     typeof maxItems === "number" ? filtered.slice(0, maxItems) : filtered;
   return (

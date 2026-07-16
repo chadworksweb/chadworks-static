@@ -307,11 +307,13 @@ export const webDesign: Service = {
         quote:
           "Chad went above and beyond and exceeded our expectations with the final product.",
         attribution: "Mary Lynn Renner, AAC Event Catering (Lansdale, PA)",
+        img: "/people/mary-lynn-renner.webp",
       },
       {
         quote:
           "Chad is very professional, talented and skilled. He does not try to sell you on products or services that you don't need.",
         attribution: "Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)",
+        img: "/people/kimberly-dolan.webp",
       },
     ],
   },

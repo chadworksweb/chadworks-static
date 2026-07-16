@@ -6,7 +6,7 @@
 //   hero -> why-split + lanes + framework
 //   -> methods walkthrough (intro/TOC + ch01 Services + ch02 Sitemap
 //      + ch03 Wireframe=camera + ch04 Brand Kit + ch05 Sample Copy + ch06 Visibility)
-//   -> compare -> portfolio -> inspect quiz -> made -> pricing -> FAQ
+//   -> compare -> inspect quiz -> made -> pricing -> FAQ
 //   -> anti-agency email thread -> nine-step timeline -> testimonials
 //   -> contact CTA -> cross-industry grid.
 //
@@ -28,7 +28,6 @@ import { SectionShell } from "@/components/capsules/SectionShell";
 import {
   CtaCapsule,
   FaqCapsule,
-  PortfolioCapsule,
   MadeByCapsule,
   PriceCapsule,
   TestimonialsCapsule,
@@ -155,11 +154,6 @@ export default function FoundationDesignPage() {
           ))}
         </div>
       </SectionShell>
-
-      {/* Sites I've built (real client shots, water-ripple on hover). */}
-      {service.portfolio && (
-        <PortfolioCapsule portfolio={service.portfolio} slug={service.slug} />
-      )}
 
       {/* The interactive six-point rubric on the dark inverted band, two-column. */}
       <SectionShell full className="cw-art-score-section">

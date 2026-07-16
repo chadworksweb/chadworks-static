@@ -213,16 +213,19 @@ const TESTIMONIALS = {
       quote:
         "Chad went above and beyond and exceeded our expectations with the final product.",
       attribution: "Mary Lynn Renner, AAC Event Catering (Lansdale, PA)",
+      img: "/people/mary-lynn-renner.webp",
     },
     {
       quote:
         "Chad is very professional, talented and skilled. He does not try to sell you on products or services that you don't need.",
       attribution: "Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)",
+      img: "/people/kimberly-dolan.webp",
     },
     {
       quote:
         "Chad is a wonder worker! My website now shows up first or second in any searches. He is an SEO magician!",
       attribution: "Ananda Forest, author",
+      img: "/people/ananda-forest.webp",
     },
   ],
 };
@@ -389,22 +392,16 @@ export default function Home() {
       {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
       <ProblemCapsule problem={PROBLEM} />
 
-      {/* 5. PORTFOLIO -- the shared global PortfolioShowcaseCapsule. The homepage
-          shows a curated subset (a few client/demo builds are held back to the
-          full /portfolio archive); /portfolio and service pages render it all. */}
-      <PortfolioShowcaseCapsule
-        exclude={[
-          "edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample",
-          "videofeed", "abracadabragems", "videoplayer", "jeremyhayes",
-        ]}
-        revealEarly
-      />
-
-      {/* 5a. TESTIMONIALS -- real client voice, sitting directly under the work it
-          is talking about. First time this capsule has run on the homepage. */}
+      {/* 4a. TESTIMONIALS -- real client voice, answering the problem beat above
+          it. First time this capsule has run on the homepage. */}
       <TestimonialsCapsule testimonials={TESTIMONIALS} />
 
-      {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
+      {/* 5. PORTFOLIO -- the shared global PortfolioShowcaseCapsule. The curated
+          selection now lives in the capsule (HELD_BACK) and is the same on every
+          surface, so there is no list to pass from here. */}
+      <PortfolioShowcaseCapsule revealEarly />
+
+      {/* 5a. Pixel divider -- the page-transition wipe as a thin rule, digitized
           in on scroll. Sits between the portfolio and the about block. */}
       <PixelDivider />
 

@@ -226,20 +226,10 @@ export const webDevelopment: Service = {
     href: "/contact/",
   },
 
-  // Portfolio shots -- REAL live client builds, captured full-width (1920px) for
-  // the water-ripple effect. Local raster PNGs (cross-origin getImageData taints
-  // the canvas, so the source must be local). Labels link to the live sites.
-  portfolio: {
-    heading: "Click into the work",
-    intro:
-      "Click anywhere on a shot to send a ripple through it. Real, live client builds -- the same custom-built performance underneath, whatever the look.",
-    items: [
-      { label: "chadlewine.com", img: "/portfolio/chadlewine.png", alt: "chadlewine.com, a custom Next.js musician site", href: "https://chadlewine.com" },
-      { label: "The Rising Compass", img: "/portfolio/risingcompass.png", alt: "risingcompass.net, a custom-built song-analysis web app", href: "https://risingcompass.net" },
-      { label: "Rozario Touma, P.C.", img: "/portfolio/rozariolaw.png", alt: "rozariolaw.com, a corporate law firm website in New York City", href: "https://rozariolaw.com" },
-      { label: "Abracadabra Gems", img: "/portfolio/abracadabragems.png", alt: "abracadabragems.com, an artisan jeweler's website", href: "https://abracadabragems.com" },
-    ],
-  },
+  // No `portfolio` block: this page's portfolio slot is overridden in
+  // app/web-development/page.tsx with the shared PortfolioShowcaseCapsule, so
+  // any data here would never render. It used to carry a full ripple-grid
+  // config that had gone silently dead behind that override.
 
   // --- conversion-support sections. ---
   // Testimonials are REAL client reviews harvested from the live chadworks.co
@@ -253,16 +243,19 @@ export const webDevelopment: Service = {
         quote:
           "Chad is a wonder worker! My website now shows up first or second in any searches. He is an SEO magician!",
         attribution: "Ananda Forest, author",
+        img: "/people/ananda-forest.webp",
       },
       {
         quote:
           "Chad is very professional, talented and skilled. He does not try to sell you on products or services that you don't need.",
         attribution: "Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)",
+        img: "/people/kimberly-dolan.webp",
       },
       {
         quote:
           "Chad went above and beyond and exceeded our expectations with the final product.",
         attribution: "Mary Lynn Renner, AAC Event Catering (Lansdale, PA)",
+        img: "/people/mary-lynn-renner.webp",
       },
     ],
   },

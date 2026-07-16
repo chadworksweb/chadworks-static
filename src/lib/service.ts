@@ -91,6 +91,12 @@ export type Testimonial = {
   // Real client voice (social proof). quote + who said it. Use real reviews only.
   quote: Writable;
   attribution: Writable;
+  // Optional headshot (e.g. "/people/mary-lynn-renner.webp"), rendered as a
+  // round avatar beside the attribution. OPTIONAL on purpose: the premium
+  // surfaces (homepage, web-design, web-development) run the three leads, who
+  // all have one. The trade pages quote six people and only two have a photo,
+  // so they pass no img and stay text-only rather than reading half-dressed.
+  img?: string;
 };
 
 // --- TIERED OFFER (optional) ------------------------------------------

@@ -2629,6 +2629,20 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-testimonial__quote::after { content: "\201D"; }
 .svc-testimonial__by { font-size: var(--text-sm); color: var(--text-secondary); }
 .svc-testimonial__by::before { content: "-- "; }
+/* Optional headshot beside the attribution (see Testimonial.img). The row is
+   inert without one: `* { margin: 0 }` means a lone attribution renders exactly
+   as it did before the wrapper existed, so the text-only pages are untouched. */
+.svc-testimonial__byline { display: flex; align-items: center; gap: var(--space-sm); }
+.svc-testimonial__avatar {
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* The dash marks where the quote ends and the name begins. A face already does
+   that, so with an avatar the dash is only clutter. */
+.svc-testimonial__byline:has(.svc-testimonial__avatar) .svc-testimonial__by::before { content: none; }
 
 /* Qualification -- who it's for / who it isn't */
 .svc-qual {
