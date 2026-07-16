@@ -49,7 +49,7 @@ export function FitCapsule({
       footer={
         moreLink && isLaunched(ROOM) ? (
           <p className="svc-qual__more">
-            <Link href={ROOM}>The longer answer, and what I built this for</Link>
+            <Link href={ROOM}>read more about this</Link>
           </p>
         ) : undefined
       }
