@@ -152,6 +152,56 @@ input, button, textarea, select { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 ul, ol { list-style: none; padding: 0; }
 
+/* PROSE LINKS -- the global treatment for a link sitting inside a paragraph.
+   The reset above strips every anchor to `color: inherit; text-decoration: none`,
+   so without this a link in prose is invisible against the copy around it.
+   A resting hairline, and on hover a second line in the teal accent that TRACES
+   across it from the left and retracts to the right on the way out.
+
+   BOTH lines are BACKGROUNDS, deliberately, because the brief is that this cannot
+   disturb line-height, kerning or leading:
+     - a ::after bar would need position: relative + absolute on the anchor, and it
+       shatters when a link wraps across two lines;
+     - text-decoration handles wrapping and descenders natively but its width
+       cannot be animated, so it can't trace;
+     - a background paints inside the inline box and occupies NO space in the line
+       box, so no amount of tuning here can move the text.
+   `padding-bottom` is the one length involved, and on an INLINE element padding
+   does not affect the line box either -- it only drops the paint box far enough
+   that the rule clears most descenders.
+
+   Two layers share one y: the static hairline (bottom layer, always 100% wide) and
+   the trace (top layer, 0 wide at rest). The trace is anchored RIGHT at rest and
+   LEFT on hover, which is what makes it grow from the left and retract to the
+   right. Swapping the anchor is instant rather than animated, and invisible,
+   because it only ever happens while the bar is at full width. */
+p a,
+.cw-fit-list a {
+  color: var(--accent);
+  text-decoration: none;
+  padding-bottom: 0.1em;
+  background-image:
+    linear-gradient(var(--accent-teal), var(--accent-teal)),
+    linear-gradient(rgba(128, 84, 188, 0.4), rgba(128, 84, 188, 0.4));
+  background-repeat: no-repeat;
+  background-size: 0 1px, 100% 1px;
+  background-position: right bottom, left bottom;
+  transition: background-size 0.4s var(--ease-smooth);
+}
+p a:hover,
+p a:focus-visible,
+.cw-fit-list a:hover,
+.cw-fit-list a:focus-visible {
+  background-size: 100% 1px, 100% 1px;
+  background-position-x: left, left;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    p a,
+    .cw-fit-list a { transition: none; }
+  }
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-display);   /* Lexend */
   line-height: var(--leading-tight);
@@ -1456,6 +1506,47 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-more__panel[data-open] .svc-more__card { opacity: 1; transform: none; }
 .svc-more__card .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* Same opt-in for the /are-we-a-good-fit/ prose beats. Paragraph spacing is not
+   automatic anywhere here: `* { margin: 0 }` at the top of this file wipes the
+   browser default, so every multi-paragraph context has to ask for it (see also
+   `.legal-prose > * + *`). Headings carry their own margin-bottom, which is why
+   heading-to-paragraph already looks right and only body-to-body needs this. */
+.cw-fit-prose .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* The three builds on /are-we-a-good-fit/. Mirrors the manifesto list's marker (a
+   "--" in the accent, hung in the padding) so the two read as the same voice, at
+   this section's body size rather than the manifesto's. `ul` is stripped by the
+   reset at the top of this file, so the marker and the spacing are both opt-in. */
+.cw-fit-list {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+.cw-fit-list li {
+  position: relative;
+  padding-left: 1.6em;
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+/* A drawn diamond rather than a glyph: a rotated square is a shape, so it stays
+   crisp at any size and takes the brand's cut-crystal cue instead of reading as
+   punctuation the way the "--" did. `top` is in em so it tracks the type. */
+.cw-fit-list li::before {
+  content: "";
+  position: absolute;
+  left: 0.1em;
+  top: 0.62em;
+  width: 0.4em;
+  height: 0.4em;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+/* The label is the link, so it takes the prose-link colour and trace from the
+   rule above; strong only carries the weight. */
+.cw-fit-list strong { font-weight: 700; }
+.cw-fit-list + .svc-block__body { margin-top: var(--space-md); }
 @media (max-width: 600px) {
   .svc-more__card { padding: var(--space-sm) var(--space-md); }
 }
@@ -2546,6 +2637,27 @@ p, li, dd, figcaption { text-wrap: pretty; }
   gap: var(--space-md);
 }
 .svc-qual__col { padding: var(--space-lg); }
+/* The cross-link under the fit/not-fit grid, into /are-we-a-good-fit/. It sits on
+   the periwinkle band, which is already `color: #fff`, so the link takes the
+   band's white and earns its affordance from the underline rather than from the
+   page's normal link colour (which would vibrate against this background). */
+.svc-qual__more {
+  margin-top: var(--space-md);
+  text-align: center;
+  font-family: var(--font-display);
+}
+/* Opts OUT of the global `p a` treatment: this link sits on the periwinkle band,
+   where the global's purple text and teal trace would both be wrong against the
+   background. Keeps its own white underline instead. */
+.svc-qual__more a {
+  color: #fff;
+  background-image: none;
+  padding-bottom: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+  text-decoration-thickness: 1px;
+}
+.svc-qual__more a:hover { text-decoration-thickness: 2px; }
 .svc-qual__label {
   font-family: var(--font-mono);
   font-size: calc(var(--text-xs) * 1.5);
@@ -2553,9 +2665,27 @@ p, li, dd, figcaption { text-wrap: pretty; }
   text-transform: uppercase;
   margin-bottom: var(--space-sm);
 }
-/* second gradient stop brightened 15% (rgb(237,231,246) x1.15 clamps to white) */
-.svc-qual__col.panel {
+/* second gradient stop brightened 15% (rgb(237,231,246) x1.15 clamps to white).
+   SCOPED to the band on purpose: this override exists to lift the panels off the
+   periwinkle, and white-on-white would erase them anywhere else. Outside the band
+   (the /are-we-a-good-fit/ hero renders QualPanels on a light section) they fall
+   back to the base `.panel` gradient, whose lavender second stop reads against the
+   page. */
+.svc-qual-section .svc-qual__col.panel {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.55) 100%);
+}
+/* The hero panels sit directly under the H1, so they need the breathing room the
+   band's heading margin used to provide. */
+.cw-fit-hero .svc-qual { margin-top: var(--space-lg); }
+/* HALF the standard vertical rhythm on /are-we-a-good-fit/ (Chad, 2026-07-16).
+   These sections are one continuous argument rather than separate bands, and the
+   full --section-pad-y read as gaps between unrelated blocks. Each section pads
+   top AND bottom, so the space BETWEEN two of them is two of these -- halving the
+   token halves that gap. Overriding the token rather than padding-block keeps the
+   clamp's fluid scaling, just at half size. */
+.cw-fit-hero,
+.cw-fit-prose {
+  --section-pad-y: clamp(1.5rem, 3.5vw, 3.5rem);
 }
 /* eyebrows match the brand blue, not the grey */
 .svc-qual__col--fit .svc-qual__label,
@@ -7140,15 +7270,13 @@ html.cw-motion-paused *::after {
   /* 25% tighter than the global body leading, scoped to these boxes only */
   line-height: calc(var(--leading-body) * 0.75);
 }
+/* These are prose links in a <p>, so the global `p a` rule now draws the resting
+   hairline and the hover trace. Its own text-decoration is gone: kept alongside
+   the global it stacked a decoration line on top of two background bars. Only the
+   weight is local. */
 .cw-lane-sub__body a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
   font-weight: 500;
-  transition: color var(--duration-base) var(--ease-smooth);
 }
-.cw-lane-sub__body a:hover { color: var(--text-primary); }
 @media (max-width: 900px) {
   .cw-lanes-scroll__chips { display: none; }
   .cw-lane-block { min-height: 0; }

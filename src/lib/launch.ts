@@ -19,6 +19,10 @@ const LAUNCHED = new Set<string>([
   "/rates/", // launched 2026-07-09 (rates capsule + contact CTA)
   "/showroom/", // launched 2026-07-15 -- the portfolio, renamed. /portfolio/ 301s here
                 // (deploy/chadworks.conf) and is never itself launched or linked.
+  "/are-we-a-good-fit/", // launched 2026-07-16 -- the qualification room
+                         // (CWS-EXPANSION-PLAN-01 item D). This one line also lights
+                         // the footer's Company link and the FitCapsule cross-link on
+                         // the homepage/about/service pages; both are isLaunched-gated.
   "/websites/", // launched 2026-07-13 (websites lane hub: live Web Design/Dev lanes, rest coming soon)
   "/web-design/",
   "/web-development/", // launched 2026-07-11 (dev page: gem-reveal explainer + platform options)
