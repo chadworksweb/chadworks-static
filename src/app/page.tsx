@@ -24,6 +24,7 @@ import {
   FaqCapsule,
   MainContactCapsule,
   PortfolioShowcaseCapsule,
+  TestimonialsCapsule,
   AboutChadCapsule,
   RatesCapsule,
   FitCapsule,
@@ -194,6 +195,38 @@ const PROBLEM = {
   },
 };
 
+// ---- TESTIMONIALS -- real client voice, curated for the homepage. ----
+// TestimonialsCapsule ships on six service pages but had never been on the
+// homepage until now (CWS-EXPANSION-PLAN-01, item A). These are the fuller,
+// named-with-company quotes the signed-off pages carry, not the short
+// Google-review lines the trade pages run -- same register as web-development,
+// which is where all three of these already appear together.
+//
+// Order is deliberate: the craft and partnership quotes lead, per the plan's
+// "craft leads on premium surfaces" call. Chad's ruling 2026-07-16 is that only
+// PRICE quotes ("keeps costs down") are off-message here; a rank quote is fine,
+// so Ananda Forest keeps his and sits third.
+const TESTIMONIALS = {
+  heading: "What clients say",
+  items: [
+    {
+      quote:
+        "Chad went above and beyond and exceeded our expectations with the final product.",
+      attribution: "Mary Lynn Renner, AAC Event Catering (Lansdale, PA)",
+    },
+    {
+      quote:
+        "Chad is very professional, talented and skilled. He does not try to sell you on products or services that you don't need.",
+      attribution: "Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)",
+    },
+    {
+      quote:
+        "Chad is a wonder worker! My website now shows up first or second in any searches. He is an SEO magician!",
+      attribution: "Ananda Forest, author",
+    },
+  ],
+};
+
 // ---- FAQ -- a focused single-band accordion. ----
 const FAQS = [
   {
@@ -360,8 +393,16 @@ export default function Home() {
           shows a curated subset (a few client/demo builds are held back to the
           full /portfolio archive); /portfolio and service pages render it all. */}
       <PortfolioShowcaseCapsule
-        exclude={["edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample"]}
+        exclude={[
+          "edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample",
+          "videofeed", "abracadabragems", "videoplayer", "jeremyhayes",
+        ]}
+        revealEarly
       />
+
+      {/* 5a. TESTIMONIALS -- real client voice, sitting directly under the work it
+          is talking about. First time this capsule has run on the homepage. */}
+      <TestimonialsCapsule testimonials={TESTIMONIALS} />
 
       {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
           in on scroll. Sits between the portfolio and the about block. */}

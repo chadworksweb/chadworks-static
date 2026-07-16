@@ -833,9 +833,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: transform var(--duration-base) var(--ease-smooth),
     opacity var(--duration-base) var(--ease-smooth);
 }
-.site-nav--open .site-nav__toggle-bar:nth-child(1) { transform: translateY(0.36rem) rotate(45deg); }
+/* The X. Each outer bar has to land exactly on the middle bar's line before it
+   rotates, or the two strokes cross off-centre and the X reads crooked. With the
+   bars centred in the button, the middle one sits on the centre line and each
+   outer one is exactly ONE GAP PLUS ONE BAR HEIGHT away from it: 0.3rem + 2px,
+   i.e. 6.8px. This used to travel 0.36rem (5.76px), stopping each stroke ~1px
+   short and leaving them crossing ~2px apart. Kept as a calc of the gap and the
+   height above so it stays true if either is retuned. */
+.site-nav--open .site-nav__toggle-bar:nth-child(1) { transform: translateY(calc(0.3rem + 2px)) rotate(45deg); }
 .site-nav--open .site-nav__toggle-bar:nth-child(2) { opacity: 0; }
-.site-nav--open .site-nav__toggle-bar:nth-child(3) { transform: translateY(-0.36rem) rotate(-45deg); }
+.site-nav--open .site-nav__toggle-bar:nth-child(3) { transform: translateY(calc(-0.3rem - 2px)) rotate(-45deg); }
 
 .site-nav__panel {
   position: absolute;
@@ -1311,7 +1318,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: var(--bg-base); /* solid base so the knockout's screen blend has
                                  white to lighten from (not transparency=black) */
   --problem-base-h: 558px;    /* the ribbon band: base section height (+30%) */
-  min-height: var(--problem-base-h);
+  /* The +1px is LOAD-BEARING, do not collapse it back to a bare var(). .svc-knockout
+     is exactly --problem-base-h tall and SCREENS against this section's background
+     (which `isolation: isolate` above makes its only backdrop). At the section's
+     min-height the two boxes are identical to the pixel, so sub-pixel rounding can
+     drop the knockout's last row just outside that backdrop -- and a screen blend
+     with no backdrop has nothing to screen against, so its #000 field paints
+     straight through as a full-bleed hairline on the boundary with the section
+     below. It measures ~1 DEVICE pixel, which is why it showed up on a DPR-3 phone
+     and only sometimes on desktop. One spare pixel of backdrop makes the overhang
+     impossible; the canvases stay at --problem-base-h, so knockout/colour
+     congruence is untouched. */
+  min-height: calc(var(--problem-base-h) + 1px);
   /* TOP-ANCHORED (not centered): the extra top padding reproduces the centered
      look at rest, but opening the pop-down grows the section DOWNWARD only --
      the H2 never moves, so the knockout overlay stays aligned with zero
@@ -6065,9 +6083,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
      of the gem's own (viewport-scaled) height tracks the responsive type. */
   transform: translateY(14%);
 }
+/* On a phone the pair of flanking gems becomes ONE big gem sitting above the
+   title (Chad, 2026-07-16). The row's DOM order is gem, title, gem, so turning
+   the row into a column lifts the first gem into place with no markup change and
+   the second is dropped rather than shrunk. */
 @media (max-width: 600px) {
-  .cw-port-titlebar__gem { width: 31px; }
-  .cw-port-titlebar__row { gap: 0.65rem; }
+  .cw-port-titlebar__row { flex-direction: column; gap: 0.65rem; }
+  /* A third of the screen. `transform: none` because the 14% nudge exists only to
+     drop the gem onto the title's ink centre when the two sit side by side --
+     stacked there is nothing to sit level with, and at this size the nudge reads
+     as the gem hanging low. */
+  .cw-port-titlebar__gem { width: 33vw; transform: none; }
+  .cw-port-titlebar__row .cw-port-titlebar__gem:last-child { display: none; }
 }
 
 /* GemstoneMark host: the canvas fills the sized box the consumer sets. */
@@ -6388,6 +6415,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   align-items: center;
   justify-content: center;
   min-width: 0;
+  /* The frame's width is a PERCENTAGE of this box (--cw-frame-w), so making the
+     stage a container lets the phone's corner radius track the frame at every
+     size instead of being frozen in px. See .cw-port-frame--phone below. */
+  container-type: inline-size;
 }
 /* One persistent shell. Height is fixed by the stage; the WIDTH and the bezel
    transition per device, so the frame visibly shrinks/expands between shapes
@@ -6458,12 +6489,32 @@ p, li, dd, figcaption { text-wrap: pretty; }
     0 12px 28px rgba(36, 57, 137, 0.12),
     0 36px 66px rgba(36, 57, 137, 0.18);
 }
-.cw-port-frame--tablet { border-radius: 26px; border-width: 6px; }
-.cw-port-frame--phone { border-radius: 34px; border-width: 5.5px; }
+/* Bezels run through --cw-bezel-scale so the base widths stay stated once here and
+   a viewport can thin them with a single knob (see the mobile rule below). */
+.cw-port-frame--tablet { border-radius: 26px; border-width: calc(6px * var(--cw-bezel-scale, 1)); }
+.cw-port-frame--phone { border-radius: 34px; border-width: calc(5.5px * var(--cw-bezel-scale, 1)); }
 .cw-port-frame--tablet::after,
 .cw-port-frame--phone::after { display: none; }
 .cw-port-frame--tablet .cw-port-frame__screen,
 .cw-port-frame--phone .cw-port-frame__screen { border-radius: 14px; }
+/* A real phone's corners are ~13.5% of its width, and that RATIO is what has to
+   hold -- the 34px above cannot, because the frame is sized in percent while the
+   radius was frozen in px. The frame is --cw-frame-w (30.7cqw) of the stage, so
+   0.135 x 30.7 = 4.15cqw keeps the ratio at any stage width. It matters most where
+   the card is narrowest: on a phone the grid drops to one column and the frame
+   lands near 108px, where 34px per corner ate two thirds of the width and the
+   device read as a lozenge (Chad, 2026-07-16). The screen keeps its original
+   14/34 ratio to the bezel. Scoped to the stage because that is where the
+   container is; the px values above stay as the fallback. */
+.cw-port-device__stage .cw-port-frame--phone { border-radius: 4.15cqw; }
+.cw-port-device__stage .cw-port-frame--phone .cw-port-frame__screen { border-radius: 1.71cqw; }
+/* MOBILE VIEW ONLY: the card shrinks to one column but the bezels are fixed px, so
+   they read proportionally chunkier here than on desktop (5.1% of the phone frame
+   vs 3.1%). 25% off both the tablet and phone bezels (Chad, 2026-07-16) -- tablet
+   6px -> 4.5px, phone 5.5px -> 4.125px. Desktop bezels are untouched. */
+@media (max-width: 600px) {
+  .cw-port-device__stage { --cw-bezel-scale: 0.75; }
+}
 .cw-port-frame__notch {
   position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
   width: 42%; height: 15px; background: #15121f;
@@ -7135,7 +7186,22 @@ html.cw-motion-paused *::after {
   color: var(--accent);
 }
 .cw-pricing__cta { display: flex; justify-content: center; margin-top: clamp(1.5rem, 3vw, 2.5rem); }
-.cw-pricing__cta-btn { font-size: var(--text-lg); padding: var(--space-sm) var(--space-xl); }
+/* The rates CTA and the portfolio-showcase CTA are deliberately the same size
+   (Chad, 2026-07-16). One rule, two selectors, so retuning one moves both. */
+.cw-pricing__cta-btn,
+.cw-port-archive__cta-btn {
+  font-size: var(--text-lg);
+  padding: var(--space-sm) var(--space-xl);
+  white-space: nowrap;
+}
+/* On a phone it is the 4rem of side padding that breaks the label across two
+   lines, not the label itself: 128px of padding plus ~20px type leaves almost
+   nothing of a 360px screen. Keep the type size (that is what matches rates) and
+   give the padding back, down to the same side padding the base .svc-btn uses. */
+@media (max-width: 600px) {
+  .cw-pricing__cta-btn,
+  .cw-port-archive__cta-btn { padding-inline: var(--space-md); }
+}
 .cw-pricing__disclaimer {
   margin-top: var(--space-sm);
   text-align: center;

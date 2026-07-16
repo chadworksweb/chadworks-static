@@ -33,7 +33,7 @@ export const ARCHIVE: ArchiveItem[] = [
     label: "SciNet Industries",
     href: "https://scinet-industries.vercel.app",
     blurb:
-      "A brand and product site for SciNet Industries, a microbiome-therapeutics concept. The hard science sits up front and still reads clearly to an investor or a first-time visitor.",
+      "A brand and product site for SciNet Industries, a microbiome-therapeutics concept.",
   },
   {
     key: "tomweather",
@@ -54,6 +54,16 @@ export const ARCHIVE: ArchiveItem[] = [
     href: "https://rslgo.com",
     blurb:
       "A custom coded consulting practice website with ecommerce, custom-designed digital products and highly tailored landing/marketing pages.",
+  },
+  {
+    key: "audioplayer",
+    slug: "audioplayer",
+    alt: "Streaming Audio Player interface example, designed and developed by chadworks",
+    url: "demos.chadworks.co/sap",
+    label: "Streaming Audio Player",
+    href: "https://demos.chadworks.co/sap",
+    blurb:
+      "A WINAMP imitation: LCD readout, a spectrum visualizer running on real Web Audio, a ten band equalizer, and a collapsible discography browser.",
   },
   {
     key: "sweatshop",
@@ -94,6 +104,16 @@ export const ARCHIVE: ArchiveItem[] = [
     href: "https://rozariolaw.com",
     blurb:
       "WordPress website for NYC law firm with a custom homepage and custom blog system.",
+  },
+  {
+    key: "videofeed",
+    slug: "videofeed",
+    alt: "Short form vertical video feed interface example, designed and developed by chadworks",
+    url: "demos.chadworks.co/sfvv",
+    label: "Short Form Vertical Video",
+    href: "https://demos.chadworks.co/sfvv",
+    blurb:
+      "A vertical feed that snaps clip to clip inside a phone frame, where only the clip you land on plays and sponsored cards fold into the run.",
   },
   {
     key: "thorobird",
@@ -143,7 +163,7 @@ export const ARCHIVE: ArchiveItem[] = [
     label: "Abracadabra Gems",
     href: "https://abracadabragems.com",
     blurb:
-      "Gemstones want color and light. The layout puts the product first and lets each piece carry the page.",
+      "WordPress website for a permanent jewelry artisan out of California.",
   },
   {
     key: "aes",
@@ -154,6 +174,16 @@ export const ARCHIVE: ArchiveItem[] = [
     href: "https://artistempowermentsuite.com",
     blurb:
       "A platform site for Artist Empowerment Suite, a toolkit that lets recording artists run their music and their fan base from one place instead of renting it back from the big-tech platforms. Custom hero, custom store, custom throughout.",
+  },
+  {
+    key: "videoplayer",
+    slug: "videoplayer",
+    alt: "Traditional Video Player interface example, designed and developed by chadworks",
+    url: "demos.chadworks.co/tvp",
+    label: "Traditional Video Player",
+    href: "https://demos.chadworks.co/tvp",
+    blurb:
+      "A CRT video player: monitor bezel, VHS counter, a searchable library, and playlists built from nested categories.",
   },
   {
     key: "jeremyhayes",
@@ -225,6 +255,10 @@ const FEATURED_LEDE =
 // swaps the "view full portfolio" button for a "view the showroom" button that
 // links to /showroom/ -- used on the homepage, where the trimmed grid points a
 // visitor to the full interactive showroom instead of the classic archive page.
+// `revealEarly` fires this block's scroll-reveal BEFORE it reaches the fold
+// rather than just after it (see PageMotion). Homepage-only by request (Chad,
+// 2026-07-16), which is why it is a prop here and not a change to the shared
+// `.reveal` class: the service pages keep the standard timing.
 export function PortfolioShowcaseCapsule({
   archiveHeading = "chadworks Project Showcase",
   featuredLede,
@@ -232,6 +266,7 @@ export function PortfolioShowcaseCapsule({
   maxItems,
   exclude,
   showroomCta = false,
+  revealEarly = false,
 }: {
   archiveHeading?: string;
   featuredLede?: string;
@@ -239,7 +274,12 @@ export function PortfolioShowcaseCapsule({
   maxItems?: number;
   exclude?: string[];
   showroomCta?: boolean;
+  revealEarly?: boolean;
 } = {}) {
+  // Appended AFTER `reveal` by SectionShell, so the section carries both classes
+  // and takes its look from `.reveal` while `.reveal-early` only picks which
+  // observer watches it.
+  const early = revealEarly ? "reveal-early" : undefined;
   const withBlurbs = blurbs
     ? ARCHIVE.map((item) =>
         blurbs[item.key] ? { ...item, blurb: blurbs[item.key] } : item
@@ -255,7 +295,7 @@ export function PortfolioShowcaseCapsule({
       {/* PORTFOLIO -- a centered titlebar: the section name flanked by two
           mini, counter-rotating CW gemstones (the same cut crystal as the hero
           mark, at badge scale). Then the flagship piece and the archive grid. */}
-      <SectionShell className="cw-port-titlebar">
+      <SectionShell className="cw-port-titlebar" trailingClassName={early}>
         <div className="cw-port-titlebar__row">
           <GemstoneMark spinDir={1} className="cw-port-titlebar__gem" />
           <h2 className="cw-port-titlebar__title">chadworks&trade; Portfolio</h2>
@@ -264,7 +304,7 @@ export function PortfolioShowcaseCapsule({
       </SectionShell>
 
       {/* The flagship piece, then the archive grid. */}
-      <SectionShell className="cw-port-feat-shell">
+      <SectionShell className="cw-port-feat-shell" trailingClassName={early}>
         <FeaturedShowcase
           primary={FEATURED}
           eyebrow="Featured build"
@@ -274,29 +314,22 @@ export function PortfolioShowcaseCapsule({
           lede={featuredLede ?? FEATURED_LEDE}
         />
       </SectionShell>
-      <SectionShell className="cw-port-archive-shell">
+      <SectionShell className="cw-port-archive-shell" trailingClassName={early}>
         <h2 className="cw-port-archive__heading">{archiveHeading}</h2>
         <ArchiveGrid items={archive} />
-        {showroomCta ? (
+        {/* Both arms of the ternary that used to live here rendered identical
+            markup and differed only in their condition, so it is one condition
+            now: an explicit `showroomCta` forces the button, otherwise it shows
+            once /showroom/ is launched. */}
+        {(showroomCta || isLaunched("/showroom/")) && (
           <div className="cw-port-archive__cta-row">
-            <Link href="/showroom/" className="svc-btn">
+            <Link href="/showroom/" className="svc-btn cw-port-archive__cta-btn">
               <span className="svc-btn__label">View the showroom</span>
               <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
                 <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
               </svg>
             </Link>
           </div>
-        ) : (
-          isLaunched("/showroom/") && (
-            <div className="cw-port-archive__cta-row">
-              <Link href="/showroom/" className="svc-btn">
-                <span className="svc-btn__label">View the showroom</span>
-                <svg className="svc-btn__arrow" viewBox="0 0 448 512" aria-hidden="true" focusable="false">
-                  <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
-                </svg>
-              </Link>
-            </div>
-          )
         )}
       </SectionShell>
     </>
