@@ -24,24 +24,30 @@ case "$ENV" in
   staging|stage)
     DOCROOT="/srv/chadworks-staging"; BASE="https://staging.chadworks.co"; EXPECT="staging";;
   config)
-    # Push the prod nginx vhost (redirects + security headers) from deploy/ to
-    # le-nginx's conf.d and reload. Content is NOT touched. Backs up the current
-    # vhost, tests the new config, and auto-restores if the test fails.
+    # Push the nginx vhosts (prod + staging + shared security headers) from
+    # deploy/ to le-nginx's conf.d and reload. Content is NOT touched. Backs up
+    # each current file, tests the new config, and auto-restores if the test
+    # fails. All three go together: chadworks-staging.conf CONSUMES the
+    # $cw_redirect map that chadworks.conf declares, so pushing one without the
+    # other can leave conf.d referencing an undefined variable.
     cd "$(dirname "$0")"
-    echo "Syncing deploy/chadworks.conf + deploy/security-headers.conf -> ${SERVER}"
-    scp deploy/chadworks.conf deploy/security-headers.conf "$SERVER":/tmp/
+    echo "Syncing deploy/chadworks.conf + chadworks-staging.conf + security-headers.conf -> ${SERVER}"
+    scp deploy/chadworks.conf deploy/chadworks-staging.conf deploy/security-headers.conf "$SERVER":/tmp/
     ssh "$SERVER" 'set -e
       TS=$(date +%Y%m%d%H%M%S); D=/root/proxy/nginx/conf.d
       sudo cp $D/chadworks.conf $D/chadworks.conf.bak-before-redirects-$TS
+      [ -f $D/chadworks-staging.conf ] && sudo cp $D/chadworks-staging.conf $D/chadworks-staging.conf.bak-$TS || true
       [ -f $D/security-headers.conf ] && sudo cp $D/security-headers.conf $D/security-headers.conf.bak-$TS || true
       sudo cp /tmp/chadworks.conf $D/chadworks.conf
+      sudo cp /tmp/chadworks-staging.conf $D/chadworks-staging.conf
       sudo cp /tmp/security-headers.conf $D/security-headers.conf
       if sudo docker exec le-nginx nginx -t; then
         sudo docker exec le-nginx nginx -s reload
         echo "nginx reloaded (rollback: chadworks.conf.bak-before-redirects-$TS)"
       else
-        echo "nginx -t FAILED -- restoring previous vhost"
+        echo "nginx -t FAILED -- restoring previous vhosts"
         sudo cp $D/chadworks.conf.bak-before-redirects-$TS $D/chadworks.conf
+        [ -f $D/chadworks-staging.conf.bak-$TS ] && sudo cp $D/chadworks-staging.conf.bak-$TS $D/chadworks-staging.conf || true
         [ -f $D/security-headers.conf.bak-$TS ] && sudo cp $D/security-headers.conf.bak-$TS $D/security-headers.conf || true
         exit 1
       fi'
@@ -75,18 +81,11 @@ tar czf - -C out . \
   | ssh "$SERVER" "sudo tar xzf - -C ${DOCROOT} && sudo chmod -R a+rX ${DOCROOT}"
 
 echo "Verifying (${ENV}):"
-# Non-fatal: a stubbed staging (DNS/vhost not live yet) returns 000; the files
-# still synced. Don't let a failed curl abort the deploy.
+# Non-fatal: don't let a failed curl abort a deploy whose files already synced.
 set +e
 curl -s -o /dev/null -w '  /            -> %{http_code}\n' "${BASE}/"
 curl -s -o /dev/null -w '  /about/      -> %{http_code}\n' "${BASE}/about/"
 curl -s -o /dev/null -w '  404 (/nope/) -> %{http_code}\n' "${BASE}/__nope__/"
 set -e
-
-if [ "$ENV" = "staging" ]; then
-  echo "Note: staging.chadworks.co is STUBBED until its DNS A record"
-  echo "      (staging -> 138.197.111.66, GoDaddy) + le-nginx vhost + cert are live."
-  echo "      Files are synced to ${DOCROOT}; the URL will 000 until then."
-fi
 
 echo "Done. Target: ${BASE}/  (${DOCROOT})"
