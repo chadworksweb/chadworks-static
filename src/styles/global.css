@@ -3661,10 +3661,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .home-hero.is-boot .home-hero__tm,
 .home-hero.is-boot .home-hero__tagword,
 .home-hero.is-boot .home-hero__lanes { opacity: 0; }
+/* The wordmark letters live inside a `background-clip: text` word, and current
+   Chrome (v150+) paints that gradient straight through a child's opacity:0, so
+   opacity no longer hides a letter. visibility still works -- toggle it too. */
+.home-hero.is-boot .home-hero__char { visibility: hidden; }
 .home-hero.is-boot .home-hero__rule { transform: scaleX(0); }
 
-.home-hero.is-anim .home-hero__char { opacity: 0; }
-.home-hero.is-anim .home-hero__char.is-on { opacity: 1; }
+.home-hero.is-anim .home-hero__char { opacity: 0; visibility: hidden; }
+.home-hero.is-anim .home-hero__char.is-on { opacity: 1; visibility: visible; }
 
 .home-hero.is-anim .home-hero__tm {
   opacity: 0;
@@ -3735,7 +3739,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
     .home-hero.is-anim .home-hero__char,
     .home-hero.is-anim .home-hero__tm,
     .home-hero.is-anim .home-hero__tagword,
-    .home-hero.is-anim .home-hero__lanes { opacity: 1; transform: none; filter: none; transition: none; }
+    .home-hero.is-anim .home-hero__lanes { opacity: 1; visibility: visible; transform: none; filter: none; transition: none; }
     .home-hero.is-anim .home-hero__rule { transform: scaleX(1); transition: none; }
   }
 }

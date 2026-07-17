@@ -198,7 +198,7 @@ const INDUSTRY: { who: string; range: string; note: string; href: string }[] = [
     who: "WebFX, small business site",
     range: "$6,500 to $15,000",
     note: "An agency whose baseline sits above most of my finished builds.",
-    href: "https://www.webfx.com/web-design/pricing/website-costs/",
+    href: "https://www.webfx.com/web-design/pricing/",
   },
   {
     who: "Pronto, brochure site of 1 to 6 pages",
@@ -214,7 +214,7 @@ const INDUSTRY: { who: string; range: string; note: string; href: string }[] = [
   },
   {
     who: "Squarespace and the builders, do it yourself",
-    range: "$17 to $99 a month",
+    range: "$16 to $99 a month",
     note: "Cheap until you count the year, notice the template everyone else is also using, and realize you never own it.",
     href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
   },
