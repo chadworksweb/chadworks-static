@@ -893,7 +893,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   position: absolute;
   top: 100%;
   left: calc(var(--space-sm) * -1);
-  min-width: calc(100% + var(--space-sm) * 2);
+  /* Size to the WIDEST child, not the (wider) parent tab: a snug, uniform box.
+     The longest item fills it; shorter items left-align inside. */
+  width: max-content;
   display: flex;
   flex-direction: column;
   padding: var(--space-2xs) 0;

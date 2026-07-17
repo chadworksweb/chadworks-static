@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { LaunchLink } from "@/components/LaunchLink";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import {
   PageComposer,
   HeroCapsule,
@@ -16,7 +17,8 @@ import {
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
 
-const PAGE_URL = `${SITE_URL}/faqs/`;
+const ROUTE = "/faqs/";
+const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
 const DESCRIPTION =
   "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,200 floor, most near $6,200), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
@@ -25,6 +27,9 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so
+  // being in launch.ts alone would still serve noindex. Both edits or neither.
+  robots: { index: isLaunched(ROUTE), follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,

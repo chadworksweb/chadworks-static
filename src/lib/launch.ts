@@ -32,6 +32,7 @@ const LAUNCHED = new Set<string>([
   "/website-design-for-septic-services/",
   "/website-design-for-foundation-repair/",
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
+  "/faqs/", // launched 2026-07-17 -- FAQ page (FAQPage JSON-LD, four themed groups)
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant
