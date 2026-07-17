@@ -108,44 +108,34 @@ const GROUPS: FaqGroup[] = [
     items: [
       {
         q: "How much does a website cost?",
-        a: (
+        a: [
+          "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000.",
           <>
-            Work bills at $315 an hour. The smallest engagement is $3,200, and
-            most websites land near $6,200. Those are the real numbers, scoped
-            to what you actually want before any work begins. The{" "}
-            <Link href="/rates/">rates page</Link> lays out the full breakdown,
-            with the math showing.
-          </>
-        ),
+            If your website needs work, not a redesign, I charge by the minute at
+            $5.25/min, which adds up to $315/hour. Read more about my fees on my{" "}
+            <Link href="/rates/">rates page</Link>.
+          </>,
+        ],
         aText:
-          "Work bills at $315 an hour. The smallest engagement is $3,200, and most websites land near $6,200. Those are the real numbers, scoped to what you actually want before any work begins. The rates page lays out the full breakdown, with the math showing.",
+          "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at $5.25/min, which adds up to $315/hour. Read more about my fees on my rates page.",
       },
       {
-        q: "Why are you not the cheapest option?",
-        a: "Deliberately. The rate reflects twenty years of doing this and a result you can point to, not a number set to undercut the next bid. If the lowest price is the thing that decides it, there are cheaper builders who will be glad to help, and that is an honest answer rather than a sales dodge.",
+        q: "Do you have a lower rate for special cases?",
+        a: "I am always open to hearing out special situations, especially mission driven and social good initiatives. However, if your project has the potential for revenue of any kind, my posted rate is almost certainly what will be charged.",
         aText:
-          "Deliberately. The rate reflects twenty years of doing this and a result you can point to, not a number set to undercut the next bid. If the lowest price is the thing that decides it, there are cheaper builders who will be glad to help, and that is an honest answer rather than a sales dodge.",
+          "I am always open to hearing out special situations, especially mission driven and social good initiatives. However, if your project has the potential for revenue of any kind, my posted rate is almost certainly what will be charged.",
       },
       {
         q: "Is there an ongoing cost after the site is built?",
-        a: (
-          <>
-            Only if you want one. WordPress maintenance runs $550 every 6 months
-            for clients who want the site cared for: updates, backups, and a
-            human watching for quiet breakage. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static site</Link>{" "}
-            needs far less upkeep, which is part of why it costs less to own over
-            the years.
-          </>
-        ),
+        a: "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc.\n\nIf you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
         aText:
-          "Only if you want one. WordPress maintenance runs $550 every 6 months for clients who want the site cared for: updates, backups, and a human watching for quiet breakage. A custom-coded static site needs far less upkeep, which is part of why it costs less to own over the years.",
+          "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc. If you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
       },
       {
-        q: "Do you offer monthly payments for a website?",
-        a: "Monthly website financing is not something chadworks offers anymore. Projects are typically split into milestones instead, so you pay against work that has been delivered rather than all at once up front.",
+        q: "How much does website maintenance cost?",
+        a: "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
         aText:
-          "Monthly website financing is not something chadworks offers anymore. Projects are typically split into milestones instead, so you pay against work that has been delivered rather than all at once up front.",
+          "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
       },
     ],
   },

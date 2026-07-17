@@ -19,6 +19,18 @@ export type FaqItem = { q: string; a: ReactNode };
 // Anything that is not a string (JSX with inline links, a Prompt) renders as one
 // paragraph exactly as before, so no existing FAQ moves.
 function Answer({ a }: { a: ReactNode }) {
+  // An ARRAY answer is an explicit list of paragraphs, each a ReactNode, so an
+  // answer can mix a paragraph break with inline links (a plain string can do
+  // the break but not the links). Each entry renders as its own <p>.
+  if (Array.isArray(a)) {
+    return (
+      <>
+        {a.map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </>
+    );
+  }
   if (typeof a === "string") {
     const paras = a
       .split(/\n{2,}/)
