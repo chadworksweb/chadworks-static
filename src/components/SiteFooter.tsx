@@ -9,7 +9,22 @@ import { isLaunched } from "@/lib/launch";
 // A link is lit + clickable when its route is launched (see launch.ts); the
 // rest are dimmed behind the "working on it" overlay. No per-link flag here --
 // launch.ts is the single source of truth.
+// Column ORDER is footer-only and does not mirror the header (Chad,
+// 2026-07-16): Company leads here, where the header leads with the lanes. A
+// footer reader is usually looking for the org (about / contact / rates), not
+// browsing the catalogue, so the lanes follow rather than open.
 const COLUMNS: { heading: string; href?: string; links: { href: string; label: string }[] }[] = [
+  {
+    heading: "Company",
+    links: [
+      { href: "/about/", label: "About" },
+      { href: "/rates/", label: "Rates" },
+      { href: "/showroom/", label: "Showroom" },
+      { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
+      { href: "/faqs/", label: "FAQs" },
+      { href: "/contact/", label: "Contact" },
+    ],
+  },
   {
     heading: "Websites",
     href: "/websites/",
@@ -41,23 +56,14 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
     heading: "Situations",
     links: [
       { href: "/switch/leave-wordpress/", label: "Leave WordPress" },
+      { href: "/switch/leave-social-media/", label: "Leave Social Media" },
       { href: "/switch/squarespace-to-static/", label: "Squarespace to Static" },
       { href: "/switch/wix-to-static/", label: "Wix to Static" },
       { href: "/switch/godaddy-to-static/", label: "GoDaddy to Static" },
       { href: "/switch/gmail-to-workspace/", label: "Gmail to Workspace" },
+      { href: "/switch/stop-paying-indeed/", label: "Stop Paying Indeed" },
       { href: "/industries-served/", label: "Industries Served" },
       { href: "/my-service-areas/", label: "Service Areas" },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { href: "/about/", label: "About" },
-      { href: "/rates/", label: "Rates" },
-      { href: "/showroom/", label: "Showroom" },
-      { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
-      { href: "/faqs/", label: "FAQs" },
-      { href: "/contact/", label: "Contact" },
     ],
   },
 ];

@@ -26,7 +26,13 @@ export const ORG = {
   sameAs: [] as string[],
 } as const;
 
-export type Lane = "websites" | "visibility" | "design";
+// Lane 01 websites, Lane 02 visibility, Lane 03 consulting (added 2026-07-16,
+// Chad). `design` is NOT a lane in the IA (which names two, now three); it sits
+// in this union as a breadcrumb convenience for the specialized design pages,
+// which all override `breadcrumbParent` to point at /industries-served/ or
+// /my-service-areas/ rather than a /design/ hub. Do not read this union as the
+// lane model -- CWS-INFORMATION-ARCHITECTURE.md is the lane model.
+export type Lane = "websites" | "visibility" | "design" | "consulting";
 
 // ---------------------------------------------------------------------
 // WRITING PROMPTS -- "prompts only" authoring (ported from the chad site).
@@ -61,6 +67,10 @@ export type ServiceStep = {
   // Finished prose, a prompt() placeholder, or inline markup (e.g. a step body
   // carrying a cross-link). The Approach/Process capsules render all three via <W>.
   body: Writable | ReactNode;
+  // OPTIONAL mono supertitle naming what KIND of step this is ("The core move",
+  // "The gate"). Read only by ActsCapsule, which needs a label the step's own
+  // number cannot carry; ignored by Approach/Process (they derive "Step N").
+  kind?: string;
 };
 
 export type ServiceProof = {

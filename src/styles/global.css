@@ -852,6 +852,82 @@ p, li, dd, figcaption { text-wrap: pretty; }
   }
 }
 
+/* ---- NAV DROPDOWN (the site's first: About > Rates, Chad 2026-07-16) -------
+   Opening is pure CSS -- :hover for pointers, :focus-within for keyboards. No JS
+   state, so it works before hydration and cannot desync.
+
+   THE ITEM IS FULL NAV HEIGHT ON PURPOSE. The links row is centred in a 4.5rem
+   bar, so a naturally-sized item ends mid-bar; `top: 100%` would then open the
+   panel floating INSIDE the nav with a dead gap between the label and the panel,
+   and the hover would drop the moment the pointer crossed it. Giving the item
+   var(--nav-height) makes its bottom edge exactly the nav's bottom edge, so the
+   panel hangs off the bar and the item itself is the hover bridge. */
+.site-nav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: var(--nav-height);
+}
+.site-nav__caret {
+  width: 0;
+  height: 0;
+  border-left: 0.25rem solid transparent;
+  border-right: 0.25rem solid transparent;
+  border-top: 0.28rem solid var(--nav-link);
+  transition: transform var(--duration-base) var(--ease-smooth);
+}
+.site-nav__item:hover .site-nav__caret,
+.site-nav__item:focus-within .site-nav__caret { transform: rotate(180deg); }
+.site-nav__dropdown {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--space-sm) * -1);
+  min-width: calc(100% + var(--space-sm) * 2);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2xs) 0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 24px 37px -18px rgba(86, 104, 173, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.35rem);
+  transition: opacity var(--duration-base) var(--ease-smooth),
+    transform var(--duration-base) var(--ease-smooth),
+    visibility var(--duration-base);
+  z-index: 1;
+}
+.site-nav__item:hover .site-nav__dropdown,
+.site-nav__item:focus-within .site-nav__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+/* Children sit a step down from their parent: same face, smaller, so the panel
+   reads as detail rather than a second row of peers. */
+.site-nav__dropdown a,
+.site-nav__dropdown .site-nav__soon {
+  font-size: 1rem;
+  padding: 0.45rem var(--space-sm);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .site-nav__dropdown { transition: none; }
+    .site-nav__caret { transition: none; }
+  }
+}
+/* Mobile panel children: indented under their parent row (no hover on touch, so
+   the dropdown collapses into the list rather than becoming a trap). */
+.site-nav__panel-inner .site-nav__panel-child {
+  padding-left: calc(var(--site-edge-min) + var(--space-md));
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
 /* PARKED for later use -- per-letter MOTION wave (vertical bob). Not applied.
    To use: point the :hover animation above at this keyframe instead, and swap
    .nav-wave__letter's transition to `transform`. */
@@ -1024,7 +1100,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--accent);
   margin-bottom: var(--space-sm);
 }
-.site-footer__heading a { color: inherit; }
+/* The heading is a <p>, so the global PROSE LINK rule (`p a`) catches its link
+   by accident and paints the resting hairline + hover trace. A module header is
+   a LABEL, not prose: it should read as a heading that happens to be clickable.
+   Both prose-link layers are background-images, so killing the background and
+   the padding it needed is the whole fix (Chad, 2026-07-16). */
+.site-footer__heading a {
+  color: inherit;
+  background-image: none;
+  padding-bottom: 0;
+}
 .site-footer__heading a:hover { color: var(--text-primary); }
 .site-footer__list {
   list-style: none;
@@ -7686,4 +7771,440 @@ html.cw-motion-paused *::after {
   font-style: italic;
   color: var(--text-secondary);
   max-width: 70ch;
+}
+
+/* =====================================================================
+   LANE 03 (CONSULTING) / V/S/R CAPSULE SET
+   Six section shapes rebuilt for /vision-strategy-roadmap/. TRACED from the
+   chadlewine Sovereignty Audit page (si-hero / bk-acts / bk-what__row /
+   sa-rule), NOT ported: none of chadlewine's SI Night CSS exists here, so
+   every rule below is written against CWS tokens and CWS class names. Keep it
+   that way -- if a shape needs changing, change it here, do not reach back into
+   the other codebase. See CWS-VSR-SERVICE.md.
+   ===================================================================== */
+
+/* ---- GLYPH TITLE BAR -- a heading between two shade ramps ------------- */
+.cw-glyphbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.cw-glyphbar__ramp {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--accent);
+  opacity: 0.55;
+}
+.cw-glyphbar__ramp--rev { text-align: left; }
+.cw-glyphbar__heading {
+  flex: 0 1 auto;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--text-primary);
+}
+.svc-dark .cw-glyphbar__heading { color: var(--dark-text); }
+.svc-dark .cw-glyphbar__ramp { color: var(--dark-muted); opacity: 0.75; }
+@media (max-width: 600px) {
+  .cw-glyphbar { gap: var(--space-sm); }
+  .cw-glyphbar__ramp { font-size: var(--text-xs); }
+}
+
+/* ---- ACTS -- the movements row (stepped glyph, kind, title, body) ------ */
+.cw-acts__intro { margin-bottom: var(--space-lg); }
+.cw-acts__list {
+  display: grid;
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Filled rows (design-system rule 8): columns come from stepColumns(), so the
+   last row is never half empty. */
+.cw-acts__list[data-cols="2"] { grid-template-columns: repeat(2, 1fr); }
+.cw-acts__list[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+.cw-acts__list[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+.cw-acts__list[data-cols="5"] { grid-template-columns: repeat(5, 1fr); }
+.cw-act {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+}
+/* The stepped glyph: four identical full blocks ramped by OPACITY only, so
+   every block shares one glyph width and one baseline. */
+.cw-act__glyph {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: -0.08em;
+  color: var(--accent);
+  margin-bottom: var(--space-2xs);
+}
+.svc-dark .cw-act__glyph { color: var(--dark-muted); }
+.cw-act__kind {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.svc-dark .cw-act__kind { color: var(--dark-muted); }
+.cw-act__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+}
+.svc-dark .cw-act__title { color: var(--dark-text); }
+.cw-act__desc {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.svc-dark .cw-act__desc { color: var(--dark-muted); }
+.cw-acts__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+@media (max-width: 900px) {
+  .cw-acts__list[data-cols="3"],
+  .cw-acts__list[data-cols="4"],
+  .cw-acts__list[data-cols="5"] { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .cw-acts__list[data-cols="2"],
+  .cw-acts__list[data-cols="3"],
+  .cw-acts__list[data-cols="4"],
+  .cw-acts__list[data-cols="5"] { grid-template-columns: 1fr; }
+}
+
+/* ---- RULE -- one governing line, then the prose that earns it --------- */
+/* WHITE SPACE, deliberate: this is the page's quietest section and the only
+   light band between two darks. The line is the one sentence a reader should
+   carry out of the page, so it gets air on BOTH sides -- crowding it against
+   the paragraph turns a statement into a subheading. The asymmetric accent rule
+   on the left is the hierarchy signal; the line does not get centered, because
+   centering would make it decorative rather than spoken. */
+.cw-rule__line {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  max-width: var(--measure-narrow);
+  margin-bottom: var(--space-xl);
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--accent);
+}
+.cw-rule__body > p {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-rule__body > p + p { margin-top: var(--space-md); }
+/* The admission (last paragraph) is the strongest thing on the page. It gets
+   its own separation and a hairline, so it reads as an aside Chad volunteered
+   rather than one more paragraph of argument. */
+.cw-rule__body > p:last-child:not(:only-child) {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ---- SPLIT CHECKLIST -- checklist + optional art, side switchable ----- */
+.cw-split__lead { margin-bottom: var(--space-lg); }
+.cw-split__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+/* No art passed. WHITE SPACE, corrected: a single left-aligned column under a
+   full-width centered title bar leaves the right half empty, and empty-right
+   does not read as restraint, it reads as a missing image. Centering the measure
+   makes the space deliberate and symmetrical about the title bar above it.
+   NOTE: this centers a PROSE MEASURE inside a section, which is allowed; it is
+   not a max-width on a page wrapper (the global layout rule). The moment real
+   art lands, `art` fills the right and this modifier stops applying. */
+.cw-split__row--solo {
+  grid-template-columns: minmax(0, var(--measure-prose));
+  justify-content: center;
+}
+.cw-split__half { min-width: 0; }
+.cw-split__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-split__list > li {
+  position: relative;
+  padding-left: var(--space-md);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-split__list > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.cw-split__list > li strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--space-3xs);
+}
+.cw-split__art { min-width: 0; }
+.cw-split__art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+}
+.cw-split__footer { margin-top: var(--space-xl); }
+.cw-split__cta { margin-top: var(--space-lg); }
+@media (max-width: 900px) {
+  .cw-split__row { grid-template-columns: 1fr; gap: var(--space-lg); }
+}
+
+/* ---- VERBATIM -- real client sentences, quoted exactly ---------------- */
+.cw-verbatim__lead { margin-bottom: var(--space-lg); }
+/* ASYMMETRIC ON PURPOSE, and this one matters. A 2x2 grid of quote cards is a
+   testimonial wall, which is the exact read this capsule exists to avoid (see
+   VerbatimCapsule.tsx) -- an even grid also claims all four sentences are
+   peers, and they are not. The first is THE spine: the sentence the whole
+   document was built to serve. So it takes the full row and the biggest type,
+   and the supporting three fill one clean row beneath it (design-system rule 8,
+   filled rows). Hierarchy comes from the layout agreeing with the argument. */
+.cw-verbatim__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-verbatim__item { display: flex; flex-direction: column; min-width: 0; }
+.cw-verbatim__item:first-child { grid-column: 1 / -1; }
+/* The featured quote is set at hero scale and given a generous measure, so it
+   is read as a statement rather than scanned as a card. */
+.cw-verbatim__item:first-child .cw-verbatim__fig { padding: var(--space-lg); }
+.cw-verbatim__item:first-child .cw-verbatim__quote > p {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  max-width: 24ch;
+}
+.cw-verbatim__item:first-child .cw-verbatim__note { max-width: var(--measure-prose); }
+.cw-verbatim__fig { padding: var(--space-md); margin: 0; }
+.cw-verbatim__quote { margin: 0; border: 0; padding: 0; }
+/* The quote is the loudest type in the section on purpose: on this page the
+   client's own sentence outranks anything chadworks wrote around it. */
+.cw-verbatim__quote > p {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: var(--dark-text);
+}
+.cw-verbatim__quote > p::before { content: "\201C"; }
+.cw-verbatim__quote > p::after  { content: "\201D"; }
+.cw-verbatim__source {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dark-muted);
+  opacity: 0.85;
+}
+.cw-verbatim__note {
+  margin-top: var(--space-sm);
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--dark-border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--dark-muted);
+}
+.cw-verbatim__footer { margin-top: var(--space-xl); }
+@media (max-width: 900px) {
+  .cw-verbatim__list { grid-template-columns: 1fr; }
+  .cw-verbatim__item:first-child .cw-verbatim__quote > p {
+    font-size: var(--text-xl);
+    max-width: none;
+  }
+}
+
+/* ---- DELIVERABLE -- the document's anatomy, then a stamped sample ----- */
+.cw-deliv__lead { margin-bottom: var(--space-lg); }
+.cw-deliv__anatomy {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-deliv__part {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-md);
+}
+/* The V / S / R watermark. Decorative and aria-hidden; the accessible letter
+   rides in the heading. */
+.cw-deliv__letter {
+  position: absolute;
+  top: -0.35em;
+  right: 0.05em;
+  font-family: var(--font-display);
+  font-size: 7rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.08;
+  pointer-events: none;
+}
+.cw-deliv__label {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+.cw-deliv__label-letter {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+}
+.cw-deliv__contents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-deliv__contents > li {
+  position: relative;
+  padding-left: var(--space-sm);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-deliv__contents > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 4px;
+  height: 1px;
+  background: var(--accent);
+}
+.cw-deliv__note { margin-top: var(--space-md); }
+
+/* The sample. The stamp is a hard requirement of the capsule, so it is styled
+   to be unmissable: it sits ON the paper's top edge, in mono, in the accent,
+   and it renders first. A composite document on a page selling verbatim
+   extraction has to announce itself before it is read. */
+/* WHITE SPACE, corrected: at 720px left-aligned under the full-width 3-up
+   anatomy, the sample left the right half empty and read as a broken row rather
+   than a specimen. Centered, the offset becomes deliberate: the anatomy is the
+   MAP (symmetric, three peers), the sample is the SPECIMEN (narrower, centered,
+   quiet), and the width change is what tells the eye it switched from schema to
+   artifact. The extra top space is the gap between those two ideas. */
+.cw-deliv__sample {
+  margin: var(--space-2xl) auto 0;
+  max-width: var(--measure-narrow);
+}
+.cw-deliv__stamp {
+  display: inline-block;
+  padding: var(--space-3xs) var(--space-xs);
+  border: 1px dashed var(--accent);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--bg-surface);
+}
+.cw-deliv__paper {
+  padding: var(--space-lg);
+  border: 1px dashed var(--accent);
+  border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--bg-elevated);
+  box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07);
+}
+.cw-deliv__paper-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-md);
+}
+.cw-deliv__paper-block + .cw-deliv__paper-block { margin-top: var(--space-lg); }
+.cw-deliv__paper-heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-2xs);
+}
+.cw-deliv__paper-body > p {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-deliv__paper-body > p + p { margin-top: var(--space-sm); }
+.cw-deliv__paper-body strong { color: var(--text-primary); }
+/* The spine sentence inside the sample: set like the real thing, because in a
+   real VSR the spine IS the loudest line on the page. */
+.cw-deliv__quote {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--accent);
+  margin-bottom: var(--space-sm);
+}
+.cw-deliv__cta { margin-top: var(--space-lg); }
+@media (max-width: 900px) {
+  .cw-deliv__anatomy { grid-template-columns: 1fr; }
+  .cw-deliv__letter { font-size: 5rem; }
 }
