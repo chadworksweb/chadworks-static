@@ -2432,6 +2432,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
     #ffffff 0%, var(--grad-peak) 30%, var(--dark-muted) 50%,
     rgba(229, 210, 244, 0.38) 50.1%, rgba(229, 210, 244, 0.38) 100%);
 }
+/* svc-fill paints via background-clip:text, so glyphs are clipped to the paint
+   box. On a two-line heading the last line's descenders (g, y, p) sit below the
+   tight line box and render cut. A little padding-bottom extends the paint box
+   so the descenders keep their fill. Margin is trimmed to hold the same gap. */
+.svc-faq__intro .svc-block__heading {
+  padding-bottom: 0.14em;
+  margin-bottom: calc(var(--space-xs) - 0.14em);
+}
 .svc-faq__layout {
   position: relative;
   display: grid;
@@ -2445,7 +2453,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
   /* homepage-only even split (opt-in via FaqCapsule evenSplit) */
   .svc-faq-section--even .svc-faq__layout { grid-template-columns: 1fr 1fr; }
 }
-.svc-faq__lead { margin-top: var(--space-md); color: var(--text-secondary); }
+.svc-faq__lead { margin-top: var(--space-xs); color: var(--text-secondary); }
 .svc-faq-section--dark .svc-faq__lead { color: rgba(229, 210, 244, 0.82); }
 
 /* The accordion list (light base; --dark overrides below) */
@@ -2530,14 +2538,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .svc-acc__item.is-open .svc-acc__q::after { color: var(--accent); }
 .svc-faq-section--dark .svc-acc__a { background: rgba(31, 23, 39, 0.35); }
 .svc-faq-section--dark .svc-acc__a p { color: rgba(229, 210, 244, 0.88); }
-/* inline links inside FAQ answers (global anchors are color:inherit/no-underline) */
-.svc-acc__a-inner a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
-  transition: color 0.25s var(--ease-smooth);
-}
+/* FAQ answer links inherit the global animated `p a` underline; only the dark
+   band needs a lighter colour so the link stays legible on the plum panel. */
 .svc-faq-section--dark .svc-acc__a-inner a { color: #e5d2f4; }
 .svc-faq-section--dark .svc-acc__a-inner a:hover { color: #fff; }
 

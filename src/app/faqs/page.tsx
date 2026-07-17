@@ -14,6 +14,7 @@ import {
   FaqCapsule,
   CtaCapsule,
 } from "@/components/capsules";
+import { FaqParas } from "@/components/FaqAccordion";
 
 const PAGE_URL = `${SITE_URL}/faqs/`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
@@ -47,9 +48,9 @@ type FaqGroup = { theme: string; lead: string; items: Faq[] };
 
 const GROUPS: FaqGroup[] = [
   {
-    theme: "Working together",
+    theme: "General FAQs",
     lead:
-      "What it's actually like to hire chadworks, before you send the first email.",
+      "Frequently asked questions about working with chadworks",
     items: [
       {
         q: "Who actually builds my site?",
@@ -102,20 +103,24 @@ const GROUPS: FaqGroup[] = [
     ],
   },
   {
-    theme: "What it costs",
+    theme: "Pricing FAQs",
     lead:
-      "The money questions, answered the same way they are on the rates page: plainly.",
+      "Frequently asked questions about the costs, fees and pricing of website design and development.",
     items: [
       {
         q: "How much does a website cost?",
-        a: [
-          "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000.",
-          <>
-            If your website needs work, not a redesign, I charge by the minute at
-            $5.25/min, which adds up to $315/hour. Read more about my fees on my{" "}
-            <Link href="/rates/">rates page</Link>.
-          </>,
-        ],
+        a: (
+          <FaqParas
+            items={[
+              "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000.",
+              <>
+                If your website needs work, not a redesign, I charge by the minute
+                at $5.25/min, which adds up to $315/hour. Read more about my fees
+                on my <Link href="/rates/">rates page</Link>.
+              </>,
+            ]}
+          />
+        ),
         aText:
           "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at $5.25/min, which adds up to $315/hour. Read more about my fees on my rates page.",
       },
@@ -140,83 +145,67 @@ const GROUPS: FaqGroup[] = [
     ],
   },
   {
-    theme: "How the site gets built",
+    theme: "Websites FAQ",
     lead:
-      "The build choices behind the site, and what stays yours when it ships.",
+      "Frequently asked questions about web design and development.",
     items: [
       {
         q: "Custom-coded or WordPress: which is right for me?",
-        a: (
-          <>
-            It depends on who needs to edit the site and how much it changes. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static site</Link> is
-            the fastest and most durable route. <Link href="/wordpress/">WordPress</Link>{" "}
-            makes sense when a non-technical team needs to publish often. You get
-            a straight recommendation for your situation, not a default pushed on
-            everyone.
-          </>
-        ),
+        a: "This comes down to one thing: editability.\n\nOver the last decade, 90% of clients that say \"editing the website is a requirement\" never edit the website, the content or the layout, so I've stopped selling WordPress as a frontrunner and am being honest with clients about whether WordPress is overkill for their needs.\n\nIf you don't already have a plan to update the site's content, whether that be a blog, photo gallery or product catalog, you almost certainly don't need WordPress. We'll discuss this on our first consultation call.",
         aText:
-          "It depends on who needs to edit the site and how much it changes. A custom-coded static site is the fastest and most durable route. WordPress makes sense when a non-technical team needs to publish often. You get a straight recommendation for your situation, not a default pushed on everyone.",
+          "This comes down to one thing: editability. Over the last decade, 90% of clients that say \"editing the website is a requirement\" never edit the website, the content or the layout, so I've stopped selling WordPress as a frontrunner and am being honest with clients about whether WordPress is overkill for their needs. If you don't already have a plan to update the site's content, whether that be a blog, photo gallery or product catalog, you almost certainly don't need WordPress. We'll discuss this on our first consultation call.",
       },
       {
         q: "Do I own my website when it is finished?",
-        a: "Completely, from day one. Code, hosting, domain, and every account are in your name. Nothing is held hostage and there is no platform lock-in designed to keep you paying. If you ever move on, you take all of it with you.",
+        a: "Yes, once you make the final payment, you own everything completely. The site lives on my private server, but the content: the code, the images, the copy, everything that was developed for the project is legally yours. If you ever decide you need to move hosts, you get a package with all of that in it, no hoops to jump through and no tech jargon to decipher.",
         aText:
-          "Completely, from day one. Code, hosting, domain, and every account are in your name. Nothing is held hostage and there is no platform lock-in designed to keep you paying. If you ever move on, you take all of it with you.",
+          "Yes, once you make the final payment, you own everything completely. The site lives on my private server, but the content: the code, the images, the copy, everything that was developed for the project is legally yours. If you ever decide you need to move hosts, you get a package with all of that in it, no hoops to jump through and no tech jargon to decipher.",
       },
       {
         q: "Will my site actually be fast?",
         a: (
           <>
-            That is the priority, not an afterthought. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static build</Link> is
-            the fastest route there is, and chadworks.co is one of them, doing
-            its own job in public. Speed is also a visibility advantage now,
-            because clean, fast pages are easier for both search engines and AI
-            assistants to read.
+            Yes, all websites chadworks develops are fast by design. Speed is not
+            an add-on, and any vendor selling it as such is trying to get one over
+            on you. If your site is not fast, it may as well not exist in 2026. For
+            the fastest sites, go with{" "}
+            <Link href="/custom-coded-static/">custom coded/static</Link>, as they
+            don't have the same bloat and oftentimes server crowding that
+            WordPress, Shopify and pagebuilders come with.
           </>
         ),
         aText:
-          "That is the priority, not an afterthought. A custom-coded static build is the fastest route there is, and chadworks.co is one of them, doing its own job in public. Speed is also a visibility advantage now, because clean, fast pages are easier for both search engines and AI assistants to read.",
+          "Yes, all websites chadworks develops are fast by design. Speed is not an add-on, and any vendor selling it as such is trying to get one over on you. If your site is not fast, it may as well not exist in 2026. For the fastest sites, go with custom coded/static, as they don't have the same bloat and oftentimes server crowding that WordPress, Shopify and pagebuilders come with.",
       },
       {
         q: "Can you redesign my site or move me off Squarespace or Wix?",
-        a: (
-          <>
-            Yes, and a common reason people reach out. Moving to a clean, custom
-            build is usually faster and easier for AI tools to read. On WordPress
-            and want off? The{" "}
-            <Link href="/switch/leave-wordpress/">leave WordPress</Link> page
-            walks through exactly what the move looks like.
-          </>
-        ),
+        a: "Yes, chadworks does lots of redesigning or platform-migration projects. I'll listen to your situation to see if we need to redesign, switch platform but keep the design, or both redesign and switch platforms while we're at it.",
         aText:
-          "Yes, and a common reason people reach out. Moving to a clean, custom build is usually faster and easier for AI tools to read. On WordPress and want off? The leave WordPress page walks through exactly what the move looks like.",
+          "Yes, chadworks does lots of redesigning or platform-migration projects. I'll listen to your situation to see if we need to redesign, switch platform but keep the design, or both redesign and switch platforms while we're at it.",
       },
       {
         q: "Can I edit the site myself after it's built?",
-        a: "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+        a: "Yes, I can build your site to be editable, but these days I press my clients to determine if they really need that feature, given the pros and cons involved.\n\nA WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me at my minutely rate.\n\nHowever, I can also build micro-admin functions to edit specific parts of your site, like a micro blog editor or a photo gallery manager, either as part of the initial project or an additional fee down the road.",
         aText:
-          "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+          "Yes, I can build your site to be editable, but these days I press my clients to determine if they really need that feature, given the pros and cons involved. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me at my minutely rate. However, I can also build micro-admin functions to edit specific parts of your site, like a micro blog editor or a photo gallery manager, either as part of the initial project or an additional fee down the road.",
       },
       {
         q: "Will my site be secure?",
-        a: "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+        a: "Yes, every site is secured with an SSL certificate and form spam prevention. For sites with login forms, additional security is available on a case by case basis, depending on the level of traffic anticipated, exposure surface and sensitivity of information held behind the login.\n\nStill, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
         aText:
-          "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+          "Yes, every site is secured with an SSL certificate and form spam prevention. For sites with login forms, additional security is available on a case by case basis, depending on the level of traffic anticipated, exposure surface and sensitivity of information held behind the login. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
       },
       {
         q: "Do you handle privacy policy, cookies, and GDPR?",
-        a: "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+        a: "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need.\n\nDisclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
         aText:
-          "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+          "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need. Disclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
       },
       {
         q: "Can you set up a newsletter or mailing list?",
-        a: "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+        a: "Yes. All sites include one subscribe form if desired, wired directly into your email platform of choice. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
         aText:
-          "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+          "Yes. All sites include one subscribe form if desired, wired directly into your email platform of choice. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
       },
     ],
   },

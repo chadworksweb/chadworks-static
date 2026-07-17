@@ -6,10 +6,25 @@
 // ALWAYS in the static HTML (GEO/no-JS: only visually collapsed), and the
 // FAQPage JSON-LD is emitted separately by the template.
 
-import { useState } from "react";
+import { useState, isValidElement } from "react";
 import type { ReactNode } from "react";
 
 export type FaqItem = { q: string; a: ReactNode };
+
+// A multi-paragraph answer that can also carry inline links. A plain string
+// answer can hold paragraph breaks (a blank line) but not JSX. In this build an
+// inline <>...</> fragment evaluates to a plain array, so a bare array can't
+// signal "paragraphs" without also catching every inline-link fragment. Hence a
+// dedicated element the Answer renderer matches by type. Each item is one <p>.
+export function FaqParas({ items }: { items: ReactNode[] }) {
+  return (
+    <>
+      {items.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+    </>
+  );
+}
 
 // A STRING answer may carry blank-line paragraph breaks, so a long answer reads
 // as prose instead of one wall (Chad, 2026-07-17). Splitting here rather than
@@ -19,18 +34,9 @@ export type FaqItem = { q: string; a: ReactNode };
 // Anything that is not a string (JSX with inline links, a Prompt) renders as one
 // paragraph exactly as before, so no existing FAQ moves.
 function Answer({ a }: { a: ReactNode }) {
-  // An ARRAY answer is an explicit list of paragraphs, each a ReactNode, so an
-  // answer can mix a paragraph break with inline links (a plain string can do
-  // the break but not the links). Each entry renders as its own <p>.
-  if (Array.isArray(a)) {
-    return (
-      <>
-        {a.map((p, i) => (
-          <p key={i}>{p}</p>
-        ))}
-      </>
-    );
-  }
+  // A FaqParas answer renders its own <p> list, so return it as-is rather than
+  // wrapping it in another <p> (which would be invalid nesting).
+  if (isValidElement(a) && a.type === FaqParas) return a;
   if (typeof a === "string") {
     const paras = a
       .split(/\n{2,}/)
@@ -50,7 +56,7 @@ function Answer({ a }: { a: ReactNode }) {
 }
 
 export function FaqAccordion({ items }: { items: FaqItem[] }) {
-  const [open, setOpen] = useState<Set<number>>(() => new Set([0]));
+  const [open, setOpen] = useState<Set<number>>(() => new Set());
 
   function toggle(i: number) {
     setOpen((prev) => {
