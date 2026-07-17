@@ -5,14 +5,14 @@
 // voice, real facts only. Answers are always in the static HTML (GEO/no-JS).
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LaunchLink } from "@/components/LaunchLink";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/service";
 import {
   PageComposer,
   HeroCapsule,
   FaqCapsule,
-  CtaCapsule,
+  MainContactCapsule,
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
 
@@ -116,7 +116,7 @@ const GROUPS: FaqGroup[] = [
               <>
                 If your website needs work, not a redesign, I charge by the minute
                 at $5.25/min, which adds up to $315/hour. Read more about my fees
-                on my <Link href="/rates/">rates page</Link>.
+                on my <LaunchLink href="/rates/">rates page</LaunchLink>.
               </>,
             ]}
           />
@@ -169,7 +169,7 @@ const GROUPS: FaqGroup[] = [
             an add-on, and any vendor selling it as such is trying to get one over
             on you. If your site is not fast, it may as well not exist in 2026. For
             the fastest sites, go with{" "}
-            <Link href="/custom-coded-static/">custom coded/static</Link>, as they
+            <LaunchLink href="/custom-coded-static/">custom coded/static</LaunchLink>, as they
             don't have the same bloat and oftentimes server crowding that
             WordPress, Shopify and pagebuilders come with.
           </>
@@ -207,12 +207,18 @@ const GROUPS: FaqGroup[] = [
         aText:
           "Yes. All sites include one subscribe form if desired, wired directly into your email platform of choice. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
       },
+      {
+        q: "Do I get analytics to see my traffic?",
+        a: "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+        aText:
+          "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+      },
     ],
   },
   {
-    theme: "Getting found in search and AI",
+    theme: "Visibility FAQs",
     lead:
-      "How a business shows up in Google, in AI assistants, and in the answers people actually read.",
+      "Frequently asked questions about SEO/GEO and how to show up on Google, ChatGPT and other search platforms.",
     items: [
       {
         q: "Can you get my business to show up in ChatGPT and Google's AI Overview?",
@@ -222,7 +228,7 @@ const GROUPS: FaqGroup[] = [
             service, since 2010. Your site will be built with the basics
             included, but competition is heavy and to rank or show up where you
             want will likely take an additional budget dedicated solely to this
-            goal. Check out the <Link href="/visibility/">Visibility page</Link>{" "}
+            goal. Check out the <LaunchLink href="/visibility/">Visibility page</LaunchLink>{" "}
             for more info.
           </>
         ),
@@ -233,7 +239,7 @@ const GROUPS: FaqGroup[] = [
         q: "Is SEO dead now that everyone uses AI?",
         a: (
           <>
-            No. Classic <Link href="/seo/">SEO</Link> is the foundation that AI
+            No. Classic <LaunchLink href="/seo/">SEO</LaunchLink> is the foundation that AI
             visibility is built on, because the assistants pull from the same
             search index and the same structured pages. A site that ranks on page
             one is a site the AI answers are more likely to cite. The two reinforce
@@ -249,35 +255,31 @@ const GROUPS: FaqGroup[] = [
           <>
             A one-time, documented read on where a business stands in AI answers,
             classic search, structured data, and its profiles, scored so you can
-            see exactly what is working and what is not. It comes as a flat quote
-            with no retainer inside. The{" "}
-            <Link href="/ai-visibility-audit/">AI visibility audit</Link> page
-            shows what gets checked.
+            see exactly what is working and what is not. It's charged as a flat
+            rate of $675 with no strings attached, no commitment to hire me for
+            anything further. Check out the{" "}
+            <LaunchLink href="/ai-visibility-audit/">AI visibility audit page</LaunchLink> for
+            more info.
           </>
         ),
         aText:
-          "A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It comes as a flat quote with no retainer inside. The AI visibility audit page shows what gets checked.",
+          "A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of $675 with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.",
       },
       {
         q: "Do you do advertising on ChatGPT?",
         a: (
           <>
-            chadworks has access to OpenAI's ChatGPT advertising beta and can set
-            it up and manage it. The honest part: OpenAI requires a minimum spend
-            of $25 a day, billed by OpenAI directly, on top of the management.
-            Whether it is worth it depends on the business, and the{" "}
-            <Link href="/digital-marketing/">digital marketing</Link> page gives
-            you a straight read.
+            Yes, I have access to OpenAI's beta advertising platform. Their
+            minimum spend is $25/day (as of June 2026) and some industries are
+            prohibited, like legal and financial services. Check out the{" "}
+            <LaunchLink href="/advertising-on-chatgpt/">
+              Advertising on ChatGPT page
+            </LaunchLink>{" "}
+            for detailed information.
           </>
         ),
         aText:
-          "chadworks has access to OpenAI's ChatGPT advertising beta and can set it up and manage it. The honest part: OpenAI requires a minimum spend of $25 a day, billed by OpenAI directly, on top of the management. Whether it is worth it depends on the business, and the digital marketing page gives you a straight read.",
-      },
-      {
-        q: "Do I get analytics to see my traffic?",
-        a: "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
-        aText:
-          "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+          "Yes, I have access to OpenAI's beta advertising platform. Their minimum spend is $25/day (as of June 2026) and some industries are prohibited, like legal and financial services. Check out the Advertising on ChatGPT page for detailed information.",
       },
       {
         q: "How long does SEO take to work?",
@@ -328,15 +330,9 @@ export default function FaqsPage() {
           The last group lands light, ahead of the dark CTA. */}
       <FaqCapsule variant="groups" groups={GROUPS} />
 
-      <CtaCapsule
-        scheme="inverted"
-        cta={{
-          heading: "Still have a question?",
-          body:
-            "Ask it directly and you will get the same straight answer, from the person who would actually do the work, usually within a day.",
-          buttonLabel: "Ask Chad directly",
-          href: "/contact/",
-        }}
+      <MainContactCapsule
+        heading="Still have a question?"
+        intro="Ask it directly and you will get the same straight answer, from the person who would actually do the work, usually within a day."
       />
     </PageComposer>
   );

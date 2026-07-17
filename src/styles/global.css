@@ -1690,6 +1690,54 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-block__body { color: var(--text-secondary); font-size: var(--text-lg); line-height: var(--leading-body); }
 
+/* Sealed inline links (LaunchLink): the target page isn't live yet, so the term
+   renders non-clickable, dimmed with a dotted rule, and reveals a "coming soon"
+   tooltip on hover/focus. Mirrors the svc-lane coming-soon bubble. */
+.cw-soon {
+  position: relative;
+  cursor: default;
+  color: inherit;
+  border-bottom: 1px dotted currentColor;
+  opacity: 0.7;
+}
+.cw-soon__tip {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 5;
+  white-space: nowrap;
+  padding: 0.32rem 0.6rem;
+  border-radius: 7px;
+  background: var(--dark-bg);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease-smooth), transform 0.22s var(--ease-smooth);
+}
+.cw-soon__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 1rem;
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.cw-soon:hover .cw-soon__tip,
+.cw-soon:focus-visible .cw-soon__tip {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .cw-soon__tip { transition: none; }
+  }
+}
+
 /* PROSE FLOW -- the multi-paragraph body container (2026-07-17).
    .svc-block__body styles ONE paragraph; a copy block with several had no home,
    which is how a page ends up hand-classing every <p>. This carries the body
