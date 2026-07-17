@@ -1102,12 +1102,22 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: color var(--duration-base) var(--ease-smooth);
 }
 .site-footer__contact:hover { color: var(--text-primary); }
+/* A column can stack more than one group (Company + Tools share the first).
+   The gap has to clear the heading's own margin so the second group reads as a
+   new module rather than a continuation of the list above it. */
+.site-footer__group + .site-footer__group { margin-top: var(--space-md); }
 .site-footer__heading {
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  /* 20% up on --text-xs (Chad, 2026-07-17). Derived rather than hardcoded to
+     0.9rem so it keeps tracking the scale if --text-xs ever moves. */
+  font-size: calc(var(--text-xs) * 1.2);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent);
+  /* Faint rule under each module header. Padding carries the gap to the rule so
+     margin-bottom keeps its old job of spacing the rule off the list. */
+  padding-bottom: var(--space-2xs);
+  border-bottom: 1px solid var(--border-subtle);
   margin-bottom: var(--space-sm);
 }
 /* The heading is a <p>, so the global PROSE LINK rule (`p a`) catches its link
@@ -1776,6 +1786,13 @@ p, li, dd, figcaption { text-wrap: pretty; }
   gap: var(--space-lg);
   align-items: start;
 }
+/* The corroborating client quote inside the argument. It sits on the dark
+   band, so it takes the light type the band already hands its children and
+   just needs separating from the prose above it. */
+.cw-onep__quote { margin-top: var(--space-md); }
+.cw-onep__quote .svc-testimonial__quote { color: var(--dark-text, #fff); }
+.cw-onep__quote .svc-testimonial__by { color: var(--dark-muted); }
+
 .cw-onep__figure { margin: 0; position: sticky; top: calc(var(--nav-height) + var(--space-sm)); }
 .cw-onep__figure img {
   display: block;
@@ -1933,12 +1950,59 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .section.svc-block.reveal:has(.svc-lanes) {
   padding-top: calc(var(--section-pad-y) * 0.15);
 }
+/* ...except the ROWS variant, which is a section in its own right rather than a
+   funnel tucked under the block above it, so it keeps the standard rhythm top
+   AND bottom (Chad, 2026-07-17). Same specificity as the rule above, so this
+   must stay after it to win. */
+.section.svc-block.reveal:has(.svc-lanes--rows) {
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
 .svc-lanes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.2rem;
   margin-top: var(--space-lg);
 }
+/* ROWS VARIANT -- the horizontal lane format: one full-width lane per row, the
+   numeral promoted from a corner watermark to a real left-hand column, the
+   accent moved to the LEFT edge, and staggered indents down the stack. Opt-in
+   via PathsCapsule `layout="rows"`; the card grid above stays the default
+   everywhere else. */
+.svc-lanes--rows { grid-template-columns: 1fr; gap: 0.9rem; }
+.svc-lanes--rows .svc-lane {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1.7rem;
+  padding: 1.6rem 2rem;
+  border-bottom: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--lane-color);
+}
+.svc-lanes--rows .svc-lane__num {
+  position: static;
+  font-size: 2.6rem;
+  color: color-mix(in srgb, var(--lane-color) 38%, transparent);
+}
+/* The accent wipes ACROSS from the left edge rather than up from the bottom. */
+.svc-lanes--rows .svc-lane::before {
+  top: 0;
+  bottom: auto;
+  width: 3px;
+  height: 100%;
+  transition: width 0.4s var(--ease-smooth), opacity 0.4s var(--ease-smooth);
+}
+.svc-lanes--rows .svc-lane:hover::before { width: 100%; height: 100%; opacity: 0.06; }
+.svc-lanes--rows .svc-lane:hover { transform: translateX(3px); }
+/* The stagger. Indents compound down the stack, then flatten on narrow screens
+   where the horizontal room is the scarce thing. */
+.svc-lanes--rows .svc-lane:nth-child(2) { margin-left: 1.6rem; }
+.svc-lanes--rows .svc-lane:nth-child(3) { margin-left: 3.2rem; }
+.svc-lanes--rows .svc-lane:nth-child(n + 4) { margin-left: 4.8rem; }
+@media (max-width: 900px) {
+  .svc-lanes--rows .svc-lane { margin-left: 0; grid-template-columns: 1fr; gap: 0.6rem; }
+  .svc-lanes--rows .svc-lane__num { font-size: 2rem; }
+}
+
 .svc-lane {
   --lane-color: var(--accent);
   position: relative;

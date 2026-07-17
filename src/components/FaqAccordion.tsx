@@ -11,6 +11,32 @@ import type { ReactNode } from "react";
 
 export type FaqItem = { q: string; a: ReactNode };
 
+// A STRING answer may carry blank-line paragraph breaks, so a long answer reads
+// as prose instead of one wall (Chad, 2026-07-17). Splitting here rather than
+// changing the `a` type keeps answers plain strings, which matters: the FAQPage
+// JSON-LD lifts `f.a` straight into `acceptedAnswer.text`, and JSX there would
+// serialize an object into the schema.
+// Anything that is not a string (JSX with inline links, a Prompt) renders as one
+// paragraph exactly as before, so no existing FAQ moves.
+function Answer({ a }: { a: ReactNode }) {
+  if (typeof a === "string") {
+    const paras = a
+      .split(/\n{2,}/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (paras.length > 1) {
+      return (
+        <>
+          {paras.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </>
+      );
+    }
+  }
+  return <p>{a}</p>;
+}
+
 export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [open, setOpen] = useState<Set<number>>(() => new Set([0]));
 
@@ -39,7 +65,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
             </button>
             <div className="svc-acc__a">
               <div className="svc-acc__a-inner">
-                <p>{item.a}</p>
+                <Answer a={item.a} />
               </div>
             </div>
           </div>

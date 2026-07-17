@@ -622,6 +622,32 @@ export default function WebsiteDesignCostCalculatorPage() {
             years that make the work good and fast. You are not paying for
             anybody&apos;s quarterly target.
           </p>
+
+          {/* A real client corroborating the claim the section just made.
+              Quotation Addition is the strongest measured GEO lever there is
+              (Princeton, KDD 2024: 27.8% against a 19.5% baseline, +22% on
+              live Perplexity), and a page that says "I will not upsell you"
+              is worth more when somebody else says it. Same markup as
+              TestimonialsCapsule so it inherits the styling and the headshot
+              instead of inventing a second quote treatment. */}
+          <figure className="svc-testimonial cw-onep__quote">
+            <blockquote className="svc-testimonial__quote">
+              Chad is very professional, talented and skilled. He does not try
+              to sell you on products or services that you don&apos;t need.
+            </blockquote>
+            <figcaption className="svc-testimonial__byline">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
+              <img
+                className="svc-testimonial__avatar"
+                src="/people/kimberly-dolan.webp"
+                alt=""
+                loading="lazy"
+              />
+              <p className="svc-testimonial__by">
+                Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)
+              </p>
+            </figcaption>
+          </figure>
         </div>
           {/* The portrait IS the argument: the section claims one person, so it
               shows the person rather than a logo. */}

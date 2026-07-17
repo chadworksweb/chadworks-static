@@ -13,18 +13,39 @@ import { isLaunched } from "@/lib/launch";
 // 2026-07-16): Company leads here, where the header leads with the lanes. A
 // footer reader is usually looking for the org (about / contact / rates), not
 // browsing the catalogue, so the lanes follow rather than open.
-const COLUMNS: { heading: string; href?: string; links: { href: string; label: string }[] }[] = [
-  {
-    heading: "Company",
-    links: [
-      { href: "/about/", label: "About" },
-      { href: "/rates/", label: "Rates" },
-      { href: "/showroom/", label: "Showroom" },
-      { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
-      { href: "/faqs/", label: "FAQs" },
-      { href: "/contact/", label: "Contact" },
-    ],
-  },
+// A column holds one or more GROUPS, stacked. Company and Tools share the first
+// column (Chad, 2026-07-17): Tools is short and does not earn a column of its
+// own, and it reads as a footnote to the org rather than a service lane.
+type FooterGroup = {
+  heading: string;
+  href?: string;
+  links: { href: string; label: string }[];
+};
+
+const COLUMNS: FooterGroup[][] = [
+  [
+    {
+      heading: "Company",
+      links: [
+        { href: "/about/", label: "About" },
+        { href: "/rates/", label: "Rates" },
+        { href: "/showroom/", label: "Showroom" },
+        { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
+        { href: "/faqs/", label: "FAQs" },
+        { href: "/contact/", label: "Contact" },
+      ],
+    },
+    {
+      heading: "Tools",
+      links: [
+        {
+          href: "/website-design-cost-calculator/",
+          label: "Website Cost Calculator",
+        },
+      ],
+    },
+  ],
+  [
   {
     heading: "Websites",
     href: "/websites/",
@@ -39,6 +60,8 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/shopify/", label: "Shopify" },
     ],
   },
+  ],
+  [
   {
     heading: "Visibility",
     href: "/visibility/",
@@ -52,6 +75,8 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/advertising-on-chatgpt/", label: "Advertising on ChatGPT" },
     ],
   },
+  ],
+  [
   {
     heading: "Situations",
     links: [
@@ -66,6 +91,7 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/my-service-areas/", label: "Service Areas" },
     ],
   },
+  ],
 ];
 
 export default function SiteFooter() {
@@ -95,32 +121,36 @@ export default function SiteFooter() {
               plain label). Driven entirely by launch.ts. */}
           <div className="site-footer__links">
             <div className="site-footer__linkgrid">
-              {COLUMNS.map((col) => (
-                <div key={col.heading} className="site-footer__col">
-                  <p className="site-footer__heading">
-                    {col.href && isLaunched(col.href) ? (
-                      <Link href={col.href}>{col.heading}</Link>
-                    ) : (
-                      col.heading
-                    )}
-                  </p>
-                  <ul className="site-footer__list">
-                    {col.links.map((l) =>
-                      isLaunched(l.href) ? (
-                        <li key={l.href}>
-                          <Link href={l.href}>{l.label}</Link>
-                        </li>
-                      ) : (
-                        <li
-                          key={l.href}
-                          className="site-footer__item--sealed"
-                          aria-hidden="true"
-                        >
-                          {l.label}
-                        </li>
-                      )
-                    )}
-                  </ul>
+              {COLUMNS.map((groups) => (
+                <div key={groups[0].heading} className="site-footer__col">
+                  {groups.map((col) => (
+                    <div key={col.heading} className="site-footer__group">
+                      <p className="site-footer__heading">
+                        {col.href && isLaunched(col.href) ? (
+                          <Link href={col.href}>{col.heading}</Link>
+                        ) : (
+                          col.heading
+                        )}
+                      </p>
+                      <ul className="site-footer__list">
+                        {col.links.map((l) =>
+                          isLaunched(l.href) ? (
+                            <li key={l.href}>
+                              <Link href={l.href}>{l.label}</Link>
+                            </li>
+                          ) : (
+                            <li
+                              key={l.href}
+                              className="site-footer__item--sealed"
+                              aria-hidden="true"
+                            >
+                              {l.label}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
