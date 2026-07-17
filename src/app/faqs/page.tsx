@@ -218,16 +218,16 @@ const GROUPS: FaqGroup[] = [
         q: "Can you get my business to show up in ChatGPT and Google's AI Overview?",
         a: (
           <>
-            It is the work chadworks leads with, and there is real precedent for
-            it. A Pennsylvania criminal-defense firm now appears in Google's AI
-            Overview for its practice area, and a Brooklyn psychologist is named
-            by AI assistants in his market. The{" "}
-            <Link href="/ai-viz/">AI visibility</Link> page lays out the full
-            approach.
+            Yes, SEO and now GEO/AI search visibility is a pillar chadworks
+            service, since 2010. Your site will be built with the basics
+            included, but competition is heavy and to rank or show up where you
+            want will likely take an additional budget dedicated solely to this
+            goal. Check out the <Link href="/visibility/">Visibility page</Link>{" "}
+            for more info.
           </>
         ),
         aText:
-          "It is the work chadworks leads with, and there is real precedent for it. A Pennsylvania criminal-defense firm now appears in Google's AI Overview for its practice area, and a Brooklyn psychologist is named by AI assistants in his market. The AI visibility page lays out the full approach.",
+          "Yes, SEO and now GEO/AI search visibility is a pillar chadworks service, since 2010. Your site will be built with the basics included, but competition is heavy and to rank or show up where you want will likely take an additional budget dedicated solely to this goal. Check out the Visibility page for more info.",
       },
       {
         q: "Is SEO dead now that everyone uses AI?",
