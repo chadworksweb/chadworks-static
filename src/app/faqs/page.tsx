@@ -53,35 +53,27 @@ const GROUPS: FaqGroup[] = [
     items: [
       {
         q: "Who actually builds my site?",
-        a: "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+        a: "Me, I build your site. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
         aText:
-          "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+          "Me, I build your site. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
       },
       {
         q: "Do you work with businesses outside Pennsylvania?",
-        a: "Yes. The work is remote, and clients sit across the country and beyond, from Brooklyn to North Alabama. chadworks is based in Pennsylvania, but where you are has never decided whether the work fits.",
+        a: "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
         aText:
-          "Yes. The work is remote, and clients sit across the country and beyond, from Brooklyn to North Alabama. chadworks is based in Pennsylvania, but where you are has never decided whether the work fits.",
+          "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
       },
       {
         q: "How long does a website take to build?",
-        a: "It depends on the scope, and you get a real timeline with your quote rather than a guess here. A focused site moves faster than a full build with deep structure and visibility work. What does not change is that you stay in the loop the whole way, with no long silences where you wonder what is happening.",
+        a: "It depends on the scope of the project. A brochure site with limited content and functionality can take as little as a week. A complex build with custom features, lots of pages and other bells and whistles can take a month, sometimes a few.",
         aText:
-          "It depends on the scope, and you get a real timeline with your quote rather than a guess here. A focused site moves faster than a full build with deep structure and visibility work. What does not change is that you stay in the loop the whole way, with no long silences where you wonder what is happening.",
+          "It depends on the scope of the project. A brochure site with limited content and functionality can take as little as a week. A complex build with custom features, lots of pages and other bells and whistles can take a month, sometimes a few.",
       },
       {
         q: "What do you need from me to get started?",
-        a: (
-          <>
-            A conversation. Tell me the business, what you want the site to do,
-            and where it is stuck today. From there you get a straight answer on
-            whether it is a fit and what it would take. The{" "}
-            <Link href="/contact/">contact page</Link> is the fastest way to
-            start.
-          </>
-        ),
+        a: "First thing is a conversation to set the scope. Then I'll provide a list of what is needed, ranging from hosting/domain access to content like text and images. You will also need to make a deposit, typically 50% of the total cost, for work to commence.",
         aText:
-          "A conversation. Tell me the business, what you want the site to do, and where it is stuck today. From there you get a straight answer on whether it is a fit and what it would take. The contact page is the fastest way to start.",
+          "First thing is a conversation to set the scope. Then I'll provide a list of what is needed, ranging from hosting/domain access to content like text and images. You will also need to make a deposit, typically 50% of the total cost, for work to commence.",
       },
       {
         q: "Do I need to have the whole scope figured out before we start?",
@@ -91,13 +83,13 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Can you get a domain name for me?",
-        a: "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+        a: "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed.\n\nYour domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
         aText:
-          "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+          "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
       },
       {
         q: "Can you set up branded email accounts for me?",
-        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will.\n\nMost clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account.\n\nIf your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
         aText:
           "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
       },

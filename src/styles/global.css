@@ -2508,6 +2508,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--text-primary);
   margin: 0;
 }
+/* Multi-paragraph answers: drop the doubled vertical padding between stacked
+   paragraphs so the break reads as one gap, not an empty line. */
+.svc-acc__a p + p { padding-top: 0; }
 .svc-acc__item.is-open .svc-acc__a { grid-template-rows: 1fr; }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
