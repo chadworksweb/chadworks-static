@@ -202,26 +202,6 @@ export function buildScreen(
   };
 }
 
-// A stratum: one flat rounded quad, drawn parallel to the screen at a z offset.
-// One mesh, redrawn per layer with different uniforms.
-export function buildStratum(radius = 0.14, seg = 5): Mesh {
-  const pos: number[] = [], nrm: number[] = [], uv: number[] = [];
-  const ring = roundedRing(1, 1, radius, seg);
-  const n = ring.length;
-  for (let i = 0; i < n; i++) {
-    const a = ring[i], c = ring[(i + 1) % n];
-    pos.push(0, 0, 0, a.x, a.y, 0, c.x, c.y, 0);
-    for (let k = 0; k < 3; k++) nrm.push(0, 0, 1);
-    uv.push(0.5, 0.5, a.x * 0.5 + 0.5, a.y * 0.5 + 0.5, c.x * 0.5 + 0.5, c.y * 0.5 + 0.5);
-  }
-  return {
-    pos: new Float32Array(pos),
-    nrm: new Float32Array(nrm),
-    uv: new Float32Array(uv),
-    count: pos.length / 3,
-  };
-}
-
 // A unit box spanning [-1,1] on every axis, flat-shaded (one normal per face).
 // The mathDev plug is assembled entirely from these: a connector body, its
 // pins, and a cable stub, each drawn with its own translate + non-uniform scale.
@@ -418,23 +398,6 @@ void main(){
   col += vec3(1.0, 0.95, 0.7) * fres * (0.15 + uCharge * 0.2 + uZap * 0.9); // shiny rim
 
   frag = vec4(col, 1.0);
-}`;
-
-// A stratum: translucent, soft-edged, tinted, and breathing on its own phase.
-export const stratumFrag = `#version 300 es
-precision highp float;
-in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal;
-uniform vec3 uLayerTint;
-uniform float uTime, uAlpha, uPhase, uPulse, uGrain;
-out vec4 frag;
-${COMMON}
-void main(){
-  float d = length(vUv - 0.5) * 2.0;
-  float edge = smoothstep(1.0, 0.35, d);
-  float breathe = 1.0 + uPulse * 0.12 * sin(uTime * 2.2 + uPhase);
-  float n = mix(1.0, 0.8 + vnoise(vUv * 22.0 + uPhase) * 0.4, uGrain);
-  float a = uAlpha * edge * breathe * n;
-  frag = vec4(uLayerTint * (0.7 + edge * 0.5), a);
 }`;
 
 // ---------------------------------------------------------------------

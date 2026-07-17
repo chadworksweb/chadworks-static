@@ -22,11 +22,9 @@ import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/mot
 import {
   Mat,
   buildScreen,
-  buildStratum,
   buildBox,
   screenVert,
   screenFrag,
-  stratumFrag,
   plugFrag,
   SCREEN,
 } from "@/lib/package-screen-core";
@@ -80,10 +78,9 @@ export function PackageScreen({
 
     // A lost context (browser WebGL cap hit during SPA nav) fails compiles with
     // an empty log. Bail quietly rather than throwing out of the effect.
-    let screenProg: WebGLProgram, stratumProg: WebGLProgram, plugProg: WebGLProgram;
+    let screenProg: WebGLProgram, plugProg: WebGLProgram;
     try {
       screenProg = link(screenVert, screenFrag);
-      stratumProg = link(screenVert, stratumFrag);
       plugProg = link(screenVert, plugFrag);
     } catch (err) {
       console.warn("PackageScreen: WebGL shader build failed; object omitted.", err);
@@ -179,13 +176,6 @@ export function PackageScreen({
       model: U(plugProg, "uModel"), normal: U(plugProg, "uNormal"),
       time: U(plugProg, "uTime"), charge: U(plugProg, "uCharge"),
       zap: U(plugProg, "uZap"),
-    };
-    const ul = {
-      proj: U(stratumProg, "uProj"), view: U(stratumProg, "uView"),
-      model: U(stratumProg, "uModel"), normal: U(stratumProg, "uNormal"),
-      tint: U(stratumProg, "uLayerTint"), time: U(stratumProg, "uTime"),
-      alpha: U(stratumProg, "uAlpha"), phase: U(stratumProg, "uPhase"),
-      pulse: U(stratumProg, "uPulse"), grain: U(stratumProg, "uGrain"),
     };
 
     // --- sizing -------------------------------------------------------
