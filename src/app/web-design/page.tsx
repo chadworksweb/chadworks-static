@@ -6,7 +6,7 @@ import ServiceTemplate from "@/components/ServiceTemplate";
 import { webDesign as service } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
-import { ProcessCapsule, AssuranceCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
+import { ProcessCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -48,9 +48,11 @@ export default function WebDesignPage() {
             scheme="inverted"
           />
         ),
-        assurance: (
-          <AssuranceCapsule assurance={service.assurance!} variant="tenets" />
-        ),
+        // The tenets moved to /about/ on 2026-07-17 (Chad's call): they are
+        // about how chadworks operates, not how a website gets designed. Held
+        // to null so the template does not fall back to the default checklist
+        // variant, which would put a weaker copy of them back on this page.
+        assurance: null,
         // Swap the light PortfolioCapsule for the full shared showroom (same one
         // the homepage renders).
         portfolio: <PortfolioShowcaseCapsule archiveHeading="Website Design Showcase" />,

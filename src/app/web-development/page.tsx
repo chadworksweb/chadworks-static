@@ -66,7 +66,7 @@ export default function WebDevelopmentPage() {
         // Drop the page-specific price section here; the rates band renders later
         // (in the assurance slot) so it lands between the FAQ and the contact CTA.
         price: null,
-        // Swap "Is this the right fit?" for the shared homepage "Who I Work With".
+        // Swap "Is this the right fit?" for the shared "Are We A Good Fit?".
         qualification: <FitCapsule />,
         // Rates band, placed between the FAQ and the contact CTA (this slot sits
         // right there in the canonical order). Replaces the dropped assurance.

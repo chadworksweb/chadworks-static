@@ -318,15 +318,9 @@ export const webDesign: Service = {
     ],
   },
 
-  assurance: {
-    heading: "chadworks tenets of transparency",
-    items: [
-      "Everything I create for you is legally yours, upon final payment.",
-      "Every project includes at least one week of post-launch coverage.",
-      "No nonsense or fluff. Direct questions and direct answers, in the name of protecting your business goals.",
-      "No lock-in, no long-term contracts or chadworks' proprietary technology or platforms that hold your project hostage should you want to leave.",
-    ],
-  },
+  // No assurance slot: the tenets of transparency moved to /about/ on
+  // 2026-07-17 and now live in TenetsCapsule, which is their canonical home.
+  // Do not retype them here.
 
   nextSteps: {
     heading: "What happens after you reach out",

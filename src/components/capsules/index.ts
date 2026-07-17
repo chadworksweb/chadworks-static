@@ -24,6 +24,7 @@ export { QualificationCapsule } from "./QualificationCapsule";
 export { FitCapsule } from "./FitCapsule";
 export { FaqCapsule } from "./FaqCapsule";
 export { AssuranceCapsule } from "./AssuranceCapsule";
+export { TenetsCapsule } from "./TenetsCapsule";
 export { NextStepsCapsule } from "./NextStepsCapsule";
 export { CtaCapsule } from "./CtaCapsule";
 export { ContactCapsule } from "./ContactCapsule";
