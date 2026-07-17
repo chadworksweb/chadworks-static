@@ -293,10 +293,10 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 // geometry input, so a scope change morphs the object itself rather than
 // decorating it. One scope layer, one channel:
 //
-//   pages        -> scale        (the screen gets bigger)
-//   sections     -> strata       (each section stacks another layer)
+//   pages        -> strata       (thin ridged leaves stacked behind: a book)
+//   sections     -> height       (cover grows a unit taller + a face divider each)
 //   ambition     -> bevel        (a plain edge cuts into a jeweled one)
-//   mathDev      -> depth        (thickness: real machinery underneath)
+//   mathDev      -> depth        (the cover's own thickness)
 //   brandingDone -> tint         (grey and unresolved -> full brand)
 //   content      -> washC        (the wash gains its third color)
 //   editability  -> sheen        (surface you can touch)
@@ -312,6 +312,8 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 // ---------------------------------------------------------------------
 export type Channels = {
   scale: number;
+  heightHalf: number; // cover half-height, driven by sections
+  sections: number; // section count, ruled across the cover face
   strata: number;
   spread: number;
   bevel: number;
@@ -354,12 +356,22 @@ export function channels(s: Scope): Channels {
   const brandT = norm(s.brandingDone, 0, BRANDING_DONE.length - 1);
 
   return {
-    scale: 0.62 + norm(s.pages, 1, 24) * 0.4,
-    // Sections stack literally: one stratum per section past the first.
-    strata: Math.max(0, Math.round(s.sections) - 1),
-    spread: 0.055 + norm(s.locales, 1, 6) * 0.14,
+    // Overall object size is now constant (no slider drives it); sections drive
+    // HEIGHT, not scale. Bumped 25% from 0.72 for a larger default presence.
+    scale: 0.9,
+    // Height is one unit PER section: the cover is short at a few sections and
+    // grows a fixed step taller with each one added.
+    heightHalf: 0.1 * s.sections,
+    // The raw count, ruled onto the cover face as section dividers.
+    sections: s.sections,
+    // Pages append thin leaves behind the cover: one leaf per page past the
+    // first, so more pages grow a real, ridged page block toward the back.
+    strata: Math.max(0, Math.round(s.pages) - 1),
+    spread: 0.03 + norm(s.locales, 1, 6) * 0.03,
     bevel: 0.012 + ambitionT * 0.075,
-    depth: 0.05 + norm(s.mathDev, 0, MATH_DEV.length - 1) * 0.34,
+    // Cover depth only: mathDev gives the front cover its modest thickness.
+    // Pages no longer touch this; they add leaves behind it instead.
+    depth: 0.03 + norm(s.mathDev, 0, MATH_DEV.length - 1) * 0.16,
     grain: 0.5 * (1 - ambitionT), // low ambition reads rough; high reads polished
     // Branding runs backwards: index 0 means nothing exists yet, so the object
     // reads grey and unresolved until a real system is in hand.

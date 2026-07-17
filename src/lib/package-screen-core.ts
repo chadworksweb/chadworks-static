@@ -243,7 +243,7 @@ layout(location=1) in vec3 aNrm;
 layout(location=2) in vec2 aUv;
 uniform mat4 uProj, uView, uModel;
 uniform mat3 uNormal;
-out vec3 vN; out vec3 vViewPos; out vec2 vUv; out vec3 vLocal;
+out vec3 vN; out vec3 vViewPos; out vec2 vUv; out vec3 vLocal; out float vFz;
 void main(){
   vec4 world = uModel * vec4(aPos, 1.0);
   vec4 viewPos = uView * world;
@@ -251,6 +251,7 @@ void main(){
   vViewPos = viewPos.xyz;
   vUv = aUv;
   vLocal = aPos;
+  vFz = aNrm.z; // 1.0 on the flat front cap: where the section rules are drawn
   gl_Position = uProj * viewPos;
 }`;
 
@@ -259,10 +260,10 @@ void main(){
 // uSheen is the specular (editability); uGrain is the surface texture.
 export const screenFrag = `#version 300 es
 precision highp float;
-in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal;
+in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal; in float vFz;
 uniform vec3 uWashA, uWashB, uWashC;
 uniform vec3 uTint;
-uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow;
+uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow, uSections;
 out vec4 frag;
 ${COMMON}
 void main(){
@@ -305,6 +306,28 @@ void main(){
   // defining it.
   float pulse = 1.0 + uPulse * 0.06 * sin(uTime * 5.0);
   vec3 col = wash * uTint * pulse + rim * 0.26 + spec;
+
+  // Section rules: each boundary (uv.y = k / uSections) is an EMBOSSED groove
+  // pressed into the front cap, not a flat black line. Across the groove the
+  // upper lip catches light and the lower lip falls into shadow, with the floor
+  // recessed darker, so it reads as an indent. fwidth scales the groove to stay
+  // crisp at any height; vFz gates it to the flat front face only.
+  if (uSections > 0.5 && vFz > 0.9) {
+    float s = vUv.y * uSections;
+    float e = fract(s);
+    float sig = e < 0.5 ? e : e - 1.0;   // signed distance to the nearest rule
+    float px = fwidth(s);                // one pixel, in section units
+    float d = abs(sig);
+    // A crisp recessed incision (the stamped line) with a shadowed upper lip
+    // and a lit lower lip, so it reads as pressed INTO the face and runs clean
+    // end to end instead of breaking into dashes.
+    float cut = 1.0 - smoothstep(0.0, px * 1.4, d);       // the dark incision
+    float shelf = 1.0 - smoothstep(px * 1.2, px * 3.0, d); // the two lips
+    col *= 1.0 - cut * 0.26;                               // recessed line (soft)
+    col *= 1.0 - shelf * step(0.0, sig) * 0.16;            // shadow on the top lip
+    col += col * shelf * step(0.0, -sig) * 0.26;           // highlight on the bottom lip
+  }
+
   frag = vec4(col, 0.94 + fres * 0.06);
 }`;
 
@@ -340,5 +363,5 @@ export const SCREEN = {
   // moves it.
   restRotY: 0.42,
   restTiltX: -0.19,
-  maxStrata: 8,
+  maxStrata: 24, // one leaf per page; pages tops out at 24
 };

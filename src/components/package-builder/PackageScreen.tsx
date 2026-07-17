@@ -113,23 +113,36 @@ export function PackageScreen({
     };
 
     const HW = SCREEN.aspect * 0.5;
-    const HH = 0.5;
     const screenBuf = mkVao();
-    const stratumBuf = mkVao();
-    const stratumMesh = buildStratum(SCREEN.radius);
-    upload(stratumBuf, stratumMesh);
+    const leafBuf = mkVao();
+    // A leaf is a thin beveled slab: its bevel rim is what catches light and
+    // reads as the ridge separating one page from the next. HD is much smaller
+    // than the cover's depth, so the leaves stay visibly thinner than the cover.
+    const LEAF_HD = 0.006, LEAF_BEVEL = 0.006;
+    const LEAF_GROOVE = 0.013, LEAF_PITCH = 2 * LEAF_HD + LEAF_GROOVE;
 
-    // Geometry is rebuilt only when depth/bevel drift past a threshold, so an
-    // ease costs a handful of rebuilds instead of one per frame.
-    let builtDepth = -1, builtBevel = -1, screenCount = 0;
-    const rebuild = (depth: number, bevel: number) => {
-      const m = buildScreen(HW, HH, depth, bevel, SCREEN.radius);
-      upload(screenBuf, m);
-      screenCount = m.count;
+    // The corner radius must shrink with the (now short) height, or a low-section
+    // slab rounds off into a pill. Cap it to a fraction of the half-height.
+    const radiusFor = (hh: number) => Math.min(SCREEN.radius, hh * 0.55);
+
+    // Cover and leaves share ONE footprint: same half-width, same half-height.
+    // Sections drive the half-height, so BOTH meshes are rebuilt together
+    // whenever the height (or the cover's depth/bevel) drifts past a threshold.
+    let builtDepth = -1, builtBevel = -1, builtHeight = -1;
+    let screenCount = 0, leafCount = 0;
+    const rebuild = (depth: number, bevel: number, hh: number) => {
+      const r = radiusFor(hh);
+      const cover = buildScreen(HW, hh, depth, bevel, r);
+      upload(screenBuf, cover);
+      screenCount = cover.count;
+      const leaf = buildScreen(HW, hh, LEAF_HD, LEAF_BEVEL, r);
+      upload(leafBuf, leaf);
+      leafCount = leaf.count;
       builtDepth = depth;
       builtBevel = bevel;
+      builtHeight = hh;
     };
-    rebuild(target.current.depth, target.current.bevel);
+    rebuild(target.current.depth, target.current.bevel, target.current.heightHalf);
 
     // --- uniforms -----------------------------------------------------
     const U = (p: WebGLProgram, n: string) => gl.getUniformLocation(p, n);
@@ -141,6 +154,7 @@ export function PackageScreen({
       time: U(screenProg, "uTime"), sheen: U(screenProg, "uSheen"),
       spectrum: U(screenProg, "uSpectrum"), grain: U(screenProg, "uGrain"),
       pulse: U(screenProg, "uPulse"), glow: U(screenProg, "uStrataGlow"),
+      sections: U(screenProg, "uSections"),
     };
     const ul = {
       proj: U(stratumProg, "uProj"), view: U(stratumProg, "uView"),
@@ -202,14 +216,19 @@ export function PackageScreen({
       cur.spin = ease(cur.spin, t.spin, k);
       cur.pulse = ease(cur.pulse, t.pulse, k);
       cur.spectrum = ease(cur.spectrum, t.spectrum, k);
+      cur.heightHalf = ease(cur.heightHalf, t.heightHalf, k);
       ease3(cur.tint, t.tint, k);
       ease3(cur.washA, t.washA, k);
       ease3(cur.washB, t.washB, k);
       ease3(cur.washC, t.washC, k);
       curStrata = ease(curStrata, t.strata, k);
 
-      if (Math.abs(cur.depth - builtDepth) > 0.006 || Math.abs(cur.bevel - builtBevel) > 0.004) {
-        rebuild(cur.depth, cur.bevel);
+      if (
+        Math.abs(cur.depth - builtDepth) > 0.006 ||
+        Math.abs(cur.bevel - builtBevel) > 0.004 ||
+        Math.abs(cur.heightHalf - builtHeight) > 0.006
+      ) {
+        rebuild(cur.depth, cur.bevel, cur.heightHalf);
       }
 
       const w = canvas.width, h = canvas.height;
@@ -242,54 +261,13 @@ export function PackageScreen({
       );
       const posed = Mat.mul(Mat.trans(driftX, driftY, 0), orient);
 
+      // --- the cover face --------------------------------------------
+      // The front slab is the book's cover. Pages no longer thicken it; they
+      // append leaves behind it (below), so this stays a constant cover and
+      // mathDev alone gives it its modest depth.
+      gl.useProgram(screenProg);
       gl.uniformMatrix4fv(us.proj, false, proj);
       gl.uniformMatrix4fv(us.view, false, view);
-
-      // --- strata: stacked BEHIND the face, drawn far -> near ---------
-      // Scope accumulates behind the screen, so adding sections reads as the
-      // object gaining real depth. depthMask off: they blend, never occlude.
-      const count = Math.round(curStrata);
-      if (count > 0) {
-        gl.useProgram(stratumProg);
-        gl.uniformMatrix4fv(ul.proj, false, proj);
-        gl.uniformMatrix4fv(ul.view, false, view);
-        gl.uniform1f(ul.time, time);
-        gl.uniform1f(ul.pulse, cur.pulse);
-        gl.uniform1f(ul.grain, cur.grain);
-        gl.depthMask(false);
-        gl.bindVertexArray(stratumBuf.vao);
-        for (let i = count - 1; i >= 0; i--) {
-          const depthIdx = i + 1;
-          const z = -(cur.depth + depthIdx * cur.spread);
-          const shrink = 1 - depthIdx * 0.035;
-          const s = cur.scale * shrink;
-          const model = Mat.mul(
-            Mat.mul(orient, Mat.trans(0, 0, z)),
-            Mat.scale(s * SCREEN.aspect * 0.5, s * 0.5, 1)
-          );
-          const mv = Mat.mul(view, model);
-          gl.uniformMatrix4fv(ul.model, false, model);
-          gl.uniformMatrix3fv(ul.normal, false, Mat.normalMat(mv));
-          // Each stratum leans a little further toward the wash's far color,
-          // so the stack reads as a gradient of scope rather than a repeat.
-          const f = depthIdx / Math.max(1, SCREEN.maxStrata);
-          gl.uniform3f(
-            ul.tint,
-            cur.washB[0] + (cur.washC[0] - cur.washB[0]) * f,
-            cur.washB[1] + (cur.washC[1] - cur.washB[1]) * f,
-            cur.washB[2] + (cur.washC[2] - cur.washB[2]) * f
-          );
-          // The newest layer fades in with the eased fractional remainder.
-          const partial = i === count - 1 ? curStrata - (count - 1) : 1;
-          gl.uniform1f(ul.alpha, 0.3 * (1 - f * 0.55) * Math.max(0, Math.min(1, partial)));
-          gl.uniform1f(ul.phase, depthIdx * 1.7);
-          gl.drawArrays(gl.TRIANGLES, 0, stratumMesh.count);
-        }
-        gl.depthMask(true);
-      }
-
-      // --- the screen face -------------------------------------------
-      gl.useProgram(screenProg);
       const model = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
       const mv = Mat.mul(view, model);
       gl.uniformMatrix4fv(us.model, false, model);
@@ -303,9 +281,58 @@ export function PackageScreen({
       gl.uniform1f(us.spectrum, cur.spectrum);
       gl.uniform1f(us.grain, cur.grain);
       gl.uniform1f(us.pulse, cur.pulse);
-      gl.uniform1f(us.glow, Math.min(1, curStrata / SCREEN.maxStrata));
+      gl.uniform1f(us.glow, 0);
+      // Sections show up as horizontal dividers ruled across the cover face.
+      // Snap to the target count (not the eased height) so lines are always
+      // whole, and the slab grows one section-unit taller for each of them.
+      gl.uniform1f(us.sections, Math.round(t.sections));
       gl.bindVertexArray(screenBuf.vao);
       gl.drawArrays(gl.TRIANGLES, 0, screenCount);
+
+      // --- leaves: thin ridged pages appended BEHIND the cover -------
+      // Each page past the first is its own thin beveled slab, stacked further
+      // back with a groove between them. The bevel rim on every leaf catches
+      // light as a ridge, so the stack reads as independent pages and not one
+      // solid mass. Same program as the cover, flat paper tint so the wash
+      // gradient does not turn each leaf into a little display. Depth test is
+      // on and depthMask stays true, so the cover and the nearer leaves occlude
+      // the ones behind, leaving only the ridged edges peeking at this angle.
+      const count = Math.round(curStrata);
+      if (count > 0) {
+        // A purple leaf tone: the lilac wash pulled toward the brand purple
+        // (washA), so every leaf carries colour and none read as bare white.
+        // One flat stop -> an even sheet; the per-leaf shade below varies it.
+        const paper = [
+          cur.washC[0] * 0.42 + cur.washA[0] * 0.58,
+          cur.washC[1] * 0.42 + cur.washA[1] * 0.58,
+          cur.washC[2] * 0.42 + cur.washA[2] * 0.58,
+        ];
+        gl.uniform3fv(us.washA, paper);
+        gl.uniform3fv(us.washB, paper);
+        gl.uniform3fv(us.washC, paper);
+        gl.uniform1f(us.sheen, 0.12);
+        gl.uniform1f(us.spectrum, 0);
+        gl.uniform1f(us.grain, 0);
+        gl.uniform1f(us.sections, 0); // no dividers on the leaf edges
+        gl.bindVertexArray(leafBuf.vao);
+        const back = cur.depth + LEAF_HD; // first leaf sits just behind the cover
+        for (let i = 0; i < count; i++) {
+          const z = -(back + LEAF_GROOVE + i * LEAF_PITCH);
+          const lm = Mat.mul(
+            Mat.mul(orient, Mat.trans(0, 0, z)),
+            Mat.scale(cur.scale, cur.scale, 1)
+          );
+          const lmv = Mat.mul(view, lm);
+          gl.uniformMatrix4fv(us.model, false, lm);
+          gl.uniformMatrix3fv(us.normal, false, Mat.normalMat(lmv));
+          // Deeper leaves darken (receding depth), and alternate leaves darken
+          // a touch more so consecutive sheets separate and read as individual
+          // pages rather than one smooth block.
+          const shade = (1 - Math.min(0.42, i * 0.02)) * (i % 2 ? 0.9 : 1);
+          gl.uniform3f(us.tint, cur.tint[0] * shade, cur.tint[1] * shade, cur.tint[2] * shade);
+          gl.drawArrays(gl.TRIANGLES, 0, leafCount);
+        }
+      }
     };
 
     const tick = (now: number) => {
