@@ -112,8 +112,12 @@ export const BASELINE: Scope = {
   sections: SECTIONS_INCLUDED,
   ambition: 0,
   mathDev: 0,
-  brandingDone: 0,
-  content: 0,
+  // Branding and copy default to UNSET (-1): no chip selected, no plaque, no
+  // gem, no copy lines -- the slab opens bare and each effect is a reveal once a
+  // chip is picked. `at()` clamps -1 to index 0 for pricing, so the quote reads
+  // as "nothing provided" (full branding to build, client copy) by default.
+  brandingDone: -1,
+  content: -1,
   editability: 0,
   motion: 0,
   commerce: 0,
@@ -180,7 +184,7 @@ export const PARAMS: Param[] = [
     label: "Copy (Text content)",
     hint: "Who writes the copy.",
     kind: "steps",
-    options: ["I have it", "Cleanup", "Most of it", "Every word"],
+    options: ["Client provides", "Cleanup", "Most of it", "Every word"],
   },
   {
     key: "editability",
@@ -319,6 +323,7 @@ export type Channels = {
   plug: number; // mathDev level: complexity of the 3D plug in the left edge
   plaque: number; // constant: the brand plaque panel, held at its level-2 state
   brandContent: number; // brandingDone level: the marks laid on the plaque
+  copy: number; // content level: skeleton copy lines laid under the gem (0..3)
   strata: number;
   spread: number;
   bevel: number;
@@ -375,6 +380,9 @@ export function channels(s: Scope): Channels {
     // at level 2, the wordmark beside it at 3, the manifesto cloud at 4.
     plaque: 1,
     brandContent: s.brandingDone,
+    // content level also lays skeleton "copy" lines under the gem: 1 line at the
+    // first level up to 4 at "Every word".
+    copy: s.content,
     // Pages append thin leaves behind the cover: one leaf per page past the
     // first, so more pages grow a real, ridged page block toward the back.
     strata: Math.max(0, Math.round(s.pages) - 1),

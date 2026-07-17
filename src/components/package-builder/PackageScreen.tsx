@@ -22,6 +22,7 @@ import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/mot
 import {
   Mat,
   buildScreen,
+  buildFace,
   buildBox,
   buildQuad,
   screenVert,
@@ -149,6 +150,11 @@ export function PackageScreen({
     // for all four corner fixings; its bevel rolls a highlight as it floats.
     const overlayBuf = mkVao();
     let overlayCount = 0;
+    // The manifesto wash (level 4) is painted on a flat rounded-rect face that
+    // matches the plaque footprint, so it is masked to the panel silhouette and
+    // fills edge to edge. Rebuilt with the panel in rebuild().
+    const cloudBuf = mkVao();
+    let cloudCount = 0;
     const OV_INSET = 0.07; // the purple frame left around the panel
     const OV_HD = 0.012, OV_BEVEL = 0.01; // thin, lightly beveled
     // A small air gap lifts the whole panel off the cover face so its back cap
@@ -171,11 +177,19 @@ export function PackageScreen({
     gl.bindTexture(gl.TEXTURE_2D, gemTex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
     let gemReady = false;
+    let gemAspect = 480 / 300; // the mark's real w/h; corrected once it decodes
     const gemImg = new Image();
     gemImg.onload = () => {
+      if (gemImg.naturalWidth && gemImg.naturalHeight) {
+        gemAspect = gemImg.naturalWidth / gemImg.naturalHeight;
+      }
       gl.bindTexture(gl.TEXTURE_2D, gemTex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      // Premultiply on upload: the PNG's transparent border texels carry white
+      // RGB, so straight alpha + linear filtering fringes a jagged white halo
+      // around the mark. Premultiplied texels fade to transparent-black at the
+      // edge and composite clean (paired with premultiplied blend + shader).
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, gemImg);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -190,7 +204,9 @@ export function PackageScreen({
     const uploadCanvas = (tex: WebGLTexture | null, cvs: HTMLCanvasElement) => {
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      // Premultiplied to match the gem so the whole decal pass shares one
+      // (premultiplied) blend + shader.
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cvs);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
@@ -214,22 +230,74 @@ export function PackageScreen({
       const ctx = cvs.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, W, H);
-        // Soft, low-alpha puffs spread across the whole field so it reads as an
-        // even atmosphere, not a bright blob in one corner.
-        const puffs: [number, number, number, number][] = [
-          [128, 128, 155, 0.15],
-          [78, 92, 92, 0.11], [182, 104, 96, 0.11],
-          [104, 178, 88, 0.09], [190, 182, 80, 0.09],
+        // A FLAT, even fill: the plaque-shaped face mesh clips this to the panel
+        // silhouette, so the wash needs no edge fade of its own -- it fills the
+        // whole face. A flat lilac floor + a soft brighter crown high on the
+        // panel, then a couple of gentle colour puffs for life.
+        ctx.fillStyle = "rgba(234,222,249,0.24)";
+        ctx.fillRect(0, 0, W, H);
+        const crown = ctx.createRadialGradient(128, 96, 0, 128, 96, 165);
+        crown.addColorStop(0, "rgba(255,255,255,0.2)");
+        crown.addColorStop(1, "rgba(255,255,255,0)");
+        ctx.fillStyle = crown;
+        ctx.fillRect(0, 0, W, H);
+        // Colour puffs fade to a transparent copy of their OWN colour (never
+        // white) so premultiplied blend leaves no fringe.
+        const puffs: [number, number, number, string][] = [
+          [84, 150, 96, "rgba(210,196,244,0.06)"],
+          [186, 104, 92, "rgba(244,212,230,0.06)"],
+          [150, 182, 84, "rgba(204,224,242,0.05)"],
         ];
-        for (const [x, y, r, a] of puffs) {
+        for (const [x, y, r, c] of puffs) {
           const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-          g.addColorStop(0, `rgba(255,255,255,${a})`);
-          g.addColorStop(0.55, `rgba(229,210,244,${a * 0.6})`);
-          g.addColorStop(1, "rgba(229,210,244,0)");
+          g.addColorStop(0, c);
+          g.addColorStop(1, c.replace(/[\d.]+\)$/, "0)"));
           ctx.fillStyle = g;
           ctx.fillRect(0, 0, W, H);
         }
         uploadCanvas(cloudTex, cvs);
+      }
+    }
+
+    // Skeleton "copy" line: a single rounded pill bar with a soft left-to-right
+    // shimmer, the text-loading-placeholder look. One texture, stretched to each
+    // line's width; the content level decides how many lines show.
+    const barTex = stubTex();
+    {
+      const cvs = document.createElement("canvas");
+      const W = 256, H = 48;
+      cvs.width = W; cvs.height = H;
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, W, H);
+        // A squared-off bar (hard corners). A gentle left-to-right shimmer so it
+        // reads as a loading placeholder. Light/inverted -- a bright lilac-white
+        // that sits as a highlight on the panel, not a dark bar.
+        const g = ctx.createLinearGradient(0, 0, W, 0);
+        g.addColorStop(0, "rgba(238,231,250,0.9)");
+        g.addColorStop(0.5, "rgba(253,250,255,0.92)");
+        g.addColorStop(1, "rgba(238,231,250,0.9)");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, W, H);
+        uploadCanvas(barTex, cvs);
+      }
+    }
+
+    // A soft feathered rectangle: the halo behind a copy line at levels 3-4.
+    // Tinted + scaled at draw time; blurred so its edges read as a glow.
+    const glowTex = stubTex();
+    {
+      const cvs = document.createElement("canvas");
+      const W = 256, H = 128;
+      cvs.width = W; cvs.height = H;
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, W, H);
+        ctx.filter = "blur(18px)";
+        ctx.fillStyle = "rgba(255,255,255,1)";
+        ctx.fillRect(38, 34, W - 76, H - 68);
+        ctx.filter = "none";
+        uploadCanvas(glowTex, cvs);
       }
     }
 
@@ -260,6 +328,15 @@ export function PackageScreen({
       );
       upload(overlayBuf, ov);
       overlayCount = ov.count;
+      // The wash face: same footprint as the panel cap (one bevel-width in from
+      // the panel rim) so the fill hugs just inside the plaque's rounded edge.
+      const face = buildFace(
+        Math.max(0.05, HW - OV_INSET - OV_BEVEL),
+        Math.max(0.03, hh - OV_INSET - OV_BEVEL),
+        Math.max(0.02, r - OV_INSET - OV_BEVEL)
+      );
+      upload(cloudBuf, face);
+      cloudCount = face.count;
       builtDepth = depth;
       builtBevel = bevel;
       builtHeight = hh;
@@ -362,6 +439,7 @@ export function PackageScreen({
       cur.plug = ease(cur.plug, t.plug, k);
       cur.plaque = ease(cur.plaque, t.plaque, k);
       cur.brandContent = ease(cur.brandContent, t.brandContent, k);
+      cur.copy = ease(cur.copy, t.copy, k);
       ease3(cur.tint, t.tint, k);
       ease3(cur.washA, t.washA, k);
       ease3(cur.washB, t.washB, k);
@@ -614,15 +692,19 @@ export function PackageScreen({
       }
 
       // --- the brand plaque: a riveted panel laminated over the front face ---
-      // A translucent beveled brand panel laid over the whole face, pinned by a
-      // copper rivet in each corner. The object is always shown branded: the
-      // plaque channel is held constant (level 2), so `appear`/`polish` settle
-      // fully on and this reads the same regardless of the branding parameter,
-      // which now prices the work rather than driving this visual. Shares the
-      // cover's orient + scale so it floats with the slab.
-      const appear = smooth(0.35, 1.0, cur.plaque);
+      // The plaque is the shared CONTENT SURFACE: it fades in only once there is
+      // something to carry -- a branding mark (gem/wash) OR copy lines. At pure
+      // default (no branding, no copy picked) there is no plaque at all, so the
+      // slab reads bare and each effect is a reveal. Shares the cover's orient +
+      // scale so it floats with the slab.
+      // The plaque appears as soon as ANY branding chip is picked -- including
+      // level 1 ("Nothing yet"), which shows the bare plate with no mark yet --
+      // or once copy lines are present. Only the unset default (-1) has none.
+      const brandPicked = smooth(-0.6, -0.1, cur.brandContent); // chip 1+
+      const copyOn = smooth(-0.6, -0.1, cur.copy); // copy chip 1+ (border lines)
+      const appear = Math.max(brandPicked, copyOn);
       if (appear > 0.01 && overlayCount > 0) {
-        const polish = Math.max(0, Math.min(1, (cur.plaque - 1) / 2)); // 0 @L2 -> 1 @L4
+        const polish = 0; // reserved; the plate holds its calm dim tone
         const S = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
         const hh = cur.heightHalf;
         const faceZ = cur.depth; // the cover's front cap
@@ -698,9 +780,14 @@ export function PackageScreen({
         // decal in the plaque's own plane -- it shares the slab's orient, so it
         // tilts and floats WITH the face like a sticker, not a separate object.
         // No animation of their own. Topmost layer, so they write no depth
-        // (transparent edges must not occlude one another).
-        if (cur.brandContent > 0.02) {
+        // (transparent edges must not occlude one another). Runs whenever the
+        // plaque is present -- the gem gates on branding, the lines on copy, so
+        // copy lines show even with no branding picked.
+        if (appear > 0.01) {
           gl.depthMask(false);
+          // Premultiplied blend for the decal pass (textures uploaded + shaded
+          // premultiplied): kills the white edge halo. Restored below.
+          gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
           gl.useProgram(texProg);
           gl.uniformMatrix4fv(ut.proj, false, proj);
           gl.uniformMatrix4fv(ut.view, false, view);
@@ -725,16 +812,114 @@ export function PackageScreen({
             gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);
           };
 
-          // The manifesto cloud fills the panel, behind the gem.
-          const cloudA = smooth(2.4, 3.0, cur.brandContent) * appear;
-          if (cloudA > 0.01) decal(cloudTex, 0, 0, pxHalf * 0.9, pyHalf * 0.9, cloudA * 0.9);
+          // The manifesto wash fills the panel, behind the gem. Drawn on the
+          // plaque-shaped face mesh (not a quad), so it is clipped to the exact
+          // rounded-rect silhouette and covers edge to edge -- masked by the
+          // plaque rather than fading out as a soft blob.
+          // Comes in at level 3 (~half) and reaches full, brighter fill at
+          // level 4 -- so both 3 and 4 carry the wash, 4 the strongest.
+          const cloudA = smooth(1.0, 3.0, cur.brandContent) * appear;
+          if (cloudA > 0.01 && cloudCount > 0) {
+            const cm = Mat.mul(
+              S,
+              Mat.mul(
+                Mat.trans(0, 0, faceZ + (2 * OV_HD + PLAQUE_GAP + 0.004) * appear),
+                Mat.scale(appear, appear, 1)
+              )
+            );
+            gl.uniformMatrix4fv(ut.model, false, cm);
+            gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, cm)));
+            gl.bindTexture(gl.TEXTURE_2D, cloudTex);
+            gl.uniform1f(ut.alpha, cloudA);
+            gl.bindVertexArray(cloudBuf.vao);
+            gl.drawArrays(gl.TRIANGLES, 0, cloudCount);
+            gl.bindVertexArray(quadBuf.vao); // back to the quad for the gem decal
+          }
 
-          // The CW gem, seated in the top-left corner of the panel.
-          const gs = 0.13; // gem half-size
+          // The CW gem, seated in the top-left corner of the panel. Width tracks
+          // the mark's real aspect so the wide CW isn't squished into a square.
+          // Its size + top margin are CAPPED to a fraction of the panel half-
+          // height, so on a short (few-section) panel the gem shrinks and never
+          // eats the room the copy lines need below it.
+          const gh = Math.min(0.1105, pyHalf * 0.42); // gem half-HEIGHT
+          const gw = gh * gemAspect;
+          const gemMargin = Math.min(0.04, pyHalf * 0.14);
           const gemA = smooth(0.4, 1.0, cur.brandContent) * appear;
           if (gemA > 0.01 && gemReady) {
-            decal(gemTex, -pxHalf + gs + 0.04, pyHalf - gs - 0.04, gs, gs, gemA);
+            decal(gemTex, -pxHalf + gw + 0.04, pyHalf - gh - gemMargin, gw, gh, gemA);
           }
+
+          // --- skeleton COPY lines: the first third of a 1/3-1/3-1/3 layout
+          // under the gem. TWO squared placeholder bars per section, left-aligned
+          // like text and distributed down the zone, so more sections means more
+          // copy at a steady density. The content LEVEL styles every line:
+          // nothing at 1, a border at 2, a glow at 3, a stronger glow at 4. ---
+          {
+            const colW = (2 * pxHalf) / 3; // first column of the three
+            const leftX = -pxHalf + 0.04; // align to the gem's left inset
+            const fullBarW = Math.max(0.04, colW - 0.06);
+            // The zone runs from just under the (capped) gem to just inside the
+            // panel bottom. Margins are proportional so it stays a valid, in-
+            // bounds band at EVERY section size -- the lines never spill past
+            // the plaque on a short panel or bunch up on a tall one.
+            const gemBottom = pyHalf - gemMargin - 2 * gh;
+            const zoneTop = gemBottom - Math.min(0.025, pyHalf * 0.08);
+            const zoneBot = -pyHalf + Math.min(0.03, pyHalf * 0.12);
+            const zoneH = Math.max(0.02, zoneTop - zoneBot);
+            // A FIXED number of copy lines (not one-per-section): adding sections
+            // does NOT add lines, it SPACES THE SAME LINES OUT. The leading is a
+            // fraction of the (section-driven) zone, so it is reduced from an
+            // even fill yet grows as the panel gets taller.
+            const nLines = Math.max(2, Math.round(t.sections) * 2); // 2 per section
+            // Even leading down the zone; reduced from a loose fill but never a
+            // solid block. More sections => more lines at a steady density.
+            const gap = zoneH / (nLines + 1);
+            const barHalfH = Math.min(0.01, gap * 0.3);
+            const widthFrac = [1.0, 0.9, 0.97, 0.72, 0.86, 0.94]; // ragged copy
+            // Content level -> lines + styling, each effect one level later than
+            // the last: level 1 draws the lines as a hollow BORDER (no fill),
+            // level 2 fills them in, level 3 adds a subtle glow, level 4 blooms
+            // to max. The unset default (-1) shows nothing.
+            const copyGate = smooth(-0.6, -0.1, cur.copy); // lines/border: level 1+
+            const fillAmt = smooth(0.4, 1.0, cur.copy); // fill: level 2+
+            const glowAmt = smooth(1.4, 2.0, cur.copy); // subtle glow: level 3+
+            const glowStrong = smooth(2.4, 3.0, cur.copy); // max glow: level 4
+            const ft = Math.min(0.0026, barHalfH * 0.5); // border edge thickness
+            for (let i = 0; i < nLines; i++) {
+              const lineA = appear * copyGate;
+              if (lineA <= 0.01) continue;
+              const bw = (fullBarW * widthFrac[i % widthFrac.length]) / 2;
+              const cx = leftX + bw;
+              const cy = zoneTop - gap * (i + 0.5);
+              // Glow halo behind: a gentle violet bloom at level 3, a bit
+              // stronger at 4 -- NOT a white-out. Drawn behind the fill so it
+              // reads as a halo AROUND the bar, not on top of it. Kept well
+              // under 1 so it never blows to solid white.
+              if (glowAmt > 0.01) {
+                const gA = glowAmt * (0.5 + 0.12 * glowStrong) * lineA; // L3 .50, L4 .62
+                // Absolute-ish halo so it reads even though the bars are thin.
+                const gpad = barHalfH * 1.4 + 0.008 + 0.016 * glowStrong; // L3 ~.022, L4 ~.038
+                gl.blendFunc(gl.ONE, gl.ONE); // additive bloom
+                gl.uniform3f(ut.tint, 0.5, 0.36, 0.95); // violet, not white
+                decal(glowTex, cx, cy, bw + gpad * 1.3, barHalfH + gpad, gA);
+                gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // back to premultiplied
+              }
+              // Fill (level 2+): the bright inverted bar body.
+              if (fillAmt > 0.01) {
+                gl.uniform3f(ut.tint, 1, 1, 1);
+                decal(barTex, cx, cy, bw, barHalfH, fillAmt * 0.88 * lineA);
+              }
+              // Hollow BORDER (level 1+): four thin edges framing the bar, so a
+              // level-1 line reads as an outline with no fill.
+              gl.uniform3f(ut.tint, 1, 1, 1);
+              decal(barTex, cx, cy + barHalfH, bw, ft, lineA); // top
+              decal(barTex, cx, cy - barHalfH, bw, ft, lineA); // bottom
+              decal(barTex, cx - bw, cy, ft, barHalfH, lineA); // left
+              decal(barTex, cx + bw, cy, ft, barHalfH, lineA); // right
+            }
+            gl.uniform3f(ut.tint, 1, 1, 1); // reset for any later decals
+          }
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // restore straight alpha
           gl.depthMask(true);
         }
       }

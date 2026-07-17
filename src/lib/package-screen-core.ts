@@ -202,6 +202,31 @@ export function buildScreen(
   };
 }
 
+// Just the flat front cap: the rounded-rect face at z=0, UV mapped across its
+// bounding box (0..1). Painting a texture on THIS mesh clips it to the exact
+// rounded-rect silhouette -- so a wash reads as masked by the plaque (rounded
+// corners and all), filling edge to edge, instead of a soft-edged sticker.
+export function buildFace(hw: number, hh: number, radius = 0.14, seg = 5): Mesh {
+  const pos: number[] = [], nrm: number[] = [], uv: number[] = [];
+  const ring = roundedRing(hw, hh, radius, seg);
+  const n = ring.length;
+  const push = (x: number, y: number) => {
+    pos.push(x, y, 0);
+    nrm.push(0, 0, 1);
+    uv.push((x / hw) * 0.5 + 0.5, (y / hh) * 0.5 + 0.5);
+  };
+  for (let i = 0; i < n; i++) {
+    const a = ring[i], c = ring[(i + 1) % n];
+    push(0, 0); push(a.x, a.y); push(c.x, c.y);
+  }
+  return {
+    pos: new Float32Array(pos),
+    nrm: new Float32Array(nrm),
+    uv: new Float32Array(uv),
+    count: pos.length / 3,
+  };
+}
+
 // A unit box spanning [-1,1] on every axis, flat-shaded (one normal per face).
 // The mathDev plug is assembled entirely from these: a connector body, its
 // pins, and a cable stub, each drawn with its own translate + non-uniform scale.
@@ -413,7 +438,10 @@ void main(){
 }`;
 
 // A plain textured quad: samples a mark (gem / wordmark / cloud) in face UV and
-// lays it over the plaque with straight alpha. uTint recolours; uAlpha fades.
+// lays it over the plaque. The texture is uploaded PREMULTIPLIED and drawn with
+// premultiplied blend (ONE, ONE_MINUS_SRC_ALPHA) so the mark's antialiased edge
+// fades to transparent-black instead of fringing a white halo. uTint recolours
+// the (premultiplied) colour; uAlpha fades the whole premultiplied result.
 export const texFrag = `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -423,7 +451,7 @@ uniform vec3 uTint;
 out vec4 frag;
 void main(){
   vec4 t = texture(uTex, vUv);
-  frag = vec4(t.rgb * uTint, t.a * uAlpha);
+  frag = vec4(t.rgb * uTint, t.a) * uAlpha;
 }`;
 
 // ---------------------------------------------------------------------

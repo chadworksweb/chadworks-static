@@ -34,7 +34,8 @@ import s from "./package-builder.module.css";
 const AS_COUNT = new Set<keyof Scope>(["pages", "sections", "integrations", "locales"]);
 
 function valueLabel(p: Param, v: number): string {
-  if (p.kind === "steps") return p.options?.[v] ?? String(v);
+  // v < 0 is the UNSET state (no chip picked): show no value, just the label.
+  if (p.kind === "steps") return v < 0 ? "" : p.options?.[v] ?? String(v);
   if (p.key === "locales") return v === 1 ? "1 language" : `${v} languages`;
   if (p.key === "integrations") return v === 1 ? "1 system" : `${v} systems`;
   return String(v);
