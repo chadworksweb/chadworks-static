@@ -1,0 +1,421 @@
+/* PACKAGE BUILDER -- the scope stage.
+   Layout reference: Robin Payot's Issey Miyake "Le sel d'Issey" salt-crystal
+   builder (Screenshot_5). That LAYOUT, not its palette:
+     - the object dead center and large, everything else floating over it
+     - a rail of compact UPPERCASE micro-type
+     - one understated finish line, bottom center
+   Each parameter is an expand panel carrying its own description, so the rail
+   stays terse at thirteen of them and the open panel IS the active layer.
+
+   PALETTE IS INVERTED from the reference: the salt builder is near-black, and
+   chadworks is not. The stage is the site's lavender surface with a white
+   centre bloom, and the OBJECT carries the dark (indigo -> brand -> lilac), so
+   the thing you are building is the darkest mass on the page.
+
+   WIDTH: contained to the global content column, NOT full-bleed. The wrap is a
+   plain grid child, so it inherits `grid-column: content` (--site-width) from
+   the page shell. Nothing inside it shrinks; only the box is bounded. Height is
+   --fold, the token the design system defines for exactly this (a full-height
+   cinematic stage sitting under the nav). */
+
+.wrap {
+  /* ONE inset for the whole stage. Everything floating over the object uses it,
+     so the rail's bottom gap equals its top gap and the box is contained by the
+     stage height instead of running off it. */
+  /* VERTICAL only. Left and right sit flush on the content column, so the rail
+     and the number line up with the header and every other band on the site. */
+  --stage-inset: clamp(0.9rem, 2.4vh, 1.6rem);
+  /* One token for the rail width: the canvas and the finish line both have to
+     know where the rail ends, so it cannot be a magic number in three places. */
+  --rail-w: min(19rem, 22vw);
+  /* The gutter between the viewport edge and the content column. The band
+     bleeds, so `100%` here is the viewport. */
+  --gutter: calc((100% - var(--site-width)) / 2);
+
+  position: relative;
+  width: 100%;
+  /* The BACKGROUND bleeds edge to edge; the CONTENT re-anchors to site width
+     via .inner. Same contract every full-width band on the site uses: pad
+     inside the max-width box, never let content ride the bleed.
+     Header offset is the showroom's: pull the band up UNDER the sticky nav so
+     the wash runs behind it, then hold the height at a full viewport. */
+  height: 100dvh;
+  margin-top: calc(-1 * var(--nav-height));
+  overflow: hidden;
+  color: #243989; /* --dark-bg */
+  background:
+    radial-gradient(88% 68% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 62%),
+    radial-gradient(70% 60% at 82% 86%, rgba(128, 84, 188, 0.12) 0%, rgba(237, 231, 246, 0) 60%),
+    #ede7f6; /* --bg-surface */
+  font-size: 16px;
+}
+
+/* The object centres in the FREE AREA, not in the band. Two corrections:
+   - Vertically: the wash runs behind the nav, but the nav still covers the top
+     --nav-height, so a canvas at inset:0 centres the shape half a nav-height
+     too high. Insetting the top puts it on the true optical middle.
+   - Horizontally: the rail occupies the left of the content column, so a
+     full-width canvas centres the shape under the rail. Starting the canvas at
+     the rail's right edge centres it in the space actually left over.
+   The canvas is transparent, so bounding it moves the SHAPE without touching
+   the background bleed. */
+.canvasLayer {
+  position: absolute;
+  top: var(--nav-height);
+  bottom: 0;
+  left: calc(var(--gutter) + var(--rail-w));
+  right: var(--gutter);
+  z-index: 0;
+}
+
+/* The content rail: bleeds nothing, re-anchored to the global site width and
+   centred, matching every other band on the site. */
+.inner {
+  position: absolute;
+  inset: var(--nav-height) 0 0 0;
+  width: var(--site-width);
+  margin-inline: auto;
+  z-index: 2;
+  /* The band is a stage, not a form: let clicks through to it and re-arm only
+     the controls that need them. */
+  pointer-events: none;
+}
+
+.inner > * {
+  pointer-events: auto;
+}
+
+.canvasLayer :global(.cw-pkgscreen),
+.canvasLayer :global(.cw-pkgscreen__canvas) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Shared micro-type: the reference's whole voice is in this rule. */
+.micro {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ---- the number (top right) ---- */
+/* Left is the scope you set; right is what it costs you. */
+.readout {
+  position: absolute;
+  z-index: 2;
+  top: var(--stage-inset);
+  right: 0;
+  text-align: right;
+  pointer-events: none;
+}
+
+.readoutLabel {
+  composes: micro;
+  opacity: 0.55;
+  margin: 0 0 0.5rem;
+}
+
+.figure {
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- the rail: its own scroll box ---- */
+.rail {
+  position: absolute;
+  z-index: 3;
+  /* Contained by the stage: the SAME inset top and bottom. The box scrolls
+     internally; it never runs past the stage. */
+  top: var(--stage-inset);
+  left: 0;
+  bottom: var(--stage-inset);
+  width: var(--rail-w);
+  padding: 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(36, 57, 137, 0.14);
+  border-radius: 4px;
+  backdrop-filter: blur(6px);
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(128, 84, 188, 0.55) rgba(36, 57, 137, 0.08);
+}
+
+/* WebKit/Blink: the same bar, drawn by hand. */
+.rail::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rail::-webkit-scrollbar-track {
+  background: rgba(36, 57, 137, 0.08);
+  border-radius: 999px;
+}
+
+.rail::-webkit-scrollbar-thumb {
+  background: rgba(128, 84, 188, 0.55);
+  border-radius: 999px;
+}
+
+.rail::-webkit-scrollbar-thumb:hover {
+  background: #8054bc;
+}
+
+/* ---- expand panels: one parameter each ---- */
+.param {
+  border-bottom: 1px solid rgba(36, 57, 137, 0.1);
+}
+
+.param:last-child {
+  border-bottom: none;
+}
+
+.head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.4rem;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.head:hover {
+  background: rgba(128, 84, 188, 0.07);
+}
+
+/* Not `composes: micro` -- the header label is deliberately a step up from the
+   rest of the micro-type, because it is the thing you scan. */
+.headLabel {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  flex: 1;
+}
+
+.paramOpen .headLabel {
+  opacity: 1;
+}
+
+.headValue {
+  composes: micro;
+  color: #8054bc;
+  letter-spacing: 0.08em;
+  text-align: right;
+}
+
+/* The caret: a plain +/- rather than an icon dep. */
+.caret {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.7rem;
+  opacity: 0.45;
+  width: 0.7rem;
+  text-align: center;
+  flex: none;
+}
+
+/* Sleek open/close. `grid-template-rows: 0fr -> 1fr` animates to the content's
+   OWN height, which max-height guessing never does: no magic number, no clip at
+   tall panels, no dead easing on short ones. Needs the body always mounted, so
+   the panel toggles a class instead of unmounting. */
+.body {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.22s ease;
+}
+
+.bodyOpen {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+/* The row that actually collapses. Overflow hidden is what makes 0fr read as
+   closed rather than as squashed content. */
+.bodyInner {
+  overflow: hidden;
+  display: grid;
+  gap: 0.55rem;
+  padding: 0 0.4rem;
+}
+
+.bodyOpen .bodyInner {
+  padding-bottom: 0.75rem;
+  transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.caret {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .bodyInner,
+  .caret {
+    transition: none;
+  }
+}
+
+.hint {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  opacity: 0.66;
+  margin: 0;
+}
+
+/* numbered chips -- the reference's "CHOOSE A CYMATICS 1 2 3 4 5" */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+.chip {
+  width: 1.65rem;
+  height: 1.65rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(36, 57, 137, 0.26);
+  background: rgba(255, 255, 255, 0.55);
+  color: #243989;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.62rem;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.chip:hover {
+  border-color: #8054bc;
+}
+
+.chipOn {
+  background: #8054bc;
+  border-color: #8054bc;
+  color: #fff;
+}
+
+/* count rows: a slim slider where a chip row would run too long */
+.count {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.range {
+  flex: 1;
+  accent-color: #8054bc;
+  cursor: pointer;
+  height: 1rem;
+  min-width: 0;
+}
+
+.countValue {
+  composes: micro;
+  min-width: 2rem;
+  text-align: right;
+  color: #8054bc;
+}
+
+/* ---- bottom: the reference's "Finish your piece" ---- */
+.finish {
+  position: absolute;
+  z-index: 4;
+  bottom: var(--stage-inset);
+  /* The rail owns the left edge; centre within what is left of the stage. */
+  left: var(--rail-w);
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.finishLink {
+  composes: micro;
+  color: #243989;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(36, 57, 137, 0.5);
+  padding-bottom: 0.28rem;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.finishLink:hover {
+  color: #8054bc;
+  border-bottom-color: #8054bc;
+}
+
+.reset {
+  composes: micro;
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reset:hover {
+  opacity: 1;
+}
+
+/* ---- narrow: stack it. The object keeps the top, the rail follows. ---- */
+@media (max-width: 900px) {
+  .wrap {
+    height: auto;
+    padding-bottom: 1.5rem;
+  }
+
+  .canvasLayer {
+    position: relative;
+    inset: auto;
+    height: 42vh;
+    min-height: 230px;
+  }
+
+  .readout,
+  .rail,
+  .finish {
+    position: relative;
+    inset: auto;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  .readout {
+    text-align: left;
+    margin-bottom: 1rem;
+  }
+
+  .rail {
+    overflow: visible;
+    max-height: none;
+  }
+
+  .finish {
+    justify-content: flex-start;
+    margin-top: 1.2rem;
+  }
+}
