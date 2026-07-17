@@ -1,16 +1,35 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { WaveText } from "@/components/WaveText";
 import { isLaunched } from "@/lib/launch";
 
-const LINKS = [
+type NavLink = {
+  href: string;
+  label: string;
+  // Dropdown children. The site's FIRST dropdown is About > Rates (Chad,
+  // 2026-07-16). Kept as a general shape rather than an About-only special case,
+  // since the other lanes are the obvious next candidates.
+  children?: { href: string; label: string }[];
+};
+
+// Order is Chad's. Lane 03 sits with the other two lanes, and Rates moves under
+// About because it is a detail OF chadworks rather than a peer of the lanes.
+// `/consulting/` is not launched (the hub does not exist yet), so isLaunched
+// renders it greyed and unclickable rather than pointing at a 404. That is the
+// intended state, not an oversight: Chad, 2026-07-16, "yes, consulting greyed
+// out for now".
+const LINKS: NavLink[] = [
   { href: "/websites/", label: "Websites" },
   { href: "/visibility/", label: "Visibility" },
-  { href: "/portfolio/", label: "Portfolio" },
-  { href: "/about/", label: "About" },
-  { href: "/rates/", label: "Rates" },
+  { href: "/consulting/", label: "Consulting" },
+  { href: "/showroom/", label: "Showroom" },
+  {
+    href: "/about/",
+    label: "About",
+    children: [{ href: "/rates/", label: "Rates" }],
+  },
   { href: "/contact/", label: "Contact" },
 ];
 
@@ -61,17 +80,44 @@ export default function SiteNav() {
           chadworks&trade;
         </Link>
         <div className="site-nav__links">
-          {LINKS.map((l) =>
-            isLaunched(l.href) ? (
-              <Link key={l.href} href={l.href}>
+          {LINKS.map((l) => {
+            const top = isLaunched(l.href) ? (
+              <Link href={l.href}>
                 <WaveText text={l.label} />
               </Link>
             ) : (
-              <span key={l.href} className="site-nav__soon" aria-disabled="true">
+              <span className="site-nav__soon" aria-disabled="true">
                 {l.label}
               </span>
-            )
-          )}
+            );
+            if (!l.children) return <Fragment key={l.href}>{top}</Fragment>;
+            // Dropdown parent. Opening is pure CSS (:hover / :focus-within), so
+            // it works before hydration and keyboard users get it for free by
+            // tabbing into the group. No JS state, nothing to desync.
+            return (
+              <div key={l.href} className="site-nav__item">
+                {top}
+                <span className="site-nav__caret" aria-hidden="true" />
+                <div className="site-nav__dropdown">
+                  {l.children.map((c) =>
+                    isLaunched(c.href) ? (
+                      <Link key={c.href} href={c.href}>
+                        <WaveText text={c.label} />
+                      </Link>
+                    ) : (
+                      <span
+                        key={c.href}
+                        className="site-nav__soon"
+                        aria-disabled="true"
+                      >
+                        {c.label}
+                      </span>
+                    )
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
         {/* Mobile-only (<=900) hamburger; the inline links hide at that tier. */}
         <button
@@ -91,17 +137,42 @@ export default function SiteNav() {
           untabbable while closed via the inert attribute. */}
       <div id="site-nav-panel" className="site-nav__panel" inert={open ? undefined : true}>
         <div className="site-nav__panel-inner">
-          {LINKS.map((l) =>
-            isLaunched(l.href) ? (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
-                {l.label}
-              </Link>
-            ) : (
-              <span key={l.href} className="site-nav__soon" aria-disabled="true">
-                {l.label}
-              </span>
-            )
-          )}
+          {/* No hover on a touch panel, so a dropdown would be a trap. Children
+              render as indented rows under their parent instead: the hierarchy
+              is still legible and every row stays one tap. */}
+          {LINKS.map((l) => (
+            <Fragment key={l.href}>
+              {isLaunched(l.href) ? (
+                <Link href={l.href} onClick={() => setOpen(false)}>
+                  {l.label}
+                </Link>
+              ) : (
+                <span className="site-nav__soon" aria-disabled="true">
+                  {l.label}
+                </span>
+              )}
+              {l.children?.map((c) =>
+                isLaunched(c.href) ? (
+                  <Link
+                    key={c.href}
+                    href={c.href}
+                    className="site-nav__panel-child"
+                    onClick={() => setOpen(false)}
+                  >
+                    {c.label}
+                  </Link>
+                ) : (
+                  <span
+                    key={c.href}
+                    className="site-nav__soon site-nav__panel-child"
+                    aria-disabled="true"
+                  >
+                    {c.label}
+                  </span>
+                )
+              )}
+            </Fragment>
+          ))}
         </div>
       </div>
     </nav>

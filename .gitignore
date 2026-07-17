@@ -2,6 +2,10 @@
 /.next
 /out
 /build
+# Agent worktrees live here (.claude/worktrees/*), each a full nested checkout
+# with its own .next cache. Never committable -- without this, one `git add -A`
+# swallows an entire second working copy and its build artifacts.
+/.claude
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store

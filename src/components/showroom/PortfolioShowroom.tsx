@@ -15,7 +15,7 @@ import { Reel } from "./Reel";
 import { TileWall } from "./TileWall";
 import { CrystalGem } from "./CrystalGem";
 import { SHOWROOM_ITEMS, type ShowroomItem } from "./showroom-data";
-import { useShowroomMode } from "./useShowroomMode";
+import type { ShowroomMode } from "./useShowroomMode";
 import {
   intro,
   startIntro,
@@ -31,35 +31,93 @@ import {
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
 import styles from "./showroom.module.css";
 
-// Shrink a title until it fits its container on one line -- never wraps. Sets a
-// `--fit-fs` custom property the CSS uses as the font-size (falling back to the
-// CSS clamp when the text already fits). Re-runs on text change and on resize.
-function useFitText(dep: string) {
+// A title is ALWAYS one line -- it never wraps, at any width. Shrink it until it fits
+// its container and hand the CSS the size as `--fit-fs` (unset = the CSS clamp, i.e.
+// the text already fits). Re-runs on text change and on resize.
+//
+// `grow`: the box widens to ACCOMMODATE the title rather than shrinking it. The card
+// buys whatever width the title's length asks for (as `--fit-w`; CSS max-width caps how
+// far), so the type holds its size and the card varies instead. Shrinking is the last
+// resort, for when even the ceiling is not enough -- a title is always one line.
+//
+// The ratio is what the card is willing to let the title shrink to BEFORE it buys
+// width. At 1 it never trades type size for width until it has spent every pixel it
+// can. It is a ratio of the title's own base size, not a pixel: the base is a clamp, so
+// a fixed floor would sit above the base on a narrow viewport and widen the card for a
+// title that fits fine.
+const MIN_FIT_RATIO = 1;
+function useFitText(dep: string, grow = false, active = true) {
   const ref = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Docked: the CSS owns the collapsed size (it outranks --fit-fs), and the card
+    // keeps the width the expanded title earned. Measuring here would read the small
+    // docked title and hand the card back a width it has to undo on expand.
+    if (!active) return;
     const box = el.parentElement ?? el;
     const fit = () => {
+      // Measure with transitions OFF. The title carries `transition: font-size 0.5s`
+      // for the collapse dock, so clearing --fit-fs does not snap to the base size --
+      // it starts a 0.5s ride toward it, and both readings below would be taken from a
+      // value still in flight. Suppressing the transition makes the measurement mean
+      // what it says, and lands the correction instantly (only the collapse is meant
+      // to animate). Restored after a flush, so the settle itself never transitions.
+      el.style.transition = "none";
       el.style.setProperty("--fit-fs", ""); // reset to the CSS default, then measure
-      const cs = getComputedStyle(box);
-      const pad = parseFloat(cs.paddingLeft || "0") + parseFloat(cs.paddingRight || "0");
-      const avail = box.clientWidth - pad;
-      const natural = el.scrollWidth;
+      if (grow) box.style.setProperty("--fit-w", ""); // measure against the standard card
+      // The title's OWN content width, not the card's minus padding: whatever else
+      // takes room on that row (the corner's reserve) is already priced in here.
+      let avail = el.clientWidth;
+      const natural = el.scrollWidth; // one line, so this is the text's true width
       if (avail > 0 && natural > avail) {
         const base = parseFloat(getComputedStyle(el).fontSize);
-        el.style.setProperty("--fit-fs", `${Math.max(10, base * (avail / natural))}px`);
+        // Past the floor, buy the card exactly the width the title is SHORT BY, then
+        // read back what it was actually allowed (max-width may cap it). The deficit
+        // is measured from the standard card and the title's natural width, never
+        // from the width this just set, so there is nothing to oscillate.
+        const need = natural * MIN_FIT_RATIO;
+        if (grow && avail < need) {
+          box.style.setProperty("--fit-w", `${Math.ceil(box.offsetWidth + (need - avail))}px`);
+          avail = el.clientWidth;
+        }
+        if (natural > avail) {
+          el.style.setProperty("--fit-fs", `${Math.max(10, base * (avail / natural))}px`);
+        }
       }
+      void el.offsetWidth;
+      el.style.transition = "";
     };
     fit();
-    const raf = requestAnimationFrame(fit); // fonts/layout can settle a frame late
-    const ro = new ResizeObserver(fit);
+    const raf = requestAnimationFrame(fit); // layout can settle a frame late
+    // The FONT settles much later than a frame, and it moves `natural` -- the whole
+    // measurement. Nothing else catches that: the observer below is width-gated, and by
+    // then --fit-w has PINNED the card's width, so swapping the font changes the text
+    // without ever changing the box, and the stale fit stands. Re-fit once the fonts
+    // are actually in. (`ready` also resolves immediately if they already are.)
+    let live = true;
+    const onFonts = () => live && fit();
+    document.fonts?.ready.then(onFonts);
+    document.fonts?.addEventListener("loadingdone", onFonts);
+    // Only WIDTH can change the answer (`avail` is a width). Re-fitting on HEIGHT is a
+    // feedback loop: the fit changes the title's size, which changes the box's height,
+    // which fires this, which fits again -- and the body's own max-height transition
+    // drives the same loop on every frame it animates.
+    let lastW = -1;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[entries.length - 1]?.contentRect.width ?? -1;
+      if (w === lastW) return;
+      lastW = w;
+      fit();
+    });
     ro.observe(box);
     return () => {
+      live = false;
       cancelAnimationFrame(raf);
+      document.fonts?.removeEventListener("loadingdone", onFonts);
       ro.disconnect();
     };
-  }, [dep]);
+  }, [dep, grow, active]);
   return ref;
 }
 
@@ -67,12 +125,18 @@ function FitText({
   as: Tag = "span",
   className,
   text,
+  grow = false,
+  active = true,
 }: {
   as?: "span" | "h2";
   className?: string;
   text: string;
+  /** Let the parent widen (via --fit-w) rather than shrink this past MIN_FIT_RATIO. */
+  grow?: boolean;
+  /** False while the parent is docked: hold the last fit rather than re-measure. */
+  active?: boolean;
 }) {
-  const ref = useFitText(text);
+  const ref = useFitText(text, grow, active);
   return (
     <Tag ref={ref as React.Ref<HTMLHeadingElement & HTMLSpanElement>} className={className}>
       {text}
@@ -89,6 +153,11 @@ function FitText({
 // hair, so the frame, the rail and the module all finish with the crystal rather than
 // being cut off mid-move. Keep in step with --stage-ms in the CSS.
 const CHROME_OUT_MS = STAGE_SECONDS * 1000 + 60;
+
+// The rail's slide-in is the same move as the crossfade, so it arrives on the gem's
+// clock too. Only for one crossfade, though: after that every shift of the strip is
+// navigation, which is a different job and keeps its own snappier curve.
+const RAIL_IN_MS = STAGE_SECONDS * 1000;
 
 // Advances the clocks: `entrance` (the gem's reverse-shatter, on load), `intro` (the
 // reel's ramp, on enter) -- both one-shots, deliberately separate, see showroom-intro
@@ -120,9 +189,12 @@ function StageShift() {
   return null;
 }
 
-export function PortfolioShowroom() {
+// Desktop-class only: ShowroomRoute owns the mode decision and mounts this lazily,
+// so by the time we are here the mode is settled and is never "static". Taking it as
+// a prop rather than reading the hook again is what lets the route keep three.js off
+// the wire for the devices that never render this at all.
+export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "static"> }) {
   const items = SHOWROOM_ITEMS;
-  const { mode } = useShowroomMode();
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [interacted, setInteracted] = useState(false);
@@ -336,7 +408,7 @@ export function PortfolioShowroom() {
                 />
               </Suspense>
             )}
-            <CrystalGem immersive={immersive} show={wallRevealed} />
+            <CrystalGem immersive={immersive} show={wallRevealed} focused={selected != null} />
           </Canvas>
 
           {/* Entry: click the gem to enter (and trigger the cold open). Held back
@@ -354,6 +426,20 @@ export function PortfolioShowroom() {
 
           {chromeUp && (
             <>
+              {/* Stepped blur over the slide, under the module: the shots carry their
+                  own headings and buttons, which read as live chrome right where the
+                  module sits. Ramped rather than switched on, so the slide recedes
+                  instead of ending at a line. On the gem's clock like the rest. */}
+              <div
+                className={`${styles.slideBlur} ${immersive ? "" : styles.slideBlurOut}`}
+                aria-hidden="true"
+              >
+                <span />
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
               <div
                 className={`${styles.stageFrame} ${immersive ? "" : styles.stageFrameOut}`}
                 aria-hidden="true"
@@ -381,6 +467,46 @@ export function PortfolioShowroom() {
                     <span>Live: {items[index]?.url}</span>
                   </span>
                 </button>
+                {/* The card gives no sign it is a control until you happen to hover it.
+                    Decorative: the card carries its own label for screen readers. */}
+                <span className={styles.featureHint} aria-hidden="true">
+                  <span className={styles.featureHintText}>Click to open</span>
+                  {/* The SFVV-R note-tag arrow, path for path (assets/core/sfvv-r).
+                      Aimed by CSS rather than redrawn, so it stays diffable against the
+                      original if that arrow ever changes. */}
+                  <svg className={styles.featureHintArrow} viewBox="0 0 44 44" fill="none">
+                    {/* The tail, cut short at the carrot end. pathLength normalises the
+                        curve to 100 whatever its real arc length, so the dash below reads
+                        as a percentage: draw the first 80, leave the last 20 empty. The
+                        curve runs from the free end toward the carrot, so the fifth that
+                        goes missing is the RIGHT one on screen. 80 is the knob; the path
+                        itself stays the asset's own. */}
+                    <path
+                      d="M6 6 C 13 22, 22 30, 34 34"
+                      pathLength="100"
+                      strokeDasharray="80 100"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+                    {/* The carrot, nudged down a hair and turned 10deg. Moved by transform
+                        rather than by editing d, so the path stays the asset's own. Mind
+                        the frame: the svg is turned 290deg as a whole, so screen "down" is
+                        NOT +y here. One screen px down is translate(-1.22 0.44) in these
+                        units, so this is roughly 2px. The rotate pivots on the carrot's
+                        own vertex, so it turns in place; that 290deg is a pure rotation
+                        (scale(-1) is both axes, not a mirror), so it preserves handedness
+                        and a negative angle reads counter-clockwise on screen too. */}
+                    <path
+                      d="M23 32 L 34 34 L 30 23"
+                      transform="translate(-2.4 0.9) rotate(-10 34 34)"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
               </div>
 
               <div className={styles.hud}>
@@ -400,14 +526,10 @@ export function PortfolioShowroom() {
 
       {mode === "lite" && <LiteGallery items={items} onSelect={setSelected} />}
 
-      {/* Crawlable fallback: shown pre-hydration and with no JS. */}
-      <ul className={styles.seo} data-shown={mode === null}>
-        {items.map((it) => (
-          <li key={it.key}>
-            <a href={it.href}>{it.label}</a> - {it.blurb}
-          </li>
-        ))}
-      </ul>
+      {/* The crawlable list that used to sit here is gone: the route now renders the
+          real portfolio archive on the server for exactly the cases it covered (no
+          JS, pre-decision, phone, tablet), and this component no longer mounts in
+          any of them. */}
 
       {sel && <SelectedFrame item={sel} closing={closing} onClose={requestClose} />}
 
@@ -481,6 +603,16 @@ function RightRail({
   // us the exit: put --rail-shift back to the fallback and the same transition runs
   // it out, on the same curve, in reverse. That slide is the grounding every other
   // piece of immersive chrome now times against.
+  // Because that entrance is emergent, its DURATION is whatever --rail-dur reads at the
+  // frame the shift lands. So the retime is a class, not a keyframe: hold the gem's
+  // clock over the arrival, then drop it and the fallback takes navigation back.
+  const [entering, setEntering] = useState(true);
+  useEffect(() => {
+    if (!entering) return;
+    const t = window.setTimeout(() => setEntering(false), RAIL_IN_MS);
+    return () => window.clearTimeout(t);
+  }, [entering]);
+
   const navRef = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -517,7 +649,7 @@ function RightRail({
       </span>
       <nav
         ref={navRef}
-        className={`${styles.rail} ${exiting ? styles.railOut : ""}`}
+        className={`${styles.rail} ${exiting ? styles.railOut : entering ? styles.railIn : ""}`}
         aria-label="Projects"
       >
       {items.map((it, i) => (
@@ -593,28 +725,23 @@ function SelectedFrame({
           className={`${styles.meta} ${invert ? styles.metaInvert : ""} ${
             hidden ? styles.metaCollapsed : ""
           }`}
-          role="button"
-          tabIndex={0}
-          aria-expanded={!hidden}
-          aria-label={hidden ? `Show ${item.label} details` : `Hide ${item.label} details`}
-          onClick={() => setHidden((h) => !h)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setHidden((h) => !h);
-            }
-          }}
         >
-          <span className={styles.metaHide} aria-hidden="true">
-            {hidden ? "Show ▲" : "Hide ▼"}
-          </span>
-          <p className={styles.metaKick}>{item.url}</p>
-          <FitText as="h2" className={styles.metaTitle} text={item.label} />
+          {/* The panel's own top-right corner is the control -- not a chip sitting on
+              it, and not the whole card. The grain is the affordance. */}
+          <button
+            type="button"
+            className={styles.metaCorner}
+            aria-expanded={!hidden}
+            aria-label={hidden ? `Show ${item.label} details` : `Hide ${item.label} details`}
+            onClick={() => setHidden((h) => !h)}
+          >
+            <span className={styles.metaCornerText}>{hidden ? "Show" : "Hide"}</span>
+          </button>
+          <FitText as="h2" className={styles.metaTitle} text={item.label} grow active={!hidden} />
           <div className={styles.metaBody}>
             <p className={styles.metaRow}>
               <span>Platform: {item.platform ?? "TBD"}</span>
               <span>Year: {item.year ?? "TBD"}</span>
-              <span>By: chadworks</span>
             </p>
             <ul className={styles.bursts}>
               {item.bursts.map((b, i) => (

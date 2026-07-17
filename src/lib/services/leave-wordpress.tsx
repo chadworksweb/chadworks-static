@@ -106,10 +106,10 @@ export const leaveWordpress: Service = {
     heading: "Proof, not promises",
     items: [
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail:
           "Real, live static builds you can click through. Same custom-built speed underneath, whatever the look on top.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
       {
         label: "A real before-and-after",

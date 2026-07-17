@@ -18,7 +18,18 @@ export type ArchiveItem = {
   blurb: string;
 };
 
-export function ArchiveGrid({ items }: { items: ArchiveItem[] }) {
+// The card title's heading LEVEL depends on what sits above the grid, so the page
+// owns it, not the grid. /portfolio/ and the homepage put the grid under their own
+// "More sites I've custom built" h2, where h3 is the correct next rung. /showroom/
+// has only its h1, so an h3 there would skip a level. Default h3 keeps every
+// existing caller rendering exactly as before.
+export function ArchiveGrid({
+  items,
+  headingLevel: Heading = "h3",
+}: {
+  items: ArchiveItem[];
+  headingLevel?: "h2" | "h3";
+}) {
   return (
     <div className="cw-port-grid">
       {items.map((item) => (
@@ -26,7 +37,7 @@ export function ArchiveGrid({ items }: { items: ArchiveItem[] }) {
           <DeviceMockup slug={item.slug} alt={item.alt} url={item.url} label={item.label} />
           <div className="cw-port-card__meta">
             <div className="cw-port-card__labelrow">
-              <h3 className="cw-port-card__label">{item.label}</h3>
+              <Heading className="cw-port-card__label">{item.label}</Heading>
               {item.href && (
                 <a
                   className="cw-port-card__visit"

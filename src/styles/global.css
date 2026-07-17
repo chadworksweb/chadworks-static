@@ -162,6 +162,56 @@ input, button, textarea, select { font: inherit; color: inherit; }
 a { color: inherit; text-decoration: none; }
 ul, ol { list-style: none; padding: 0; }
 
+/* PROSE LINKS -- the global treatment for a link sitting inside a paragraph.
+   The reset above strips every anchor to `color: inherit; text-decoration: none`,
+   so without this a link in prose is invisible against the copy around it.
+   A resting hairline, and on hover a second line in the teal accent that TRACES
+   across it from the left and retracts to the right on the way out.
+
+   BOTH lines are BACKGROUNDS, deliberately, because the brief is that this cannot
+   disturb line-height, kerning or leading:
+     - a ::after bar would need position: relative + absolute on the anchor, and it
+       shatters when a link wraps across two lines;
+     - text-decoration handles wrapping and descenders natively but its width
+       cannot be animated, so it can't trace;
+     - a background paints inside the inline box and occupies NO space in the line
+       box, so no amount of tuning here can move the text.
+   `padding-bottom` is the one length involved, and on an INLINE element padding
+   does not affect the line box either -- it only drops the paint box far enough
+   that the rule clears most descenders.
+
+   Two layers share one y: the static hairline (bottom layer, always 100% wide) and
+   the trace (top layer, 0 wide at rest). The trace is anchored RIGHT at rest and
+   LEFT on hover, which is what makes it grow from the left and retract to the
+   right. Swapping the anchor is instant rather than animated, and invisible,
+   because it only ever happens while the bar is at full width. */
+p a,
+.cw-fit-list a {
+  color: var(--accent);
+  text-decoration: none;
+  padding-bottom: 0.1em;
+  background-image:
+    linear-gradient(var(--accent-teal), var(--accent-teal)),
+    linear-gradient(rgba(128, 84, 188, 0.4), rgba(128, 84, 188, 0.4));
+  background-repeat: no-repeat;
+  background-size: 0 1px, 100% 1px;
+  background-position: right bottom, left bottom;
+  transition: background-size 0.4s var(--ease-smooth);
+}
+p a:hover,
+p a:focus-visible,
+.cw-fit-list a:hover,
+.cw-fit-list a:focus-visible {
+  background-size: 100% 1px, 100% 1px;
+  background-position-x: left, left;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    p a,
+    .cw-fit-list a { transition: none; }
+  }
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-display);   /* Lexend */
   line-height: var(--leading-tight);
@@ -812,6 +862,82 @@ p, li, dd, figcaption { text-wrap: pretty; }
   }
 }
 
+/* ---- NAV DROPDOWN (the site's first: About > Rates, Chad 2026-07-16) -------
+   Opening is pure CSS -- :hover for pointers, :focus-within for keyboards. No JS
+   state, so it works before hydration and cannot desync.
+
+   THE ITEM IS FULL NAV HEIGHT ON PURPOSE. The links row is centred in a 4.5rem
+   bar, so a naturally-sized item ends mid-bar; `top: 100%` would then open the
+   panel floating INSIDE the nav with a dead gap between the label and the panel,
+   and the hover would drop the moment the pointer crossed it. Giving the item
+   var(--nav-height) makes its bottom edge exactly the nav's bottom edge, so the
+   panel hangs off the bar and the item itself is the hover bridge. */
+.site-nav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: var(--nav-height);
+}
+.site-nav__caret {
+  width: 0;
+  height: 0;
+  border-left: 0.25rem solid transparent;
+  border-right: 0.25rem solid transparent;
+  border-top: 0.28rem solid var(--nav-link);
+  transition: transform var(--duration-base) var(--ease-smooth);
+}
+.site-nav__item:hover .site-nav__caret,
+.site-nav__item:focus-within .site-nav__caret { transform: rotate(180deg); }
+.site-nav__dropdown {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--space-sm) * -1);
+  min-width: calc(100% + var(--space-sm) * 2);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2xs) 0;
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: 0 24px 37px -18px rgba(86, 104, 173, 0.25);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.35rem);
+  transition: opacity var(--duration-base) var(--ease-smooth),
+    transform var(--duration-base) var(--ease-smooth),
+    visibility var(--duration-base);
+  z-index: 1;
+}
+.site-nav__item:hover .site-nav__dropdown,
+.site-nav__item:focus-within .site-nav__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+/* Children sit a step down from their parent: same face, smaller, so the panel
+   reads as detail rather than a second row of peers. */
+.site-nav__dropdown a,
+.site-nav__dropdown .site-nav__soon {
+  font-size: 1rem;
+  padding: 0.45rem var(--space-sm);
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .site-nav__dropdown { transition: none; }
+    .site-nav__caret { transition: none; }
+  }
+}
+/* Mobile panel children: indented under their parent row (no hover on touch, so
+   the dropdown collapses into the list rather than becoming a trap). */
+.site-nav__panel-inner .site-nav__panel-child {
+  padding-left: calc(var(--site-edge-min) + var(--space-md));
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
 /* PARKED for later use -- per-letter MOTION wave (vertical bob). Not applied.
    To use: point the :hover animation above at this keyframe instead, and swap
    .nav-wave__letter's transition to `transform`. */
@@ -843,9 +969,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: transform var(--duration-base) var(--ease-smooth),
     opacity var(--duration-base) var(--ease-smooth);
 }
-.site-nav--open .site-nav__toggle-bar:nth-child(1) { transform: translateY(0.36rem) rotate(45deg); }
+/* The X. Each outer bar has to land exactly on the middle bar's line before it
+   rotates, or the two strokes cross off-centre and the X reads crooked. With the
+   bars centred in the button, the middle one sits on the centre line and each
+   outer one is exactly ONE GAP PLUS ONE BAR HEIGHT away from it: 0.3rem + 2px,
+   i.e. 6.8px. This used to travel 0.36rem (5.76px), stopping each stroke ~1px
+   short and leaving them crossing ~2px apart. Kept as a calc of the gap and the
+   height above so it stays true if either is retuned. */
+.site-nav--open .site-nav__toggle-bar:nth-child(1) { transform: translateY(calc(0.3rem + 2px)) rotate(45deg); }
 .site-nav--open .site-nav__toggle-bar:nth-child(2) { opacity: 0; }
-.site-nav--open .site-nav__toggle-bar:nth-child(3) { transform: translateY(-0.36rem) rotate(-45deg); }
+.site-nav--open .site-nav__toggle-bar:nth-child(3) { transform: translateY(calc(-0.3rem - 2px)) rotate(-45deg); }
 
 .site-nav__panel {
   position: absolute;
@@ -977,7 +1110,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: var(--accent);
   margin-bottom: var(--space-sm);
 }
-.site-footer__heading a { color: inherit; }
+/* The heading is a <p>, so the global PROSE LINK rule (`p a`) catches its link
+   by accident and paints the resting hairline + hover trace. A module header is
+   a LABEL, not prose: it should read as a heading that happens to be clickable.
+   Both prose-link layers are background-images, so killing the background and
+   the padding it needed is the whole fix (Chad, 2026-07-16). */
+.site-footer__heading a {
+  color: inherit;
+  background-image: none;
+  padding-bottom: 0;
+}
 .site-footer__heading a:hover { color: var(--text-primary); }
 .site-footer__list {
   list-style: none;
@@ -1321,7 +1463,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
   background: var(--bg-base); /* solid base so the knockout's screen blend has
                                  white to lighten from (not transparency=black) */
   --problem-base-h: 558px;    /* the ribbon band: base section height (+30%) */
-  min-height: var(--problem-base-h);
+  /* The +1px is LOAD-BEARING, do not collapse it back to a bare var(). .svc-knockout
+     is exactly --problem-base-h tall and SCREENS against this section's background
+     (which `isolation: isolate` above makes its only backdrop). At the section's
+     min-height the two boxes are identical to the pixel, so sub-pixel rounding can
+     drop the knockout's last row just outside that backdrop -- and a screen blend
+     with no backdrop has nothing to screen against, so its #000 field paints
+     straight through as a full-bleed hairline on the boundary with the section
+     below. It measures ~1 DEVICE pixel, which is why it showed up on a DPR-3 phone
+     and only sometimes on desktop. One spare pixel of backdrop makes the overhang
+     impossible; the canvases stay at --problem-base-h, so knockout/colour
+     congruence is untouched. */
+  min-height: calc(var(--problem-base-h) + 1px);
   /* TOP-ANCHORED (not centered): the extra top padding reproduces the centered
      look at rest, but opening the pop-down grows the section DOWNWARD only --
      the H2 never moves, so the knockout overlay stays aligned with zero
@@ -1448,6 +1601,47 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .svc-more__panel[data-open] .svc-more__card { opacity: 1; transform: none; }
 .svc-more__card .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* Same opt-in for the /are-we-a-good-fit/ prose beats. Paragraph spacing is not
+   automatic anywhere here: `* { margin: 0 }` at the top of this file wipes the
+   browser default, so every multi-paragraph context has to ask for it (see also
+   `.legal-prose > * + *`). Headings carry their own margin-bottom, which is why
+   heading-to-paragraph already looks right and only body-to-body needs this. */
+.cw-fit-prose .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* The three builds on /are-we-a-good-fit/. Mirrors the manifesto list's marker (a
+   "--" in the accent, hung in the padding) so the two read as the same voice, at
+   this section's body size rather than the manifesto's. `ul` is stripped by the
+   reset at the top of this file, so the marker and the spacing are both opt-in. */
+.cw-fit-list {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+.cw-fit-list li {
+  position: relative;
+  padding-left: 1.6em;
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+/* A drawn diamond rather than a glyph: a rotated square is a shape, so it stays
+   crisp at any size and takes the brand's cut-crystal cue instead of reading as
+   punctuation the way the "--" did. `top` is in em so it tracks the type. */
+.cw-fit-list li::before {
+  content: "";
+  position: absolute;
+  left: 0.1em;
+  top: 0.62em;
+  width: 0.4em;
+  height: 0.4em;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+/* The label is the link, so it takes the prose-link colour and trace from the
+   rule above; strong only carries the weight. */
+.cw-fit-list strong { font-weight: 700; }
+.cw-fit-list + .svc-block__body { margin-top: var(--space-md); }
 @media (max-width: 600px) {
   .svc-more__card { padding: var(--space-sm) var(--space-md); }
 }
@@ -2641,6 +2835,20 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-testimonial__quote::after { content: "\201D"; }
 .svc-testimonial__by { font-size: var(--text-sm); color: var(--text-secondary); }
 .svc-testimonial__by::before { content: "-- "; }
+/* Optional headshot beside the attribution (see Testimonial.img). The row is
+   inert without one: `* { margin: 0 }` means a lone attribution renders exactly
+   as it did before the wrapper existed, so the text-only pages are untouched. */
+.svc-testimonial__byline { display: flex; align-items: center; gap: var(--space-sm); }
+.svc-testimonial__avatar {
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+}
+/* The dash marks where the quote ends and the name begins. A face already does
+   that, so with an avatar the dash is only clutter. */
+.svc-testimonial__byline:has(.svc-testimonial__avatar) .svc-testimonial__by::before { content: none; }
 
 /* Qualification -- who it's for / who it isn't */
 .svc-qual {
@@ -2649,6 +2857,27 @@ p, li, dd, figcaption { text-wrap: pretty; }
   gap: var(--space-md);
 }
 .svc-qual__col { padding: var(--space-lg); }
+/* The cross-link under the fit/not-fit grid, into /are-we-a-good-fit/. It sits on
+   the periwinkle band, which is already `color: #fff`, so the link takes the
+   band's white and earns its affordance from the underline rather than from the
+   page's normal link colour (which would vibrate against this background). */
+.svc-qual__more {
+  margin-top: var(--space-md);
+  text-align: center;
+  font-family: var(--font-display);
+}
+/* Opts OUT of the global `p a` treatment: this link sits on the periwinkle band,
+   where the global's purple text and teal trace would both be wrong against the
+   background. Keeps its own white underline instead. */
+.svc-qual__more a {
+  color: #fff;
+  background-image: none;
+  padding-bottom: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+  text-decoration-thickness: 1px;
+}
+.svc-qual__more a:hover { text-decoration-thickness: 2px; }
 .svc-qual__label {
   font-family: var(--font-mono);
   font-size: calc(var(--text-xs) * 1.5);
@@ -2656,9 +2885,27 @@ p, li, dd, figcaption { text-wrap: pretty; }
   text-transform: uppercase;
   margin-bottom: var(--space-sm);
 }
-/* second gradient stop brightened 15% (rgb(237,231,246) x1.15 clamps to white) */
-.svc-qual__col.panel {
+/* second gradient stop brightened 15% (rgb(237,231,246) x1.15 clamps to white).
+   SCOPED to the band on purpose: this override exists to lift the panels off the
+   periwinkle, and white-on-white would erase them anywhere else. Outside the band
+   (the /are-we-a-good-fit/ hero renders QualPanels on a light section) they fall
+   back to the base `.panel` gradient, whose lavender second stop reads against the
+   page. */
+.svc-qual-section .svc-qual__col.panel {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.55) 100%);
+}
+/* The hero panels sit directly under the H1, so they need the breathing room the
+   band's heading margin used to provide. */
+.cw-fit-hero .svc-qual { margin-top: var(--space-lg); }
+/* HALF the standard vertical rhythm on /are-we-a-good-fit/ (Chad, 2026-07-16).
+   These sections are one continuous argument rather than separate bands, and the
+   full --section-pad-y read as gaps between unrelated blocks. Each section pads
+   top AND bottom, so the space BETWEEN two of them is two of these -- halving the
+   token halves that gap. Overriding the token rather than padding-block keeps the
+   clamp's fluid scaling, just at half size. */
+.cw-fit-hero,
+.cw-fit-prose {
+  --section-pad-y: clamp(1.5rem, 3.5vw, 3.5rem);
 }
 /* eyebrows match the brand blue, not the grey */
 .svc-qual__col--fit .svc-qual__label,
@@ -6186,9 +6433,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
      of the gem's own (viewport-scaled) height tracks the responsive type. */
   transform: translateY(14%);
 }
+/* On a phone the pair of flanking gems becomes ONE big gem sitting above the
+   title (Chad, 2026-07-16). The row's DOM order is gem, title, gem, so turning
+   the row into a column lifts the first gem into place with no markup change and
+   the second is dropped rather than shrunk. */
 @media (max-width: 600px) {
-  .cw-port-titlebar__gem { width: 31px; }
-  .cw-port-titlebar__row { gap: 0.65rem; }
+  .cw-port-titlebar__row { flex-direction: column; gap: 0.65rem; }
+  /* A third of the screen. `transform: none` because the 14% nudge exists only to
+     drop the gem onto the title's ink centre when the two sit side by side --
+     stacked there is nothing to sit level with, and at this size the nudge reads
+     as the gem hanging low. */
+  .cw-port-titlebar__gem { width: 33vw; transform: none; }
+  .cw-port-titlebar__row .cw-port-titlebar__gem:last-child { display: none; }
 }
 
 /* GemstoneMark host: the canvas fills the sized box the consumer sets. */
@@ -6377,6 +6633,39 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 .cw-port-card__label a { color: inherit; text-decoration: none; }
 .cw-port-card__label a:hover { color: var(--accent); }
+
+/* ---- /showroom/'s archive only ----
+   The card styles above are SHARED: the homepage runs 12 of these cards and
+   /portfolio/ runs 19. Everything here is therefore scoped under
+   .cw-showroom-archive and must stay that way -- unscoped, each of these lands on
+   both of those pages.
+   On /showroom/ the archive is not a section of a page, it IS the page (the
+   showroom itself is desktop-only), so it carries a centered, larger treatment the
+   in-page grids do not want. */
+.cw-showroom-archive .svc-lede {
+  text-align: center;
+  /* .measure-prose caps the lede's width; centering the TEXT inside a box still
+     pinned to the left just moves the ragged edge. Center the box too. */
+  margin-inline: auto;
+}
+.cw-showroom-archive .cw-port-card__label {
+  font-size: var(--text-xl);
+}
+/* The row holds the title AND its visit arrow, so centering belongs here -- on the
+   label alone the pair would still sit left with the text centered inside it. */
+.cw-showroom-archive .cw-port-card__labelrow {
+  justify-content: center;
+}
+.cw-showroom-archive .cw-port-card__blurb {
+  text-align: center;
+}
+/* Space between the mockup card and the project title. On __meta (the whole text
+   block below the card) rather than the title, so the card's own gap rhythm
+   between title, blurb and cta is left alone. */
+.cw-showroom-archive .cw-port-card__meta {
+  margin-top: var(--space-sm);
+}
+
 /* Title + a "visit live site" arrow sitting just to the right of the title. */
 .cw-port-card__labelrow { display: flex; align-items: center; gap: 0.7rem; }
 .cw-port-card__visit {
@@ -6476,6 +6765,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
   align-items: center;
   justify-content: center;
   min-width: 0;
+  /* The frame's width is a PERCENTAGE of this box (--cw-frame-w), so making the
+     stage a container lets the phone's corner radius track the frame at every
+     size instead of being frozen in px. See .cw-port-frame--phone below. */
+  container-type: inline-size;
 }
 /* One persistent shell. Height is fixed by the stage; the WIDTH and the bezel
    transition per device, so the frame visibly shrinks/expands between shapes
@@ -6546,12 +6839,32 @@ p, li, dd, figcaption { text-wrap: pretty; }
     0 12px 28px rgba(36, 57, 137, 0.12),
     0 36px 66px rgba(36, 57, 137, 0.18);
 }
-.cw-port-frame--tablet { border-radius: 26px; border-width: 6px; }
-.cw-port-frame--phone { border-radius: 34px; border-width: 5.5px; }
+/* Bezels run through --cw-bezel-scale so the base widths stay stated once here and
+   a viewport can thin them with a single knob (see the mobile rule below). */
+.cw-port-frame--tablet { border-radius: 26px; border-width: calc(6px * var(--cw-bezel-scale, 1)); }
+.cw-port-frame--phone { border-radius: 34px; border-width: calc(5.5px * var(--cw-bezel-scale, 1)); }
 .cw-port-frame--tablet::after,
 .cw-port-frame--phone::after { display: none; }
 .cw-port-frame--tablet .cw-port-frame__screen,
 .cw-port-frame--phone .cw-port-frame__screen { border-radius: 14px; }
+/* A real phone's corners are ~13.5% of its width, and that RATIO is what has to
+   hold -- the 34px above cannot, because the frame is sized in percent while the
+   radius was frozen in px. The frame is --cw-frame-w (30.7cqw) of the stage, so
+   0.135 x 30.7 = 4.15cqw keeps the ratio at any stage width. It matters most where
+   the card is narrowest: on a phone the grid drops to one column and the frame
+   lands near 108px, where 34px per corner ate two thirds of the width and the
+   device read as a lozenge (Chad, 2026-07-16). The screen keeps its original
+   14/34 ratio to the bezel. Scoped to the stage because that is where the
+   container is; the px values above stay as the fallback. */
+.cw-port-device__stage .cw-port-frame--phone { border-radius: 4.15cqw; }
+.cw-port-device__stage .cw-port-frame--phone .cw-port-frame__screen { border-radius: 1.71cqw; }
+/* MOBILE VIEW ONLY: the card shrinks to one column but the bezels are fixed px, so
+   they read proportionally chunkier here than on desktop (5.1% of the phone frame
+   vs 3.1%). 25% off both the tablet and phone bezels (Chad, 2026-07-16) -- tablet
+   6px -> 4.5px, phone 5.5px -> 4.125px. Desktop bezels are untouched. */
+@media (max-width: 600px) {
+  .cw-port-device__stage { --cw-bezel-scale: 0.75; }
+}
 .cw-port-frame__notch {
   position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
   width: 42%; height: 15px; background: #15121f;
@@ -7177,15 +7490,13 @@ html.cw-motion-paused *::after {
   /* 25% tighter than the global body leading, scoped to these boxes only */
   line-height: calc(var(--leading-body) * 0.75);
 }
+/* These are prose links in a <p>, so the global `p a` rule now draws the resting
+   hairline and the hover trace. Its own text-decoration is gone: kept alongside
+   the global it stacked a decoration line on top of two background bars. Only the
+   weight is local. */
 .cw-lane-sub__body a {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1px;
   font-weight: 500;
-  transition: color var(--duration-base) var(--ease-smooth);
 }
-.cw-lane-sub__body a:hover { color: var(--text-primary); }
 @media (max-width: 900px) {
   .cw-lanes-scroll__chips { display: none; }
   .cw-lane-block { min-height: 0; }
@@ -7223,7 +7534,22 @@ html.cw-motion-paused *::after {
   color: var(--accent);
 }
 .cw-pricing__cta { display: flex; justify-content: center; margin-top: clamp(1.5rem, 3vw, 2.5rem); }
-.cw-pricing__cta-btn { font-size: var(--text-lg); padding: var(--space-sm) var(--space-xl); }
+/* The rates CTA and the portfolio-showcase CTA are deliberately the same size
+   (Chad, 2026-07-16). One rule, two selectors, so retuning one moves both. */
+.cw-pricing__cta-btn,
+.cw-port-archive__cta-btn {
+  font-size: var(--text-lg);
+  padding: var(--space-sm) var(--space-xl);
+  white-space: nowrap;
+}
+/* On a phone it is the 4rem of side padding that breaks the label across two
+   lines, not the label itself: 128px of padding plus ~20px type leaves almost
+   nothing of a 360px screen. Keep the type size (that is what matches rates) and
+   give the padding back, down to the same side padding the base .svc-btn uses. */
+@media (max-width: 600px) {
+  .cw-pricing__cta-btn,
+  .cw-port-archive__cta-btn { padding-inline: var(--space-md); }
+}
 .cw-pricing__disclaimer {
   margin-top: var(--space-sm);
   text-align: center;
@@ -7566,4 +7892,440 @@ html.cw-motion-paused *::after {
   font-style: italic;
   color: var(--text-secondary);
   max-width: 70ch;
+}
+
+/* =====================================================================
+   LANE 03 (CONSULTING) / V/S/R CAPSULE SET
+   Six section shapes rebuilt for /vision-strategy-roadmap/. TRACED from the
+   chadlewine Sovereignty Audit page (si-hero / bk-acts / bk-what__row /
+   sa-rule), NOT ported: none of chadlewine's SI Night CSS exists here, so
+   every rule below is written against CWS tokens and CWS class names. Keep it
+   that way -- if a shape needs changing, change it here, do not reach back into
+   the other codebase. See CWS-VSR-SERVICE.md.
+   ===================================================================== */
+
+/* ---- GLYPH TITLE BAR -- a heading between two shade ramps ------------- */
+.cw-glyphbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.cw-glyphbar__ramp {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--accent);
+  opacity: 0.55;
+}
+.cw-glyphbar__ramp--rev { text-align: left; }
+.cw-glyphbar__heading {
+  flex: 0 1 auto;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: var(--text-primary);
+}
+.svc-dark .cw-glyphbar__heading { color: var(--dark-text); }
+.svc-dark .cw-glyphbar__ramp { color: var(--dark-muted); opacity: 0.75; }
+@media (max-width: 600px) {
+  .cw-glyphbar { gap: var(--space-sm); }
+  .cw-glyphbar__ramp { font-size: var(--text-xs); }
+}
+
+/* ---- ACTS -- the movements row (stepped glyph, kind, title, body) ------ */
+.cw-acts__intro { margin-bottom: var(--space-lg); }
+.cw-acts__list {
+  display: grid;
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+/* Filled rows (design-system rule 8): columns come from stepColumns(), so the
+   last row is never half empty. */
+.cw-acts__list[data-cols="2"] { grid-template-columns: repeat(2, 1fr); }
+.cw-acts__list[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+.cw-acts__list[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+.cw-acts__list[data-cols="5"] { grid-template-columns: repeat(5, 1fr); }
+.cw-act {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+}
+/* The stepped glyph: four identical full blocks ramped by OPACITY only, so
+   every block shares one glyph width and one baseline. */
+.cw-act__glyph {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: 1;
+  letter-spacing: -0.08em;
+  color: var(--accent);
+  margin-bottom: var(--space-2xs);
+}
+.svc-dark .cw-act__glyph { color: var(--dark-muted); }
+.cw-act__kind {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.svc-dark .cw-act__kind { color: var(--dark-muted); }
+.cw-act__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+}
+.svc-dark .cw-act__title { color: var(--dark-text); }
+.cw-act__desc {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.svc-dark .cw-act__desc { color: var(--dark-muted); }
+.cw-acts__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-lg);
+}
+@media (max-width: 900px) {
+  .cw-acts__list[data-cols="3"],
+  .cw-acts__list[data-cols="4"],
+  .cw-acts__list[data-cols="5"] { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .cw-acts__list[data-cols="2"],
+  .cw-acts__list[data-cols="3"],
+  .cw-acts__list[data-cols="4"],
+  .cw-acts__list[data-cols="5"] { grid-template-columns: 1fr; }
+}
+
+/* ---- RULE -- one governing line, then the prose that earns it --------- */
+/* WHITE SPACE, deliberate: this is the page's quietest section and the only
+   light band between two darks. The line is the one sentence a reader should
+   carry out of the page, so it gets air on BOTH sides -- crowding it against
+   the paragraph turns a statement into a subheading. The asymmetric accent rule
+   on the left is the hierarchy signal; the line does not get centered, because
+   centering would make it decorative rather than spoken. */
+.cw-rule__line {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  max-width: var(--measure-narrow);
+  margin-bottom: var(--space-xl);
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--accent);
+}
+.cw-rule__body > p {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-rule__body > p + p { margin-top: var(--space-md); }
+/* The admission (last paragraph) is the strongest thing on the page. It gets
+   its own separation and a hairline, so it reads as an aside Chad volunteered
+   rather than one more paragraph of argument. */
+.cw-rule__body > p:last-child:not(:only-child) {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ---- SPLIT CHECKLIST -- checklist + optional art, side switchable ----- */
+.cw-split__lead { margin-bottom: var(--space-lg); }
+.cw-split__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  align-items: center;
+}
+/* No art passed. WHITE SPACE, corrected: a single left-aligned column under a
+   full-width centered title bar leaves the right half empty, and empty-right
+   does not read as restraint, it reads as a missing image. Centering the measure
+   makes the space deliberate and symmetrical about the title bar above it.
+   NOTE: this centers a PROSE MEASURE inside a section, which is allowed; it is
+   not a max-width on a page wrapper (the global layout rule). The moment real
+   art lands, `art` fills the right and this modifier stops applying. */
+.cw-split__row--solo {
+  grid-template-columns: minmax(0, var(--measure-prose));
+  justify-content: center;
+}
+.cw-split__half { min-width: 0; }
+.cw-split__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-split__list > li {
+  position: relative;
+  padding-left: var(--space-md);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-split__list > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.cw-split__list > li strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: var(--space-3xs);
+}
+.cw-split__art { min-width: 0; }
+.cw-split__art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-subtle);
+}
+.cw-split__footer { margin-top: var(--space-xl); }
+.cw-split__cta { margin-top: var(--space-lg); }
+@media (max-width: 900px) {
+  .cw-split__row { grid-template-columns: 1fr; gap: var(--space-lg); }
+}
+
+/* ---- VERBATIM -- real client sentences, quoted exactly ---------------- */
+.cw-verbatim__lead { margin-bottom: var(--space-lg); }
+/* ASYMMETRIC ON PURPOSE, and this one matters. A 2x2 grid of quote cards is a
+   testimonial wall, which is the exact read this capsule exists to avoid (see
+   VerbatimCapsule.tsx) -- an even grid also claims all four sentences are
+   peers, and they are not. The first is THE spine: the sentence the whole
+   document was built to serve. So it takes the full row and the biggest type,
+   and the supporting three fill one clean row beneath it (design-system rule 8,
+   filled rows). Hierarchy comes from the layout agreeing with the argument. */
+.cw-verbatim__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-verbatim__item { display: flex; flex-direction: column; min-width: 0; }
+.cw-verbatim__item:first-child { grid-column: 1 / -1; }
+/* The featured quote is set at hero scale and given a generous measure, so it
+   is read as a statement rather than scanned as a card. */
+.cw-verbatim__item:first-child .cw-verbatim__fig { padding: var(--space-lg); }
+.cw-verbatim__item:first-child .cw-verbatim__quote > p {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  max-width: 24ch;
+}
+.cw-verbatim__item:first-child .cw-verbatim__note { max-width: var(--measure-prose); }
+.cw-verbatim__fig { padding: var(--space-md); margin: 0; }
+.cw-verbatim__quote { margin: 0; border: 0; padding: 0; }
+/* The quote is the loudest type in the section on purpose: on this page the
+   client's own sentence outranks anything chadworks wrote around it. */
+.cw-verbatim__quote > p {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: var(--dark-text);
+}
+.cw-verbatim__quote > p::before { content: "\201C"; }
+.cw-verbatim__quote > p::after  { content: "\201D"; }
+.cw-verbatim__source {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dark-muted);
+  opacity: 0.85;
+}
+.cw-verbatim__note {
+  margin-top: var(--space-sm);
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--dark-border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--dark-muted);
+}
+.cw-verbatim__footer { margin-top: var(--space-xl); }
+@media (max-width: 900px) {
+  .cw-verbatim__list { grid-template-columns: 1fr; }
+  .cw-verbatim__item:first-child .cw-verbatim__quote > p {
+    font-size: var(--text-xl);
+    max-width: none;
+  }
+}
+
+/* ---- DELIVERABLE -- the document's anatomy, then a stamped sample ----- */
+.cw-deliv__lead { margin-bottom: var(--space-lg); }
+.cw-deliv__anatomy {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-deliv__part {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-md);
+}
+/* The V / S / R watermark. Decorative and aria-hidden; the accessible letter
+   rides in the heading. */
+.cw-deliv__letter {
+  position: absolute;
+  top: -0.35em;
+  right: 0.05em;
+  font-family: var(--font-display);
+  font-size: 7rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+  opacity: 0.08;
+  pointer-events: none;
+}
+.cw-deliv__label {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2xs);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+.cw-deliv__label-letter {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+}
+.cw-deliv__contents {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.cw-deliv__contents > li {
+  position: relative;
+  padding-left: var(--space-sm);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-deliv__contents > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 4px;
+  height: 1px;
+  background: var(--accent);
+}
+.cw-deliv__note { margin-top: var(--space-md); }
+
+/* The sample. The stamp is a hard requirement of the capsule, so it is styled
+   to be unmissable: it sits ON the paper's top edge, in mono, in the accent,
+   and it renders first. A composite document on a page selling verbatim
+   extraction has to announce itself before it is read. */
+/* WHITE SPACE, corrected: at 720px left-aligned under the full-width 3-up
+   anatomy, the sample left the right half empty and read as a broken row rather
+   than a specimen. Centered, the offset becomes deliberate: the anatomy is the
+   MAP (symmetric, three peers), the sample is the SPECIMEN (narrower, centered,
+   quiet), and the width change is what tells the eye it switched from schema to
+   artifact. The extra top space is the gap between those two ideas. */
+.cw-deliv__sample {
+  margin: var(--space-2xl) auto 0;
+  max-width: var(--measure-narrow);
+}
+.cw-deliv__stamp {
+  display: inline-block;
+  padding: var(--space-3xs) var(--space-xs);
+  border: 1px dashed var(--accent);
+  border-bottom: 0;
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--bg-surface);
+}
+.cw-deliv__paper {
+  padding: var(--space-lg);
+  border: 1px dashed var(--accent);
+  border-radius: 0 var(--radius) var(--radius) var(--radius);
+  background: var(--bg-elevated);
+  box-shadow: 0 14px 40px rgba(36, 57, 137, 0.07);
+}
+.cw-deliv__paper-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-md);
+}
+.cw-deliv__paper-block + .cw-deliv__paper-block { margin-top: var(--space-lg); }
+.cw-deliv__paper-heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-2xs);
+}
+.cw-deliv__paper-body > p {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+.cw-deliv__paper-body > p + p { margin-top: var(--space-sm); }
+.cw-deliv__paper-body strong { color: var(--text-primary); }
+/* The spine sentence inside the sample: set like the real thing, because in a
+   real VSR the spine IS the loudest line on the page. */
+.cw-deliv__quote {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--accent);
+  margin-bottom: var(--space-sm);
+}
+.cw-deliv__cta { margin-top: var(--space-lg); }
+@media (max-width: 900px) {
+  .cw-deliv__anatomy { grid-template-columns: 1fr; }
+  .cw-deliv__letter { font-size: 5rem; }
 }

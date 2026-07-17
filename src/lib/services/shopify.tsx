@@ -148,9 +148,9 @@ export const shopify: Service = {
         detail: "I've used Shopify for a manufacturing company doing millions in revenue. The platform holds, and I know where it strains.",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail: "Live builds, walkable right now, in the immersive portfolio.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

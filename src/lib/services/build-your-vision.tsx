@@ -138,10 +138,10 @@ export const buildYourVision: Service = {
         href: "https://rslgo.com",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail:
           "More live, custom builds you can click through. Same custom-built foundation underneath, whatever sits on top.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

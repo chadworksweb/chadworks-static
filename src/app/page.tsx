@@ -24,6 +24,7 @@ import {
   FaqCapsule,
   MainContactCapsule,
   PortfolioShowcaseCapsule,
+  TestimonialsCapsule,
   AboutChadCapsule,
   RatesCapsule,
   FitCapsule,
@@ -194,6 +195,41 @@ const PROBLEM = {
   },
 };
 
+// ---- TESTIMONIALS -- real client voice, curated for the homepage. ----
+// TestimonialsCapsule ships on six service pages but had never been on the
+// homepage until now (CWS-EXPANSION-PLAN-01, item A). These are the fuller,
+// named-with-company quotes the signed-off pages carry, not the short
+// Google-review lines the trade pages run -- same register as web-development,
+// which is where all three of these already appear together.
+//
+// Order is deliberate: the craft and partnership quotes lead, per the plan's
+// "craft leads on premium surfaces" call. Chad's ruling 2026-07-16 is that only
+// PRICE quotes ("keeps costs down") are off-message here; a rank quote is fine,
+// so Ananda Forest keeps his and sits third.
+const TESTIMONIALS = {
+  heading: "What clients say",
+  items: [
+    {
+      quote:
+        "Chad went above and beyond and exceeded our expectations with the final product.",
+      attribution: "Mary Lynn Renner, AAC Event Catering (Lansdale, PA)",
+      img: "/people/mary-lynn-renner.webp",
+    },
+    {
+      quote:
+        "Chad is very professional, talented and skilled. He does not try to sell you on products or services that you don't need.",
+      attribution: "Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)",
+      img: "/people/kimberly-dolan.webp",
+    },
+    {
+      quote:
+        "Chad is a wonder worker! My website now shows up first or second in any searches. He is an SEO magician!",
+      attribution: "Ananda Forest, author",
+      img: "/people/ananda-forest.webp",
+    },
+  ],
+};
+
 // ---- FAQ -- a focused single-band accordion. ----
 const FAQS = [
   {
@@ -356,14 +392,16 @@ export default function Home() {
       {/* 4. The ribbons + knockout problem beat, with the frosted expand panel. */}
       <ProblemCapsule problem={PROBLEM} />
 
-      {/* 5. PORTFOLIO -- the shared global PortfolioShowcaseCapsule. The homepage
-          shows a curated subset (a few client/demo builds are held back to the
-          full /portfolio archive); /portfolio and service pages render it all. */}
-      <PortfolioShowcaseCapsule
-        exclude={["edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample"]}
-      />
+      {/* 4a. TESTIMONIALS -- real client voice, answering the problem beat above
+          it. First time this capsule has run on the homepage. */}
+      <TestimonialsCapsule testimonials={TESTIMONIALS} />
 
-      {/* 5b. Pixel divider -- the page-transition wipe as a thin rule, digitized
+      {/* 5. PORTFOLIO -- the shared global PortfolioShowcaseCapsule. The curated
+          selection now lives in the capsule (HELD_BACK) and is the same on every
+          surface, so there is no list to pass from here. */}
+      <PortfolioShowcaseCapsule revealEarly />
+
+      {/* 5a. Pixel divider -- the page-transition wipe as a thin rule, digitized
           in on scroll. Sits between the portfolio and the about block. */}
       <PixelDivider />
 

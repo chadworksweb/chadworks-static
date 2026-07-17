@@ -14,33 +14,71 @@ export function PageMotion() {
     const reduce = prefersReducedMotion();
 
     // --- scroll reveal ---
-    // Two triggers share one `.is-visible` toggle:
-    //   .reveal       -- fires as the element just enters (rootMargin -8%).
-    //   .reveal-late  -- waits until the element is well up the viewport
-    //                    (rootMargin -32%), so a longer glide is seen mid-screen
-    //                    rather than down at the fold. Used by the process cards.
+    // Three triggers share one `.is-visible` toggle. Only the rootMargin differs:
+    //   .reveal        -- fires as the element just enters (rootMargin -8%).
+    //   .reveal-early  -- fires BEFORE the element reaches the fold (rootMargin
+    //                     +14%, the one positive margin here), so the rise is
+    //                     already settling by the time it is read rather than
+    //                     starting under the reader's eye. Used by the homepage
+    //                     portfolio showcase.
+    //   .reveal-late   -- waits until the element is well up the viewport
+    //                     (rootMargin -32%), so a longer glide is seen mid-screen
+    //                     rather than down at the fold. Used by the process cards.
+    //
+    // `.reveal-early` carries `.reveal` too, and takes its look and its
+    // reduced-motion guard from it -- the early class is a TRIGGER, not a style.
+    // Hence the `:not()` below: without it both observers would watch the same
+    // element and the -8% one would fight the whole point of the +14% one.
     const observers: IntersectionObserver[] = [];
+
+    // The trigger expressed in PIXELS: roughly 12% of one screen. For any element
+    // shorter than the viewport this works out to the same 0.12 ratio the reveal
+    // has always used, so those sections fire exactly when they used to.
+    const triggerPx = window.innerHeight * 0.12;
+
+    const onIntersect: IntersectionObserverCallback = (entries, o) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add("is-visible");
+          o.unobserve(e.target);
+        }
+      });
+    };
+
     const setupReveal = (selector: string, rootMargin: string) => {
       const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
       if (reduce) {
         els.forEach((el) => el.classList.add("is-visible"));
         return;
       }
-      const obs = new IntersectionObserver(
-        (entries, o) => {
-          entries.forEach((e) => {
-            if (e.isIntersecting) {
-              e.target.classList.add("is-visible");
-              o.unobserve(e.target);
-            }
-          });
-        },
-        { threshold: 0.12, rootMargin }
-      );
-      els.forEach((el) => obs.observe(el));
-      observers.push(obs);
+      // One observer PER element, because the threshold has to be derived from
+      // that element's own height and IntersectionObserver takes its options per
+      // observer, not per target.
+      //
+      // WHY, and it is not theoretical: a FIXED ratio is unreachable once an
+      // element is much taller than the screen. intersectionRatio tops out near
+      // viewportH / elementH, so at ~8x the viewport a 0.12 threshold can never
+      // be crossed, the callback never runs, and the section stays at the
+      // `opacity: 0` that `.reveal` starts from -- permanently. That is exactly
+      // how the homepage portfolio grid went invisible on a real phone: the grid
+      // drops to one column under 600px and the section becomes several screens
+      // tall, while on desktop it stays 2-up and short enough to clear 0.12,
+      // which is why the bug never showed up here.
+      //
+      // Clamping to the pixel trigger leaves short elements on their old ratio
+      // and gives tall ones a threshold they can actually reach. Height is safe
+      // to read now: DeviceMockup's frames sit in a fixed-height stage, so the
+      // cards do not depend on images having loaded.
+      els.forEach((el) => {
+        const h = el.getBoundingClientRect().height;
+        const threshold = h > 0 ? Math.min(0.12, triggerPx / h) : 0;
+        const obs = new IntersectionObserver(onIntersect, { threshold, rootMargin });
+        obs.observe(el);
+        observers.push(obs);
+      });
     };
-    setupReveal(".reveal", "0px 0px -8% 0px");
+    setupReveal(".reveal:not(.reveal-early)", "0px 0px -8% 0px");
+    setupReveal(".reveal-early", "0px 0px 14% 0px");
     setupReveal(".reveal-late", "0px 0px -32% 0px");
 
     // --- scroll-fill headings ---

@@ -154,9 +154,9 @@ export const ecommerce: Service = {
         detail: "I've used Shopify for a multi-million dollar manufacturing company and run WooCommerce for product businesses shipping today.",
       },
       {
-        label: "The portfolio",
+        label: "The showroom",
         detail: "Walk through live builds and judge the craft with your own eyes.",
-        href: "/portfolio/",
+        href: "/showroom/",
       },
     ],
   },

@@ -30,3 +30,14 @@ export { ContactCapsule } from "./ContactCapsule";
 export { MainContactCapsule } from "./MainContactCapsule";
 export { EraTimelineCapsule } from "./EraTimelineCapsule";
 export { AnatomyCapsule } from "./AnatomyCapsule";
+
+// --- The V/S/R (Lane 03 consulting) set. Traced from the chadlewine
+// Sovereignty Audit page's sections and rebuilt on CWS tokens; see
+// CWS-VSR-SERVICE.md. Global capsules, not page-private: the acts row, the
+// governing-rule statement and the split checklist are all reusable shapes.
+export { GlyphTitleBar, ActGlyph } from "./GlyphTitleBar";
+export { ActsCapsule } from "./ActsCapsule";
+export { RuleCapsule } from "./RuleCapsule";
+export { SplitChecklistCapsule } from "./SplitChecklistCapsule";
+export { VerbatimCapsule } from "./VerbatimCapsule";
+export { DeliverableCapsule } from "./DeliverableCapsule";

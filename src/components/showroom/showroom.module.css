@@ -111,12 +111,100 @@
   display: block;
 }
 
+/* ---- Stepped blur over the slide ----
+   One big blur would end on a hard line wherever its mask stopped. This is the stacked
+   trick instead: each layer blurs a little more than the last and starts a little lower,
+   and because every layer filters the BACKDROP (which already includes the layers behind
+   it), the blur compounds down the frame -- a ramp, not a step, with no seam.
+   --slide-blur-from is where the first layer starts; the rest divide what is left. It
+   sits under the module (z 12) and over the canvas, so the module stays sharp and only
+   the slide goes soft. */
+.slideBlur {
+  /* The ramp's range. Every band below derives from these two, so re-aiming the blur is
+     these numbers and nothing else -- the alternative is six literals that have to be
+     kept in step by hand. */
+  --slide-blur-from: 55%;
+  --slide-blur-to: 98%;
+  --slide-blur-step: calc((var(--slide-blur-to) - var(--slide-blur-from)) / 5);
+  /* TWO rules keep this element able to blur at all, and BOTH are load-bearing. Break
+     either and the bands blur an empty backdrop: perfect computed values, nothing on
+     screen. That failure is invisible to every measurement, so it can only be caught by
+     eye, in Chrome. Do not "tidy" any of this without looking at the result.
+
+     1. FIXED, not absolute. The canvas is always its own composited layer. Absolutely
+        positioned, this paints into a surface that cannot sample that layer.
+     2. NO animation on THIS element. An opacity animation gives it a render surface,
+        and its children cannot sample outside one. The fade lives on the spans instead
+        (each span's own opacity does not interfere with its own backdrop-filter).
+
+     Rule 2 is why this looked haunted: with fill-mode both, a finished animation is
+     still in effect, and Chrome may keep that surface alive or drop it. Dropped, the
+     blur appeared; kept, it did not. Same code, different luck, load to load.
+
+     Geometry does not change: .canvasWrap is the full viewport and the showroom locks
+     scroll, so inset:0 is the same box either way, and z-index 10 still keeps the
+     module and HUD (z 12) sharp above it. */
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+/* Each band fades in across its own slice (--a to --b), which is where the NEXT one
+   picks up, so the layers hand off with no seam. Doubling the blur each step is what
+   makes the ramp read as even: perceived blur grows with the radius, not linearly. */
+.slideBlur span {
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--a), #000 var(--b));
+  mask-image: linear-gradient(to bottom, transparent var(--a), #000 var(--b));
+  /* The fade rides HERE, not on the parent, and that is not a style choice: see rule 2
+     on .slideBlur. Same keyframes, same clock, same result on screen. */
+  animation: cw-frame-in var(--stage-ms) var(--stage-ease) both;
+}
+.slideBlurOut span {
+  animation: cw-frame-out var(--stage-ms) var(--stage-ease) both;
+}
+.slideBlur span:nth-child(1) {
+  --a: var(--slide-blur-from);
+  --b: calc(var(--slide-blur-from) + var(--slide-blur-step));
+  -webkit-backdrop-filter: blur(1.9px);
+  backdrop-filter: blur(1.9px);
+}
+.slideBlur span:nth-child(2) {
+  --a: calc(var(--slide-blur-from) + var(--slide-blur-step));
+  --b: calc(var(--slide-blur-from) + 2 * var(--slide-blur-step));
+  -webkit-backdrop-filter: blur(3.75px);
+  backdrop-filter: blur(3.75px);
+}
+.slideBlur span:nth-child(3) {
+  --a: calc(var(--slide-blur-from) + 2 * var(--slide-blur-step));
+  --b: calc(var(--slide-blur-from) + 3 * var(--slide-blur-step));
+  -webkit-backdrop-filter: blur(7.5px);
+  backdrop-filter: blur(7.5px);
+}
+.slideBlur span:nth-child(4) {
+  --a: calc(var(--slide-blur-from) + 3 * var(--slide-blur-step));
+  --b: calc(var(--slide-blur-from) + 4 * var(--slide-blur-step));
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+}
+.slideBlur span:nth-child(5) {
+  --a: calc(var(--slide-blur-from) + 4 * var(--slide-blur-step));
+  --b: var(--slide-blur-to);
+  -webkit-backdrop-filter: blur(30px);
+  backdrop-filter: blur(30px);
+}
+
 /* ---- HUD ---- */
 .hud {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
+  /* ABOVE the slide blur. It had no z-index, which put it under .slideBlur (z 10) --
+     and it lives at the bottom of the frame, exactly where the blur is strongest, so
+     the counter went soft with the slide. This is chrome; only the slide blurs. */
+  z-index: 12;
   padding: clamp(1.7rem, 3vw, 2.6rem);
   display: flex;
   align-items: flex-end;
@@ -161,27 +249,25 @@
   opacity: 0;
 }
 
-/* ---- SEO / crawlable fallback ----
-   Kept in the DOM for crawlers, but ALWAYS visually hidden (sr-only). On SSR/first
-   paint the mode is undecided; showing this list was flashing a text list of projects
-   before the WebGL stage mounted. Hiding it means the dark stage paints immediately and
-   the gem fades straight in -- no text flash. */
-.seo {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-  list-style: none;
-}
-.seo a {
-  color: #cbb4f5;
-  font-weight: 600;
+/* ---- The archive: what the server ships, and what non-desktop keeps ----
+   A phone or a tablet never leaves this, so it is real page content, not a fallback
+   -- no sr-only, no hiding.
+   On a desktop-class device the showroom replaces it, but that decision is made in
+   JS, which cannot run until after first paint and then still has to fetch the
+   showroom's chunk. Left to JS alone, the whole archive grid paints and is yanked
+   away -- a far louder version of the text flash this page has always guarded
+   against.
+   So the CSS answers first. This query is the SAME question useShowroomMode asks
+   (see the gate there); asked here, it is answered at first paint: if this device is
+   going to get the showroom, never paint the archive at all. The two conditions must
+   stay in step -- if you move the gate, move this with it.
+   It stays in the DOM either way, so crawlers still read it. Google indexes
+   mobile-first, at a coarse-pointer viewport, where this query does not match and
+   the archive is plainly visible. */
+@media (min-width: 901px) and (pointer: fine) and (hover: hover) {
+  .archive {
+    display: none;
+  }
 }
 
 /* ---- Selected state: full-bleed takeover, inset stylized frame ---- */
@@ -288,9 +374,35 @@
   left: clamp(1.4rem, 4vw, 3.4rem);
   bottom: clamp(1.4rem, 5vh, 3.4rem);
   z-index: 2;
-  /* Fixed width so the collapsed heading keeps the full card's width. */
-  width: min(42ch, calc(100% - 2 * clamp(1.4rem, 4vw, 3.4rem)));
-  padding: 1.25rem 1.6rem 1.35rem;
+  /* ONE width for every project, so the card reads as the same object from shot to
+     shot -- and so the collapsed heading keeps the full card's width. A title only
+     earns more (--fit-w, set by useFitText) once holding this width would shrink it
+     past MIN_FIT_RATIO of its base; titles never wrap, so the alternative is a title
+     that fades away. max-width is the ceiling: the card stops at its own gutters. */
+  width: var(--fit-w, min(42ch, calc(100% - 2 * clamp(1.4rem, 4vw, 3.4rem))));
+  max-width: calc(100% - 2 * clamp(1.4rem, 4vw, 3.4rem));
+  --meta-pad-x: 1.6rem;
+  --meta-corner: 3.2rem;
+  /* The corner runs longways along the top edge: the grain still gathers in the
+     corner itself, and the label rides the rest of it. */
+  --meta-corner-w: 7.5rem;
+  /* The grain runs PAST the control, 50px further left than the strip it sits in --
+     the field is a look, the strip is the target, and they do not have to be the same
+     box (see .metaCorner::before, which is pointer-events: none for exactly that). */
+  --meta-grain-over: 25px;
+  /* The fade's END, as a radius: 88% of this is where the dots reach zero. Sized so
+     that end lands --meta-grain-over further out than it did, while the stops below
+     hold the fade itself at the same ~45px width -- extended, not stretched. */
+  --meta-grain: 7rem;
+  /* The dots read as texture, not as content: well under the label's contrast. */
+  --meta-grain-ink: color-mix(in srgb, currentColor 38%, transparent);
+  --meta-grain-lit: rgba(255, 255, 255, 0.22);
+  /* The plate behind the label (see .metaCornerText). Deliberately DEEPER than the
+     card, not a match for it: matched to the surface, the plate only ever read as the
+     halo it threw past the text, so tightening it made it vanish. It has to carry its
+     own tone to be a shape at this size. */
+  --meta-shade: rgba(9, 8, 16, 0.8);
+  padding: 1.25rem var(--meta-pad-x) 1.35rem;
   border-radius: 16px;
   background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
   -webkit-backdrop-filter: blur(14px) saturate(1.15);
@@ -308,8 +420,11 @@
   background: linear-gradient(160deg, rgba(240, 238, 250, 0.92) 0%, rgba(221, 213, 243, 0.85) 100%);
   border-color: rgba(60, 40, 100, 0.2);
   color: #1a1526;
+  /* The FAR stop of this card's own gradient. The card runs light at the top (where
+     the plate sits) toward this at the bottom, so borrowing the far end reads as a
+     deeper patch of the card itself -- present, but nothing new introduced. */
+  --meta-shade: rgba(221, 213, 243, 0.82);
 }
-.metaInvert .metaKick { color: #6629bc; }
 .metaInvert .metaTitle { color: #1a1526; }
 .metaInvert .metaRow { color: #4a3d6e; }
 .metaInvert .bursts li { color: #2a2340; }
@@ -318,53 +433,114 @@
   border-bottom-color: rgba(58, 29, 110, 0.4);
 }
 .metaInvert .visit:hover { color: #6629bc; border-color: #6629bc; }
-/* Hide/show control -- a tactile drag-handle ridge (grabber) at the top center of
-   the card, not a capsule button. Label text is hidden; the ridge is the affordance
-   and its color follows the card (adapts to the inverted variant via currentColor). */
-.metaHide {
+/* Open/close: the panel's OWN top-right corner, not a control placed on top of one.
+   No border, no fill, no label -- it borrows the card's surface and the card's corner
+   radius, and the only thing marking it is the grain. Sized off the panel's padding
+   so it reaches the card's edges exactly: the corner IS the target. */
+.metaCorner {
   position: absolute;
-  top: 0.7rem;
-  right: 0.8rem;
+  top: 0;
+  right: 0;
   z-index: 1;
-  display: inline-flex;
+  /* Longways: the label needs the run, the grain still owns the corner. */
+  width: var(--meta-corner-w);
+  height: var(--meta-corner);
+  display: flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.28rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+  justify-content: flex-end;
+  margin: 0;
+  /* Sits the label inside the grain rather than at its inner end. Along this row the
+     field runs ~95px in from the corner, so dead centre would be ~48px; the label
+     rides 10px nearer the corner than that. That last 10px is a look call, not a
+     measurement -- don't "correct" it back to centre.
+     The bottom padding is what centres the label VERTICALLY IN THE GRAIN rather than
+     in the strip: it matches the 10% the grain gives up at its bottom, so align-items
+     centres against the field's box and the two stay in step from one value. */
+  padding: 0 1.225rem calc(var(--meta-corner) * 0.1) 0;
+  border: 0;
+  background: none;
+  /* The card's corner, tracked from the card itself rather than restated. */
+  border-top-right-radius: inherit;
   color: inherit;
-  opacity: 0.62;
+  cursor: pointer;
+  /* The Enter CTA's type, so the two controls speak in the same voice. */
   font-family: var(--font-mono, monospace);
-  font-size: 0.6rem;
-  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  /* Just a state label -- the whole box is the trigger, so clicks pass through. */
-  pointer-events: none;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 1px 2px rgba(0, 0, 0, 0.28);
-  transition: opacity 0.16s ease;
+  opacity: 0.62;
+  transition: opacity 0.16s ease, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
-/* Braille-style dot grid so it reads as a raised, tactile control. Two layered
-   radial gradients: a soft top-left highlight on each dot + the dot itself. */
-.metaHide::before {
+.metaCorner:hover,
+.metaCorner:focus-visible { opacity: 1; }
+/* The corner itself takes the press -- the card does not move under it. */
+.metaCorner:active { transform: translateY(1px); }
+/* Braille-style dot grid so the corner reads as raised and tactile: a soft top-left
+   highlight on each dot + the dot itself, in the card's own color (so it inverts with
+   .metaInvert). Masked out toward the inside, so the grain gathers INTO the corner
+   and dissolves into the panel instead of ending on the hard edge of a chip. */
+.metaCorner::before {
   content: "";
-  width: 14px;
-  height: 14px;
+  position: absolute;
+  /* Reaches left of the strip so the fade can FINISH in open panel instead of being
+     cut off at the strip's edge. Decorative only: the strip stays the hit area -- so
+     the 10% comes off the FIELD's bottom without touching the target. Off the bottom,
+     not split: the grain is anchored to the corner and only the bottom edge is free. */
+  inset: 0 0 calc(var(--meta-corner) * 0.1) calc(-1 * var(--meta-grain-over));
+  pointer-events: none;
+  border-top-right-radius: inherit;
   background-image:
-    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.55) 0.5px, transparent 0.9px),
-    radial-gradient(circle, currentColor 1.3px, transparent 1.7px);
+    radial-gradient(circle at 38% 38%, var(--meta-grain-lit) 0.5px, transparent 0.9px),
+    radial-gradient(circle, var(--meta-grain-ink) 1.3px, transparent 1.7px);
   background-size: 4.5px 4.5px, 4.5px 4.5px;
-  background-position: center, center;
-  opacity: 0.85;
+  background-position: top right, top right;
+  /* An EXPLICIT radius, not a keyword. The gradient is centred ON the corner, so the
+     keywords all misfire here: closest-side is zero (it masks the grain away entirely)
+     and farthest-side tracks the LONG edge, which smears the grain down the whole
+     strip. --meta-grain pins where the fade ENDS; the stops hold its width. */
+  -webkit-mask-image: radial-gradient(circle var(--meta-grain) at 100% 0, #000 56%, transparent 88%);
+  mask-image: radial-gradient(circle var(--meta-grain) at 100% 0, #000 56%, transparent 88%);
 }
-/* The whole caption box is the open/close trigger -- a tactile clickable area. */
-.meta { cursor: pointer; }
-.meta:hover .metaHide { opacity: 1; }
-.meta:active { transform: translateY(1px); }
+/* The label rides ON the grain, so it needs the card back under it to stay legible:
+   a soft blob of the card's OWN surface, edges dissolved, no border and no chip. */
+.metaCornerText {
+  position: relative;
+  z-index: 1;
+}
+.metaCornerText::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  /* Hugs the LETTERS, not the line box. The span's inline box is ~19px tall for an
+     11.5px font: the rest is the font's leading plus an empty descender (the label is
+     all caps), so insetting that box only ever hugs the leading. Pin the height off the
+     type size instead and centre it, which is what actually closes the gap. */
+  top: 50%;
+  left: -0.6rem;
+  /* Not the same as the left: letter-spacing adds a full space AFTER the last letter,
+     and the E brings its own side bearing, so ~5px of the span's box is empty run. The
+     shade tracks the BOX, so without this it sits visibly off its own text. */
+  right: calc(-0.6rem + 0.2em + 2px);
+  height: calc(1em + 5px);
+  transform: translateY(-50%);
+  /* Traces the label's own box: a rounded rect, not an ellipse. The blur is what keeps
+     the edges dissolving into the grain -- a flat fill cuts a window in it, and a
+     radial gradient loses the shape and reads as a blob. It has to stay well under the
+     box's own height, or the softening is all there is and the shape goes back to a
+     blob; same reason the radius stays under half the height, or it is just a pill. */
+  border-radius: 4px;
+  background: var(--meta-shade);
+  filter: blur(1.5px);
+}
 /* Collapsible body: everything below the title folds away smoothly. */
 .metaBody {
+  /* Needed for the fold -- but it also clips sideways, and the burst markers sit at
+     x=0 with a 10px glow, so it was cutting the left half off every one of them. Push
+     the CLIP 12px left and pull the box back by the same: the content does not move,
+     the glow gets room to bleed into the card's own padding. */
+  padding-left: 12px;
+  margin-left: -12px;
   overflow: hidden;
   max-height: 24rem;
   opacity: 1;
@@ -386,16 +562,11 @@
   /* 65% smaller than the full-card title while docked. */
   font-size: clamp(0.63rem, 1.75vw, 1.19rem);
 }
-.metaKick {
-  margin: 0 0 0.3rem;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #aeb9ea;
-}
 .metaTitle {
-  margin: 0 0 0.9rem;
+  /* The title is the top row now, so it shares that row with the corner. Hold it
+     clear of the whole strip, label included: useFitText measures the title's OWN
+     width, so this reserve is already in the number it fits to. */
+  margin: 0 calc(var(--meta-corner-w) - var(--meta-pad-x) + 0.35rem) 0.9rem 0;
   /* One line, always (useFitText sets --fit-fs). The collapsed rule below still
      wins by specificity, so the docked heading keeps its own smaller size. */
   font-size: var(--fit-fs, clamp(1.8rem, 5vw, 3.4rem));
@@ -577,6 +748,14 @@
 }
 .featureTitle {
   margin: 0;
+  /* STRETCH, and it is load-bearing. This is a flex item in a column that CENTRES its
+     items, so left alone its box shrinks to its own text: clientWidth would always equal
+     scrollWidth, useFitText could never see an overflow, and the title would never shrink
+     -- it would just spill past the card. Stretching hands it the card's content width to
+     measure against. The look does not change: text-align below still centres the words.
+     This card and the opened panel measure DIFFERENT boxes on purpose (the panel's title
+     is a block whose own margin reserves the corner). Do not merge the two. */
+  align-self: stretch;
   /* One line, always: useFitText shrinks via --fit-fs when the title would wrap. */
   font-size: var(--fit-fs, clamp(2rem, 6.4vw, 5rem));
   font-weight: 800;
@@ -600,6 +779,70 @@
   text-transform: uppercase;
   color: rgba(223, 226, 245, 0.86);
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+/* The click hint: the card looks like furniture until you hover it, so this says it is
+   a control. It STRIKES like the gem's neon tube rather than pulsing: a few hard blinks
+   while the gas catches, then it holds. Deliberately not a loop -- a flicker after the
+   gas has caught reads as a fault, which is exactly why the tube's own last dip was
+   dropped (see NEON_STRIKE in CrystalGem.tsx). Waits out the module's arrival first,
+   so the strike is not swallowed by the fade it would ride in on. */
+.featureHint {
+  /* OUT OF FLOW, deliberately. .feature is anchored by its BOTTOM, so anything added
+     to its column grows the box upward and shoves the title module up with it. Hung
+     below the card instead: the hint can be moved without the module ever moving. */
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  left: 0;
+  right: 0;
+  /* Arrow beside the words, not stacked over them: it points up-left, so it reaches
+     the card from here without needing to sit between the two. */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c47bff;
+  text-shadow: 0 0 10px rgba(196, 123, 255, 0.5);
+  animation: cw-hint-strike 700ms step-end var(--stage-ms) both;
+}
+/* The words ride the stem, not the arrow's box. The arrow is turned inside that box, so
+   its stroke starts about 7px below the box's centre, and centring the text on the box
+   leaves the words floating above the line they belong to. Transform rather than margin
+   or align-self, so the flex row's height never moves (see the note on .featureHint
+   above: this whole thing is hung out of flow to keep the module still). 7px is the
+   measured gap between the box's centre and the stem's near end. */
+.featureHintText {
+  transform: translateY(7px);
+}
+/* The SFVV-R note-tag arrow, aimed rather than redrawn: it is drawn pointing down-
+   right, scale(-1) flips it on both axes (which is a 180 turn), then the rotation
+   takes it the rest of the way. Kept as the two steps it was tuned in, so re-aiming it
+   is one number. currentColor keeps it on the neon lavender with the words, and it
+   strikes with them since it is inside the hint. */
+.featureHintArrow {
+  width: 34px;
+  height: 34px;
+  transform: scale(-1) rotate(110deg);
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
+}
+/* Mirrors NEON_STRIKE in CrystalGem.tsx: the SAME sequence, as % of its 700ms. The two
+   are one look in two files and must stay in step. step-end is what makes them blinks
+   rather than fades -- each stop holds until the next, like the JS lookup it copies. */
+@keyframes cw-hint-strike {
+  0% { opacity: 1; }
+  6.43% { opacity: 0; }
+  10.71% { opacity: 0.9; }
+  16.43% { opacity: 0.05; }
+  22.14% { opacity: 1; }
+  27.86% { opacity: 0.15; }
+  33.57% { opacity: 0.85; }
+  40.71% { opacity: 0; }
+  46.43% { opacity: 1; }
+  100% { opacity: 1; }
 }
 @keyframes cw-fade-up {
   from { opacity: 0; transform: translateY(0.5rem); }
@@ -669,10 +912,11 @@
   /* The active thumb is pinned to the vertical center; --rail-shift (set per index
      in JS) slides the strip up one item at a time so earlier items ride off top. */
   transform: translateY(var(--rail-shift, -50%));
-  /* Two jobs on one transform. NAVIGATION stays snappy at 0.42s. The EXIT retimes to
-     the gem's clock (see .railOut) so the strip rises and fades with the crossfade
-     rather than finishing early and popping out. Opacity is always on the gem's
-     clock: the rail must fade AS it rises, not translate and then vanish. */
+  /* Two jobs on one transform. NAVIGATION stays snappy at the 0.42s fallback. The
+     ARRIVAL and the EXIT both retime to the gem's clock (see .railIn / .railOut) so the
+     strip rides the crossfade in and out rather than beating the crystal home and
+     popping out early. Opacity is always on the gem's clock: the rail must fade AS it
+     rises, not translate and then vanish. */
   transition:
     transform var(--rail-dur, 0.42s) var(--rail-ease, cubic-bezier(0.22, 0.7, 0.2, 1)),
     opacity var(--stage-ms) var(--stage-ease);
@@ -682,6 +926,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+}
+/* Arriving: the strip drops into place on the gem's clock, so it lands WITH the
+   crossfade. Held for exactly one crossfade (RAIL_IN_MS), then the class goes and the
+   0.42s fallback takes over -- the entrance and navigation share one transform, and
+   only the entrance belongs to the gem. */
+.railIn {
+  --rail-dur: var(--stage-ms);
+  --rail-ease: var(--stage-ease);
 }
 /* Leaving: the rail rises (--rail-shift reverts to the -50% fallback, so the same
    transition runs it out the way it came in) and fades WHILE it rises -- both retimed
@@ -940,6 +1192,9 @@
   .escBtn { animation: none; }
   .enter { animation: none; }
   .featureTitle { animation: none; }
+  /* Lands lit instead of striking: a blink sequence is the one thing this setting is
+     most for, and the hint still has to be readable. */
+  .featureHint { animation: none; }
   .rail { transition: none; }
   .railItem { transition: none; }
   .railScrollArrow { animation: none; }
