@@ -23,12 +23,21 @@ import {
   Mat,
   buildScreen,
   buildStratum,
+  buildBox,
   screenVert,
   screenFrag,
   stratumFrag,
+  plugFrag,
   SCREEN,
 } from "@/lib/package-screen-core";
 import type { Channels } from "@/lib/package-builder";
+
+// Plug palette: a dark connector body, copper pins, and the electric cyan the
+// pins pulse toward at level 5.
+const WHITE: [number, number, number] = [1, 1, 1];
+const PLUG_DARK: [number, number, number] = [0.1, 0.11, 0.17];
+const COPPER: [number, number, number] = [0.83, 0.65, 0.45];
+const ELECTRIC: [number, number, number] = [1.0, 0.95, 0.6];
 
 export function PackageScreen({
   channels,
@@ -71,10 +80,11 @@ export function PackageScreen({
 
     // A lost context (browser WebGL cap hit during SPA nav) fails compiles with
     // an empty log. Bail quietly rather than throwing out of the effect.
-    let screenProg: WebGLProgram, stratumProg: WebGLProgram;
+    let screenProg: WebGLProgram, stratumProg: WebGLProgram, plugProg: WebGLProgram;
     try {
       screenProg = link(screenVert, screenFrag);
       stratumProg = link(screenVert, stratumFrag);
+      plugProg = link(screenVert, plugFrag);
     } catch (err) {
       console.warn("PackageScreen: WebGL shader build failed; object omitted.", err);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -121,6 +131,12 @@ export function PackageScreen({
     const LEAF_HD = 0.006, LEAF_BEVEL = 0.006;
     const LEAF_GROOVE = 0.013, LEAF_PITCH = 2 * LEAF_HD + LEAF_GROOVE;
 
+    // The mathDev plug is assembled from unit boxes: a connector body, its pins
+    // and a cable, each drawn with its own transform. One mesh, drawn many times.
+    const boxBuf = mkVao();
+    const boxMesh = buildBox();
+    upload(boxBuf, boxMesh);
+
     // The corner radius must shrink with the (now short) height, or a low-section
     // slab rounds off into a pill. Cap it to a fraction of the half-height.
     const radiusFor = (hh: number) => Math.min(SCREEN.radius, hh * 0.55);
@@ -154,7 +170,15 @@ export function PackageScreen({
       time: U(screenProg, "uTime"), sheen: U(screenProg, "uSheen"),
       spectrum: U(screenProg, "uSpectrum"), grain: U(screenProg, "uGrain"),
       pulse: U(screenProg, "uPulse"), glow: U(screenProg, "uStrataGlow"),
-      sections: U(screenProg, "uSections"),
+      sections: U(screenProg, "uSections"), zap: U(screenProg, "uZap"),
+      wipe: U(screenProg, "uWipe"),
+    };
+    // The plug body's energy program.
+    const up = {
+      proj: U(plugProg, "uProj"), view: U(plugProg, "uView"),
+      model: U(plugProg, "uModel"), normal: U(plugProg, "uNormal"),
+      time: U(plugProg, "uTime"), charge: U(plugProg, "uCharge"),
+      zap: U(plugProg, "uZap"),
     };
     const ul = {
       proj: U(stratumProg, "uProj"), view: U(stratumProg, "uView"),
@@ -185,11 +209,24 @@ export function PackageScreen({
     // only eases on real changes.
     const cur: Channels = JSON.parse(JSON.stringify(target.current));
     const ease = (a: number, b: number, k: number) => a + (b - a) * k;
+    const smooth = (a: number, b: number, x: number) => {
+      const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    };
     const ease3 = (a: [number, number, number], b: [number, number, number], k: number) => {
       a[0] = ease(a[0], b[0], k);
       a[1] = ease(a[1], b[1], k);
       a[2] = ease(a[2], b[2], k);
     };
+
+    // Plug electric one-shot: fire the charge->zap once when level 5 is chosen,
+    // and again on each click of the plug. Not a loop. These live across frames
+    // and are read by both the draw loop and the click handler below.
+    let triggerT = -999; // draw-clock time of the last trigger
+    let firedElectric = false; // did we fire the initial one-shot at level 5?
+    let clickPulse = false; // set by the click handler, consumed next frame
+    let lastElectric = false; // is the plug currently at level 5? (for the handler)
+    const plugScreen = { x: -1, y: -1 }; // plug body centre in canvas px
 
     const reduce = prefersReducedMotion();
     let raf = 0, running = false, t0 = 0, prevTs = 0;
@@ -217,6 +254,7 @@ export function PackageScreen({
       cur.pulse = ease(cur.pulse, t.pulse, k);
       cur.spectrum = ease(cur.spectrum, t.spectrum, k);
       cur.heightHalf = ease(cur.heightHalf, t.heightHalf, k);
+      cur.plug = ease(cur.plug, t.plug, k);
       ease3(cur.tint, t.tint, k);
       ease3(cur.washA, t.washA, k);
       ease3(cur.washB, t.washB, k);
@@ -261,6 +299,29 @@ export function PackageScreen({
       );
       const posed = Mat.mul(Mat.trans(driftX, driftY, 0), orient);
 
+      // Electric ONE-SHOT for the level-5 plug: charge builds, then a longer
+      // zap wipes clean across the slab, then it rests. Fires once when level 5
+      // is selected and again on every plug click -- never on a loop.
+      const electricOn = Math.round(target.current.plug) >= 4;
+      lastElectric = electricOn;
+      if (electricOn && !firedElectric) { triggerT = time; firedElectric = true; }
+      if (!electricOn) firedElectric = false;
+      if (clickPulse) { triggerT = time; clickPulse = false; }
+
+      let plugCharge = 0, plugZap = 0, plugWipe = 0;
+      if (electricOn) {
+        const BUILD = 1.3, ZAP = 1.5; // zap runs long enough to cross the slab
+        const dt = time - triggerT;
+        if (dt >= 0 && dt < BUILD) {
+          plugCharge = smooth(0, BUILD, dt); // energy winds up in the plug
+        } else if (dt >= BUILD && dt < BUILD + ZAP) {
+          const z = (dt - BUILD) / ZAP; // 0..1 across the discharge
+          plugCharge = 1 - smooth(0, 1, z); // the plug drains as it fires
+          plugWipe = smooth(0, 1, z) * 1.05; // wavefront crosses fully (past 1)
+          plugZap = Math.min(1, z / 0.08) * (1 - smooth(0.82, 1, z)); // rise, hold, fall
+        }
+      }
+
       // --- the cover face --------------------------------------------
       // The front slab is the book's cover. Pages no longer thicken it; they
       // append leaves behind it (below), so this stays a constant cover and
@@ -282,6 +343,8 @@ export function PackageScreen({
       gl.uniform1f(us.grain, cur.grain);
       gl.uniform1f(us.pulse, cur.pulse);
       gl.uniform1f(us.glow, 0);
+      gl.uniform1f(us.zap, plugZap); // the plug's discharge hits the cover here
+      gl.uniform1f(us.wipe, plugWipe); // ...as a wavefront sweeping across it
       // Sections show up as horizontal dividers ruled across the cover face.
       // Snap to the target count (not the eased height) so lines are always
       // whole, and the slab grows one section-unit taller for each of them.
@@ -314,6 +377,7 @@ export function PackageScreen({
         gl.uniform1f(us.spectrum, 0);
         gl.uniform1f(us.grain, 0);
         gl.uniform1f(us.sections, 0); // no dividers on the leaf edges
+        gl.uniform1f(us.zap, 0);
         gl.bindVertexArray(leafBuf.vao);
         const back = cur.depth + LEAF_HD; // first leaf sits just behind the cover
         for (let i = 0; i < count; i++) {
@@ -331,6 +395,113 @@ export function PackageScreen({
           const shade = (1 - Math.min(0.42, i * 0.02)) * (i % 2 ? 0.9 : 1);
           gl.uniform3f(us.tint, cur.tint[0] * shade, cur.tint[1] * shade, cur.tint[2] * shade);
           gl.drawArrays(gl.TRIANGLES, 0, leafCount);
+        }
+      }
+
+      // --- the mathDev plug: a 3D connector seated in the cover's left edge ---
+      // Nothing at level 1 (mathDev "None"); the plug appears from level 2 up.
+      // Body sits just outside the edge; the pins bridge the gap and run INTO
+      // the slab, where the cover occludes them, so it reads as plugged in.
+      // Everything shares the cover's orient, so the plug floats with the slab.
+      // At level 5 the body runs electric (its own energy shader) and the pins
+      // flash white/yellow when the charge discharges into the slab.
+      if (Math.round(t.plug) >= 1) {
+        const LEFT = -HW; // the cover's left edge in local space
+        const g = cur.plug; // eased 1..4 -> smooth body growth
+        const pinN = 1 + Math.round(t.plug); // pin COUNT snaps (2..5)
+        const electric = Math.round(t.plug) >= 4;
+        const S = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
+
+        const bodyHx = 0.07;
+        const bodyHy = 0.05 + g * 0.018;
+        const bodyHz = 0.045 + g * 0.02;
+        const bodyPx = LEFT - 0.1 - g * 0.01;
+        const bodyModel = Mat.mul(
+          S,
+          Mat.mul(Mat.trans(bodyPx, 0, 0), Mat.scale(bodyHx, bodyHy, bodyHz))
+        );
+        const bodyMv = Mat.mul(view, bodyModel);
+
+        // Project the body centre to canvas px so the click handler can hit-test
+        // the plug. model[12..14] is the box centre in world space.
+        const vz = bodyModel[14] + SCREEN.camZ;
+        if (vz < -0.001) {
+          const ndcx = (proj[0] * bodyModel[12]) / -vz;
+          const ndcy = (proj[5] * bodyModel[13]) / -vz;
+          plugScreen.x = (ndcx * 0.5 + 0.5) * canvas.clientWidth;
+          plugScreen.y = (1 - (ndcy * 0.5 + 0.5)) * canvas.clientHeight;
+        }
+
+        // Body: the energy program at level 5, a flat dark casing otherwise.
+        if (electric) {
+          gl.useProgram(plugProg);
+          gl.uniformMatrix4fv(up.proj, false, proj);
+          gl.uniformMatrix4fv(up.view, false, view);
+          gl.uniformMatrix4fv(up.model, false, bodyModel);
+          gl.uniformMatrix3fv(up.normal, false, Mat.normalMat(bodyMv));
+          gl.uniform1f(up.time, time);
+          gl.uniform1f(up.charge, plugCharge);
+          gl.uniform1f(up.zap, plugZap);
+          gl.bindVertexArray(boxBuf.vao);
+          gl.drawArrays(gl.TRIANGLES, 0, boxMesh.count);
+        }
+
+        // Pins (and the casing at lower levels) use the flat screen program.
+        gl.useProgram(screenProg);
+        gl.uniformMatrix4fv(us.proj, false, proj);
+        gl.uniformMatrix4fv(us.view, false, view);
+        gl.uniform1f(us.time, time);
+        gl.uniform1f(us.spectrum, 0);
+        gl.uniform1f(us.grain, 0);
+        gl.uniform1f(us.pulse, 0);
+        gl.uniform1f(us.glow, 0);
+        gl.uniform1f(us.sections, 0);
+        gl.uniform1f(us.zap, 0);
+        gl.bindVertexArray(boxBuf.vao);
+
+        const box = (
+          px: number, py: number, pz: number,
+          hx: number, hy: number, hz: number,
+          col: [number, number, number], sheen: number,
+          tintv: [number, number, number] = WHITE
+        ) => {
+          const m = Mat.mul(S, Mat.mul(Mat.trans(px, py, pz), Mat.scale(hx, hy, hz)));
+          const mv = Mat.mul(view, m);
+          gl.uniformMatrix4fv(us.model, false, m);
+          gl.uniformMatrix3fv(us.normal, false, Mat.normalMat(mv));
+          gl.uniform3fv(us.washA, col);
+          gl.uniform3fv(us.washB, col);
+          gl.uniform3fv(us.washC, col);
+          gl.uniform3fv(us.tint, tintv);
+          gl.uniform1f(us.sheen, sheen);
+          gl.drawArrays(gl.TRIANGLES, 0, boxMesh.count);
+        };
+
+        if (!electric) box(bodyPx, 0, 0, bodyHx, bodyHy, bodyHz, PLUG_DARK, 0.16);
+
+        // Pins: copper normally; at level 5 they carry the discharge, blooming
+        // white/yellow on the zap and shimmering with the charge between zaps.
+        let pinCol = COPPER;
+        let pinTint = WHITE;
+        let pinSheen = 0.6;
+        if (electric) {
+          const e = Math.min(1, plugCharge * 0.5 + plugZap);
+          pinCol = [
+            COPPER[0] + (ELECTRIC[0] - COPPER[0]) * e,
+            COPPER[1] + (ELECTRIC[1] - COPPER[1]) * e,
+            COPPER[2] + (ELECTRIC[2] - COPPER[2]) * e,
+          ];
+          const b = 1 + (plugCharge * 0.4 + plugZap * 2.2);
+          pinTint = [b, b, b * 0.92]; // a touch warm (yellow) in the bloom
+          pinSheen = 0.9;
+        }
+
+        const pinHx = 0.1;
+        const pinPx = bodyPx + bodyHx + pinHx - 0.02;
+        const gap = 0.032;
+        for (let i = 0; i < pinN; i++) {
+          const py = (i - (pinN - 1) / 2) * gap;
+          box(pinPx, py, 0, pinHx, 0.012, 0.012, pinCol, pinSheen, pinTint);
         }
       }
     };
@@ -373,12 +544,29 @@ export function PackageScreen({
     const repaint = () => { if (!running) requestAnimationFrame((n) => draw(n)); };
     host.addEventListener("cw-repaint", repaint);
 
+    // Click the level-5 plug to fire another charge->zap. The draw loop keeps
+    // plugScreen current; here we only hit-test and flag it for the next frame.
+    const near = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const dx = e.clientX - rect.left - plugScreen.x;
+      const dy = e.clientY - rect.top - plugScreen.y;
+      return Math.hypot(dx, dy) < 78;
+    };
+    const onClick = (e: MouseEvent) => { if (lastElectric && near(e)) clickPulse = true; };
+    const onMove = (e: MouseEvent) => {
+      canvas.style.cursor = lastElectric && near(e) ? "pointer" : "";
+    };
+    canvas.addEventListener("click", onClick);
+    canvas.addEventListener("pointermove", onMove);
+
     return () => {
       stop();
       unsub();
       io.disconnect();
       ro.disconnect();
       host.removeEventListener("cw-repaint", repaint);
+      canvas.removeEventListener("click", onClick);
+      canvas.removeEventListener("pointermove", onMove);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, []);

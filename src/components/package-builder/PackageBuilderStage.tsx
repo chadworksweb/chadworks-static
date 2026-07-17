@@ -63,7 +63,7 @@ export function PackageBuilderStage() {
     // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
     // content back on the site width.
     <div className={`full ${s.wrap}`}>
-      {/* the object */}
+      {/* the object -- the slab AND the mathDev plug both live in here now */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />
       </div>
@@ -73,6 +73,11 @@ export function PackageBuilderStage() {
         <div className={s.readout}>
           <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
           <p className={s.figure}>{money(total)}</p>
+          {dirty ? (
+            <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
+              Reset
+            </button>
+          ) : null}
         </div>
 
         {/* the scope */}
@@ -145,11 +150,6 @@ export function PackageBuilderStage() {
           <a className={s.finishLink} href="/contact/">
             Send this scope to Chad
           </a>
-          {dirty ? (
-            <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
-              Reset
-            </button>
-          ) : null}
         </div>
       </div>
     </div>

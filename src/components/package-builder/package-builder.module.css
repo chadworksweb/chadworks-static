@@ -370,6 +370,11 @@
   opacity: 0.5;
   cursor: pointer;
   padding: 0;
+  /* Now lives under the cost readout (which is pointer-events: none), so it has
+     to re-arm its own clicks and sit tight under the figure, right-aligned. */
+  pointer-events: auto;
+  display: block;
+  margin: 0.6rem 0 0 auto;
 }
 
 .reset:hover {

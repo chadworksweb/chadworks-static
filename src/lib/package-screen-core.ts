@@ -222,6 +222,47 @@ export function buildStratum(radius = 0.14, seg = 5): Mesh {
   };
 }
 
+// A unit box spanning [-1,1] on every axis, flat-shaded (one normal per face).
+// The mathDev plug is assembled entirely from these: a connector body, its
+// pins, and a cable stub, each drawn with its own translate + non-uniform scale.
+export function buildBox(): Mesh {
+  const pos: number[] = [], nrm: number[] = [], uv: number[] = [];
+  // 6 faces: axis, sign, and the two in-plane axes.
+  const faces: [number, number][] = [
+    [0, 1], [0, -1], // +x, -x
+    [1, 1], [1, -1], // +y, -y
+    [2, 1], [2, -1], // +z, -z
+  ];
+  for (const [axis, s] of faces) {
+    const n = [0, 0, 0];
+    n[axis] = s;
+    // the two axes spanning this face
+    const u = (axis + 1) % 3;
+    const v = (axis + 2) % 3;
+    const quad = [
+      [-1, -1], [1, -1], [1, 1],
+      [-1, -1], [1, 1], [-1, 1],
+    ];
+    // wind so the outward normal faces out for +s; flip order for -s
+    const order = s > 0 ? quad : quad.slice().reverse();
+    for (const [a, b] of order) {
+      const p = [0, 0, 0];
+      p[axis] = s;
+      p[u] = a;
+      p[v] = b;
+      pos.push(p[0], p[1], p[2]);
+      nrm.push(n[0], n[1], n[2]);
+      uv.push(a * 0.5 + 0.5, b * 0.5 + 0.5);
+    }
+  }
+  return {
+    pos: new Float32Array(pos),
+    nrm: new Float32Array(nrm),
+    uv: new Float32Array(uv),
+    count: pos.length / 3,
+  };
+}
+
 // ---------------------------------------------------------------------
 // SHADERS (GLSL ES 3.0)
 // ---------------------------------------------------------------------
@@ -263,7 +304,7 @@ precision highp float;
 in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal; in float vFz;
 uniform vec3 uWashA, uWashB, uWashC;
 uniform vec3 uTint;
-uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow, uSections;
+uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow, uSections, uZap, uWipe;
 out vec4 frag;
 ${COMMON}
 void main(){
@@ -328,7 +369,55 @@ void main(){
     col += col * shelf * step(0.0, -sig) * 0.26;           // highlight on the bottom lip
   }
 
+  // Zap: the plug's discharge wipes across the whole face as a wavefront that
+  // travels left (the plug edge) to right. uWipe is the front position (0..1);
+  // a bright leading band plus a fading trail behind it read as the surge
+  // sweeping the slab. uZap is the overall intensity envelope.
+  if (uZap > 0.001) {
+    float front = 1.0 - smoothstep(0.0, 0.09, abs(vUv.x - uWipe));
+    float behind = uWipe - vUv.x;
+    float trail = clamp(1.0 - behind / 0.42, 0.0, 1.0) * step(0.0, behind);
+    float w = max(front, trail * 0.55);
+    col += vec3(1.0, 0.92, 0.55) * uZap * w * 1.25;
+  }
+
   frag = vec4(col, 0.94 + fres * 0.06);
+}`;
+
+// The plug body's own shader: an electric energy field that builds with uCharge
+// and flashes with uZap. Drifting plasma plus ridged filaments read as arcs;
+// the colour runs yellow at low energy to white at the peak; a fresnel rim
+// keeps the box shiny. Used only for the level-5 plug body.
+export const plugFrag = `#version 300 es
+precision highp float;
+in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal; in float vFz;
+uniform float uTime, uCharge, uZap;
+out vec4 frag;
+${COMMON}
+void main(){
+  vec2 p = vUv * 3.2;
+  float t = uTime;
+  // drifting plasma
+  float f = vnoise(p * 1.4 + vec2(t * 0.9, -t * 0.7))
+          + 0.5 * vnoise(p * 2.9 + vec2(-t * 1.4, t * 1.2));
+  f /= 1.5;
+  // ridged filaments = electric arcs, plus a faster shimmer set
+  float arc = pow(1.0 - abs(f - 0.5) * 2.0, 6.0);
+  float shimmer = pow(1.0 - abs(vnoise(p * 5.0 + vec2(t * 2.4, t * 1.9)) - 0.5) * 2.0, 12.0);
+  float energy = clamp(arc * 0.8 + shimmer, 0.0, 1.0);
+  float level = 0.10 + uCharge * 0.75 + uZap * 1.4;
+  energy *= level;
+
+  vec3 body = vec3(0.05, 0.05, 0.08);                       // dark casing
+  vec3 hot = mix(vec3(1.0, 0.82, 0.30), vec3(1.0, 1.0, 0.95), energy); // yellow -> white
+  vec3 col = body + hot * energy * 1.5;
+  col += vec3(1.0, 0.85, 0.4) * (uCharge * 0.12 + uZap * 0.7); // whole-box glow + flash
+
+  vec3 N = normalize(vN); vec3 V = normalize(-vViewPos);
+  float fres = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);
+  col += vec3(1.0, 0.95, 0.7) * fres * (0.15 + uCharge * 0.2 + uZap * 0.9); // shiny rim
+
+  frag = vec4(col, 1.0);
 }`;
 
 // A stratum: translucent, soft-edged, tinted, and breathing on its own phase.

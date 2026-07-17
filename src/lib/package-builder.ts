@@ -296,7 +296,8 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 //   pages        -> strata       (thin ridged leaves stacked behind: a book)
 //   sections     -> height       (cover grows a unit taller + a face divider each)
 //   ambition     -> bevel        (a plain edge cuts into a jeweled one)
-//   mathDev      -> depth        (the cover's own thickness)
+//   mathDev      -> plug         (a 3D connector seated in the cover's left edge;
+//                                 more pins/body/cable the higher the level)
 //   brandingDone -> tint         (grey and unresolved -> full brand)
 //   content      -> washC        (the wash gains its third color)
 //   editability  -> sheen        (surface you can touch)
@@ -314,6 +315,7 @@ export type Channels = {
   scale: number;
   heightHalf: number; // cover half-height, driven by sections
   sections: number; // section count, ruled across the cover face
+  plug: number; // mathDev level: complexity of the 3D plug in the left edge
   strata: number;
   spread: number;
   bevel: number;
@@ -364,14 +366,18 @@ export function channels(s: Scope): Channels {
     heightHalf: 0.1 * s.sections,
     // The raw count, ruled onto the cover face as section dividers.
     sections: s.sections,
+    // mathDev level drives the 3D plug seated in the cover's left edge.
+    plug: s.mathDev,
     // Pages append thin leaves behind the cover: one leaf per page past the
     // first, so more pages grow a real, ridged page block toward the back.
     strata: Math.max(0, Math.round(s.pages) - 1),
     spread: 0.03 + norm(s.locales, 1, 6) * 0.03,
     bevel: 0.012 + ambitionT * 0.075,
-    // Cover depth only: mathDev gives the front cover its modest thickness.
-    // Pages no longer touch this; they add leaves behind it instead.
-    depth: 0.03 + norm(s.mathDev, 0, MATH_DEV.length - 1) * 0.16,
+    // Cover depth is now a constant: mathDev no longer drives the slab at all.
+    // Its visual moved OUT of the WebGL object to a DOM motherboard layer that
+    // plugs into the cover's left edge (see Motherboard.tsx), so the object
+    // keeps a fixed, modest cover thickness.
+    depth: 0.06,
     grain: 0.5 * (1 - ambitionT), // low ambition reads rough; high reads polished
     // Branding runs backwards: index 0 means nothing exists yet, so the object
     // reads grey and unresolved until a real system is in hand.
