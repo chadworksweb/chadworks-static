@@ -58,13 +58,22 @@ const DETAILED: LeadFormConfig = {
   ],
 };
 
-export function MainContactCapsule() {
+// Heading/intro default to the homepage copy; any page can override them (e.g.
+// the FAQ page closes with "Still have a question?") while reusing the same
+// forms, contact details, and layout.
+export function MainContactCapsule({
+  heading = "Tell me about your project.",
+  intro = "Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small.",
+}: {
+  heading?: string;
+  intro?: string;
+} = {}) {
   return (
     <ContactCapsule
       id="contact"
       scheme="inverted"
-      heading="Tell me about your project."
-      intro="Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small."
+      heading={heading}
+      intro={intro}
       emailLabel="Email directly"
       email={EMAIL}
       phoneLabel="Call directly"

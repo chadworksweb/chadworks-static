@@ -28,7 +28,10 @@ const LINKS: NavLink[] = [
   {
     href: "/about/",
     label: "About",
-    children: [{ href: "/rates/", label: "Rates" }],
+    children: [
+      { href: "/rates/", label: "Rates" },
+      { href: "/faqs/", label: "FAQs" },
+    ],
   },
   { href: "/contact/", label: "Contact" },
 ];

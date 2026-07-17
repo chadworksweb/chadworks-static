@@ -26,6 +26,10 @@ import {
 // the homepage uses the real sitewide header + this pocket toggle like every page.
 const ISOLATED_HEADER_ROUTES = new Set<string>();
 
+// Routes with no animated content worth pausing, so the pocket toggle is hidden
+// entirely (nothing for it to control). Matched with the trailing slash trimmed.
+const MOTIONLESS_ROUTES = new Set<string>(["/faqs"]);
+
 export function MotionTogglePocket() {
   const pathname = usePathname();
   const [paused, setPaused] = useState(false);
@@ -69,6 +73,7 @@ export function MotionTogglePocket() {
   }, [pathname]);
 
   if (ISOLATED_HEADER_ROUTES.has(pathname)) return null;
+  if (MOTIONLESS_ROUTES.has(pathname.replace(/\/$/, "") || "/")) return null;
 
   // The start-motion invite is never stowed -- under reduced motion the hero
   // art (and its toggle) are hidden, so there is no second button to clash with.

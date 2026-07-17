@@ -5,17 +5,20 @@
 // voice, real facts only. Answers are always in the static HTML (GEO/no-JS).
 
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LaunchLink } from "@/components/LaunchLink";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import {
   PageComposer,
   HeroCapsule,
   FaqCapsule,
-  CtaCapsule,
+  MainContactCapsule,
 } from "@/components/capsules";
+import { FaqParas } from "@/components/FaqAccordion";
 
-const PAGE_URL = `${SITE_URL}/faqs/`;
+const ROUTE = "/faqs/";
+const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
 const DESCRIPTION =
   "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,200 floor, most near $6,200), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
@@ -24,6 +27,9 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so
+  // being in launch.ts alone would still serve noindex. Both edits or neither.
+  robots: { index: isLaunched(ROUTE), follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
@@ -47,41 +53,33 @@ type FaqGroup = { theme: string; lead: string; items: Faq[] };
 
 const GROUPS: FaqGroup[] = [
   {
-    theme: "Working together",
+    theme: "General FAQs",
     lead:
-      "What it's actually like to hire chadworks, before you send the first email.",
+      "Frequently asked questions about working with chadworks",
     items: [
       {
         q: "Who actually builds my site?",
-        a: "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+        a: "Me, I build your site. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
         aText:
-          "Chad, the person you email. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
+          "Me, I build your site. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
       },
       {
         q: "Do you work with businesses outside Pennsylvania?",
-        a: "Yes. The work is remote, and clients sit across the country and beyond, from Brooklyn to North Alabama. chadworks is based in Pennsylvania, but where you are has never decided whether the work fits.",
+        a: "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
         aText:
-          "Yes. The work is remote, and clients sit across the country and beyond, from Brooklyn to North Alabama. chadworks is based in Pennsylvania, but where you are has never decided whether the work fits.",
+          "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
       },
       {
         q: "How long does a website take to build?",
-        a: "It depends on the scope, and you get a real timeline with your quote rather than a guess here. A focused site moves faster than a full build with deep structure and visibility work. What does not change is that you stay in the loop the whole way, with no long silences where you wonder what is happening.",
+        a: "It depends on the scope of the project. A brochure site with limited content and functionality can take as little as a week. A complex build with custom features, lots of pages and other bells and whistles can take a month, sometimes a few.",
         aText:
-          "It depends on the scope, and you get a real timeline with your quote rather than a guess here. A focused site moves faster than a full build with deep structure and visibility work. What does not change is that you stay in the loop the whole way, with no long silences where you wonder what is happening.",
+          "It depends on the scope of the project. A brochure site with limited content and functionality can take as little as a week. A complex build with custom features, lots of pages and other bells and whistles can take a month, sometimes a few.",
       },
       {
         q: "What do you need from me to get started?",
-        a: (
-          <>
-            A conversation. Tell me the business, what you want the site to do,
-            and where it is stuck today. From there you get a straight answer on
-            whether it is a fit and what it would take. The{" "}
-            <Link href="/contact/">contact page</Link> is the fastest way to
-            start.
-          </>
-        ),
+        a: "First thing is a conversation to set the scope. Then I'll provide a list of what is needed, ranging from hosting/domain access to content like text and images. You will also need to make a deposit, typically 50% of the total cost, for work to commence.",
         aText:
-          "A conversation. Tell me the business, what you want the site to do, and where it is stuck today. From there you get a straight answer on whether it is a fit and what it would take. The contact page is the fastest way to start.",
+          "First thing is a conversation to set the scope. Then I'll provide a list of what is needed, ranging from hosting/domain access to content like text and images. You will also need to make a deposit, typically 50% of the total cost, for work to commence.",
       },
       {
         q: "Do I need to have the whole scope figured out before we start?",
@@ -91,13 +89,13 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Can you get a domain name for me?",
-        a: "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+        a: "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed.\n\nYour domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
         aText:
-          "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Either way, the domain is registered in your name and stays yours. Also, your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
+          "Yes, securing your domain is part of getting set up. If the name you want is already taken, buying it from whoever holds it is sometimes possible, though the price for that swings widely and is never guaranteed. Your domain name lives in your own account that I am given access to. It doesn't live in my account, so you never have to worry about it being out of reach.",
       },
       {
         q: "Can you set up branded email accounts for me?",
-        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will.\n\nMost clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account.\n\nIf your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
         aText:
           "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
       },
@@ -110,159 +108,143 @@ const GROUPS: FaqGroup[] = [
     ],
   },
   {
-    theme: "What it costs",
+    theme: "Pricing FAQs",
     lead:
-      "The money questions, answered the same way they are on the rates page: plainly.",
+      "Frequently asked questions about the costs, fees and pricing of website design and development.",
     items: [
       {
         q: "How much does a website cost?",
         a: (
-          <>
-            Work bills at $315 an hour. The smallest engagement is $3,200, and
-            most websites land near $6,200. Those are the real numbers, scoped
-            to what you actually want before any work begins. The{" "}
-            <Link href="/rates/">rates page</Link> lays out the full breakdown,
-            with the math showing.
-          </>
+          <FaqParas
+            items={[
+              "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000.",
+              <>
+                If your website needs work, not a redesign, I charge by the minute
+                at $5.25/min, which adds up to $315/hour. Read more about my fees
+                on my <LaunchLink href="/rates/">rates page</LaunchLink>.
+              </>,
+            ]}
+          />
         ),
         aText:
-          "Work bills at $315 an hour. The smallest engagement is $3,200, and most websites land near $6,200. Those are the real numbers, scoped to what you actually want before any work begins. The rates page lays out the full breakdown, with the math showing.",
+          "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at $5.25/min, which adds up to $315/hour. Read more about my fees on my rates page.",
       },
       {
-        q: "Why are you not the cheapest option?",
-        a: "Deliberately. The rate reflects twenty years of doing this and a result you can point to, not a number set to undercut the next bid. If the lowest price is the thing that decides it, there are cheaper builders who will be glad to help, and that is an honest answer rather than a sales dodge.",
+        q: "Do you have a lower rate for special cases?",
+        a: "I am always open to hearing out special situations, especially mission driven and social good initiatives. However, if your project has the potential for revenue of any kind, my posted rate is almost certainly what will be charged.",
         aText:
-          "Deliberately. The rate reflects twenty years of doing this and a result you can point to, not a number set to undercut the next bid. If the lowest price is the thing that decides it, there are cheaper builders who will be glad to help, and that is an honest answer rather than a sales dodge.",
+          "I am always open to hearing out special situations, especially mission driven and social good initiatives. However, if your project has the potential for revenue of any kind, my posted rate is almost certainly what will be charged.",
       },
       {
         q: "Is there an ongoing cost after the site is built?",
-        a: (
-          <>
-            Only if you want one. WordPress maintenance runs $550 every 6 months
-            for clients who want the site cared for: updates, backups, and a
-            human watching for quiet breakage. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static site</Link>{" "}
-            needs far less upkeep, which is part of why it costs less to own over
-            the years.
-          </>
-        ),
+        a: "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc.\n\nIf you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
         aText:
-          "Only if you want one. WordPress maintenance runs $550 every 6 months for clients who want the site cared for: updates, backups, and a human watching for quiet breakage. A custom-coded static site needs far less upkeep, which is part of why it costs less to own over the years.",
+          "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc. If you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
       },
       {
-        q: "Do you offer monthly payments for a website?",
-        a: "Monthly website financing is not something chadworks offers anymore. Projects are typically split into milestones instead, so you pay against work that has been delivered rather than all at once up front.",
+        q: "How much does website maintenance cost?",
+        a: "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
         aText:
-          "Monthly website financing is not something chadworks offers anymore. Projects are typically split into milestones instead, so you pay against work that has been delivered rather than all at once up front.",
+          "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
       },
     ],
   },
   {
-    theme: "How the site gets built",
+    theme: "Websites FAQ",
     lead:
-      "The build choices behind the site, and what stays yours when it ships.",
+      "Frequently asked questions about web design and development.",
     items: [
       {
         q: "Custom-coded or WordPress: which is right for me?",
-        a: (
-          <>
-            It depends on who needs to edit the site and how much it changes. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static site</Link> is
-            the fastest and most durable route. <Link href="/wordpress/">WordPress</Link>{" "}
-            makes sense when a non-technical team needs to publish often. You get
-            a straight recommendation for your situation, not a default pushed on
-            everyone.
-          </>
-        ),
+        a: "This comes down to one thing: editability.\n\nOver the last decade, 90% of clients that say \"editing the website is a requirement\" never edit the website, the content or the layout, so I've stopped selling WordPress as a frontrunner and am being honest with clients about whether WordPress is overkill for their needs.\n\nIf you don't already have a plan to update the site's content, whether that be a blog, photo gallery or product catalog, you almost certainly don't need WordPress. We'll discuss this on our first consultation call.",
         aText:
-          "It depends on who needs to edit the site and how much it changes. A custom-coded static site is the fastest and most durable route. WordPress makes sense when a non-technical team needs to publish often. You get a straight recommendation for your situation, not a default pushed on everyone.",
+          "This comes down to one thing: editability. Over the last decade, 90% of clients that say \"editing the website is a requirement\" never edit the website, the content or the layout, so I've stopped selling WordPress as a frontrunner and am being honest with clients about whether WordPress is overkill for their needs. If you don't already have a plan to update the site's content, whether that be a blog, photo gallery or product catalog, you almost certainly don't need WordPress. We'll discuss this on our first consultation call.",
       },
       {
         q: "Do I own my website when it is finished?",
-        a: "Completely, from day one. Code, hosting, domain, and every account are in your name. Nothing is held hostage and there is no platform lock-in designed to keep you paying. If you ever move on, you take all of it with you.",
+        a: "Yes, once you make the final payment, you own everything completely. The site lives on my private server, but the content: the code, the images, the copy, everything that was developed for the project is legally yours. If you ever decide you need to move hosts, you get a package with all of that in it, no hoops to jump through and no tech jargon to decipher.",
         aText:
-          "Completely, from day one. Code, hosting, domain, and every account are in your name. Nothing is held hostage and there is no platform lock-in designed to keep you paying. If you ever move on, you take all of it with you.",
+          "Yes, once you make the final payment, you own everything completely. The site lives on my private server, but the content: the code, the images, the copy, everything that was developed for the project is legally yours. If you ever decide you need to move hosts, you get a package with all of that in it, no hoops to jump through and no tech jargon to decipher.",
       },
       {
         q: "Will my site actually be fast?",
         a: (
           <>
-            That is the priority, not an afterthought. A{" "}
-            <Link href="/custom-coded-static/">custom-coded static build</Link> is
-            the fastest route there is, and chadworks.co is one of them, doing
-            its own job in public. Speed is also a visibility advantage now,
-            because clean, fast pages are easier for both search engines and AI
-            assistants to read.
+            Yes, all websites chadworks develops are fast by design. Speed is not
+            an add-on, and any vendor selling it as such is trying to get one over
+            on you. If your site is not fast, it may as well not exist in 2026. For
+            the fastest sites, go with{" "}
+            <LaunchLink href="/custom-coded-static/">custom coded/static</LaunchLink>, as they
+            don't have the same bloat and oftentimes server crowding that
+            WordPress, Shopify and pagebuilders come with.
           </>
         ),
         aText:
-          "That is the priority, not an afterthought. A custom-coded static build is the fastest route there is, and chadworks.co is one of them, doing its own job in public. Speed is also a visibility advantage now, because clean, fast pages are easier for both search engines and AI assistants to read.",
+          "Yes, all websites chadworks develops are fast by design. Speed is not an add-on, and any vendor selling it as such is trying to get one over on you. If your site is not fast, it may as well not exist in 2026. For the fastest sites, go with custom coded/static, as they don't have the same bloat and oftentimes server crowding that WordPress, Shopify and pagebuilders come with.",
       },
       {
         q: "Can you redesign my site or move me off Squarespace or Wix?",
-        a: (
-          <>
-            Yes, and a common reason people reach out. Moving to a clean, custom
-            build is usually faster and easier for AI tools to read. On WordPress
-            and want off? The{" "}
-            <Link href="/switch/leave-wordpress/">leave WordPress</Link> page
-            walks through exactly what the move looks like.
-          </>
-        ),
+        a: "Yes, chadworks does lots of redesigning or platform-migration projects. I'll listen to your situation to see if we need to redesign, switch platform but keep the design, or both redesign and switch platforms while we're at it.",
         aText:
-          "Yes, and a common reason people reach out. Moving to a clean, custom build is usually faster and easier for AI tools to read. On WordPress and want off? The leave WordPress page walks through exactly what the move looks like.",
+          "Yes, chadworks does lots of redesigning or platform-migration projects. I'll listen to your situation to see if we need to redesign, switch platform but keep the design, or both redesign and switch platforms while we're at it.",
       },
       {
         q: "Can I edit the site myself after it's built?",
-        a: "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+        a: "Yes, I can build your site to be editable, but these days I press my clients to determine if they really need that feature, given the pros and cons involved.\n\nA WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me at my minutely rate.\n\nHowever, I can also build micro-admin functions to edit specific parts of your site, like a micro blog editor or a photo gallery manager, either as part of the initial project or an additional fee down the road.",
         aText:
-          "It depends on how the site is built. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me. Either way, you own everything and nothing is locked away, and if a WordPress edit ever goes sideways, backups make it easy to roll back.",
+          "Yes, I can build your site to be editable, but these days I press my clients to determine if they really need that feature, given the pros and cons involved. A WordPress site comes with a dashboard, and most builds include a 30-minute tutorial so you can update text and images with confidence. A custom-coded static site has no dashboard by design, which is part of what makes it fast and secure, so content changes come back through me at my minutely rate. However, I can also build micro-admin functions to edit specific parts of your site, like a micro blog editor or a photo gallery manager, either as part of the initial project or an additional fee down the road.",
       },
       {
         q: "Will my site be secure?",
-        a: "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+        a: "Yes, every site is secured with an SSL certificate and form spam prevention. For sites with login forms, additional security is available on a case by case basis, depending on the level of traffic anticipated, exposure surface and sensitivity of information held behind the login.\n\nStill, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
         aText:
-          "Yes. Every site ships with an SSL certificate, and a custom-coded static build raises the bar further: with no database and no login to attack, most of the usual break-in routes simply are not there. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
+          "Yes, every site is secured with an SSL certificate and form spam prevention. For sites with login forms, additional security is available on a case by case basis, depending on the level of traffic anticipated, exposure surface and sensitivity of information held behind the login. Still, it's true that no site anywhere is completely hacker-proof, since even Visa and the Social Security system have been breached. What I can promise is that your site is built to remove the easy targets.",
       },
       {
         q: "Do you handle privacy policy, cookies, and GDPR?",
-        a: "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+        a: "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need.\n\nDisclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
         aText:
-          "Yes. Every site launches with a privacy policy and, where it is needed, a cookie notice and consent banner, so you are covered on the basics from day one. If your audience reaches into the EU or the UK, I build in the GDPR pieces that apply to how your site actually collects data. I am not your lawyer, and a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+          "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need. Disclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
       },
       {
         q: "Can you set up a newsletter or mailing list?",
-        a: "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+        a: "Yes. All sites include one subscribe form if desired, wired directly into your email platform of choice. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
         aText:
-          "Yes. Most sites include a subscribe form in the spots where a visitor is most likely to sign up, feeding straight into your list. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+          "Yes. All sites include one subscribe form if desired, wired directly into your email platform of choice. Connecting and configuring the email platform behind it is usually an add-on service, since the tool and its pricing depend on how you plan to use it.",
+      },
+      {
+        q: "Do I get analytics to see my traffic?",
+        a: "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+        aText:
+          "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
       },
     ],
   },
   {
-    theme: "Getting found in search and AI",
+    theme: "Visibility FAQs",
     lead:
-      "How a business shows up in Google, in AI assistants, and in the answers people actually read.",
+      "Frequently asked questions about SEO/GEO and how to show up on Google, ChatGPT and other search platforms.",
     items: [
       {
         q: "Can you get my business to show up in ChatGPT and Google's AI Overview?",
         a: (
           <>
-            It is the work chadworks leads with, and there is real precedent for
-            it. A Pennsylvania criminal-defense firm now appears in Google's AI
-            Overview for its practice area, and a Brooklyn psychologist is named
-            by AI assistants in his market. The{" "}
-            <Link href="/ai-viz/">AI visibility</Link> page lays out the full
-            approach.
+            Yes, SEO and now GEO/AI search visibility is a pillar chadworks
+            service, since 2010. Your site will be built with the basics
+            included, but competition is heavy and to rank or show up where you
+            want will likely take an additional budget dedicated solely to this
+            goal. Check out the <LaunchLink href="/visibility/">Visibility page</LaunchLink>{" "}
+            for more info.
           </>
         ),
         aText:
-          "It is the work chadworks leads with, and there is real precedent for it. A Pennsylvania criminal-defense firm now appears in Google's AI Overview for its practice area, and a Brooklyn psychologist is named by AI assistants in his market. The AI visibility page lays out the full approach.",
+          "Yes, SEO and now GEO/AI search visibility is a pillar chadworks service, since 2010. Your site will be built with the basics included, but competition is heavy and to rank or show up where you want will likely take an additional budget dedicated solely to this goal. Check out the Visibility page for more info.",
       },
       {
         q: "Is SEO dead now that everyone uses AI?",
         a: (
           <>
-            No. Classic <Link href="/seo/">SEO</Link> is the foundation that AI
+            No. Classic <LaunchLink href="/seo/">SEO</LaunchLink> is the foundation that AI
             visibility is built on, because the assistants pull from the same
             search index and the same structured pages. A site that ranks on page
             one is a site the AI answers are more likely to cite. The two reinforce
@@ -278,35 +260,31 @@ const GROUPS: FaqGroup[] = [
           <>
             A one-time, documented read on where a business stands in AI answers,
             classic search, structured data, and its profiles, scored so you can
-            see exactly what is working and what is not. It comes as a flat quote
-            with no retainer inside. The{" "}
-            <Link href="/ai-visibility-audit/">AI visibility audit</Link> page
-            shows what gets checked.
+            see exactly what is working and what is not. It's charged as a flat
+            rate of $675 with no strings attached, no commitment to hire me for
+            anything further. Check out the{" "}
+            <LaunchLink href="/ai-visibility-audit/">AI visibility audit page</LaunchLink> for
+            more info.
           </>
         ),
         aText:
-          "A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It comes as a flat quote with no retainer inside. The AI visibility audit page shows what gets checked.",
+          "A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of $675 with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.",
       },
       {
         q: "Do you do advertising on ChatGPT?",
         a: (
           <>
-            chadworks has access to OpenAI's ChatGPT advertising beta and can set
-            it up and manage it. The honest part: OpenAI requires a minimum spend
-            of $25 a day, billed by OpenAI directly, on top of the management.
-            Whether it is worth it depends on the business, and the{" "}
-            <Link href="/digital-marketing/">digital marketing</Link> page gives
-            you a straight read.
+            Yes, I have access to OpenAI's beta advertising platform. Their
+            minimum spend is $25/day (as of June 2026) and some industries are
+            prohibited, like legal and financial services. Check out the{" "}
+            <LaunchLink href="/advertising-on-chatgpt/">
+              Advertising on ChatGPT page
+            </LaunchLink>{" "}
+            for detailed information.
           </>
         ),
         aText:
-          "chadworks has access to OpenAI's ChatGPT advertising beta and can set it up and manage it. The honest part: OpenAI requires a minimum spend of $25 a day, billed by OpenAI directly, on top of the management. Whether it is worth it depends on the business, and the digital marketing page gives you a straight read.",
-      },
-      {
-        q: "Do I get analytics to see my traffic?",
-        a: "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
-        aText:
-          "Yes. Every site launches with Google Analytics wired in, so from day one you can see who is visiting and which pages actually hold their attention. It is the free, industry-standard tracking the big sites run on, and I confirm it is reading correctly before the site goes live.",
+          "Yes, I have access to OpenAI's beta advertising platform. Their minimum spend is $25/day (as of June 2026) and some industries are prohibited, like legal and financial services. Check out the Advertising on ChatGPT page for detailed information.",
       },
       {
         q: "How long does SEO take to work?",
@@ -357,15 +335,9 @@ export default function FaqsPage() {
           The last group lands light, ahead of the dark CTA. */}
       <FaqCapsule variant="groups" groups={GROUPS} />
 
-      <CtaCapsule
-        scheme="inverted"
-        cta={{
-          heading: "Still have a question?",
-          body:
-            "Ask it directly and you will get the same straight answer, from the person who would actually do the work, usually within a day.",
-          buttonLabel: "Ask Chad directly",
-          href: "/contact/",
-        }}
+      <MainContactCapsule
+        heading="Still have a question?"
+        intro="Ask it directly and you will get the same straight answer, from the person who would actually do the work, usually within a day."
       />
     </PageComposer>
   );
