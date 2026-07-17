@@ -112,7 +112,7 @@ export const BASELINE: Scope = {
   sections: SECTIONS_INCLUDED,
   ambition: 0,
   mathDev: 0,
-  brandingDone: 3,
+  brandingDone: 0,
   content: 0,
   editability: 0,
   motion: 0,
@@ -298,7 +298,8 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 //   ambition     -> bevel        (a plain edge cuts into a jeweled one)
 //   mathDev      -> plug         (a 3D connector seated in the cover's left edge;
 //                                 more pins/body/cable the higher the level)
-//   brandingDone -> tint         (grey and unresolved -> full brand)
+//   brandingDone -> brandContent (the plaque panel is constant; this ladder lays
+//                                 marks on it: gem @2, + wordmark @3, + cloud @4)
 //   content      -> washC        (the wash gains its third color)
 //   editability  -> sheen        (surface you can touch)
 //   motion       -> spin         (how alive it is)
@@ -316,6 +317,8 @@ export type Channels = {
   heightHalf: number; // cover half-height, driven by sections
   sections: number; // section count, ruled across the cover face
   plug: number; // mathDev level: complexity of the 3D plug in the left edge
+  plaque: number; // constant: the brand plaque panel, held at its level-2 state
+  brandContent: number; // brandingDone level: the marks laid on the plaque
   strata: number;
   spread: number;
   bevel: number;
@@ -355,7 +358,6 @@ const INDIGO: [number, number, number] = [0.141, 0.224, 0.537]; // #243989
 
 export function channels(s: Scope): Channels {
   const ambitionT = norm(s.ambition, 0, AMBITION.length - 1);
-  const brandT = norm(s.brandingDone, 0, BRANDING_DONE.length - 1);
 
   return {
     // Overall object size is now constant (no slider drives it); sections drive
@@ -368,6 +370,11 @@ export function channels(s: Scope): Channels {
     sections: s.sections,
     // mathDev level drives the 3D plug seated in the cover's left edge.
     plug: s.mathDev,
+    // The brand plaque PANEL is constant (the modest translucent level-2 panel);
+    // it is always shown. brandingDone drives the MARKS laid on it: the CW gem
+    // at level 2, the wordmark beside it at 3, the manifesto cloud at 4.
+    plaque: 1,
+    brandContent: s.brandingDone,
     // Pages append thin leaves behind the cover: one leaf per page past the
     // first, so more pages grow a real, ridged page block toward the back.
     strata: Math.max(0, Math.round(s.pages) - 1),
@@ -379,13 +386,11 @@ export function channels(s: Scope): Channels {
     // keeps a fixed, modest cover thickness.
     depth: 0.06,
     grain: 0.5 * (1 - ambitionT), // low ambition reads rough; high reads polished
-    // Branding runs backwards: index 0 means nothing exists yet, so the object
-    // reads grey and unresolved until a real system is in hand.
-    // The stage is light (the site's lavender surface), so the object carries
-    // the dark: indigo -> brand -> lilac across the face, which is the same
-    // ramp the KeyFacts band arc walks. Tint multiplies that wash, so grey
-    // reads as "the brand is not resolved yet" without going invisible.
-    tint: mix3(GREY, WHITE, brandT),
+    // Tint is a constant now. Branding no longer dims the object: it always
+    // reads fully lit (the old level-4 value), and the brand instead shows up
+    // as the corner plaque (see the plaque channel). White is a neutral
+    // multiplier, so the wash carries the colour untouched.
+    tint: WHITE,
     washA: mix3(BRAND, INDIGO, norm(s.geo, 0, GEO.length - 1)),
     washB: mix3(BRAND, COPPER, norm(s.commerce, 0, COMMERCE.length - 1) * 0.65),
     washC: mix3(

@@ -243,6 +243,17 @@ export function buildBox(): Mesh {
   };
 }
 
+// A flat unit quad on the z=0 plane, UV 0..1, facing +z. Used to lay a textured
+// brand mark (the CW gem, the wordmark, the manifesto cloud) onto the plaque.
+export function buildQuad(): Mesh {
+  return {
+    pos: new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0]),
+    nrm: new Float32Array([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1]),
+    uv: new Float32Array([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1]),
+    count: 6,
+  };
+}
+
 // ---------------------------------------------------------------------
 // SHADERS (GLSL ES 3.0)
 // ---------------------------------------------------------------------
@@ -285,6 +296,7 @@ in vec3 vN; in vec3 vViewPos; in vec2 vUv; in vec3 vLocal; in float vFz;
 uniform vec3 uWashA, uWashB, uWashC;
 uniform vec3 uTint;
 uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow, uSections, uZap, uWipe;
+uniform float uAlpha; // overall opacity; 1 for solid parts, <1 for the brand glaze
 out vec4 frag;
 ${COMMON}
 void main(){
@@ -361,7 +373,7 @@ void main(){
     col += vec3(1.0, 0.92, 0.55) * uZap * w * 1.25;
   }
 
-  frag = vec4(col, 0.94 + fres * 0.06);
+  frag = vec4(col, (0.94 + fres * 0.06) * uAlpha);
 }`;
 
 // The plug body's own shader: an electric energy field that builds with uCharge
@@ -398,6 +410,20 @@ void main(){
   col += vec3(1.0, 0.95, 0.7) * fres * (0.15 + uCharge * 0.2 + uZap * 0.9); // shiny rim
 
   frag = vec4(col, 1.0);
+}`;
+
+// A plain textured quad: samples a mark (gem / wordmark / cloud) in face UV and
+// lays it over the plaque with straight alpha. uTint recolours; uAlpha fades.
+export const texFrag = `#version 300 es
+precision highp float;
+in vec2 vUv;
+uniform sampler2D uTex;
+uniform float uAlpha;
+uniform vec3 uTint;
+out vec4 frag;
+void main(){
+  vec4 t = texture(uTex, vUv);
+  frag = vec4(t.rgb * uTint, t.a * uAlpha);
 }`;
 
 // ---------------------------------------------------------------------
