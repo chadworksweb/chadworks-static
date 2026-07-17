@@ -1,7 +1,7 @@
 // =====================================================================
 // chadworks Static -- PACKAGE SCREEN CORE (standalone engine)
 //
-// The geometry + shaders for the scope object on /build-your-website-package/.
+// The geometry + shaders for the scope object on /website-design-cost-calculator/.
 // A floating flat-but-3D SCREEN: a beveled slab that gains stacked strata as
 // scope is added. Each scope layer drives one channel of the object.
 //

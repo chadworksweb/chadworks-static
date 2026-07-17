@@ -1,7 +1,7 @@
 "use client";
 
 // =====================================================================
-// PackageScreen -- the scope object for /build-your-website-package/.
+// PackageScreen -- the scope object for /website-design-cost-calculator/.
 //
 // A floating flat-but-3D screen that morphs in real time as scope layers are
 // checked on and off. Every channel from lib/package-builder is eased toward

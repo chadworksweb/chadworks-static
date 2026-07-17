@@ -162,7 +162,7 @@ export const wordpress: Service = {
     figure: "$3,200 - $6,200+",
     figureSub: "Value-based -- maintenance $550 / 6 months",
     body:
-      "A WordPress build is priced like every build here: on what it wins for your business, starting at the $3,200 floor with most landing near $6,200. The difference from the static route is the ongoing side: WordPress needs maintenance, and mine is $550 every six months for updates and small content changes, stated here so it never surprises you.",
+      "A WordPress build is priced like every build here: on what it wins for your business, starting at the $3,200 baseline with most landing near $6,200. The difference from the static route is the ongoing side: WordPress needs maintenance, and mine is $550 every six months for updates and small content changes, stated here so it never surprises you.",
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if a WordPress site is sold to you

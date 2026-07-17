@@ -126,6 +126,16 @@
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 
+/* PARAGRAPH FLOW (2026-07-17). The blanket `* { margin: 0 }` above is right for
+   layout primitives and wrong for prose: it strips the gap between stacked
+   paragraphs, so every copy block that needed one has been re-adding it by hand
+   (see .cw-manifesto__panel further down). This restores the default in ONE
+   place so new copy never has to think about it again.
+   Adjacent-sibling only, so a lone <p> in a grid/flex cell is untouched and
+   gap-based layouts cannot double up. Component rules still win on
+   specificity, so nothing existing changes shape. */
+p + p { margin-top: var(--space-sm); }
+
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 /* During a page transition the cover scrolls the new route to the top; that
    reset must be INSTANT (the old smooth scroll-to-top read as a jump from the
@@ -1475,6 +1485,117 @@ p, li, dd, figcaption { text-wrap: pretty; }
   transition: background-position 0.12s linear;
 }
 .svc-block__body { color: var(--text-secondary); font-size: var(--text-lg); line-height: var(--leading-body); }
+
+/* PROSE FLOW -- the multi-paragraph body container (2026-07-17).
+   .svc-block__body styles ONE paragraph; a copy block with several had no home,
+   which is how a page ends up hand-classing every <p>. This carries the body
+   typography and spaces whatever is stacked inside it (owl selector, so headings
+   and paragraphs both flow). Colour is inherited-aware: the dark bands set
+   color on the section, so the light-mode colour is scoped and then handed back
+   on dark, mirroring how .svc-dark .svc-block__body already works. */
+.svc-prose { color: var(--text-secondary); font-size: var(--text-lg); line-height: var(--leading-body); }
+.svc-prose > * + * { margin-top: var(--space-sm); }
+.svc-prose > * + h3 { margin-top: var(--space-md); }
+.svc-prose h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+}
+.svc-dark .svc-prose,
+.svc-faq-section--dark .svc-prose { color: var(--dark-muted); }
+.svc-dark .svc-prose h3,
+.svc-faq-section--dark .svc-prose h3 { color: var(--dark-text, #fff); }
+
+/* RATE CARD -- the model's ladders, published as grouped static tables.
+   One panel per scope layer (13, matching the calculator's params exactly) so
+   the reader can find "Motion" without reading forty rows, and so each panel
+   is a self-contained numeric passage a retrieval engine can lift whole.
+   Shaded head + zebra rows carry the grouping; the panels auto-fit, so the
+   card reflows from three columns to one without a breakpoint per width. */
+.cw-ratecard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  align-items: start;
+}
+.cw-ratecard__group {
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-elevated);
+}
+.cw-ratecard__head {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-medium);
+}
+.cw-ratecard__title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.cw-ratecard__hint {
+  margin-top: 0.1rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+.cw-ratecard__rows { display: grid; }
+.cw-ratecard__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.55rem var(--space-sm);
+}
+.cw-ratecard__row:nth-child(odd) { background: rgba(128, 84, 188, 0.05); }
+.cw-ratecard__opt {
+  font-size: 0.97rem;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+.cw-ratecard__amt {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.97rem;
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+/* A zero is information, not a price: it should read as "costs nothing" rather
+   than compete with the figures that do cost something. */
+.cw-ratecard__amt--zero { color: var(--text-secondary); font-weight: 400; }
+
+/* WHY-ONE-PERSON -- prose left, portrait right. The portrait is the point of
+   the section (one person, not a logo), so it sticks while the argument
+   scrolls, then drops under the copy once there is no room for a second
+   column. */
+.cw-onep__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.44fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
+.cw-onep__figure { margin: 0; position: sticky; top: calc(var(--nav-height) + var(--space-sm)); }
+.cw-onep__figure img {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  margin-inline: auto;
+  filter: drop-shadow(0 18px 40px rgba(31, 23, 39, 0.45));
+}
+@media (max-width: 900px) {
+  .cw-onep__layout { grid-template-columns: 1fr; }
+  .cw-onep__figure { position: static; }
+  .cw-onep__figure img { max-width: 260px; }
+}
 
 /* Approach -- numbered steps */
 /* Columns are set PER PAGE via --svc-cols (ServiceTemplate.stepColumns) so the

@@ -160,7 +160,7 @@ export const shopify: Service = {
     figure: "$3,200 - $6,200+",
     figureSub: "Value-based -- plus Shopify's own monthly plan",
     body:
-      "A Shopify build is priced on what it wins for your business, from the $3,200 floor with most landing near $6,200. Shopify's own monthly plan sits on top, and I'll lay out that real number, including what the apps you actually need cost, before you ever commit to the platform.",
+      "A Shopify build is priced on what it wins for your business, from the $3,200 baseline with most landing near $6,200. Shopify's own monthly plan sits on top, and I'll lay out that real number, including what the apps you actually need cost, before you ever commit to the platform.",
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}Shopify&apos;s base plan is

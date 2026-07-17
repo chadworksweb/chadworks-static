@@ -20,7 +20,7 @@
 import { useMemo, useState } from "react";
 import PackageScreen from "@/components/package-builder/PackageScreen";
 import {
-  FLOOR,
+  BASELINE,
   PARAMS,
   channels,
   money,
@@ -41,7 +41,7 @@ function valueLabel(p: Param, v: number): string {
 }
 
 export function PackageBuilderStage() {
-  const [scope, setScope] = useState<Scope>(FLOOR);
+  const [scope, setScope] = useState<Scope>(BASELINE);
   // Not an accordion: any number of panels can be open, so two layers can be
   // compared without one closing the other.
   const [open, setOpen] = useState<ReadonlySet<keyof Scope>>(new Set(["pages"]));
@@ -57,7 +57,7 @@ export function PackageBuilderStage() {
 
   const ch = useMemo(() => channels(scope), [scope]);
   const total = price(scope);
-  const dirty = JSON.stringify(scope) !== JSON.stringify(FLOOR);
+  const dirty = JSON.stringify(scope) !== JSON.stringify(BASELINE);
 
   return (
     // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
@@ -146,7 +146,7 @@ export function PackageBuilderStage() {
             Send this scope to Chad
           </a>
           {dirty ? (
-            <button type="button" className={s.reset} onClick={() => setScope(FLOOR)}>
+            <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
               Reset
             </button>
           ) : null}

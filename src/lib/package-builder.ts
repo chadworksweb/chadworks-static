@@ -1,6 +1,6 @@
 // =====================================================================
 // chadworks Static -- PACKAGE BUILDER MODEL (pure, no React)
-// The scope model behind /build-your-website-package/. Two jobs:
+// The scope model behind /website-design-cost-calculator/. Two jobs:
 //   1. price(scope)  -> the number
 //   2. channels(scope) -> the screen augmentation each scope layer drives
 // Kept pure so the pricing can be tuned (and eventually tested) without
@@ -14,7 +14,9 @@
 // ---------------------------------------------------------------------
 // TUNING -- the whole pricing surface, in one block, on purpose.
 // ---------------------------------------------------------------------
-export const BASE = 3200; // the floor build: 3 pages, clean and correct
+// "Baseline", never "floor" (Chad, 2026-07-17). The readout already says
+// "Baseline price" at rest, so the copy and the tool now use one word.
+export const BASE = 3200; // the baseline build: 3 pages, clean and correct
 
 const PER_PAGE = 260; // each page past the 3 the base covers
 const PAGES_INCLUDED = 3;
@@ -24,7 +26,12 @@ const PER_INTEGRATION = 450;
 const PER_LOCALE = 800; // each locale past the first
 
 // Step ladders. Index = the option index on that parameter.
-const FANCY = [0, 400, 1100, 2200, 3600];
+// Ambition prices SURFACE AREA of art direction, not quality of craft. The
+// craft is constant at every index; what grows is how much of the page gets
+// it. Renaming this off "How fancy" (2026-07-17, Chad's call) is what keeps
+// the calculator from contradicting the packages page, which promises the
+// number never scales with "how much polish you deserve".
+const AMBITION = [0, 400, 1100, 2200, 3600];
 const MATH_DEV = [0, 600, 1800, 4200, 9000];
 const BRANDING_DONE = [1400, 800, 150, 0]; // nothing done -> full system in hand
 const CONTENT_PER_PAGE = [0, 60, 140, 240]; // you have it -> I write every word
@@ -35,12 +42,57 @@ const GEO = [0, 600, 1500, 3000];
 const TIMELINE_MULT = [1, 1.15, 1.35]; // applied to the whole build, last
 
 // ---------------------------------------------------------------------
+// RATE CARD -- the ladders above, exported so the page can SERVER-RENDER them
+// as a static HTML table.
+//
+// Why this exists: AI crawlers do not execute JavaScript. Vercel/MERJ
+// instrumented 1.3 billion crawler fetches and found GPTBot, ClaudeBot and
+// PerplexityBot all REQUEST js files and none of them RUN one. A price that
+// only exists in calculator state is a price no engine can read, so the whole
+// ladder is published as HTML too.
+//
+// It is derived FROM these consts rather than retyped in the copy, so the
+// published card cannot drift from what the calculator actually charges.
+// Retuning a ladder retunes the table in the same edit.
+// ---------------------------------------------------------------------
+const LADDER_BY_KEY: Partial<Record<keyof Scope, number[]>> = {
+  ambition: AMBITION,
+  mathDev: MATH_DEV,
+  brandingDone: BRANDING_DONE,
+  content: CONTENT_PER_PAGE,
+  editability: EDITABILITY,
+  motion: MOTION,
+  commerce: COMMERCE,
+  geo: GEO,
+};
+
+// The step ladder behind a `kind: "steps"` param, index-aligned to its options.
+export function ladderFor(key: keyof Scope): number[] | undefined {
+  return LADDER_BY_KEY[key];
+}
+
+// The per-unit rates behind the `kind: "range"` params, plus the multiplier.
+export const UNIT_RATES = {
+  perPage: PER_PAGE,
+  pagesIncluded: PAGES_INCLUDED,
+  perSection: PER_SECTION,
+  sectionsIncluded: SECTIONS_INCLUDED,
+  perIntegration: PER_INTEGRATION,
+  perLocale: PER_LOCALE,
+  timelineMult: TIMELINE_MULT,
+} as const;
+
+// `content` bills per page, not once. The table has to say so or the figure
+// reads as a flat fee and understates a long site.
+export const PER_PAGE_LADDER_KEYS: ReadonlySet<keyof Scope> = new Set(["content"]);
+
+// ---------------------------------------------------------------------
 // SCOPE
 // ---------------------------------------------------------------------
 export type Scope = {
   pages: number;
   sections: number; // per page
-  fancy: number;
+  ambition: number;
   mathDev: number;
   brandingDone: number;
   content: number;
@@ -53,12 +105,12 @@ export type Scope = {
   locales: number;
 };
 
-// The floor build. Every ladder sits at the index that adds nothing, so an
+// The baseline build. Every ladder sits at the index that adds nothing, so an
 // untouched builder reads exactly BASE.
-export const FLOOR: Scope = {
+export const BASELINE: Scope = {
   pages: PAGES_INCLUDED,
   sections: SECTIONS_INCLUDED,
-  fancy: 0,
+  ambition: 0,
   mathDev: 0,
   brandingDone: 3,
   content: 0,
@@ -103,11 +155,11 @@ export const PARAMS: Param[] = [
     max: 10,
   },
   {
-    key: "fancy",
-    label: "How fancy",
-    hint: "How far the visual treatment goes.",
+    key: "ambition",
+    label: "Visual ambition",
+    hint: "How much of the page gets art direction.",
     kind: "steps",
-    options: ["Plain", "Clean", "Considered", "Rich", "The full chadworks"],
+    options: ["Straightforward", "Considered", "Layered", "Art-directed", "The full chadworks"],
   },
   {
     key: "mathDev",
@@ -118,14 +170,14 @@ export const PARAMS: Param[] = [
   },
   {
     key: "brandingDone",
-    label: "Branding already done",
+    label: "Branding",
     hint: "What you bring versus what I build.",
     kind: "steps",
     options: ["Nothing yet", "A logo", "A brand guide", "A full system"],
   },
   {
     key: "content",
-    label: "Words",
+    label: "Copy (Text content)",
     hint: "Who writes the copy.",
     kind: "steps",
     options: ["I have it", "Cleanup", "Most of it", "Every word"],
@@ -146,7 +198,7 @@ export const PARAMS: Param[] = [
   },
   {
     key: "commerce",
-    label: "Selling",
+    label: "Ecommerce",
     hint: "What the site sells and how.",
     kind: "steps",
     options: ["Nothing", "A few products", "A real store", "A catalog", "A platform"],
@@ -154,7 +206,7 @@ export const PARAMS: Param[] = [
   {
     key: "integrations",
     label: "Integrations",
-    hint: "Booking, CRM, memberships, APIs.",
+    hint: "Calendly, HubSpot, memberships, subscriptions, APIs.",
     kind: "range",
     min: 0,
     max: 8,
@@ -198,19 +250,19 @@ export function ledger(s: Scope): LedgerLine[] {
   const extraPages = Math.max(0, s.pages - PAGES_INCLUDED);
   const extraSections = Math.max(0, s.sections - SECTIONS_INCLUDED);
   const lines: LedgerLine[] = [
-    { label: "The floor build", amount: BASE },
+    { label: "The baseline build", amount: BASE },
     { label: `Pages past ${PAGES_INCLUDED}`, amount: extraPages * PER_PAGE },
     {
       label: `Sections past ${SECTIONS_INCLUDED}`,
       amount: extraSections * PER_SECTION * s.pages,
     },
-    { label: "How fancy", amount: at(FANCY, s.fancy) },
+    { label: "Visual ambition", amount: at(AMBITION, s.ambition) },
     { label: "Math and development", amount: at(MATH_DEV, s.mathDev) },
     { label: "Branding to build", amount: at(BRANDING_DONE, s.brandingDone) },
-    { label: "Words", amount: at(CONTENT_PER_PAGE, s.content) * s.pages },
+    { label: "Copy", amount: at(CONTENT_PER_PAGE, s.content) * s.pages },
     { label: "Who edits it", amount: at(EDITABILITY, s.editability) },
     { label: "Motion", amount: at(MOTION, s.motion) },
-    { label: "Selling", amount: at(COMMERCE, s.commerce) },
+    { label: "Ecommerce", amount: at(COMMERCE, s.commerce) },
     { label: "Integrations", amount: s.integrations * PER_INTEGRATION },
     { label: "AI visibility", amount: at(GEO, s.geo) },
     { label: "Languages", amount: Math.max(0, s.locales - 1) * PER_LOCALE },
@@ -243,7 +295,7 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 //
 //   pages        -> scale        (the screen gets bigger)
 //   sections     -> strata       (each section stacks another layer)
-//   fancy        -> bevel        (a plain edge cuts into a jeweled one)
+//   ambition     -> bevel        (a plain edge cuts into a jeweled one)
 //   mathDev      -> depth        (thickness: real machinery underneath)
 //   brandingDone -> tint         (grey and unresolved -> full brand)
 //   content      -> washC        (the wash gains its third color)
@@ -255,7 +307,7 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 //   timeline     -> pulse        (rush reads as urgency)
 //   locales      -> spread       (the strata fan apart: parallel sites)
 //
-// `fancy` also drives polish (grain, inverted), because refinement and edge
+// `ambition` also drives polish (grain, inverted), because refinement and edge
 // treatment are the same idea seen twice. That is the one deliberate double.
 // ---------------------------------------------------------------------
 export type Channels = {
@@ -298,7 +350,7 @@ const COPPER: [number, number, number] = [0.831, 0.647, 0.455]; // #d4a574
 const INDIGO: [number, number, number] = [0.141, 0.224, 0.537]; // #243989
 
 export function channels(s: Scope): Channels {
-  const fancyT = norm(s.fancy, 0, FANCY.length - 1);
+  const ambitionT = norm(s.ambition, 0, AMBITION.length - 1);
   const brandT = norm(s.brandingDone, 0, BRANDING_DONE.length - 1);
 
   return {
@@ -306,9 +358,9 @@ export function channels(s: Scope): Channels {
     // Sections stack literally: one stratum per section past the first.
     strata: Math.max(0, Math.round(s.sections) - 1),
     spread: 0.055 + norm(s.locales, 1, 6) * 0.14,
-    bevel: 0.012 + fancyT * 0.075,
+    bevel: 0.012 + ambitionT * 0.075,
     depth: 0.05 + norm(s.mathDev, 0, MATH_DEV.length - 1) * 0.34,
-    grain: 0.5 * (1 - fancyT), // plain reads rough; fancy reads polished
+    grain: 0.5 * (1 - ambitionT), // low ambition reads rough; high reads polished
     // Branding runs backwards: index 0 means nothing exists yet, so the object
     // reads grey and unresolved until a real system is in hand.
     // The stage is light (the site's lavender surface), so the object carries

@@ -171,7 +171,7 @@ export const customCodedStatic: Service = {
     figure: "$3,200 - $6,200+",
     figureSub: "Value-based -- near-zero running costs after",
     body:
-      "Custom static is priced like every build here: on what it wins for your business, from the $3,200 floor with most landing near $6,200. The difference is everything after launch. No platform maintenance, no plugin renewals, hosting that rounds to nothing. Content changes go through me and bill at $315 an hour, which for most marketing sites means a handful of small invoices a year instead of a monthly subscription.",
+      "Custom static is priced like every build here: on what it wins for your business, from the $3,200 baseline with most landing near $6,200. The difference is everything after launch. No platform maintenance, no plugin renewals, hosting that rounds to nothing. Content changes go through me and bill at $315 an hour, which for most marketing sites means a handful of small invoices a year instead of a monthly subscription.",
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if your content changes every week,
