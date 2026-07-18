@@ -18,3 +18,8 @@ next-env.d.ts
 # were re-encoded to .webp on 2026-07-18; the rest are orphans. deploy.sh also
 # excludes them from the prod sync, so untracking alone is not load-bearing.
 /public/portfolio/*.png
+# Same for the JPG originals, as of 2026-07-18: the site serves the .webp
+# copies, so these are masters kept on disk, not deployable assets. NOTE the
+# leading path and single *: this must NOT match /public/portfolio/wall/*.jpg,
+# which IS live and IS tracked.
+/public/portfolio/*.jpg

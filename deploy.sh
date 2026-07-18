@@ -86,13 +86,21 @@ echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # accumulate harmlessly; sweep them by hand if the docroot grows: on the server
 # `sudo rm -rf ${DOCROOT}/_next` before a deploy, then redeploy.
 ssh "$SERVER" "sudo mkdir -p ${DOCROOT}"
-# --exclude: the portfolio PNG captures are local source material only. They are
-# unreachable from any launched page and were shipping 4.34 MB to prod for
-# nothing. They are gitignored too, but this exclude is the load-bearing guard:
-# `next build` copies all of public/ into out/, so a PNG sitting in the working
-# tree would otherwise ride along on every deploy. Removing this line puts them
+# --exclude: the portfolio JPG and PNG captures are local source material only.
+# The site serves the .webp copies (see src/lib/captures.ts); these originals are
+# referenced by nothing and were shipping ~19 MB to prod for nothing. They are
+# gitignored too, but these excludes are the load-bearing guard: `next build`
+# copies all of public/ into out/, so an original sitting in the working tree
+# would otherwise ride along on every deploy. Removing these lines puts them
 # straight back on prod.
-tar czf - -C out --exclude='./portfolio/*.png' . \
+#
+# --no-wildcards-match-slash is REQUIRED, not cosmetic. GNU tar wildcards match
+# "/" by default, so a bare './portfolio/*.jpg' also matches
+# './portfolio/wall/<slug>.jpg' and silently drops all 23 tile-wall images --
+# which ARE live (TileWall.tsx). Verified: with the flag, 23 wall tiles survive
+# and 0 root captures do; without it, the wall is wiped.
+tar czf - -C out --no-wildcards-match-slash \
+      --exclude='./portfolio/*.jpg' --exclude='./portfolio/*.png' . \
   | ssh "$SERVER" "sudo tar xzf - -C ${DOCROOT} && sudo chmod -R a+rX ${DOCROOT}"
 
 echo "Verifying (${ENV}):"
