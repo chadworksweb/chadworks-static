@@ -306,25 +306,10 @@ export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "stati
     setEntered(false);
   };
 
-  // Lock the page to the viewport while immersive.
-  //
-  // Going immersive takes the desktop scrollbar away -- the overlay covers the page
-  // and its content stops overflowing -- and that scrollbar occupies real layout
-  // width, so everything silently widens by ~15px and snaps back on exit. That snap,
-  // under the closing overlay, is the jitter. RESERVE the gutter for as long as the
-  // showroom is mounted and the width never moves: with `stable` the space is held
-  // whether or not a scrollbar is actually in it, so entering and leaving are free.
-  // Compensating with padding cannot work here -- by the time an effect runs the
-  // scrollbar is already gone, so there is nothing left to measure.
-  useEffect(() => {
-    const el = document.documentElement;
-    const prev = el.style.scrollbarGutter;
-    el.style.scrollbarGutter = "stable";
-    return () => {
-      el.style.scrollbarGutter = prev;
-    };
-  }, []);
-
+  // Lock the page to the viewport while immersive. No width compensation needed:
+  // `scrollbar-gutter: stable` on html (global.css) holds the space globally, and
+  // `overflow: hidden` still counts as a scroll container so the gutter survives
+  // the lock.
   useEffect(() => {
     if (!immersive) return;
     const el = document.documentElement;

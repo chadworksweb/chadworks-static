@@ -18,6 +18,7 @@ import { MainContactCapsule } from "@/components/capsules/MainContactCapsule";
 import { PageMotion } from "@/components/PageMotion";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { ArchiveGrid } from "@/components/portfolio/ArchiveGrid";
+import showroomStyles from "@/components/showroom/showroom.module.css";
 import { captureSrc } from "@/lib/captures";
 import { ShowroomRoute } from "@/components/showroom/ShowroomRoute";
 import { SHOWROOM_ITEMS } from "@/components/showroom/showroom-data";
@@ -115,7 +116,7 @@ function ShowroomArchive() {
 
 export default function ShowroomPage() {
   return (
-    <div className="full">
+    <div className={`full ${showroomStyles.route}`}>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
       <ShowroomRoute archive={<ShowroomArchive />} />

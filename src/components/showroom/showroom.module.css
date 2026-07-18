@@ -2,6 +2,16 @@
    drum draws into the canvas; this module owns the chrome (HUD, selected frame,
    lite gallery, SEO fallback). Brand palette pulled from GemstoneCW / CodeFall. */
 
+/* Hold the scrollbar's width for the LIFE OF THIS ROUTE, and only this route.
+   `.route` is on the server-rendered page wrapper, so the gutter is reserved the
+   instant the route commits -- before the media query hides the archive and long
+   before the three.js chunk mounts the showroom. Without it the width moves twice
+   under the page-transition reveal: tall archive (real scrollbar) -> one-viewport
+   showroom (no scrollbar). `overflow: hidden` on the immersive lock is still a
+   scroll container, so the gutter survives that too. Nothing outside /showroom/
+   sees this rule. */
+html:has(.route) { scrollbar-gutter: stable; }
+
 .wrap {
   /* THE GEM IS THE NORTH STAR. Its dark->light crossfade (showroom-intro's `stage`,
      STAGE_SECONDS) is the one clock the immersive chrome starts and ends on -- the
