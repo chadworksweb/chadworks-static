@@ -8,6 +8,7 @@
 
 import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import {
   PageComposer,
   HeroCapsule,
@@ -20,7 +21,8 @@ import {
 import ManifestoSection from "@/components/ManifestoSection";
 import { AboutHeroArt } from "@/components/art/AboutHeroArt";
 
-const PAGE_URL = `${SITE_URL}/about/`;
+const PAGE_PATH = "/about/";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "About Chad: Designing Since Age 11 | chadworks";
 const DESCRIPTION =
   "chadworks is one person: Chad, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
@@ -29,6 +31,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  robots: { index: isLaunched(PAGE_PATH), follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,

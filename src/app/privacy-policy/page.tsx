@@ -8,8 +8,10 @@
 import type { Metadata } from "next";
 import { PageMotion } from "@/components/PageMotion";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 
-const PAGE_URL = `${SITE_URL}/privacy-policy/`;
+const PAGE_PATH = "/privacy-policy/";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "Privacy Policy | chadworks";
 const DESCRIPTION =
   "How chadworks handles your information: what the contact form collects, how consent controls Google Analytics, the limited service providers involved, your California privacy rights, and how to request your data. chadworks does not sell or share your information.";
@@ -18,7 +20,7 @@ const LAST_UPDATED = "July 6, 2026";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  robots: { index: true, follow: true },
+  robots: { index: isLaunched(PAGE_PATH), follow: true },
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: TITLE,

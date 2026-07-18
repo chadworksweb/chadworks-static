@@ -8,6 +8,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 
@@ -26,7 +27,8 @@ const RATE_EXAMPLES: { task: string; time: string }[] = [
   { task: "Changing the colors of the site's text or single UI element", time: "120 seconds" },
 ];
 
-const PAGE_URL = `${SITE_URL}/rates/`;
+const PAGE_PATH = "/rates/";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
   "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land near $6,200. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
@@ -35,6 +37,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  robots: { index: isLaunched(PAGE_PATH), follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,

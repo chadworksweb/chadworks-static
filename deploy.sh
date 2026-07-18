@@ -71,6 +71,15 @@ echo "Building static export (next build -> out/) ..."
 npm run build >/dev/null
 echo "Built $(find out -type f | wc -l) files."
 
+# Launch-control safety net: refuse to ship a build where a sitemap page serves
+# noindex, or an unlaunched page is indexable. Blocks the deploy, not the build,
+# so local `npm run build` stays fast.
+echo "Auditing index directives against the sitemap ..."
+node scripts/index-audit.mjs || {
+  echo "Deploy aborted: indexing does not match launch.ts. Fix the pages above and rerun."
+  exit 1
+}
+
 echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # Additive tar-sync (like the libra-engine-site deploy): extracts/overwrites but
 # does NOT prune. Next hashes its build assets, so stale /_next/static files just

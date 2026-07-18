@@ -8,9 +8,11 @@
 
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule } from "@/components/capsules";
 
-const PAGE_URL = `${SITE_URL}/contact/`;
+const PAGE_PATH = "/contact/";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const EMAIL = "chad@chadworks.co";
 const TITLE = "Contact chadworks | Talk to the Person Who Builds It";
 const DESCRIPTION =
@@ -20,6 +22,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  robots: { index: isLaunched(PAGE_PATH), follow: true },
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
