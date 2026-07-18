@@ -29,6 +29,7 @@ import {
   ENTRANCE_DURATION,
 } from "./showroom-intro";
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
+import { captureSrc } from "@/lib/captures";
 import styles from "./showroom.module.css";
 
 // A title is ALWAYS one line -- it never wraps, at any width. Shrink it until it fits
@@ -661,7 +662,7 @@ function RightRail({
           onClick={() => onClick(i)}
         >
           <span className={styles.railTitle}>{it.label}</span>
-          <img src={`/portfolio/${it.slug}-desktop.jpg`} alt={it.label} loading="lazy" />
+          <img src={captureSrc(it.slug)} alt={it.label} loading="lazy" />
           <span className={styles.railBr} aria-hidden="true" />
         </button>
       ))}
@@ -684,7 +685,7 @@ function LiteGallery({
         {items.map((it, i) => (
           <li key={it.key} className={styles.liteCard}>
             <button type="button" className={styles.liteBtn} onClick={() => onSelect(i)}>
-              <img src={`/portfolio/${it.slug}-desktop.jpg`} alt={it.alt} loading="lazy" />
+              <img src={captureSrc(it.slug)} alt={it.alt} loading="lazy" />
               <span className={styles.liteLabel}>{it.label}</span>
             </button>
           </li>
@@ -719,7 +720,7 @@ function SelectedFrame({
     >
       <div className={`${styles.frame} ${closing ? styles.frameClosing : ""}`}>
         <span className={styles.frameBr} aria-hidden="true" />
-        <img className={styles.shot} src={`/portfolio/${item.slug}-desktop.jpg`} alt={item.alt} />
+        <img className={styles.shot} src={captureSrc(item.slug)} alt={item.alt} />
 
         <div
           className={`${styles.meta} ${invert ? styles.metaInvert : ""} ${

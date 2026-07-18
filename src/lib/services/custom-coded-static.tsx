@@ -161,8 +161,8 @@ export const customCodedStatic: Service = {
     intro:
       "Live custom-coded builds. Click anywhere on a shot to send a ripple through it.",
     items: [
-      { label: "chadlewine.com", img: "/portfolio/chadlewine.png", alt: "chadlewine.com, a custom-coded musician website", href: "https://chadlewine.com" },
-      { label: "The Rising Compass", img: "/portfolio/risingcompass.png", alt: "risingcompass.net, a custom-coded song-analysis web app", href: "https://risingcompass.net" },
+      { label: "chadlewine.com", img: "/portfolio/chadlewine.webp", alt: "chadlewine.com, a custom-coded musician website", href: "https://chadlewine.com" },
+      { label: "The Rising Compass", img: "/portfolio/risingcompass.webp", alt: "risingcompass.net, a custom-coded song-analysis web app", href: "https://risingcompass.net" },
     ],
   },
 

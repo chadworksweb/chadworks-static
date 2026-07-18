@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 import { MockupFrame } from "./MockupFrame";
+import { captureSrc } from "@/lib/captures";
 
 type DeviceKey = "desktop" | "tablet" | "mobile";
 
@@ -73,7 +74,7 @@ export function DeviceMockup({
           bezel) while MockupFrame crossfades the screenshot inside it. */}
       <div className="cw-port-device__stage">
         <MockupFrame
-          src={`/portfolio/${slug}-${device}.jpg`}
+          src={captureSrc(slug, device)}
           alt={`${alt} -- ${sel.label.toLowerCase()} view`}
           url={url}
           variant={sel.variant}

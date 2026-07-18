@@ -18,6 +18,7 @@ import { MainContactCapsule } from "@/components/capsules/MainContactCapsule";
 import { PageMotion } from "@/components/PageMotion";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { ArchiveGrid } from "@/components/portfolio/ArchiveGrid";
+import { captureSrc } from "@/lib/captures";
 import { ShowroomRoute } from "@/components/showroom/ShowroomRoute";
 import { SHOWROOM_ITEMS } from "@/components/showroom/showroom-data";
 
@@ -63,7 +64,7 @@ const collectionJsonLd = {
         "@type": "WebSite",
         name: w.label,
         url: w.href,
-        image: `${SITE_URL}/portfolio/${w.slug}-desktop.jpg`,
+        image: `${SITE_URL}${captureSrc(w.slug)}`,
       },
     })),
   },

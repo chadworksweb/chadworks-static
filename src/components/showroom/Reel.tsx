@@ -15,6 +15,7 @@ import * as THREE from "three";
 import type { ShowroomItem } from "./showroom-data";
 import { intro, stage, easeInOutCubic } from "./showroom-intro";
 import { useMotionPausedRef } from "./useMotionPaused";
+import { captureSrc } from "@/lib/captures";
 
 const ITEM_Z = -1.4;
 const GAP = 1.15;
@@ -90,7 +91,7 @@ export function Reel({
   }, []);
 
   const urls = useMemo(
-    () => items.map((it) => `/portfolio/${it.slug}-desktop.jpg`),
+    () => items.map((it) => captureSrc(it.slug)),
     [items]
   );
   // useLoader, NOT drei's useTexture: useTexture calls gl.initTexture() on every

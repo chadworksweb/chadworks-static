@@ -11,3 +11,10 @@ next-env.d.ts
 .DS_Store
 .env*.local
 *.log
+
+# Portfolio PNG captures: kept locally as source material, never deployed.
+# They are unreachable from any launched page and were shipping 4.34 MB to prod
+# for nothing. The two that were actually referenced (chadlewine, risingcompass)
+# were re-encoded to .webp on 2026-07-18; the rest are orphans. deploy.sh also
+# excludes them from the prod sync, so untracking alone is not load-bearing.
+/public/portfolio/*.png

@@ -86,7 +86,13 @@ echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # accumulate harmlessly; sweep them by hand if the docroot grows: on the server
 # `sudo rm -rf ${DOCROOT}/_next` before a deploy, then redeploy.
 ssh "$SERVER" "sudo mkdir -p ${DOCROOT}"
-tar czf - -C out . \
+# --exclude: the portfolio PNG captures are local source material only. They are
+# unreachable from any launched page and were shipping 4.34 MB to prod for
+# nothing. They are gitignored too, but this exclude is the load-bearing guard:
+# `next build` copies all of public/ into out/, so a PNG sitting in the working
+# tree would otherwise ride along on every deploy. Removing this line puts them
+# straight back on prod.
+tar czf - -C out --exclude='./portfolio/*.png' . \
   | ssh "$SERVER" "sudo tar xzf - -C ${DOCROOT} && sudo chmod -R a+rX ${DOCROOT}"
 
 echo "Verifying (${ENV}):"
