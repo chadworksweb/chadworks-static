@@ -1,0 +1,171 @@
+/* The homepage section rail (expansion plan item I).
+
+   Does NOT touch the scrollbar. The native bar keeps the position job.
+
+   The rail IS the segment spine: one bar per section, its length proportional to
+   that section's share of the document, docked flush to the viewport edge so it
+   seams against the scrollbar rather than floating inboard of it. The glyph
+   column that used to sit here is gone; it read as a second scrollbar.
+
+   The cursor model is the one that worked: approach the right edge and every
+   label fades in at once, so the whole page structure is readable in one look;
+   point at a single segment and that one lifts and takes the accent.
+
+   Hidden below 900px per the plan. Motion gated on `html:not(.cw-force-motion)`. */
+
+.rail {
+  /* the gap between the sticky header and the motion pocket; tune this one value
+     to move the bottom edge */
+  --cw-rail-foot: 5.5rem;
+
+  position: fixed;
+  top: var(--nav-height);
+  bottom: var(--cw-rail-foot);
+  right: 0;
+  width: 12rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  z-index: 60;
+  /* never eat clicks meant for the page; only the segments do */
+  pointer-events: none;
+}
+
+@media (max-width: 899px) {
+  .rail { display: none; }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  max-height: 90vh;
+  min-height: 0;
+}
+
+/* ---- a segment ---- */
+.seg {
+  position: relative;
+  display: block;
+  min-height: 0;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: right;
+  cursor: pointer;
+  pointer-events: auto;
+  text-decoration: none;
+}
+.seg + .seg { margin-top: 6px; }
+
+.seg:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* The bar: docked hard to the edge, no inset. Width is constant everywhere
+   except the active section, so nothing shifts as the cursor travels; hover and
+   proximity are carried by value and hue alone. */
+.bar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--text-primary);
+  opacity: 0.16;
+  transition:
+    opacity 220ms var(--ease-smooth),
+    background-color 220ms var(--ease-smooth);
+}
+
+/* approaching the rail wakes the whole spine */
+.near .bar { opacity: 0.3; }
+
+.seg:hover .bar,
+.seg:focus-visible .bar {
+  opacity: 0.8;
+  background: var(--accent);
+}
+
+/* The section you are in carries real mass. This is the ONE state allowed to
+   change the silhouette; every other state is value and hue only. */
+.on .bar {
+  width: 5px;
+  opacity: 1;
+  background: var(--nav-link-pulse, #6629bc);
+}
+
+
+/* ---- number + name, right-aligned off the spine ---- */
+.meta {
+  position: absolute;
+  right: 0.85rem;
+  top: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(6px);
+  transition:
+    opacity 260ms var(--ease-swoop),
+    transform 260ms var(--ease-swoop);
+}
+.n {
+  font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: rgba(36, 57, 137, 0.42);
+  font-variant-numeric: tabular-nums;
+}
+.t {
+  font-family: var(--font-mono, ui-monospace, Menlo, Consolas, monospace);
+  font-size: 0.63rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(36, 57, 137, 0.55);
+}
+
+/* the cursor model: proximity reveals the whole set, hover picks one out */
+.near .meta { opacity: 1; transform: translateX(0); }
+.seg:hover .meta,
+.seg:focus-visible .meta { opacity: 1; transform: translateX(-3px); }
+.seg:hover .t,
+.seg:focus-visible .t { color: var(--nav-link-pulse, #6629bc); }
+.seg:hover .n,
+.seg:focus-visible .n { color: rgba(102, 41, 188, 0.7); }
+
+/* The active section is marked by its BAR, never by a label parked on screen.
+   Nothing here shows a title until the cursor is involved. */
+.on .n { color: var(--nav-link-pulse, #6629bc); }
+.on .t { color: var(--nav-link-pulse, #6629bc); font-weight: 600; }
+
+/* ---- over dark bands ---- */
+.rail.overDark .bar { background: var(--periwinkle-soft, #aeb9ea); }
+.rail.overDark .seg:hover .bar,
+.rail.overDark .seg:focus-visible .bar { background: var(--btn-hover-from, #d6abf4); }
+.rail.overDark .on .bar { background: var(--dark-muted, #e5d2f4); }
+.rail.overDark .n { color: rgba(174, 185, 234, 0.5); }
+.rail.overDark .t { color: rgba(174, 185, 234, 0.62); }
+.rail.overDark .on .n,
+.rail.overDark .on .t,
+.rail.overDark .seg:hover .t,
+.rail.overDark .seg:focus-visible .t { color: #e0bcff; }
+.rail.overDark .seg:focus-visible { outline-color: var(--btn-hover-from, #d6abf4); }
+
+/* ---- reduced motion: keep every state, drop the easing ---- */
+@media (prefers-reduced-motion: reduce) {
+  html:not(:global(.cw-force-motion)) .bar,
+  html:not(:global(.cw-force-motion)) .meta {
+    transition: none;
+  }
+}
