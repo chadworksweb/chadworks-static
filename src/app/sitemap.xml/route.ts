@@ -7,12 +7,19 @@
 // (layout.tsx) and simply absent here. Launch a page = add it to launch.ts.
 
 import { SITE_URL } from "@/lib/service";
-import { LAUNCHED_ROUTES } from "@/lib/launch";
+import { LAUNCHED_ROUTES, isLaunched } from "@/lib/launch";
+import { getEssaySlugs } from "@/lib/essays";
 
 export const dynamic = "force-static";
 
-// Routes advertised to search engines right now (the launched set).
-const routes = LAUNCHED_ROUTES;
+// Routes advertised to search engines right now (the launched set) plus, when
+// the essays collection is launched, one entry per published essay (the [slug]
+// pages are not in LAUNCHED_ROUTES individually -- they inherit the collection
+// launch, so they are enumerated from the content dir here).
+const essayRoutes = isLaunched("/essays/")
+  ? getEssaySlugs().map((slug) => `/essays/${slug}/`)
+  : [];
+const routes = [...LAUNCHED_ROUTES, ...essayRoutes];
 
 export async function GET(): Promise<Response> {
   const lastmod = new Date().toISOString().slice(0, 10);

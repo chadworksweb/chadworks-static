@@ -8,7 +8,8 @@ import { MotionTogglePocket } from "@/components/MotionTogglePocket";
 import { MotionInvite } from "@/components/MotionInvite";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 import { GoogleAnalytics } from "@/components/consent/GoogleAnalytics";
-import { buildOrgJsonLd, SITE_URL } from "@/lib/service";
+import { SITE_URL } from "@/lib/service";
+import { buildSiteGraph } from "@/lib/jsonld";
 
 // Pre-hydration consent bootstrap. Reads the saved choice (cw_cookie_consent),
 // else the cached geo default (cw_geo_default), else defaults to DENY, then
@@ -90,11 +91,13 @@ export default function RootLayout({
         {/* Consent bootstrap: set window.__CW_CONSENT__ before hydration so GA
             is gated correctly on first paint (see CONSENT_BOOTSTRAP above). */}
         <script dangerouslySetInnerHTML={{ __html: CONSENT_BOOTSTRAP }} />
-        {/* Site-wide Organization schema (GEO checklist 2): one consistent
-            provider entity in the static HTML of every page. */}
+        {/* Site identity @graph (GEO checklist 2): Organization + Person +
+            WebSite, each with a stable @id, in the static HTML of every page.
+            Every other node on the site references these by @id rather than
+            restating them -- see src/lib/jsonld.ts for why that is mandatory. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildOrgJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildSiteGraph()) }}
         />
         <ConsentProvider>
           <SiteNav />

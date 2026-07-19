@@ -91,20 +91,8 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
         <p className="svc-lede measure-prose">{hub.answer}</p>
       </section>
 
-      {/* THESIS (optional) -- the lane's argument, before the routes. */}
-      {hub.thesis && (
-        <section className="section full svc-block svc-dark reveal">
-          <h2 className="svc-block__heading">{hub.thesis.heading}</h2>
-          {hub.thesis.subheading && (
-            <h3 className="svc-block__subheading">{hub.thesis.subheading}</h3>
-          )}
-          {hub.thesis.paragraphs.map((p, i) => (
-            <p key={i} className="svc-block__body measure-prose">{p}</p>
-          ))}
-        </section>
-      )}
-
-      {/* LANES -- every service in the lane as an asymmetric hover lane. */}
+      {/* LANES -- every service in the lane as an asymmetric hover lane.
+          Sits directly under the hero on both hubs; the thesis follows it. */}
       <section className="section svc-block reveal">
         {hub.lanesHeading && (
           <h2 className="svc-block__heading">{hub.lanesHeading}</h2>
@@ -172,6 +160,19 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
           })()}
         </div>
       </section>
+
+      {/* THESIS (optional) -- the lane's argument, after the routes. */}
+      {hub.thesis && (
+        <section className="section full svc-block svc-dark reveal">
+          <h2 className="svc-block__heading">{hub.thesis.heading}</h2>
+          {hub.thesis.subheading && (
+            <h3 className="svc-block__subheading">{hub.thesis.subheading}</h3>
+          )}
+          {hub.thesis.paragraphs.map((p, i) => (
+            <p key={i} className="svc-block__body measure-prose">{p}</p>
+          ))}
+        </section>
+      )}
 
       {/* CTA -- the global contact capsule (same as the homepage close). */}
       <MainContactCapsule />

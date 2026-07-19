@@ -52,6 +52,11 @@
 - [Wix to Static](https://chadworks.co/switch/wix-to-static/): Leave a Wix site you can't export. Rebuilt as a fast custom static site you own and can take anywhere, hosted for $20 a month ($10 non-profit).
 - [GoDaddy to Static](https://chadworks.co/switch/godaddy-to-static/): Trade the GoDaddy Website Builder for a real custom static site designed around your business. Keep your domain, drop the builder fee; hosting is $20 a month ($10 non-profit).
 
+## Essays
+
+- [Essays](https://chadworks.co/essays/): Published thinking on the web, business and the industry, written by Chad, not generated. The argument behind how chadworks works.
+- [Is Your Agency Ripping You Off?](https://chadworks.co/essays/is-your-agency-ripping-you-off/): How the perpetual retainer works as an industry con, why most clients are dormant rather than active, and the real email thread with an agency billing a client $1,000 a month for what amounted to hosting. Includes Chad's own account of selling retainers at $125 a month and then retiring the service.
+
 ## About
 
 - [About Chad](https://chadworks.co/about/): The person behind chadworks: one person who designs the site and writes the code, era by era from MySpace-taught HTML to clients named in AI answers.

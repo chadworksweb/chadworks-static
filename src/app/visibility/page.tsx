@@ -9,15 +9,16 @@ import { VisibilityHeroArt } from "@/components/art/VisibilityHeroArt";
 
 const hub: HubConfig = {
   slug: "visibility",
-  eyebrow: "Lane two: being found",
+  eyebrow: "chadworks Service Lane 02",
   title: "Visibility",
   answer: (
     <>
-      Visibility is being found and chosen: in Google, in the AI assistants
-      people now ask instead of Google, and in the inbox. I&apos;m Chad, and
-      I&apos;ve spent 20 years getting businesses in front of the people
-      looking for them. The work has consolidated, and so has the way I sell
-      it: one umbrella, with every piece underneath.
+      Visibility is the state of being found on the internet. That covers
+      ranking on Google and getting cited or suggested by the AI chatbots and
+      assistants people now ask instead. Do you want to be found online? Good.
+      I&apos;ll make it
+      happen. You don&apos;t need to know the acronyms to know what you want,
+      and I don&apos;t need to sell you each piece as an add-on or an upcharge.
     </>
   ),
   heroArt: <VisibilityHeroArt />,
@@ -25,6 +26,12 @@ const hub: HubConfig = {
     heading: "Want to be visible in this day and age?",
     subheading: "Then you have to do it all.",
     paragraphs: [
+      <>
+        The industry calls those SEO (search engine optimization) and GEO
+        (generative engine optimization), along with a few other acronyms for
+        the emerging work of getting a business shown on AI platforms.
+        I&apos;m skipping the jargon and collapsing all of it into one service.
+      </>,
       <>
         Buyers don&apos;t just search anymore. They ask ChatGPT who to hire,
         skim a Google page that now answers questions itself, and check that
@@ -41,9 +48,6 @@ const hub: HubConfig = {
       </>,
     ],
   },
-  lanesHeading: "The visibility services",
-  lanesIntro:
-    "AI Visibility is the complete answer. The rest are real, sellable pieces of it, here for when you know exactly which piece you need.",
   lanes: [
     {
       label: "AI Visibility",

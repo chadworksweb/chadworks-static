@@ -38,7 +38,7 @@ import {
 } from "@/components/septic/SepticMethods";
 import { SepticBrandKit, SepticSampleCopy } from "@/components/septic/SepticBrandSample";
 import { SepticVisibility } from "@/components/septic/SepticVisibility";
-import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
+import { GoingToBat } from "@/components/GoingToBat";
 import { IndustryHubCta } from "@/components/IndustryHubCta";
 import { isLaunched } from "@/lib/launch";
 
@@ -175,10 +175,8 @@ export default function SepticDesignPage() {
         schemeAuto
       />
 
-      {/* The real anti-agency email thread. */}
-      <SectionShell reveal={false} className="cw-art-voice-section">
-        <SepticVoicebox />
-      </SectionShell>
+      {/* The anti-agency email thread, now published as an essay. */}
+      <GoingToBat />
 
       {/* Nine-step build process (bold timeline). */}
       <ProcessCapsule

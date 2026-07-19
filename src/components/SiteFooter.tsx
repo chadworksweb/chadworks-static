@@ -20,6 +20,7 @@ const COLUMNS: { heading: string; href?: string; links: { href: string; label: s
       { href: "/about/", label: "About" },
       { href: "/rates/", label: "Rates" },
       { href: "/showroom/", label: "Showroom" },
+      { href: "/essays/", label: "Essays" },
       { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
       { href: "/faqs/", label: "FAQs" },
       { href: "/contact/", label: "Contact" },

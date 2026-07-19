@@ -30,6 +30,7 @@ import {
   FitCapsule,
 } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { LANE_COLORS } from "@/lib/capsule";
 import HomeHero from "@/components/HomeHero";
 import { GemstoneCW } from "@/components/GemstoneCW";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
@@ -55,7 +56,7 @@ import {
   MailChip,
   PinChipDark,
 } from "@/components/art/VisibilityHeroArt";
-import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
+import { GoingToBat } from "@/components/GoingToBat";
 
 // The Websites + Visibility chip sets COMBINED into one stream (copied from the
 // /websites/ and /visibility/ hero art). They share a single sticky column on
@@ -120,6 +121,24 @@ const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }
   { title: "SEO", href: "/seo/", body: "SEO *didn't* die, it became the foundation. This is the classic discipline: ranking your pages for the phrases your buyers actually type into Google. It still works on its own, and it's also what the AI assistants read before they decide who to name." },
   { title: "Digital Marketing", href: "/digital-marketing/", body: "This is mostly a catch-all term to cover a broad range of services that help your business get seen online. Essentially, everything chadworks does is digital marketing, so this page exists to capture people looking for digital marketing, then share what I offer within that arena." },
   { title: "Email Marketing", href: "/email-marketing/", body: "E-mail is still the reigning champ of all direct to consumer digital marketing channels. Once a customer gives you their email address, they've given you a direct line to their inbox, the closest thing to the real mailbox any company can get. Email marketing should be a top priority for any serious business or initiative." },
+];
+
+// ---- HOME PATHS -- the two service lanes as cards under the hero. Both jump
+// to their own block inside cw-lanes-scroll, below the manifesto. The third
+// card in the row is the contact CTA, written inline in the JSX. ----
+const HOME_PATHS = [
+  {
+    label: "Websites",
+    detail:
+      "The one piece of your business you fully own on the internet: the look, the code, the hosting, all custom built and all in your name.",
+    href: "#lane-websites",
+  },
+  {
+    label: "Visibility",
+    detail:
+      "Being found and chosen: in Google, in the AI assistants people now ask instead of Google, and in the inbox.",
+    href: "#lane-visibility",
+  },
 ];
 
 // ---- MANIFESTO ("who is chadworks for?") -- the FULL manifesto now lives on the
@@ -272,6 +291,42 @@ export default function Home() {
       {/* 1. The existing homepage hero (bare: no CTAs, divider stretched). */}
       <HomeHero bare />
 
+      {/* 1a. The three-up lane module: the two service lanes jump down to their
+          blocks below the manifesto, the third is the inverted contact CTA card
+          used on the /websites/ and /visibility/ hubs, pointing at the footer
+          form. Same svc-lanes chrome as those hubs. */}
+      <SectionShell className="svc-block cw-home-paths">
+        <div className="svc-lanes">
+          {HOME_PATHS.map((p, i) => (
+            <a
+              key={p.href}
+              href={p.href}
+              className="svc-lane"
+              style={{ "--lane-color": LANE_COLORS[i] } as React.CSSProperties}
+            >
+              <span className="svc-lane__num" aria-hidden="true">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="svc-lane__content">
+                <span className="svc-lane__title">{p.label}</span>
+                <span className="svc-lane__desc">{p.detail}</span>
+                <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
+              </span>
+            </a>
+          ))}
+          <a href="#contact" className="svc-lane svc-lane--cta">
+            <span className="svc-lane__content">
+              <span className="svc-lane__title">Not sure which fits?</span>
+              <span className="svc-lane__desc">
+                Cut right to it and tell me your idea. I&apos;ll tell you what
+                I&apos;d do for you.
+              </span>
+              <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
+            </span>
+          </a>
+        </div>
+      </SectionShell>
+
       {/* 2 + 2.5. The CW gemstone and the manifesto share ONE ambient field: the
           Lyric-Transformer fbm cloud (<ManifestoAmbient />) is a full-bleed layer
           that begins in the lower third of the gemstone and runs through the
@@ -317,7 +372,7 @@ export default function Home() {
             ))}
           </div>
           <div className="cw-lanes-scroll__text">
-            <div className="cw-lane-block">
+            <div className="cw-lane-block" id="lane-websites">
               <p className="eyebrow">Service Lane 01</p>
               <h2 className="svc-hero__title">
                 <span className="text-gradient">Websites</span>
@@ -349,7 +404,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div className="cw-lane-block cw-lane-block--alt">
+            <div className="cw-lane-block cw-lane-block--alt" id="lane-visibility">
               <p className="eyebrow">Service Lane 02</p>
               <h2 className="svc-hero__title">
                 <span className="text-gradient">Visibility</span>
@@ -427,10 +482,8 @@ export default function Home() {
         evenSplit
       />
 
-      {/* 7a. "Going to bat" -- the real anti-agency email thread (septic page). */}
-      <SectionShell reveal={false} className="cw-art-voice-section">
-        <SepticVoicebox />
-      </SectionShell>
+      {/* 7a. "Going to bat" -- the thread itself moved to the essay; this links out. */}
+      <GoingToBat />
 
       {/* 8. Contact -- the dark band with the quick/detailed form. */}
       <MainContactCapsule />

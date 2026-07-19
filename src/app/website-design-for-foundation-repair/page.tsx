@@ -43,7 +43,7 @@ import {
 } from "@/components/foundation/FoundationMethods";
 import { FoundationBrandKit, FoundationSampleCopy } from "@/components/foundation/FoundationBrandSample";
 import { FoundationVisibility } from "@/components/foundation/FoundationVisibility";
-import { SepticVoicebox } from "@/components/septic/SepticVoicebox";
+import { GoingToBat } from "@/components/GoingToBat";
 import { IndustryHubCta } from "@/components/IndustryHubCta";
 import { isLaunched } from "@/lib/launch";
 
@@ -182,10 +182,8 @@ export default function FoundationDesignPage() {
         schemeAuto
       />
 
-      {/* The real anti-agency email thread (shared with the septic page). */}
-      <SectionShell reveal={false} className="cw-art-voice-section">
-        <SepticVoicebox />
-      </SectionShell>
+      {/* The anti-agency email thread, now published as an essay. */}
+      <GoingToBat />
 
       {/* Nine-step build process (bold timeline). */}
       <ProcessCapsule

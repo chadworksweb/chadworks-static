@@ -47,6 +47,12 @@ const LAUNCHED = new Set<string>([
   "/website-design-for-foundation-repair/",
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
   "/faqs/", // launched 2026-07-17 -- FAQ page (FAQPage JSON-LD, four themed groups)
+  "/essays/", // launched 2026-07-17 -- the essays surface (CWS-EXPANSION-PLAN-01
+              // item N: authority is published, not case-studied). This lights the
+              // footer's Essays link; individual essays inherit the launch and are
+              // added to the sitemap from the content dir (see sitemap.xml/route).
+              // NOTE: held back from prod -- local only until the essays work ships.
+              // Prod's launch.ts does not carry this line.
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant

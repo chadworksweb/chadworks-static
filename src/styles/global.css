@@ -185,8 +185,15 @@ ul, ol { list-style: none; padding: 0; }
    LEFT on hover, which is what makes it grow from the left and retract to the
    right. Swapping the anchor is instant rather than animated, and invisible,
    because it only ever happens while the bar is at full width. */
+/* THE CANONICAL PROSE LINK. One house style, drawn with background-image so it
+   can animate; `text-decoration` stays NONE here on purpose.
+   RULE: never add `text-decoration: underline` to a link that also matches this
+   selector -- you get two underlines, a static one plus the animated bar. If a
+   context needs a plain static underline instead, opt OUT explicitly the way
+   .svc-qual__more a does (background-image: none; padding-bottom: 0). */
 p a,
-.cw-fit-list a {
+.cw-fit-list a,
+.essay-prose a {
   color: var(--accent);
   text-decoration: none;
   padding-bottom: 0.1em;
@@ -201,7 +208,9 @@ p a,
 p a:hover,
 p a:focus-visible,
 .cw-fit-list a:hover,
-.cw-fit-list a:focus-visible {
+.cw-fit-list a:focus-visible,
+.essay-prose a:hover,
+.essay-prose a:focus-visible {
   background-size: 100% 1px, 100% 1px;
   background-position-x: left, left;
 }
@@ -5765,7 +5774,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* Methods closing note */
 .cw-art-methods-note { margin: 2.4rem auto 0; text-align: center; font-size: 0.96rem; color: var(--text-secondary); max-width: 640px; }
-.cw-art-methods-note a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.cw-art-methods-note a { color: var(--accent); font-weight: 500; }
 .cw-art-methods-note a:hover { color: var(--text-primary); }
 .cw-art-mobile-br { display: none; }
 @media (max-width: 720px) { .cw-art-mobile-br { display: initial; } }
@@ -6088,7 +6097,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 
 /* ---- why-split lead paragraph + last-updated stamp ---- */
 .cw-art-why__lead { margin-top: 1.4rem; font-size: 1.05rem; line-height: 1.72; color: var(--text-secondary); max-width: 720px; }
-.cw-art-why__lead a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.cw-art-why__lead a { color: var(--accent); font-weight: 500; }
 .cw-art-why__lead a:hover { color: var(--text-primary); }
 .cw-art-why__right { min-width: 0; }
 .cw-art-last-updated { display: block; margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.7; }
@@ -6108,7 +6117,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-qa__item { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius); padding: 1.5rem 1.6rem; }
 .cw-art-qa__q { font-family: var(--font-display); font-weight: 700; font-size: 1.12rem; line-height: 1.3; letter-spacing: -0.01em; color: var(--text-primary); margin: 0 0 0.6rem; }
 .cw-art-qa__a { font-size: 0.98rem; line-height: 1.68; color: var(--text-secondary); margin: 0; }
-.cw-art-qa__a a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; font-weight: 500; }
+.cw-art-qa__a a { color: var(--accent); font-weight: 500; }
 .cw-art-qa__a a:hover { color: var(--text-primary); }
 .cw-art-qa__callout { margin: 2rem auto 0; max-width: 820px; text-align: left; background: rgba(128, 84, 188, 0.06); border: 1px solid rgba(128, 84, 188, 0.22); border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0; padding: 1.2rem 1.5rem; font-size: 1rem; line-height: 1.65; color: var(--text-primary); }
 .cw-art-qa__callout strong { color: var(--text-primary); }
@@ -6276,7 +6285,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
   line-height: 1.7;
   color: var(--text-secondary);
 }
-.cw-art-eligible__note a { color: var(--accent); text-decoration: underline; }
+.cw-art-eligible__note a { color: var(--accent); }
 
 /* ---- single (solo) pricing panel: center one .cw-art-pricing-panel ---- */
 .cw-art-pricing-solo { margin-top: 2.4rem; max-width: 720px; }
@@ -6326,6 +6335,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-art-voice__heading { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.7rem, 3.4vw, 2.6rem); line-height: 1.22; letter-spacing: -0.014em; color: var(--text-primary); max-width: 880px; margin-bottom: 0.6rem; }
 .cw-art-voice__desktop-br { display: inline; }
 @media (max-width: 600px) { .cw-art-voice__desktop-br { display: none; } }
+/* Sub-headline above the lead ("Real exchange with a client's previous
+   agency"). Sits a step under the section heading on the service pages, and is
+   the TOP line of the block in the essay embed, where the H2 is dropped. */
+.cw-art-voice__subhead { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.15rem, 1.9vw, 1.5rem); line-height: 1.3; letter-spacing: -0.008em; color: var(--text-primary); margin-bottom: 0.55rem; }
 .cw-art-voice__lead { font-size: 1.05rem; line-height: 1.65; color: var(--text-secondary); max-width: 720px; margin-bottom: 2.2rem; }
 .cw-art-voice__char { font-weight: 700; font-style: normal; }
 .cw-art-voice__char--client { color: var(--grad-deep); }
@@ -8451,4 +8464,559 @@ html.cw-motion-paused *::after {
 @media (max-width: 900px) {
   .cw-deliv__anatomy { grid-template-columns: 1fr; }
   .cw-deliv__letter { font-size: 5rem; }
+}
+
+/* =====================================================================
+   ESSAYS (CWS-EXPANSION-PLAN-01 item N) -- the /essays/ index + article.
+   Reading surface ported from chadlewine, rebuilt on chadworks tokens. The
+   article body is remark-rendered markdown, so these style raw h2/p/ul/etc.
+   The global reset zeroes margins, so flow spacing is added back here (same
+   pattern as .legal-prose). Prose measure is an allowed opt-in (reading
+   column), NOT a page-shell narrowing.
+   ===================================================================== */
+
+/* ---- Index archive: two equal columns (1/2 - 1/2) of vertical cards. Each
+   card = featured image on top (1200x630 ratio) + date (only), title, dek.
+   chadworks branding. ---- */
+/* Pull the grid up close under the hero (the hero already carries bottom
+   padding; the default section top pad would double the gap). */
+/* The essays archive sits directly under its own hero, so the pair is tightened:
+   the hero gives up half its bottom padding and the grid drops its top padding
+   entirely (Chad, 2026-07-18). */
+.essays-hero { padding-block-end: calc(var(--hero-pad-y) * 0.5); }
+.essays-archive { padding-block-start: 0; }
+.essays-archive__empty {
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+}
+.essays-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+@media (max-width: 768px) {
+  .essays-grid { grid-template-columns: 1fr; }
+}
+.essay-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.essay-card:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -12px rgba(36, 57, 137, 0.25);
+}
+.essay-card__art-wrap {
+  position: relative;
+  aspect-ratio: 1200 / 630;   /* featured-image ratio */
+  overflow: hidden;
+  background: var(--bg-wash);
+}
+.essay-card__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.essay-card:hover .essay-card__art { transform: scale(1.04); }
+.essay-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+}
+.essay-card__date {
+  font-family: var(--font-ui);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.essay-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+}
+.essay-card__dek {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* ---- Article ---- */
+.essay-wrap {
+  max-width: var(--measure-prose);
+  margin-inline: auto;
+}
+.essay-head { margin-bottom: var(--space-xl); }
+.essay-head__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+}
+/* Meta links (eyebrow, byline) are mono UI, not prose: they opt OUT of the
+   canonical animated bar so the plain hover underline is the only one drawn.
+   Both live inside a <p>, so without this they would match `p a` and double. */
+.essay-head__eyebrow a {
+  color: var(--accent);
+  text-decoration: none;
+  background-image: none;
+  padding-bottom: 0;
+}
+.essay-head__eyebrow a:hover { text-decoration: underline; }
+.essay-head__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-md);
+}
+.essay-head__dek {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: var(--text-secondary);
+}
+/* Visible byline (E-E-A-T on the page, not only in the JSON-LD). Sits under the
+   dek in the same mono register as the eyebrow, one step quieter. */
+.essay-head__byline {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.essay-head__byline a {
+  color: var(--accent);
+  text-decoration: none;
+  background-image: none;
+  padding-bottom: 0;
+}
+.essay-head__byline a:hover { text-decoration: underline; }
+
+/* Rendered markdown body. Flow spacing restored (reset zeroes margins). */
+.essay-prose {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-primary);
+}
+.essay-prose > * + * { margin-top: var(--space-md); }
+.essay-prose h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  margin-top: var(--space-xl);
+}
+.essay-prose h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  margin-top: var(--space-lg);
+}
+.essay-prose p { color: var(--text-primary); }
+.essay-prose strong { font-weight: 700; color: var(--text-primary); }
+.essay-prose em { font-style: italic; }
+/* Styled by the canonical prose-link rule above (animated bar). Only the
+   weight is essay-specific -- no text-decoration here, or it doubles. */
+.essay-prose a {
+  font-weight: 500;
+}
+.essay-prose ul, .essay-prose ol {
+  display: grid;
+  gap: var(--space-2xs);
+  padding-left: 1.4em;
+}
+.essay-prose ul { list-style: disc; }
+.essay-prose ol { list-style: decimal; }
+.essay-prose li { padding-left: 0.25em; line-height: var(--leading-body); }
+.essay-prose blockquote {
+  padding-left: var(--space-md);
+  border-left: 3px solid var(--accent);
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.essay-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  margin-block: var(--space-lg);
+}
+.essay-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--bg-surface);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.essay-foot {
+  margin-top: var(--space-2xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+/* ---------------------------------------------------------------------
+   GOING-TO-BAT TEASER (GoingToBat.tsx) -- the capsule that replaced the
+   inline email thread on the homepage + trade pages. Two columns: the
+   cutout on a tactile dot field at left, the copy at right, closed by an
+   elongated pill whose label rides the far right.
+   --------------------------------------------------------------------- */
+.cw-bat {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  grid-template-areas:
+    "art body"
+    "cta cta";
+  align-items: end;
+  column-gap: clamp(1rem, 3vw, 3rem);
+  row-gap: 0;              /* the figure has to reach the pill's seam */
+}
+.cw-bat__art {
+  grid-area: art;
+  position: relative;
+  align-self: end;
+  min-width: 0;
+  /* Sits UNDER the pill and overlaps its top edge, so the pill crops the
+     figure off at the seam instead of stopping politely above it. */
+  z-index: 0;
+  margin-bottom: -14px;
+}
+/* Braille-style dot grid, ported from the showroom's .metaCorner::before:
+   same 4.5px cell and two-gradient build (lit speck + ink dot), masked to a
+   soft ellipse so the field gathers behind the figure and dissolves out. */
+.cw-bat__grain {
+  position: absolute;
+  inset: 6% -4% 0 -4%;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.5) 0.5px, transparent 0.9px),
+    radial-gradient(circle, color-mix(in srgb, var(--grad-deep) 26%, transparent) 1.3px, transparent 1.7px);
+  background-size: 4.5px 4.5px, 4.5px 4.5px;
+  /* Centered on the FIGURE, not on the image box: the cutout's subject sits
+     left of center, so an even ellipse pooled the grain out to his right. */
+  -webkit-mask-image: radial-gradient(ellipse 54% 52% at 40% 46%, #000 40%, transparent 80%);
+  mask-image: radial-gradient(ellipse 54% 52% at 40% 46%, #000 40%, transparent 80%);
+}
+.cw-bat__cutout {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cw-bat__body {
+  grid-area: body;
+  min-width: 0;
+  padding-bottom: var(--space-lg);
+}
+.cw-bat__body .svc-block__heading { margin-bottom: var(--space-xs); }
+/* A hair down from the standard block body, not the full 10% (that read as
+   fine print next to the heading). */
+.cw-bat__body .svc-block__body { margin-bottom: 0; font-size: 1.16em; }
+/* The pill runs the FULL section width, both columns, and rides above the
+   figure so it cuts the cutout off cleanly at its top seam. */
+/* The BAR is decoration only: a full-width lavender pill the figure sits on. */
+.cw-bat__bar {
+  grid-area: cta;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  width: 100%;
+  min-height: 3.6rem;
+  background: var(--btn-bg);
+  border-radius: 999px;
+  overflow: hidden;
+  /* The key sits INSIDE the pill's face, not flush to its edge. */
+  padding: 5px;
+}
+/* The TARGET is only this panel at the bar's right end -- filled edge to edge
+   with the showroom's braille field (.metaCorner::before: 4.5px cell, a lit
+   speck over an ink dot), softened at its inner edge so it dissolves into the
+   plain pill instead of ending on a hard seam. */
+.cw-bat__cta {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Sized by its LABEL, with even padding, so the key is not lopsided. */
+  padding-inline: clamp(calc(var(--space-md) * 1.25), 2.75vw, calc(var(--space-lg) * 1.25));
+  border-radius: 999px;
+  overflow: hidden;                       /* the dot field stops at the key */
+  color: var(--btn-text);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(var(--text-sm) * 1.2);
+  text-decoration: none;
+  background-image: none;                 /* opt out of the prose-link bar */
+  /* Seated (rest): a hair lighter than the pill face, lit along its top edge
+     and casting a short drop -- so it reads as a key sitting ON the surface. */
+  background-color: color-mix(in srgb, var(--btn-bg) 88%, #ffffff);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 1px 2px color-mix(in srgb, var(--btn-text) 22%, transparent);
+  transition:
+    background-color var(--duration-fast) var(--ease-smooth),
+    box-shadow var(--duration-fast) var(--ease-smooth),
+    transform var(--duration-fast) var(--ease-smooth);
+}
+/* Pressed: the key sinks into the pill face -- the drop shadow goes away, the
+   light flips to a shadow cast from the rim onto the key, and it darkens a
+   touch. The pill's own outline never moves. */
+.cw-bat__cta:hover,
+.cw-bat__cta:focus-visible {
+  background-color: color-mix(in srgb, var(--btn-bg) 92%, var(--btn-text));
+  transform: translateY(1px) scale(0.994);
+  box-shadow:
+    inset 0 3px 5px -1px color-mix(in srgb, var(--btn-text) 42%, transparent),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5),
+    0 0 0 transparent;
+}
+.cw-bat__cta:active {
+  transform: translateY(2px) scale(0.99);
+  box-shadow:
+    inset 0 4px 7px -1px color-mix(in srgb, var(--btn-text) 55%, transparent),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+    0 0 0 transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-bat__cta { transition: none; }
+}
+/* The key's face is TACTILE: the showroom's braille field (.metaCorner::before)
+   -- 4.5px cell, a lit speck over an ink dot -- filling the key edge to edge,
+   clipped by its own radius. Sits ABOVE the key's fill (z-index 0, not -1, or
+   the background-color buries it) and below the label. */
+.cw-bat__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.7) 0.5px, transparent 0.9px),
+    radial-gradient(circle, color-mix(in srgb, var(--btn-text) 34%, transparent) 1.3px, transparent 1.7px);
+  background-size: 4.5px 4.5px, 4.5px 4.5px;
+}
+.cw-bat__cta-label {
+  position: relative;
+  z-index: 1;
+  transition: transform var(--duration-base) var(--ease-spring, var(--ease-smooth));
+}
+.cw-bat__cta-label::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: -0.6rem;
+  right: calc(-0.6rem + 0.2em + 2px);
+  height: calc(1em + 8px);
+  transform: translateY(-50%);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--btn-bg) 55%, #ffffff);
+  filter: blur(1.5px);
+}
+@media (max-width: 860px) {
+  .cw-bat {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "body"
+      "art"
+      "cta";
+  }
+  .cw-bat__art { max-width: 380px; margin-inline: auto; margin-bottom: -10px; }
+  .cw-bat__body { padding-bottom: var(--space-md); }
+  .cw-bat__bar { min-height: 3.2rem; }
+  .cw-bat__cta { padding-inline: var(--space-md); }
+}
+
+/* EMBEDDED THREAD BAND (essay one-off, see AgencyThreadEmbed.tsx). Breaks out
+   of the reading column: the band bleeds edge to edge in its own shade, while
+   the page-shell grid re-anchors the content to SITE width. A shade, not an
+   invert -- it reads as a different surface without flipping the page dark. */
+.essay-thread-band {
+  background: color-mix(in srgb, var(--bg-surface) 55%, var(--bg-base));
+  border-block: 1px solid var(--border-subtle);
+}
+.essay-thread__layout {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(1rem, 2.4vw, 2rem);
+}
+.essay-thread__main { flex: 1 1 0; min-width: 0; }
+.essay-thread__aside-img {
+  flex: 0 0 auto;
+  width: clamp(200px, 22vw, 300px);
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
+  pointer-events: none;
+}
+.essay-thread__aside-img img { display: block; width: 100%; height: auto; }
+@media (max-width: 860px) {
+  .essay-thread__layout { display: block; }
+  .essay-thread__aside-img { display: none; }
+}
+/* The prose section that resumes AFTER the band should not re-pay the full
+   section rhythm on top -- the band already provided the separation. */
+.essay-article--tail { padding-top: var(--space-lg); }
+
+/* AUTHOR BIO BOX -- portrait + the About line, closing the essay. Backs the
+   Person node in the JSON-LD with something a reader (and a crawler) can see. */
+.essay-bio {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-2xl);
+  padding: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--bg-surface) 40%, var(--bg-base));
+}
+/* GEM FACET MASK -- an elongated hexagon cut at the CW gemstone's angles, so
+   the portrait reads as a faceted stone rather than a stock avatar. Flat top
+   and bottom keep the face centered and stop the chin being clipped; the
+   corner insets (18%/82%) match the mark's shoulder angle. object-position
+   sits slightly high so the crop favors the eyes over the shirt. */
+.essay-bio__facet {
+  flex: 0 0 auto;
+  display: block;
+  width: clamp(84px, 11vw, 112px);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--bg-base);
+  clip-path: polygon(
+    50% 0%,
+    93% 18%,
+    93% 82%,
+    50% 100%,
+    7% 82%,
+    7% 18%
+  );
+}
+.essay-bio__portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+}
+.essay-bio__body { min-width: 0; }
+.essay-bio__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.essay-bio__name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  line-height: 1.2;
+  margin: 0.15rem 0 0.45rem;
+}
+/* Meta link: opts out of the canonical animated bar (see the prose-link rule). */
+.essay-bio__name a {
+  color: var(--text-primary);
+  text-decoration: none;
+  background-image: none;
+  padding-bottom: 0;
+}
+.essay-bio__name a:hover { color: var(--accent); }
+.essay-bio__text {
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+@media (max-width: 560px) {
+  .essay-bio { flex-direction: column; align-items: flex-start; }
+}
+
+/* FOOT ROW -- back link and freshness on ONE line, split by a three-pip
+   brand-gradient divider (the PixelDivider motif, held static at this size). */
+.essay-foot--tail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.essay-foot__divider {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+.essay-foot__pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+}
+/* Five pips MIRRORED around the middle: lightest at both ends, darkest in the
+   center. Reads as a centered ornament between the link and the date rather
+   than a ramp pointing at one of them. */
+.essay-foot__pip:nth-child(1),
+.essay-foot__pip:nth-child(5) { background: var(--grad-peak); }
+.essay-foot__pip:nth-child(2),
+.essay-foot__pip:nth-child(4) {
+  background: color-mix(in srgb, #ffffff 15%, var(--grad-mid));
+}
+.essay-foot__pip:nth-child(3) { background: var(--grad-deep); }
+
+/* Phone: the three-part row cannot hold one line, and wrapping strands the
+   pips mid-air against the right edge. Stack instead, left-aligned with the
+   rest of the page, with the pip run acting as the rule between the two. */
+@media (max-width: 560px) {
+  .essay-foot--tail {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-xs);
+  }
+  .essay-foot__divider {
+    flex: 0 0 auto;
+    justify-content: center;
+    padding-block: 2px;
+  }
+}
+
+/* Freshness line: visible "Last updated" (AEO signal), right of the divider. */
+.essay-foot__updated {
+  margin-bottom: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.essay-foot__back {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--accent);
+  text-decoration: none;
+}
+.essay-foot__back:hover { text-decoration: underline; }
+@media (max-width: 600px) {
+  /* Phone: a step down from the desktop 3xl, but bigger than the plain 2xl --
+     the essay title is the page's whole first impression. */
+  .essay-head__title { font-size: clamp(2.25rem, 1.7rem + 2.4vw, 2.75rem); }
 }
