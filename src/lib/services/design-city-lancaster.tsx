@@ -16,13 +16,13 @@ export const lancaster: Service = {
     "chadworks designs and builds custom websites for Lancaster, PA businesses, the Lancaster County city with a real tourism draw, an independent arts scene, and the farm country that surrounds it.",
 
   answer:
-    "If you run a business in Lancaster, PA, here is what you get: a custom website that works for both the visitor finding you for the first time and the local who returns, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before work starts. Lancaster is unusual: a city with a genuine arts scene and First Friday energy, sitting in the middle of farm and Amish country that pulls steady tourism. Your site has to land with a stranger planning a trip and a regular checking your hours, often on the same day.",
+    "If you run a business in Lancaster, PA, here is what you get: a custom website that works for both the visitor finding you for the first time and the local who returns, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Lancaster is unusual: a city with a genuine arts scene and First Friday energy, sitting in the middle of farm and Amish country that pulls steady tourism. Your site has to land with a stranger planning a trip and a regular checking your hours, often on the same day.",
 
   keyFactsHeading: "Lancaster web design, at a glance",
   keyFacts: [
     "Custom websites for Lancaster businesses, built for a Lancaster County city that draws real tourism, supports an independent arts scene, and anchors the surrounding farm country.",
     "Designed to work for two audiences at once: the out-of-town visitor discovering you and the local who already knows you, both usually on a phone.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
     "Local or remote both work: I am based in Greater Philadelphia and run Lancaster County projects comfortably remote, with in-person available when it helps.",
   ],
 
@@ -85,10 +85,10 @@ export const lancaster: Service = {
 
   price: {
     heading: "What a Lancaster site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Lancaster business runs $5,200 to $8,200, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that wins both visitors and locals and that you fully own, not a template you rent by the month.",
+      "A custom site for a Lancaster business runs $5,000 to $10,000, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that wins both visitors and locals and that you fully own, not a template you rent by the month.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const lancaster: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
     },
     {
       q: "Can my site serve both tourists and regulars?",
@@ -141,6 +141,6 @@ export const lancaster: Service = {
   meta: {
     title: "Website Design in Lancaster, PA | chadworks",
     description:
-      "Custom website design for Lancaster, PA businesses in the Lancaster County city, built to win both tourists and locals across the arts scene and farm country. Fast, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Lancaster, PA businesses in the Lancaster County city, built to win both tourists and locals across the arts scene and farm country. Fast, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };

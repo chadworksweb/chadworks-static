@@ -16,7 +16,7 @@ export const treeCompanies: Service = {
     "chadworks builds tree service websites that win the storm-response and emergency-removal call, with a page for every town you cover, real crew and crane-truck photos, and tap-to-call one thumb-press away.",
 
   answer:
-    "When a limb is through a roof or a trunk is across the driveway, the homeowner is on a phone, scared, and calling the first tree company that looks real and answers fast. I build the site that wins that call. I'm Chad, and I've been getting trade businesses found online since the MySpace days. Your tree service site loads fast on a phone, puts tap-to-call in the header on every page, leads with your insurance and certifications, and gets a real page for each town you serve so you rank where the storm actually hit. Custom builds run $5,200 to $8,200 depending on scope, quoted up front before any work starts.",
+    "When a limb is through a roof or a trunk is across the driveway, the homeowner is on a phone, scared, and calling the first tree company that looks real and answers fast. I build the site that wins that call. I'm Chad, and I've been getting trade businesses found online since the MySpace days. Your tree service site loads fast on a phone, puts tap-to-call in the header on every page, leads with your insurance and certifications, and gets a real page for each town you serve so you rank where the storm actually hit. Custom builds run $5,000 to $10,000 depending on scope, quoted up front before any work starts.",
 
   keyFactsHeading: "Tree service web design, at a glance",
   keyFacts: [
@@ -106,7 +106,7 @@ export const treeCompanies: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,200 - $8,200",
+    figure: "$5,000 - $10,000",
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing is based on scope, not hours. A focused conversion site lands near the low end of the range. Add a real photo gallery of your crew and equipment, intake forms, or a page for each town you cover and the number moves up. You see the full quote before we start, and that is the number on the final invoice. When you need something later, you email me and I bill the work.",
@@ -147,7 +147,7 @@ export const treeCompanies: Service = {
     },
     {
       q: "Why do you show pricing when most agencies don't?",
-      a: "Because you should know roughly what you are going to spend before we talk. The range here is honest: $5,200 to $8,200 based on scope, quoted flat up front. Most agencies hide pricing so they can size the quote to what they think you will pay.",
+      a: "Because you should know roughly what you are going to spend before we talk. The range here is honest: $5,000 to $10,000 based on scope, quoted flat up front. Most agencies hide pricing so they can size the quote to what they think you will pay.",
     },
   ],
 
@@ -162,6 +162,6 @@ export const treeCompanies: Service = {
   meta: {
     title: "Website Design for Tree Companies | chadworks",
     description:
-      "Tree service websites built to win the storm-response and emergency-removal call: fast on a phone, tap-to-call in the header, insurance and certifications up top, and a real page for every town you cover. Custom builds run $5,200 to $8,200, quoted up front.",
+      "Tree service websites built to win the storm-response and emergency-removal call: fast on a phone, tap-to-call in the header, insurance and certifications up top, and a real page for every town you cover. Custom builds run $5,000 to $10,000, quoted up front.",
   },
 };

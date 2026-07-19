@@ -16,13 +16,13 @@ export const pottstown: Service = {
     "chadworks designs and builds custom websites for Pottstown, PA businesses, the Schuylkill River town on the Montgomery and Chester county border with a manufacturing heritage and a revitalizing downtown.",
 
   answer:
-    "If you run a business in Pottstown, PA, here is what you get: a custom website that pulls real local customers and gives you an edge as the downtown comes back, fast on a phone and tuned so Google and the AI answer engines find you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before work starts. Pottstown is a working town on the Schuylkill with deep manufacturing roots and a High Street that is steadily revitalizing. The businesses investing in their presence now are the ones that will own that comeback, and a real website is the cheapest way to plant that flag.",
+    "If you run a business in Pottstown, PA, here is what you get: a custom website that pulls real local customers and gives you an edge as the downtown comes back, fast on a phone and tuned so Google and the AI answer engines find you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Pottstown is a working town on the Schuylkill with deep manufacturing roots and a High Street that is steadily revitalizing. The businesses investing in their presence now are the ones that will own that comeback, and a real website is the cheapest way to plant that flag.",
 
   keyFactsHeading: "Pottstown web design, at a glance",
   keyFacts: [
     "Custom websites for Pottstown businesses, built for a Schuylkill River town on the Montgomery and Chester border with a manufacturing heritage and a downtown on the upswing.",
     "Designed to give early movers an edge while the High Street revitalizes, and fast on a phone so nearby customers actually find you.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. Honest about ROI for a value-minded market, no template rent.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. Honest about ROI for a value-minded market, no template rent.",
     "Local or remote both work: I am based in Greater Philadelphia and run Pottstown projects comfortably remote, with in-person available when useful.",
   ],
 
@@ -85,10 +85,10 @@ export const pottstown: Service = {
 
   price: {
     heading: "What a Pottstown site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Pottstown business runs $5,200 to $8,200, depending on page count and how much custom work the project needs. You get the exact figure before any work begins. I know this is a value-minded market, so I am straight with you about what the site should return: this is a real investment in being findable, and a site you fully own, not a monthly template rental.",
+      "A custom site for a Pottstown business runs $5,000 to $10,000, depending on page count and how much custom work the project needs. You get the exact figure before any work begins. I know this is a value-minded market, so I am straight with you about what the site should return: this is a real investment in being findable, and a site you fully own, not a monthly template rental.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const pottstown: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
     },
     {
       q: "Is a website worth it for a business like mine in Pottstown?",
@@ -141,6 +141,6 @@ export const pottstown: Service = {
   meta: {
     title: "Website Design in Pottstown, PA | chadworks",
     description:
-      "Custom website design for Pottstown, PA businesses on the Schuylkill at the Montgomery and Chester border, built to win the downtown comeback. Fast, honest pricing, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Pottstown, PA businesses on the Schuylkill at the Montgomery and Chester border, built to win the downtown comeback. Fast, honest pricing, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };

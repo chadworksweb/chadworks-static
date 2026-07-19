@@ -16,13 +16,13 @@ export const collegeville: Service = {
     "chadworks designs and builds custom websites for Collegeville, PA businesses, the growing Montgomery County suburb anchored by Ursinus College and the Providence Town Center.",
 
   answer:
-    "If you run a business in Collegeville, PA, here is what you get: a custom website built to reach a fast-growing suburb of new residents and students, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before work starts. Collegeville keeps growing: new families moving in around the Providence Town Center, and a steady churn of Ursinus College students and parents. These are people who do not have your business memorized yet. They search for what they need, and your site is how they discover you rather than the chain down the road.",
+    "If you run a business in Collegeville, PA, here is what you get: a custom website built to reach a fast-growing suburb of new residents and students, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Collegeville keeps growing: new families moving in around the Providence Town Center, and a steady churn of Ursinus College students and parents. These are people who do not have your business memorized yet. They search for what they need, and your site is how they discover you rather than the chain down the road.",
 
   keyFactsHeading: "Collegeville web design, at a glance",
   keyFacts: [
     "Custom websites for Collegeville businesses, built for a growing Montgomery County suburb anchored by Ursinus College and the Providence Town Center.",
     "Designed to reach newcomers, new residents and a revolving Ursinus crowd, who search before they buy because they have no local habits yet.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
     "Local or remote both work: I am based in Greater Philadelphia, an easy reach to Collegeville, and I run plenty of projects fully remote.",
   ],
 
@@ -85,10 +85,10 @@ export const collegeville: Service = {
 
   price: {
     heading: "What a Collegeville site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Collegeville business runs $5,200 to $8,200, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that wins newcomers from the chains and that you fully own, not a template you rent month to month.",
+      "A custom site for a Collegeville business runs $5,000 to $10,000, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that wins newcomers from the chains and that you fully own, not a template you rent month to month.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const collegeville: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
     },
     {
       q: "Can a website help me compete with the chains near the Town Center?",
@@ -141,6 +141,6 @@ export const collegeville: Service = {
   meta: {
     title: "Website Design in Collegeville, PA | chadworks",
     description:
-      "Custom website design for Collegeville, PA businesses in the growing Montgomery County suburb near Ursinus College and the Providence Town Center. Fast, mobile-first, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Collegeville, PA businesses in the growing Montgomery County suburb near Ursinus College and the Providence Town Center. Fast, mobile-first, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };

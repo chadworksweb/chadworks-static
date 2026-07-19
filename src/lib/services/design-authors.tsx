@@ -16,7 +16,7 @@ export const authors: Service = {
     "chadworks builds author sites that drive book launches, send readers straight to every retailer, grow a mailing list with a reader magnet, and keep your series and backlist easy to navigate.",
 
   answer:
-    "An author site has two jobs: sell the book a reader just heard about, and turn that reader into a subscriber you can reach the day the next one drops. I build for both. I'm Chad, and I've been designing and shipping sites since the MySpace days. Your author site gets a focused launch page for the current title, buy-links to Amazon, Barnes and Noble, Bookshop, and your own store, a mailing list fueled by a reader magnet so your list grows on its own, and a clean home for your series and backlist so readers binge in order. Custom builds run $5,200 to $8,200 depending on scope, quoted up front before any work begins.",
+    "An author site has two jobs: sell the book a reader just heard about, and turn that reader into a subscriber you can reach the day the next one drops. I build for both. I'm Chad, and I've been designing and shipping sites since the MySpace days. Your author site gets a focused launch page for the current title, buy-links to Amazon, Barnes and Noble, Bookshop, and your own store, a mailing list fueled by a reader magnet so your list grows on its own, and a clean home for your series and backlist so readers binge in order. Custom builds run $5,000 to $10,000 depending on scope, quoted up front before any work begins.",
 
   keyFactsHeading: "Author web design, at a glance",
   keyFacts: [
@@ -106,7 +106,7 @@ export const authors: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,200 - $8,200",
+    figure: "$5,000 - $10,000",
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing is based on scope, not hours. A focused site with a launch page, buy-links, and a mailing list lands near the low end of the range. Add a reader-magnet delivery flow, a full series and backlist catalog, or per-book landing pages and the number moves up. You see the full quote before we start, and that is the number on the final invoice. When the next book is ready, you email me and I bill the new launch page.",
@@ -162,6 +162,6 @@ export const authors: Service = {
   meta: {
     title: "Website Design for Authors | chadworks",
     description:
-      "Author websites built to sell the book and grow the list: launch pages, retailer buy-links, a mailing list driven by a reader magnet, organized series and backlist, and events. Custom builds run $5,200 to $8,200, quoted up front.",
+      "Author websites built to sell the book and grow the list: launch pages, retailer buy-links, a mailing list driven by a reader magnet, organized series and backlist, and events. Custom builds run $5,000 to $10,000, quoted up front.",
   },
 };

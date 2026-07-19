@@ -1,5 +1,5 @@
 // Route: /rates/ -- standalone page. Value-based pricing with the math
-// showing. Real numbers only ($5.25/min, $3,200 baseline, $6,200 typical, $550
+// showing. Real numbers only ($5.25/min, $3,200 baseline, $5,000-$10,000 typical, $550
 // every 6 months for WordPress care). Signature moment (CWS-CREATIVE-ARSENAL):
 // the glass price panel + scanning border + a show-the-math ledger. Copy in
 // Chad's public voice, big-ticket posture (never apologize for the number).
@@ -29,7 +29,7 @@ const RATE_EXAMPLES: { task: string; time: string }[] = [
 const PAGE_URL = `${SITE_URL}/rates/`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
-  "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land near $6,200. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
+  "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land between $5,000 and $10,000. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
 
 export const metadata: Metadata = {
   title: TITLE,

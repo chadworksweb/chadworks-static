@@ -151,7 +151,7 @@ export const buildYourVision: Service = {
     // PROMPT: pricing posture in Chad's voice; numbers live on the rates page.
     body: prompt(
       "Ambitious-build pricing posture",
-      "State it plainly and unapologetically in Chad's voice: building something original is real work and it is priced like real work, see the rates page for the actual numbers ($315/hr, $3,200 baseline, $6,200 target average per the IA). Reframe 'we are not for strict budgets' as a feature, the same posture as the rates page: the people who get the most from this are the ones who care more about the thing being right than about it being cheap. Be honest that if the budget is tight, this probably is not the page for them, and point them to the lighter Websites options.",
+      "State it plainly and unapologetically in Chad's voice: building something original is real work and it is priced like real work, see the rates page for the actual numbers ($315/hr, $3,200 baseline, $5,000-$10,000 typical per the IA). Reframe 'we are not for strict budgets' as a feature, the same posture as the rates page: the people who get the most from this are the ones who care more about the thing being right than about it being cheap. Be honest that if the budget is tight, this probably is not the page for them, and point them to the lighter Websites options.",
     ),
   },
 

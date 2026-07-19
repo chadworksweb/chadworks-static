@@ -16,13 +16,13 @@ export const lansdale: Service = {
     "chadworks designs and builds custom websites for Lansdale, PA businesses, the Montgomery County rail-hub borough with a commuter flow and a growing brewery and small-business core.",
 
   answer:
-    "If you run a business in Lansdale, PA, here is what you get: a custom website built for how people in a commuter town actually search, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building websites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before anything starts. Lansdale is a SEPTA rail hub, so a big chunk of your potential customers move through town on a schedule: a quick errand before the train, a brewery stop after work, a weekend on Main Street. Your site has to catch people who are busy, on their phone, and deciding fast.",
+    "If you run a business in Lansdale, PA, here is what you get: a custom website built for how people in a commuter town actually search, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building websites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before anything starts. Lansdale is a SEPTA rail hub, so a big chunk of your potential customers move through town on a schedule: a quick errand before the train, a brewery stop after work, a weekend on Main Street. Your site has to catch people who are busy, on their phone, and deciding fast.",
 
   keyFactsHeading: "Lansdale web design, at a glance",
   keyFacts: [
     "Custom websites for Lansdale businesses, built for a Montgomery County rail hub where the SEPTA commuter flow, a growing brewery scene, and a downtown small-business core all overlap.",
     "Designed mobile-first for a busy, on-the-move audience: someone checking your hours from the platform or your menu on the walk over.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. No monthly template rent, no surprise invoices.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No monthly template rent, no surprise invoices.",
     "Local or remote both work: I am based in Greater Philadelphia, a short hop from Lansdale, and I run plenty of projects fully remote.",
   ],
 
@@ -85,10 +85,10 @@ export const lansdale: Service = {
 
   price: {
     heading: "What a Lansdale site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Lansdale business runs $5,200 to $8,200, depending on page count and how much custom design is involved. You get the exact figure before any work begins. This is a value-based build for a site that converts busy local searchers and that you fully own, not a template you rent month after month.",
+      "A custom site for a Lansdale business runs $5,000 to $10,000, depending on page count and how much custom design is involved. You get the exact figure before any work begins. This is a value-based build for a site that converts busy local searchers and that you fully own, not a template you rent month after month.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const lansdale: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template charge.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template charge.",
     },
     {
       q: "Why does load speed matter so much for my site?",
@@ -141,6 +141,6 @@ export const lansdale: Service = {
   meta: {
     title: "Website Design in Lansdale, PA | chadworks",
     description:
-      "Custom website design for Lansdale, PA businesses near the SEPTA rail hub and the downtown brewery scene. Fast, mobile-first, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Lansdale, PA businesses near the SEPTA rail hub and the downtown brewery scene. Fast, mobile-first, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };

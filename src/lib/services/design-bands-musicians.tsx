@@ -16,7 +16,7 @@ export const bandsMusicians: Service = {
     "chadworks builds artist sites that put tour dates, your EPK, streaming and merch links, and a mailing list signup in one fast home that loads instantly on a fan's phone at a show.",
 
   answer:
-    "A fan at your show pulls out a phone, taps your name, and decides in seconds whether to follow you home. I build the site that turns that moment into a mailing list signup, a stream, or a merch sale. I'm Chad, I've built and shipped sites since the MySpace days, and I make music too, so I get the difference between a press kit and a poster. Your artist site loads fast on a phone, keeps tour dates current, links straight to Spotify, Apple Music, Bandcamp, and your merch, and captures emails so you own your audience instead of renting it from an algorithm. Custom builds run $5,200 to $8,200 depending on scope, quoted up front.",
+    "A fan at your show pulls out a phone, taps your name, and decides in seconds whether to follow you home. I build the site that turns that moment into a mailing list signup, a stream, or a merch sale. I'm Chad, I've built and shipped sites since the MySpace days, and I make music too, so I get the difference between a press kit and a poster. Your artist site loads fast on a phone, keeps tour dates current, links straight to Spotify, Apple Music, Bandcamp, and your merch, and captures emails so you own your audience instead of renting it from an algorithm. Custom builds run $5,000 to $10,000 depending on scope, quoted up front.",
 
   keyFactsHeading: "Artist web design, at a glance",
   keyFacts: [
@@ -103,7 +103,7 @@ export const bandsMusicians: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,200 - $8,200",
+    figure: "$5,000 - $10,000",
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing is based on scope, not hours. A focused site with tour dates, streaming links, and a mailing list lands near the low end of the range. Add a full EPK section, a merch store integration, or per-release landing pages and the number moves up. You see the full quote before we start, and that is the number on the final invoice. When you need a new release page later, you email me and I bill the work.",
@@ -159,6 +159,6 @@ export const bandsMusicians: Service = {
   meta: {
     title: "Website Design for Bands and Musicians | chadworks",
     description:
-      "Artist websites built for the fan at the show: tour dates, a real EPK, streaming and merch links, and a mailing list signup, all fast on a phone. Built by a developer who makes music. Custom builds run $5,200 to $8,200, quoted up front.",
+      "Artist websites built for the fan at the show: tour dates, a real EPK, streaming and merch links, and a mailing list signup, all fast on a phone. Built by a developer who makes music. Custom builds run $5,000 to $10,000, quoted up front.",
   },
 };

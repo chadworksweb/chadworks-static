@@ -16,13 +16,13 @@ export const phoenixville: Service = {
     "chadworks designs and builds custom websites for Phoenixville, PA businesses, the revitalized Chester County steel town whose Bridge Street is now a magnet for breweries, arts, and the Firebird Festival.",
 
   answer:
-    "If you run a business in Phoenixville, PA, here is what you get: a custom website with the personality to fit a town that reinvented itself, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before work starts. Phoenixville went from a shuttered steel town to one of the most alive main streets around: Bridge Street breweries, the Colonial Theatre, the foundry, and the Firebird Festival burning every December. The crowd this draws expects character. A generic site reads as out of step with the place.",
+    "If you run a business in Phoenixville, PA, here is what you get: a custom website with the personality to fit a town that reinvented itself, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Phoenixville went from a shuttered steel town to one of the most alive main streets around: Bridge Street breweries, the Colonial Theatre, the foundry, and the Firebird Festival burning every December. The crowd this draws expects character. A generic site reads as out of step with the place.",
 
   keyFactsHeading: "Phoenixville web design, at a glance",
   keyFacts: [
     "Custom websites for Phoenixville businesses, built for a revitalized Chester County steel town whose Bridge Street now runs on breweries, arts, the Colonial Theatre, and the Firebird Festival.",
     "Designed with real character, because the crowd Phoenixville draws expects personality and a generic template reads as a poor fit for the town.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
     "Local or remote both work: I am based in Greater Philadelphia, an easy reach to Chester County, and I run plenty of projects fully remote.",
   ],
 
@@ -85,10 +85,10 @@ export const phoenixville: Service = {
 
   price: {
     heading: "What a Phoenixville site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Phoenixville business runs $5,200 to $8,200, depending on page count and how much custom design the project calls for. You get the exact figure before any work begins. This is a value-based build for a site with genuine character that fits the town and that you fully own, not a template you rent month to month.",
+      "A custom site for a Phoenixville business runs $5,000 to $10,000, depending on page count and how much custom design the project calls for. You get the exact figure before any work begins. This is a value-based build for a site with genuine character that fits the town and that you fully own, not a template you rent month to month.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const phoenixville: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
     },
     {
       q: "Why does character matter so much for a Phoenixville site?",
@@ -141,6 +141,6 @@ export const phoenixville: Service = {
   meta: {
     title: "Website Design in Phoenixville, PA | chadworks",
     description:
-      "Custom website design for Phoenixville, PA businesses in the revitalized Chester County steel town, from Bridge Street breweries to the arts and foundry scene. Distinctive, fast, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Phoenixville, PA businesses in the revitalized Chester County steel town, from Bridge Street breweries to the arts and foundry scene. Distinctive, fast, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };
