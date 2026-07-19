@@ -6,7 +6,7 @@ import ServiceTemplate from "@/components/ServiceTemplate";
 import { webDesign as service } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
-import { ProcessCapsule, PathsCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
+import { ProcessCapsule, PathsCapsule, PortfolioShowcaseCapsule, AboutChadCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule, TestimonialsCapsule } from "@/components/capsules";
 import { PixelDivider } from "@/components/PixelDivider";
 
 export const metadata: Metadata = {
@@ -49,11 +49,23 @@ export default function WebDesignPage() {
             scheme="inverted"
           />
         ),
-        // The tenets moved to /about/ on 2026-07-17 (Chad's call): they are
-        // about how chadworks operates, not how a website gets designed. Held
-        // to null so the template does not fall back to the default checklist
-        // variant, which would put a weaker copy of them back on this page.
-        assurance: null,
+        // "What clients say" moves down to sit between the FAQs and the contact
+        // section (Chad, 2026-07-19): the proof lands last, once the questions
+        // are answered and right as the ask arrives.
+        //
+        // The canonical slot order is fixed, and `assurance` is the only slot
+        // between `faq` and `nextSteps`. It is empty on this page anyway (the
+        // tenets moved to /about/ on 2026-07-17, Chad's call, and it was held at
+        // null so the template could not fall back to the default checklist and
+        // put a weaker copy of them back here), so the testimonials ride in it
+        // and the real testimonials slot is emptied.
+        testimonials: null,
+        assurance: (
+          <TestimonialsCapsule
+            testimonials={service.testimonials!}
+            className="cw-wd-testimonials"
+          />
+        ),
         // Platform Options run as horizontal lanes here (Chad, 2026-07-17). The
         // card grid leaves the fourth platform orphaned on a second row, and
         // these four are a sequence to read down rather than tiles to compare.
@@ -75,16 +87,26 @@ export default function WebDesignPage() {
         portfolio: <PortfolioShowcaseCapsule archiveHeading="Website Design Showcase" />,
         // Use the shared homepage About Chad block, but keep this page's own
         // "professional web designer" photo caption.
+        // `cw-wd-made` tightens the top padding ONLY here, closing the gap under
+        // the portfolio showcase above it (Chad, 2026-07-19). The class is
+        // page-scoped on purpose: the same block renders on the homepage and
+        // keeps the standard rhythm there.
         made: (
           <AboutChadCapsule
             captionMain="Don't worry, I'm a professional."
             captionSub="(Web designer.)"
+            className="cw-wd-made"
           />
         ),
-        // Swap the page-specific price section for the shared homepage rates band.
-        price: <RatesCapsule />,
-        // Swap the page-specific fit section for the shared homepage one.
-        qualification: <FitCapsule />,
+        // Both slots take the shared homepage bands instead of the
+        // page-specific sections, and they are placed CROSSED on purpose
+        // (Chad, 2026-07-19): fit reads before rates now, so the page settles
+        // whether we should work together before it talks about money. The
+        // canonical slot order is [... price, qualification ...] and cannot be
+        // reordered per page, so the swap is done by trading contents, the same
+        // trick the nextSteps/cta pair below uses.
+        price: <FitCapsule />,
+        qualification: <RatesCapsule />,
         // Contact/CTA + "what happens after" get reordered here. The canonical
         // slot order is [... nextSteps, cta], so to render the contact section
         // FIRST and "what happens after" AFTER it, we place the shared homepage

@@ -11,9 +11,12 @@ export type MadeByCapsuleProps = {
   // page). "split": header moves into the right copy column, the row top-aligns,
   // and the left photo column sticks while the copy scrolls past it.
   variant?: "stacked" | "split";
+  // Per-instance hook, appended last so one placement can be tuned without
+  // touching the block everywhere else it renders.
+  className?: string;
 };
 
-export function MadeByCapsule({ made, variant = "stacked" }: MadeByCapsuleProps) {
+export function MadeByCapsule({ made, variant = "stacked", className }: MadeByCapsuleProps) {
   const split = variant === "split";
   const header = (
     <>
@@ -22,7 +25,13 @@ export function MadeByCapsule({ made, variant = "stacked" }: MadeByCapsuleProps)
     </>
   );
   return (
-    <SectionShell className={"svc-block svc-made" + (split ? " svc-made--split" : "")}>
+    <SectionShell
+      className={
+        "svc-block svc-made" +
+        (split ? " svc-made--split" : "") +
+        (className ? " " + className : "")
+      }
+    >
       {!split && header}
       <div className="svc-made__grid">
         <div className="svc-made__photo">

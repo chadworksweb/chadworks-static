@@ -4821,6 +4821,51 @@ p, li, dd, figcaption { text-wrap: pretty; }
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.01em;
 }
+/* ---- /web-design/ per-instance spacing (Chad, 2026-07-19) ----------------
+   Both classes are passed from src/app/web-design/page.tsx and exist nowhere
+   else, so the shared capsules keep the standard rhythm on every other page.
+   Two classes beat the base `.section` single-class rule on specificity. */
+
+/* The testimonials band sits under the dark FAQ now, and the full section pad
+   on top read as a hole between them. */
+.section.cw-wd-testimonials {
+  padding-top: calc(var(--section-pad-y) * 0.5);
+}
+
+/* Closes the gap between the portfolio showcase and the About Chad block. */
+.section.cw-wd-made {
+  padding-top: calc(var(--section-pad-y) * 0.35);
+}
+
+/* Inclusions list on the cost calculator. Full width, two columns once there
+   is room, so seven items read as one block rather than a long thin scroll.
+   Borrows the "+" marker from .svc-qual__col--fit without inheriting that
+   component's two-column shell. */
+.cw-included {
+  margin: var(--space-lg) 0 var(--space-md);
+  display: grid;
+  gap: var(--space-xs) var(--space-lg);
+  list-style: none;
+  padding: 0;
+}
+@media (min-width: 760px) {
+  .cw-included { grid-template-columns: 1fr 1fr; }
+}
+.cw-included li {
+  position: relative;
+  padding-left: var(--space-md);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+.cw-included li::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  color: var(--accent-teal);
+  font-weight: 700;
+}
+
 .rates-ledger__note {
   grid-column: 1 / -1;
   margin: 0.5rem 0 0;

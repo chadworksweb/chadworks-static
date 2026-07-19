@@ -3,14 +3,18 @@
 import type { Service } from "@/lib/service";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
+import { cx } from "@/lib/capsule";
 
 export type TestimonialsCapsuleProps = {
   testimonials: NonNullable<Service["testimonials"]>;
+  // Per-instance hook. Appended to the section classes so ONE placement can be
+  // tuned (spacing, usually) without moving the band everywhere it renders.
+  className?: string;
 };
 
-export function TestimonialsCapsule({ testimonials }: TestimonialsCapsuleProps) {
+export function TestimonialsCapsule({ testimonials, className }: TestimonialsCapsuleProps) {
   return (
-    <SectionShell full className="svc-testimonials-band">
+    <SectionShell full className={cx("svc-testimonials-band", className)}>
       <h2 className="svc-block__heading">{testimonials.heading}</h2>
       <ul className="svc-testimonials">
         {testimonials.items.map((t, i) => (
