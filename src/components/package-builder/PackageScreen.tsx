@@ -906,6 +906,7 @@ export function PackageScreen({
       proj: U(lineProg, "uProj"), view: U(lineProg, "uView"),
       model: U(lineProg, "uModel"), col: U(lineProg, "uCol"),
       alpha: U(lineProg, "uAlpha"),
+      yFade: U(lineProg, "uYFade"), yHalf: U(lineProg, "uYHalf"),
     };
 
     // The icosahedron edge buffer: positions only, drawn as GL_LINES. Its own
@@ -938,7 +939,7 @@ export function PackageScreen({
     const brushTex = stubTex();
     {
       const cvs = document.createElement("canvas");
-      const W = 256, H = 64;
+      const W = 256, H = 128;
       cvs.width = W; cvs.height = H;
       const ctx = cvs.getContext("2d");
       if (ctx) {
@@ -946,16 +947,24 @@ export function PackageScreen({
         // Opaque at the right, gone at the left: the stroke's own length fade.
         const hg = ctx.createLinearGradient(0, 0, W, 0);
         hg.addColorStop(0, "rgba(255,255,255,0)");
-        hg.addColorStop(0.55, "rgba(255,255,255,0.5)");
+        hg.addColorStop(0.32, "rgba(255,255,255,0.5)");
+        hg.addColorStop(0.68, "rgba(255,255,255,0.92)"); // bright well before the tucked-in end
         hg.addColorStop(1, "rgba(255,255,255,1)");
         ctx.fillStyle = hg;
         ctx.fillRect(0, 0, W, H);
-        // Feather the top and bottom to nothing so the stroke has no hard edge.
+        // Vertical profile of a LIGHT STREAK, not a flat band: a thin bright
+        // core at the centre with a soft glow falling off to nothing at the
+        // edges. When the quad is drawn a few times taller than the core, the
+        // core reads as a fine luminous line and the wings as its halo.
         ctx.globalCompositeOperation = "destination-in";
         const vg = ctx.createLinearGradient(0, 0, 0, H);
-        vg.addColorStop(0, "rgba(0,0,0,0)");
-        vg.addColorStop(0.5, "rgba(0,0,0,1)");
-        vg.addColorStop(1, "rgba(0,0,0,0)");
+        vg.addColorStop(0.0, "rgba(0,0,0,0)");
+        vg.addColorStop(0.2, "rgba(0,0,0,0.2)"); // glow wing
+        vg.addColorStop(0.38, "rgba(0,0,0,0.82)");
+        vg.addColorStop(0.5, "rgba(0,0,0,1)"); // broad bright core -> a thick line
+        vg.addColorStop(0.62, "rgba(0,0,0,0.82)");
+        vg.addColorStop(0.8, "rgba(0,0,0,0.2)");
+        vg.addColorStop(1.0, "rgba(0,0,0,0)");
         ctx.fillStyle = vg;
         ctx.fillRect(0, 0, W, H);
         ctx.globalCompositeOperation = "source-over";
@@ -968,16 +977,51 @@ export function PackageScreen({
     // Lengths biased short (pow > 1) so a few reach far and most bank at the
     // edge, which builds the density falloff. `fy` spreads them over (and a
     // little past) the slab's height.
-    const STREAKS = Array.from({ length: 60 }, () => ({
-      fy: (Math.random() * 2 - 1) * 1.08,
-      rx: -0.02 + Math.random() * 0.08, // right end, at/just under the left edge
-      lenF: 0.18 + Math.pow(Math.random(), 1.7) * 0.82, // biased short
-      thF: 0.028 + Math.random() * 0.07, // thickness (soft, so it can be broad)
-      a: 0.16 + Math.random() * 0.46, // base opacity, kept low so they layer
-      rate: 0.06 + Math.random() * 0.2, // SLOW drift
-      ph: Math.random() * 6.283,
-      lenPh: Math.random() * 6.283,
-    }));
+    // Colour is a SELECTION of tones, not a continuous range (Chad, 2026-07-19):
+    // a few tones clustered around the brand purple, a few around pale-yellow
+    // light. Each streak picks one and gets only a hair of jitter, so the wake
+    // reads as a handful of coloured lights rather than a smear of every hue
+    // between them.
+    const WAKE_PURPLES: [number, number, number][] = [
+      [0.5, 0.33, 0.74], // brand violet
+      [0.41, 0.27, 0.67], // deeper
+      [0.63, 0.49, 0.87], // light lavender
+      [0.36, 0.31, 0.72], // indigo-violet
+    ];
+    // Warm streaks are pale-yellow ALMOST WHITE only (Chad, 2026-07-19): a
+    // cream, not a saturated yellow. It has to stay a touch warmer than pure
+    // white or it vanishes against the cool lavender stage -- the warmth is
+    // exactly what makes it read as light there.
+    const WAKE_YELLOWS: [number, number, number][] = [
+      [1.0, 0.96, 0.82],
+      [1.0, 0.97, 0.85],
+      [1.0, 0.95, 0.8],
+    ];
+    const pickCol = (arr: [number, number, number][]): [number, number, number] => {
+      const base = arr[Math.floor(Math.random() * arr.length)];
+      const j = () => (Math.random() * 2 - 1) * 0.02; // hair of jitter, not a range
+      return [
+        Math.min(1, Math.max(0, base[0] + j())),
+        Math.min(1, Math.max(0, base[1] + j())),
+        Math.min(1, Math.max(0, base[2] + j())),
+      ];
+    };
+    const STREAKS = Array.from({ length: 104 }, () => {
+      // A share of the field is warm light; the rest is purple. Warm streaks
+      // run a touch brighter so the yellow reads as light, not a tint.
+      const warm = Math.random() < 0.36;
+      return {
+        fy: Math.random() * 2 - 1, // normalized height, -1..1; scaled + inset below
+        lenF: 0.2 + Math.pow(Math.random(), 1.7) * 0.8, // biased short
+        thF: 0.05 + Math.random() * 0.11, // thick glow-band height
+        a: warm ? 0.4 + Math.random() * 0.48 : 0.22 + Math.random() * 0.5,
+        col: warm ? pickCol(WAKE_YELLOWS) : pickCol(WAKE_PURPLES),
+        warm,
+        rate: 0.06 + Math.random() * 0.2, // SLOW drift
+        ph: Math.random() * 6.283,
+        lenPh: Math.random() * 6.283,
+      };
+    });
 
     // --- sizing -------------------------------------------------------
     let DPR = 1;
@@ -1413,23 +1457,32 @@ export function PackageScreen({
         const leftEdge = -HW * cur.scale * 0.9;
         const vExtent = cur.heightHalf * cur.scale;
 
-        // (A) the soft body: a few flat cover copies at very low alpha, so the
-        // wake has an underlying smear the strokes sit in rather than floating
-        // as loose marks. Kept faint -- the strokes carry the read.
+        // (A) the EDGE BLEED: the slab's trailing edge dissolving into the
+        // wake instead of ending on a hard line (Chad, 2026-07-19). Flat violet
+        // copies of the cover shifted a SHORT way left and stacked densest at
+        // the edge -- the crisp slab covers their right, so what shows is a soft
+        // violet smear hugging the left edge that the streaks run out of. Short
+        // on purpose: this blurs the edge, it is not the long outline from
+        // before.
         gl.useProgram(lineProg);
         gl.uniformMatrix4fv(ul.proj, false, proj);
         gl.uniformMatrix4fv(ul.view, false, view);
         gl.uniform3f(ul.col, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+        // Fade the smear's top and bottom so the slab shape dissolves into the
+        // streaks vertically instead of trailing a hard-edged block.
+        gl.uniform1f(ul.yFade, 1);
+        gl.uniform1f(ul.yHalf, cur.heightHalf);
         gl.bindVertexArray(screenBuf.vao);
-        const BODY_N = 24;
-        const bodyLen = cur.pulse * 0.42;
-        for (let i = 1; i <= BODY_N; i++) {
-          const frac = i / BODY_N;
-          const ghost = Mat.mul(Mat.trans(-bodyLen * frac, 0, 0), model);
+        const EDGE_N = 18;
+        const edgeLen = cur.pulse * 0.17; // short: the edge blur, not an outline
+        for (let i = 1; i <= EDGE_N; i++) {
+          const frac = i / EDGE_N;
+          const ghost = Mat.mul(Mat.trans(-edgeLen * frac, 0, 0), model);
           gl.uniformMatrix4fv(ul.model, false, ghost);
-          gl.uniform1f(ul.alpha, 0.022 * cur.pulse * Math.pow(1 - frac, 1.3));
+          gl.uniform1f(ul.alpha, 0.05 * cur.pulse * Math.pow(1 - frac, 0.85));
           gl.drawArrays(gl.TRIANGLES, 0, screenCount);
         }
+        gl.uniform1f(ul.yFade, 0); // back to no fade for any later line pass
 
         // (B) the brush streaks: soft textured strokes over the body. Each is
         // opaque at the slab edge and fades to its tip; overlapping strokes of
@@ -1438,7 +1491,6 @@ export function PackageScreen({
         gl.useProgram(texProg);
         gl.uniformMatrix4fv(ut.proj, false, proj);
         gl.uniformMatrix4fv(ut.view, false, view);
-        gl.uniform3f(ut.tint, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
         gl.uniform2f(ut.uvScale, 1, 1);
         gl.uniform1f(ut.falloff, 0);
         gl.uniform1f(ut.breath, 1);
@@ -1448,18 +1500,30 @@ export function PackageScreen({
         gl.uniform1i(ut.tex, 0);
         gl.bindTexture(gl.TEXTURE_2D, brushTex);
         gl.bindVertexArray(quadBuf.vao);
-        const maxLen = 0.9 * cur.pulse;
+        const maxLen = 1.05 * cur.pulse;
         for (const s of STREAKS) {
           const lz = 0.6 + 0.4 * Math.sin(time * s.rate + s.lenPh);
           const len = maxLen * s.lenF * lz;
           if (len < 0.02) continue;
           const halfW = len * 0.5;
-          const cx = leftEdge + s.rx - halfW; // right edge tucked at the slab edge
-          const y = s.fy * vExtent;
+          // The origin (the streak's bright right end) must sit INSIDE the
+          // slab's silhouette so it is always covered. The slab only sways
+          // (no drift), so a fixed base inset clears that; the fy^2 term pushes
+          // top and bottom streaks deeper still, because the rounded corners
+          // and the Y-tilt curl the left edge rightward there -- which is
+          // exactly where a streak was poking out above the top before.
+          const y = s.fy * vExtent * 0.9;
+          const originX = leftEdge + 0.14 + 0.2 * s.fy * s.fy;
+          const cx = originX - halfW; // right edge = originX, tucked under the slab
           const m = Mat.mul(Mat.trans(cx, y, 0), Mat.scale(halfW, s.thF * 0.5, 1));
           gl.uniformMatrix4fv(ut.model, false, m);
           gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, m)));
-          const av = s.a * cur.pulse * (0.6 + 0.4 * Math.sin(time * s.rate * 0.83 + s.ph));
+          // The streak's chosen tone, straight from its bucket. Warm streaks
+          // get a brightness bump so the pale yellow reads as light.
+          gl.uniform3f(ut.tint, s.col[0], s.col[1], s.col[2]);
+          const av =
+            s.a * cur.pulse * (0.62 + 0.38 * Math.sin(time * s.rate * 0.83 + s.ph)) *
+            (s.warm ? 1.35 : 1.0);
           if (av <= 0.01) continue;
           gl.uniform1f(ut.alpha, av);
           gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);

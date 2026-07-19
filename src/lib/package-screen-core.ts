@@ -647,14 +647,31 @@ export const ICO_LINES: Float32Array = (() => {
 export const lineVert = `#version 300 es
 layout(location=0) in vec3 aPos;
 uniform mat4 uProj, uView, uModel;
-void main(){ gl_Position = uProj * uView * uModel * vec4(aPos, 1.0); }`;
+out float vLY; // local Y, so the fragment can fade the top and bottom
+void main(){ vLY = aPos.y; gl_Position = uProj * uView * uModel * vec4(aPos, 1.0); }`;
 
 export const lineFrag = `#version 300 es
 precision highp float;
+in float vLY;
 uniform vec3 uCol;
 uniform float uAlpha;
+// The motion wake's edge-bleed reuses this shader to smear the slab shape, but
+// that shape's flat top and bottom read as a hard-edged block. uYFade fades
+// alpha toward the top and bottom (normalized by uYHalf, the local half-height)
+// so the smear dissolves into the streaks instead of ending on a straight line.
+// Default 0 leaves every other line pass (the wireframes) untouched.
+uniform float uYFade;
+uniform float uYHalf;
 out vec4 frag;
-void main(){ frag = vec4(uCol * uAlpha, uAlpha); }`;
+void main(){
+  float f = 1.0;
+  if (uYFade > 0.5) {
+    float ny = abs(vLY) / max(uYHalf, 0.0001);
+    f = 1.0 - smoothstep(0.5, 1.0, ny);
+  }
+  float a = uAlpha * f;
+  frag = vec4(uCol * a, a);
+}`;
 
 // ---------------------------------------------------------------------
 // DEFAULTS -- this engine's own locked look. Not the gem's.
