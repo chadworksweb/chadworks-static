@@ -27,7 +27,12 @@
   --stage-inset: clamp(0.9rem, 2.4vh, 1.6rem);
   /* One token for the rail width: the canvas and the finish line both have to
      know where the rail ends, so it cannot be a magic number in three places. */
-  --rail-w: min(19rem, 22vw);
+  --rail-w: calc(min(19rem, 22vw) + 50px);
+  /* The caret column and the gap in front of it. Tokens because the slider's
+     number has to land in the SAME column as the header's number, and it can
+     only do that by reserving the exact width the caret takes out of the row. */
+  --caret-col: 0.7rem;
+  --head-gap: 0.6rem;
   /* The gutter between the viewport edge and the content column. The band
      bleeds, so `100%` here is the viewport. */
   --gutter: calc((100% - var(--site-width)) / 2);
@@ -138,6 +143,11 @@
   width: var(--rail-w);
   padding: 0.5rem;
   overflow-y: auto;
+  /* Hold the scrollbar's track ALWAYS, even when the rail is short enough not
+     to scroll. Without it the bar appears and vanishes as panels open and shut,
+     and every option row reflows by the bar's width each time. The gutter is
+     reserved up front so the content width is constant. */
+  scrollbar-gutter: stable;
   overscroll-behavior: contain;
   display: grid;
   gap: 0.3rem;
@@ -173,6 +183,16 @@
 /* ---- expand panels: one parameter each ---- */
 .param {
   border-bottom: 1px solid rgba(36, 57, 137, 0.1);
+  transition: background 0.2s ease;
+}
+
+/* The open panel wears the hover tint, a step darker: the same violet the head
+   picks up on hover, so "you are pointing at this" and "this is the one you
+   have open" read as one gesture at two strengths. It sits on the whole param,
+   not just the head, so the open block shades as a single region. Hovering an
+   open head still darkens further, since .head:hover composites over this. */
+.paramOpen {
+  background: rgba(128, 84, 188, 0.11);
 }
 
 .param:last-child {
@@ -184,8 +204,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.5rem 0.4rem;
+  gap: var(--head-gap);
+  /* Double the left inset: the header title stands in from the block's edge
+     rather than sitting flush on it. Right stays put so the value and caret
+     keep the column the slider's number is aligned to. */
+  padding: 0.5rem 0.4rem 0.5rem 0.8rem;
   background: none;
   border: none;
   color: inherit;
@@ -196,6 +219,22 @@
 
 .head:hover {
   background: rgba(128, 84, 188, 0.07);
+}
+
+/* The open header inverts instead of darkening: white plate, ruled in the violet
+   it used to be filled with. Against .paramOpen's tinted body the white reads as
+   the lifted, active row, and the rule keeps its edge without adding weight.
+   The border replaces .head's `border: none`, so the box grows 2px -- offset out
+   of the padding to hold the header's height steady against closed rows. */
+.paramOpen .head {
+  background: #fff;
+  border: 1px solid rgba(128, 84, 188, 0.19);
+  padding: calc(0.5rem - 1px) calc(0.4rem - 1px) calc(0.5rem - 1px) calc(0.8rem - 1px);
+}
+
+.paramOpen .head:hover {
+  background: rgba(128, 84, 188, 0.06);
+  border-color: rgba(128, 84, 188, 0.34);
 }
 
 /* Not `composes: micro` -- the header label is deliberately a step up from the
@@ -211,6 +250,7 @@
 
 .paramOpen .headLabel {
   opacity: 1;
+  font-weight: 700;
 }
 
 .headValue {
@@ -225,7 +265,7 @@
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.7rem;
   opacity: 0.45;
-  width: 0.7rem;
+  width: var(--caret-col);
   text-align: center;
   flex: none;
 }
@@ -257,9 +297,16 @@
   padding: 0 0.4rem;
 }
 
+/* Top padding sits HERE, not as a margin under the head: the head carries a
+   background now, and a margin would cut a pale stripe between it and the body
+   tint. Padding also has to live on the open state only -- the collapse animates
+   the row to 0fr, and a constant padding would leave a sliver behind when shut.
+   Same treatment as padding-bottom, so both ends breathe and both animate. */
 .bodyOpen .bodyInner {
+  padding-top: 0.6rem;
   padding-bottom: 0.75rem;
-  transition: padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .caret {
@@ -269,6 +316,9 @@
 @media (prefers-reduced-motion: reduce) {
   .body,
   .bodyInner,
+  /* .bodyOpen .bodyInner sets the padding transition and outranks a bare
+     .bodyInner selector, so it has to be named here or it keeps animating. */
+  .bodyOpen .bodyInner,
   .caret {
     transition: none;
   }
@@ -281,42 +331,79 @@
   margin: 0;
 }
 
-/* numbered chips -- the reference's "CHOOSE A CYMATICS 1 2 3 4 5" */
-.chips {
+/* Ordered option list. Was a row of bare numbered chips, where the option text
+   lived only in a tooltip -- the number told you nothing and the choice could
+   not be read without hovering. Every option now states itself, in rank order,
+   and the numeral survives only as a rank marker beside the words. */
+.opts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem;
+  flex-direction: column;
+  gap: 0.18rem;
 }
 
-.chip {
-  width: 1.65rem;
-  height: 1.65rem;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(36, 57, 137, 0.26);
-  background: rgba(255, 255, 255, 0.55);
+.optItem {
+  margin: 0;
+}
+
+.opt {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.36rem 0.5rem;
+  text-align: left;
+  border: 1px solid transparent;
+  border-left: 2px solid rgba(36, 57, 137, 0.18);
+  background: rgba(255, 255, 255, 0.4);
   color: #243989;
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.62rem;
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.3;
   cursor: pointer;
   transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
 }
 
-.chip:hover {
-  border-color: #8054bc;
+.opt:hover {
+  border-left-color: #8054bc;
+  background: rgba(128, 84, 188, 0.08);
 }
 
-.chipOn {
-  background: #8054bc;
-  border-color: #8054bc;
-  color: #fff;
+/* The rank marker: quiet by default so the words lead. */
+.optNum {
+  flex: none;
+  min-width: 0.85rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem;
+  color: rgba(36, 57, 137, 0.5);
+}
+
+.optText {
+  min-width: 0;
+}
+
+.optOn {
+  border-left-color: #8054bc;
+  background: rgba(128, 84, 188, 0.16);
+  color: #46256f;
+  font-weight: 600;
+}
+
+.optOn .optNum {
+  color: #8054bc;
 }
 
 /* count rows: a slim slider where a chip row would run too long */
+/* The row reserves the caret's column on the right, so the slider's number ends
+   on the same edge as the header's number directly above it rather than running
+   out into the space the caret occupies. */
 .count {
   display: flex;
   align-items: center;
   gap: 0.7rem;
+  padding-right: calc(var(--caret-col) + var(--head-gap));
 }
 
 .range {

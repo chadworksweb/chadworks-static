@@ -114,8 +114,8 @@ export const BASELINE: Scope = {
   mathDev: 0,
   // Branding and copy default to UNSET (-1): no chip selected, no plaque, no
   // gem, no copy lines -- the slab opens bare and each effect is a reveal once a
-  // chip is picked. `at()` clamps -1 to index 0 for pricing, so the quote reads
-  // as "nothing provided" (full branding to build, client copy) by default.
+  // chip is picked. `at()` bills -1 as 0, so an untouched builder reads the BASE
+  // headline and the first click is what moves the price.
   brandingDone: -1,
   content: -1,
   editability: 0,
@@ -145,7 +145,7 @@ export const PARAMS: Param[] = [
   {
     key: "pages",
     label: "Pages",
-    hint: "How many pages earn their place.",
+    hint: "Number of unique keystone pages, e.g. Home, About, Contact (not posts or products)",
     kind: "range",
     min: 1,
     max: 24,
@@ -163,7 +163,7 @@ export const PARAMS: Param[] = [
     label: "Visual ambition",
     hint: "How much of the page gets art direction.",
     kind: "steps",
-    options: ["Straightforward", "Considered", "Layered", "Art-directed", "The full chadworks"],
+    options: ["Straightforward", "Considered", "Layered", "Art-directed", "The (chad)works"],
   },
   {
     key: "mathDev",
@@ -242,8 +242,12 @@ export const PARAMS: Param[] = [
 // ---------------------------------------------------------------------
 // PRICING
 // ---------------------------------------------------------------------
+// UNSET (-1) adds nothing. Branding and copy open with no chip picked, and an
+// untouched builder has to read the BASE headline, so an unpicked ladder cannot
+// bill its first rung. Level 1 and unset look identical on the slab; they are
+// deliberately NOT identical on the ledger. Picking any chip starts charging.
 const at = (ladder: number[], i: number) =>
-  ladder[Math.max(0, Math.min(ladder.length - 1, Math.round(i)))];
+  i < 0 ? 0 : ladder[Math.min(ladder.length - 1, Math.round(i))];
 
 export type LedgerLine = { label: string; amount: number };
 
@@ -324,6 +328,7 @@ export type Channels = {
   plaque: number; // constant: the brand plaque panel, held at its level-2 state
   brandContent: number; // brandingDone level: the marks laid on the plaque
   copy: number; // content level: skeleton copy lines laid under the gem (0..3)
+  rimGlow: number; // top ambition step only: light sustained inside the bevel
   strata: number;
   spread: number;
   bevel: number;
@@ -351,6 +356,22 @@ const mix3 = (
 ];
 const norm = (v: number, min: number, max: number) =>
   Math.max(0, Math.min(1, (v - min) / (max - min)));
+
+// How far the brand plaque sits in from the cover's rim. It is PackageScreen's
+// OV_INSET, restated here because the bevel ladder has to know where the panel
+// edge is in order to finish against it. Keep the two in step: if the plaque is
+// re-inset, the top ambition step stops touching.
+const PLAQUE_INSET = 0.07;
+const BEVEL_MIN = 0.012; // the rim at "Straightforward": a hairline chamfer
+// Overshoot past the panel edge, so the bevel starts just UNDER the plaque
+// rather than exactly at it. Two things eat into a perfect meeting: the panel is
+// lifted off the cap to avoid z-fighting and then scaled back down to correct
+// its projection, which pulls its edge inboard a hair. Landing the bevel exactly
+// on PLAQUE_INSET therefore left a sliver of bare cap showing between the two --
+// and the cover's section rules run across that sliver, so the ridges peeked out
+// at the seam. Overshooting puts the panel edge over the start of the slope and
+// seals it shut.
+const BEVEL_SEAL = 0.005;
 
 // Brand anchors. These mirror the CSS color tokens; they are NOT imported from
 // the gem's core, on purpose (see package-screen-core's isolation note).
@@ -383,16 +404,29 @@ export function channels(s: Scope): Channels {
     // content level also lays skeleton "copy" lines under the gem: 1 line at the
     // first level up to 4 at "Every word".
     copy: s.content,
+    // The lit bevel belongs to the LAST ambition step alone. It is the reward
+    // for going all the way, so it does not ramp with ambitionT -- it is off at
+    // every other level and on at the top. The render loop eases the switch, so
+    // a hard 0/1 here still arrives as a slow fade rather than a snap.
+    rimGlow: s.ambition >= AMBITION.length - 1 ? 1 : 0,
     // Pages append thin leaves behind the cover: one leaf per page past the
     // first, so more pages grow a real, ridged page block toward the back.
     strata: Math.max(0, Math.round(s.pages) - 1),
     spread: 0.03 + norm(s.locales, 1, 6) * 0.03,
-    bevel: 0.012 + ambitionT * 0.075,
-    // Cover depth is now a constant: mathDev no longer drives the slab at all.
-    // Its visual moved OUT of the WebGL object to a DOM motherboard layer that
-    // plugs into the cover's left edge (see Motherboard.tsx), so the object
-    // keeps a fixed, modest cover thickness.
-    depth: 0.06,
+    // Ambition widens the cover's bevel until it CLOSES on the plaque: the top
+    // step lands the bevel exactly on PLAQUE_INSET, so the rim finishes its
+    // travel against the panel's edge instead of stalling short of it. The old
+    // 0.075 slope overshot that mark and then got clipped by buildScreen's
+    // halfDepth ceiling, which is why steps 4 and 5 rendered identically.
+    bevel: BEVEL_MIN + ambitionT * (PLAQUE_INSET + BEVEL_SEAL - BEVEL_MIN),
+    // Depth is a FUNCTION of the bevel, not a free constant. buildScreen's rim
+    // slopes at 45 degrees and it clamps the bevel to halfDepth * 0.9, so a thin
+    // cover silently caps how far the rim can travel. Holding the floor at the
+    // old 0.06 keeps the low steps exactly as they were and lets the cover
+    // thicken only where the wide bevel actually needs the room.
+    // (mathDev still does NOT drive the slab; its visual lives in the DOM
+    // motherboard layer that plugs into the cover's left edge.)
+    depth: Math.max(0.06, (BEVEL_MIN + ambitionT * (PLAQUE_INSET + BEVEL_SEAL - BEVEL_MIN)) / 0.9),
     grain: 0.5 * (1 - ambitionT), // low ambition reads rough; high reads polished
     // Tint is a constant now. Branding no longer dims the object: it always
     // reads fully lit (the old level-4 value), and the brand instead shows up

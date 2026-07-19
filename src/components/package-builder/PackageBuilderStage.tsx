@@ -123,21 +123,24 @@ export function PackageBuilderStage() {
                         <span className={s.countValue}>{v}</span>
                       </div>
                     ) : (
-                      <div className={s.chips} role="group" aria-label={p.label}>
+                      <ol className={s.opts} role="group" aria-label={p.label}>
                         {p.options?.map((opt, i) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
-                            aria-pressed={i === v}
-                            aria-label={`${p.label}: ${opt}`}
-                            title={opt}
-                            onClick={() => set(p.key, i)}
-                          >
-                            {i + 1}
-                          </button>
+                          <li key={opt} className={s.optItem}>
+                            <button
+                              type="button"
+                              className={`${s.opt}${i === v ? ` ${s.optOn}` : ""}`}
+                              aria-pressed={i === v}
+                              aria-label={`${p.label}: ${opt}`}
+                              onClick={() => set(p.key, i)}
+                            >
+                              <span className={s.optNum} aria-hidden="true">
+                                {i + 1}
+                              </span>
+                              <span className={s.optText}>{opt}</span>
+                            </button>
+                          </li>
                         ))}
-                      </div>
+                      </ol>
                     )}
                   </div>
                 </div>

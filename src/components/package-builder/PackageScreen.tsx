@@ -160,7 +160,12 @@ export function PackageScreen({
     // A small air gap lifts the whole panel off the cover face so its back cap
     // and bevel never sit coplanar with the front cap -- coplanar surfaces
     // z-fight and flicker as the object floats.
-    const PLAQUE_GAP = 0.012;
+    // Kept to the THINNEST lift that still separates the two surfaces. At the
+    // top ambition step the cover's bevel is tuned to climb exactly to the
+    // panel's edge, and any air under the panel reads as the plaque hovering
+    // clear of the rim it is supposed to be meeting -- the wider the bevel, the
+    // more that hover shows. This is a z-fight guard, not a design gap.
+    const PLAQUE_GAP = 0.003;
     const rivetBuf = mkVao();
     const rivetMesh = buildScreen(1, 1, 0.5, 0.34, 1); // a beveled disc
     upload(rivetBuf, rivetMesh);
@@ -355,6 +360,7 @@ export function PackageScreen({
       pulse: U(screenProg, "uPulse"), glow: U(screenProg, "uStrataGlow"),
       sections: U(screenProg, "uSections"), zap: U(screenProg, "uZap"),
       wipe: U(screenProg, "uWipe"), alpha: U(screenProg, "uAlpha"),
+      rimGlow: U(screenProg, "uRimGlow"), rimAll: U(screenProg, "uRimAll"),
     };
     // The plug body's energy program.
     const up = {
@@ -405,9 +411,17 @@ export function PackageScreen({
     // and again on each click of the plug. Not a loop. These live across frames
     // and are read by both the draw loop and the click handler below.
     let triggerT = -999; // draw-clock time of the last trigger
+    // Draw-clock time of the last CLICK, tracked apart from triggerT. The plug
+    // charges and zaps whenever level 5 comes on, but it only drives itself home
+    // when a person actually clicks it -- appearing already seated, or reseating
+    // itself every time the level is toggled, would read as an idle animation
+    // instead of a response.
+    let insertT = -999;
     let firedElectric = false; // did we fire the initial one-shot at level 5?
     let clickPulse = false; // set by the click handler, consumed next frame
     let lastElectric = false; // is the plug currently at level 5? (for the handler)
+    let plugHover = false; // pointer is over the plug AND the plug is clickable
+    let hoverAmt = 0; // eased plugHover: the lift that says "this is a control"
     const plugScreen = { x: -1, y: -1 }; // plug body centre in canvas px
 
     const reduce = prefersReducedMotion();
@@ -440,6 +454,10 @@ export function PackageScreen({
       cur.plaque = ease(cur.plaque, t.plaque, k);
       cur.brandContent = ease(cur.brandContent, t.brandContent, k);
       cur.copy = ease(cur.copy, t.copy, k);
+      // Eased at a QUARTER of the morph rate. Everything else on this object
+      // snaps to its new shape; the rim light has to arrive slowly or the
+      // sustain it is supposed to hold gets announced by a hard switch-on.
+      cur.rimGlow = ease(cur.rimGlow, t.rimGlow, k * 0.25);
       ease3(cur.tint, t.tint, k);
       ease3(cur.washA, t.washA, k);
       ease3(cur.washB, t.washB, k);
@@ -490,13 +508,27 @@ export function PackageScreen({
       const electricOn = Math.round(target.current.plug) >= 4;
       lastElectric = electricOn;
       if (electricOn && !firedElectric) { triggerT = time; firedElectric = true; }
-      if (!electricOn) firedElectric = false;
-      if (clickPulse) { triggerT = time; clickPulse = false; }
+      if (!electricOn) { firedElectric = false; insertT = -999; }
+      if (clickPulse) { triggerT = time; insertT = time; clickPulse = false; }
 
-      let plugCharge = 0, plugZap = 0, plugWipe = 0;
+      // Hover only means anything while the plug is clickable, which is level 5
+      // alone. Eased so the lift arrives as a swell rather than a switch.
+      hoverAmt = ease(hoverAmt, plugHover ? 1 : 0, Math.min(1, dt * 9));
+
+      let plugCharge = 0, plugZap = 0, plugWipe = 0, plugInsert = 0;
       if (electricOn) {
         const BUILD = 1.3, ZAP = 1.5; // zap runs long enough to cross the slab
         const dt = time - triggerT;
+        // Seating the plug. It drives IN fast on the click, holds home for the
+        // whole charge and discharge, and only backs out once the wipe has
+        // finished crossing the slab -- so the travel frames the event rather
+        // than competing with it. Measured from insertT, NOT triggerT: the
+        // charge and zap also run on the level-5 one-shot, but the seating is
+        // reserved for a real click.
+        const di = time - insertT;
+        const END = BUILD + ZAP, OUT = 0.42;
+        if (di >= 0 && di < END) plugInsert = smooth(0, 0.18, di);
+        else if (di >= END && di < END + OUT) plugInsert = 1 - smooth(END, END + OUT, di);
         if (dt >= 0 && dt < BUILD) {
           plugCharge = smooth(0, BUILD, dt); // energy winds up in the plug
         } else if (dt >= BUILD && dt < BUILD + ZAP) {
@@ -528,6 +560,8 @@ export function PackageScreen({
       gl.uniform1f(us.grain, cur.grain);
       gl.uniform1f(us.pulse, cur.pulse);
       gl.uniform1f(us.glow, 0);
+      gl.uniform1f(us.rimGlow, cur.rimGlow);
+      gl.uniform1f(us.rimAll, 0); // the cover lights its BEVEL only
       gl.uniform1f(us.alpha, 1); // solid; resets the glaze alpha each frame
       gl.uniform1f(us.zap, plugZap); // the plug's discharge hits the cover here
       gl.uniform1f(us.wipe, plugWipe); // ...as a wavefront sweeping across it
@@ -564,6 +598,11 @@ export function PackageScreen({
         gl.uniform1f(us.grain, 0);
         gl.uniform1f(us.sections, 0); // no dividers on the leaf edges
         gl.uniform1f(us.zap, 0);
+        // The page stack takes NO rim light. The lit cloud belongs to the cover's
+        // bezel alone; carrying it onto the leaves spread it across the whole
+        // stack, which is not what the effect is for.
+        gl.uniform1f(us.rimGlow, 0);
+        gl.uniform1f(us.rimAll, 0);
         gl.bindVertexArray(leafBuf.vao);
         const back = cur.depth + LEAF_HD; // first leaf sits just behind the cover
         for (let i = 0; i < count; i++) {
@@ -601,7 +640,12 @@ export function PackageScreen({
         const bodyHx = 0.07;
         const bodyHy = 0.05 + g * 0.018;
         const bodyHz = 0.045 + g * 0.02;
-        const bodyPx = LEFT - 0.1 - g * 0.01;
+        // Seating travel. Small on purpose: the plug should look like it took a
+        // firm push home, not like it launched itself at the slab. Moving the
+        // BODY is enough -- the pins are positioned off bodyPx, so they ride in
+        // with it and stay bridged the whole way.
+        const PLUG_TRAVEL = 0.045;
+        const bodyPx = LEFT - 0.1 - g * 0.01 + plugInsert * PLUG_TRAVEL;
         const bodyModel = Mat.mul(
           S,
           Mat.mul(Mat.trans(bodyPx, 0, 0), Mat.scale(bodyHx, bodyHy, bodyHz))
@@ -626,7 +670,11 @@ export function PackageScreen({
           gl.uniformMatrix4fv(up.model, false, bodyModel);
           gl.uniformMatrix3fv(up.normal, false, Mat.normalMat(bodyMv));
           gl.uniform1f(up.time, time);
-          gl.uniform1f(up.charge, plugCharge);
+          // Hover rides in on the CHARGE channel rather than a new uniform: the
+          // plug already reads "energy building" that way, so pointing at it
+          // previews the thing clicking it does. Capped low so a hovered plug
+          // never looks like a plug mid-charge.
+          gl.uniform1f(up.charge, Math.min(1, plugCharge + hoverAmt * 0.16));
           gl.uniform1f(up.zap, plugZap);
           gl.bindVertexArray(boxBuf.vao);
           gl.drawArrays(gl.TRIANGLES, 0, boxMesh.count);
@@ -641,6 +689,8 @@ export function PackageScreen({
         gl.uniform1f(us.grain, 0);
         gl.uniform1f(us.pulse, 0);
         gl.uniform1f(us.glow, 0);
+        gl.uniform1f(us.rimGlow, 0); // the plug is its own light, not the rim's
+        gl.uniform1f(us.rimAll, 0);
         gl.uniform1f(us.sections, 0);
         gl.uniform1f(us.zap, 0);
         gl.bindVertexArray(boxBuf.vao);
@@ -677,9 +727,9 @@ export function PackageScreen({
             COPPER[1] + (ELECTRIC[1] - COPPER[1]) * e,
             COPPER[2] + (ELECTRIC[2] - COPPER[2]) * e,
           ];
-          const b = 1 + (plugCharge * 0.4 + plugZap * 2.2);
+          const b = 1 + (plugCharge * 0.4 + plugZap * 2.2 + hoverAmt * 0.30);
           pinTint = [b, b, b * 0.92]; // a touch warm (yellow) in the bloom
-          pinSheen = 0.9;
+          pinSheen = 0.9 + hoverAmt * 0.08;
         }
 
         const pinHx = 0.1;
@@ -692,18 +742,16 @@ export function PackageScreen({
       }
 
       // --- the brand plaque: a riveted panel laminated over the front face ---
-      // The plaque is the shared CONTENT SURFACE: it fades in only once there is
-      // something to carry -- a branding mark (gem/wash) OR copy lines. At pure
-      // default (no branding, no copy picked) there is no plaque at all, so the
-      // slab reads bare and each effect is a reveal. Shares the cover's orient +
-      // scale so it floats with the slab.
-      // The plaque appears as soon as ANY branding chip is picked -- including
-      // level 1 ("Nothing yet"), which shows the bare plate with no mark yet --
-      // or once copy lines are present. Only the unset default (-1) has none.
-      const brandPicked = smooth(-0.6, -0.1, cur.brandContent); // chip 1+
-      const copyOn = smooth(-0.6, -0.1, cur.copy); // copy chip 1+ (border lines)
-      const appear = Math.max(brandPicked, copyOn);
-      if (appear > 0.01 && overlayCount > 0) {
+      // The plaque is the shared CONTENT SURFACE and it is ALWAYS present: the
+      // untouched default reads exactly like branding level 1 ("Nothing yet"),
+      // a bare riveted plate carrying no mark. Unset and level 1 are identical
+      // on the slab and differ only on the ledger -- unset bills nothing, level
+      // 1 bills the full branding build (see `at()` in package-builder.ts).
+      // What reveals on pick is the CONTENT laid on the plate: the gem and wash
+      // gate on branding, the skeleton lines on copy. Shares the cover's orient
+      // + scale so it floats with the slab.
+      const appear = 1;
+      if (overlayCount > 0) {
         const polish = 0; // reserved; the plate holds its calm dim tone
         const S = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
         const hh = cur.heightHalf;
@@ -717,6 +765,8 @@ export function PackageScreen({
         gl.uniform1f(us.grain, 0);
         gl.uniform1f(us.pulse, 0);
         gl.uniform1f(us.glow, 0);
+        gl.uniform1f(us.rimGlow, 0); // the plaque never carries it
+        gl.uniform1f(us.rimAll, 0);
         gl.uniform1f(us.zap, 0);
         // No own indents: the panel is a translucent glaze, so the cover's real
         // section grooves (and its wash) show THROUGH it.
@@ -733,9 +783,25 @@ export function PackageScreen({
           PLAQUE_DIM[2] + (PLAQUE_LIT[2] - PLAQUE_DIM[2]) * polish,
         ];
         const plateB = 1 + polish * 0.4;
+        // Perspective compensation. The plaque is laminated PROUD of the front
+        // cap (by OV_HD + PLAQUE_GAP, to keep the two off a coplanar z-fight),
+        // so it sits nearer the camera than the cap and projects proportionally
+        // larger. That was invisible while a wide purple frame absorbed it, but
+        // now that the top ambition step walks the bevel exactly onto the panel
+        // edge there is no slack left, and the surplus shows as the plaque --
+        // the top corner and its rivet first -- hanging off the rim.
+        // Scaling by the ratio of the two eye distances makes the lifted panel
+        // project at exactly the footprint it would have had lying on the cap,
+        // so it still meets the bevel and stops overhanging it.
+        const camDist = -SCREEN.camZ;
+        const liftScale = (z: number) => (camDist - z) / (camDist - faceZ);
+        const ovShrink = liftScale(faceZ + (OV_HD + PLAQUE_GAP) * appear);
         const ovModel = Mat.mul(
           S,
-          Mat.mul(Mat.trans(0, 0, faceZ + (OV_HD + PLAQUE_GAP) * appear), Mat.scale(appear, appear, appear))
+          Mat.mul(
+            Mat.trans(0, 0, faceZ + (OV_HD + PLAQUE_GAP) * appear),
+            Mat.scale(appear * ovShrink, appear * ovShrink, appear)
+          )
         );
         gl.uniformMatrix4fv(us.model, false, ovModel);
         gl.uniformMatrix3fv(us.normal, false, Mat.normalMat(Mat.mul(view, ovModel)));
@@ -757,9 +823,13 @@ export function PackageScreen({
         gl.uniform3f(us.tint, rivetB, rivetB, rivetB * 0.96);
         gl.uniform1f(us.sheen, 0.6 + polish * 0.35);
         gl.bindVertexArray(rivetBuf.vao);
-        const cx = Math.max(0.06, HW - OV_INSET - 0.055);
-        const cy = Math.max(0.04, hh - OV_INSET - 0.055);
         const rivetZ = faceZ + (PLAQUE_GAP + 2 * OV_HD + 0.006) * appear;
+        // The studs stand proud of the panel, so they need the SAME projection
+        // correction, against their own (greater) lift -- otherwise the corner
+        // rivet creeps outward off the plaque it is supposed to be pinning.
+        const rivetShrink = liftScale(rivetZ);
+        const cx = Math.max(0.06, HW - OV_INSET - 0.055) * rivetShrink;
+        const cy = Math.max(0.04, hh - OV_INSET - 0.055) * rivetShrink;
         const rr = 0.014 * appear;
         for (const sx of [-1, 1])
           for (const sy of [-1, 1]) {
@@ -973,10 +1043,15 @@ export function PackageScreen({
     };
     const onClick = (e: MouseEvent) => { if (lastElectric && near(e)) clickPulse = true; };
     const onMove = (e: MouseEvent) => {
-      canvas.style.cursor = lastElectric && near(e) ? "pointer" : "";
+      plugHover = lastElectric && near(e);
+      canvas.style.cursor = plugHover ? "pointer" : "";
     };
+    // The pointer can leave the canvas without a final move inside it, which
+    // would strand the plug lit. Clearing on leave is what keeps hover honest.
+    const onLeave = () => { plugHover = false; canvas.style.cursor = ""; };
     canvas.addEventListener("click", onClick);
     canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerleave", onLeave);
 
     return () => {
       stop();
@@ -986,6 +1061,7 @@ export function PackageScreen({
       host.removeEventListener("cw-repaint", repaint);
       canvas.removeEventListener("click", onClick);
       canvas.removeEventListener("pointermove", onMove);
+      canvas.removeEventListener("pointerleave", onLeave);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, []);

@@ -322,8 +322,22 @@ uniform vec3 uWashA, uWashB, uWashC;
 uniform vec3 uTint;
 uniform float uTime, uSheen, uSpectrum, uGrain, uPulse, uStrataGlow, uSections, uZap, uWipe;
 uniform float uAlpha; // overall opacity; 1 for solid parts, <1 for the brand glaze
+uniform float uRimGlow; // the top ambition step: light held inside the bevel
+// 1 = light the WHOLE surface, not just the 45-degree band. The cover keeps the
+// band (its front cap must stay clean under the plaque); the page leaves behind
+// it show only a thin edge-on sliver of cap, and masking that sliver out is what
+// left a flat unlit segment down the left of the stack.
+uniform float uRimAll;
 out vec4 frag;
 ${COMMON}
+// Four octaves of the shared value noise. Enough to give the rim cloud real
+// internal structure; few enough that it stays soft rather than turning to
+// static at this scale.
+float fbm2(vec2 p){
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 4; i++) { v += a * vnoise(p); p *= 2.03; a *= 0.5; }
+  return v;
+}
 void main(){
   vec3 N = normalize(vN);
   vec3 V = normalize(-vViewPos);
@@ -396,6 +410,90 @@ void main(){
     float trail = clamp(1.0 - behind / 0.42, 0.0, 1.0) * step(0.0, behind);
     float w = max(front, trail * 0.55);
     col += vec3(1.0, 0.92, 0.55) * uZap * w * 1.25;
+  }
+
+  // Rim glow: the top ambition step lights the BEVEL from inside, and nothing
+  // else. buildScreen gives the caps a normal of z = +/-1 and the 45-degree rim
+  // a normal of z = +/-0.707, so vFz alone separates the two -- the band lights
+  // up and the front cap, the back cap and the plaque over them stay untouched.
+  //
+  // The motion is deliberately becalmed. Three long sine waves at incommensurate
+  // frequencies drift across the rim and sum into slow bright and dim regions
+  // that never repeat on a countable beat but never jump either: cloud, not
+  // sparks. Everything is a smooth function of time, so there is no flicker, no
+  // noise, and no chaos -- the one fast-moving effect on this object is the
+  // plug's zap, and this is written to read as its opposite.
+  if (uRimGlow > 0.001) {
+    float bev = mix(1.0 - smoothstep(0.80, 0.96, abs(vFz)), 1.0, uRimAll);
+    if (bev > 0.001) {
+      // The field is sampled in OBJECT space, not uv, so the billows keep one
+      // physical size no matter how tall the slab grows -- a uv field would
+      // stretch the cloud as sections are added.
+      float t = uTime * 0.045;
+      // ...plus a term that ADVECTS the field around the perimeter. Object space
+      // alone left each straight run of rim reading a fixed slice of the field:
+      // down the left rim x is all but constant, so that segment sat in whatever
+      // density it happened to land in and stayed there until the warp crawled
+      // past. Rotating a unit direction vector marches the billows around the
+      // rim instead, so every segment keeps being handed new material.
+      // The rotation is used INSTEAD of an angle: atan's seam falls at -pi,
+      // which is the left rim exactly, and would crease the very place this is
+      // meant to fix.
+      vec2 dir = normalize(vLocal.xy + vec2(1e-5));
+      float ca = cos(t * 0.22), sa = sin(t * 0.22);
+      vec2 spin = vec2(dir.x * ca - dir.y * sa, dir.x * sa + dir.y * ca);
+      vec2 cp = vLocal.xy * 5.5 + spin * 2.6;
+      // Two stages of domain warp. Warping the lookup with noise (rather than
+      // just summing octaves) is what turns bands into billows: the field folds
+      // back on itself and grows the lobed, curdled edges clouds actually have.
+      vec2 q = vec2(fbm2(cp + vec2(0.0, t)),
+                    fbm2(cp + vec2(3.7, 1.9) - t * 0.6));
+      vec2 r = vec2(fbm2(cp + 1.7 * q + vec2(1.3, 4.1) + t * 0.5),
+                    fbm2(cp + 1.7 * q + vec2(5.9, 2.4) - t * 0.35));
+      float f = fbm2(cp + 1.4 * r);
+      // A TIGHTER ramp than the field's natural spread: it throws more of the
+      // range to full and to empty and spends less of it in the mid greys, which
+      // is what reads as billows with edges rather than a haze.
+      float dens = smoothstep(0.40, 0.74, f);
+      // The bright cores are cut separately, higher up the same field, so the
+      // densest hearts light well past the body of the cloud instead of the
+      // whole thing brightening together.
+      float core = smoothstep(0.66, 0.94, f);
+
+      // Surface-aware shading, three terms:
+      // 1. Self-shadow. Sample the same field one step TOWARD the light; where
+      //    the neighbour is denser this point sits in its lee and darkens. That
+      //    difference is what gives the cloud relief instead of flat opacity.
+      vec2 ld = normalize(L.xy + vec2(1e-5)) * 0.22;
+      float densL = smoothstep(0.40, 0.74, fbm2(cp + 1.4 * r + ld));
+      float shade = 1.0 - clamp(densL - dens, 0.0, 1.0) * 0.90;
+      // 2. Diffuse. The rim's own normal still governs it, so the cloud obeys
+      //    the same key light as the rest of the slab and turns with the float.
+      //    The floor is high: this is emission from inside the material, so a
+      //    rim angled away from the key must still carry its clouds.
+      float ndl = 0.62 + 0.38 * max(dot(N, L), 0.0);
+      // 3. Scatter. Grazing angles read brightest, the way light escapes a
+      //    translucent edge. It is MIXED IN rather than used as a raw multiplier
+      //    -- as a pure fresnel it fell to zero on whichever rim faced the
+      //    camera, which is exactly the segment that reads widest on screen, so
+      //    the side you could see best was the one that lost its clouds.
+      float scatter = 0.42 + 0.58 * pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 2.0);
+
+      float breath = 0.70 + 0.30 * sin(uTime * 0.095);
+      float gate = uRimGlow * bev;
+      float amt = gate * dens * shade * ndl * breath;
+      // Contrast is bought at BOTH ends. The gaps between billows darken the rim
+      // slightly, so the lit parts have something to be lit against -- raising
+      // the peaks alone just washes the whole band out and undoes the earlier
+      // dial-back.
+      col *= 1.0 - gate * (1.0 - dens) * 0.16;
+      col += vec3(0.58, 0.42, 1.00) * amt * 0.42;
+      // The white core is kept deliberately low. It is the term that tips this
+      // from cloud into flame if it runs hot: the billow structure and the rim
+      // contrast come from dens/shade, so the core only has to suggest a lit
+      // heart, not supply the brightness.
+      col += vec3(1.00, 0.97, 1.00) * gate * core * shade * breath * scatter * 0.30;
+    }
   }
 
   frag = vec4(col, (0.94 + fres * 0.06) * uAlpha);
