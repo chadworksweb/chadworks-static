@@ -43,6 +43,7 @@ import {
   ladderFor,
   money,
   price,
+  weeksLabel,
   type Param,
   type Scope,
 } from "@/lib/package-builder";
@@ -185,6 +186,35 @@ const EXAMPLES: { name: string; detail: string; scope: Scope }[] = [
   },
 ];
 
+// ---------------------------------------------------------------------
+// AFTER LAUNCH -- the ongoing-cost question, held to the same discipline as
+// the build.
+//
+// The biggest hole in every calculator on this SERP, including this one until
+// now: they price the build and go quiet about everything after it. The
+// anxiety underneath the query was never "what does it cost to make". It is
+// "what happens the first time I need a word changed and I have to call
+// somebody". A page that answers that outranks a page that dodges it.
+//
+// NOTHING HERE IS A NEW PRICE. Every figure is the minutely rate already
+// published on /rates/ applied to the task times already published on
+// /rates/, computed rather than typed so the two pages cannot drift.
+// ---------------------------------------------------------------------
+const MINUTELY = 5.25; // $/min. Also stated in /rates/, /faqs/ and RatesCapsule.
+
+// Minutes are lifted from RATE_EXAMPLES on /rates/. Keep them in step.
+const AFTER_LAUNCH: { task: string; min: number; max: number }[] = [
+  { task: "Changing the text on a page", min: 1, max: 1 },
+  { task: "Swapping an image", min: 1, max: 1 },
+  { task: "Adding a page you did not plan for", min: 10, max: 10 },
+  { task: "Fixing something small that broke", min: 10, max: 20 },
+  { task: "Building a whole new page template", min: 30, max: 30 },
+];
+
+const cost = (mins: number) => money(Math.round(mins * MINUTELY));
+const costRange = (r: { min: number; max: number }) =>
+  r.min === r.max ? cost(r.min) : `${cost(r.min)} to ${cost(r.max)}`;
+
 // What the rest of the industry quotes. Sourced, linked, and set against the
 // numbers above, because citing sources is the strongest GEO lever available
 // to a page that does not already rank (Princeton GEO, KDD 2024: rank-5 pages
@@ -193,6 +223,15 @@ const EXAMPLES: { name: string; detail: string; scope: Scope }[] = [
 //
 // VERIFY THESE FIGURES AGAIN BEFORE LAUNCH. They are other people's prices and
 // they go stale, and a wrong one is chadworks' credibility, not theirs.
+//
+// Last verified 2026-07-19. WebFX, Pronto and Outliant all re-confirmed
+// against their live pages, wording unchanged.
+//
+// SQUARESPACE IS THE SOFT ONE. Their pricing page renders the numbers in JS,
+// so there is no first-party HTML to check them against; $16 to $99 is the
+// annual-billing ladder corroborated by a third party (Website Builder Expert,
+// June 2026), not read off Squarespace itself. Monthly billing runs $21 to
+// $119. Chad: eyeball that one in a browser before this page goes public.
 const INDUSTRY: { who: string; range: string; note: string; href: string }[] = [
   {
     who: "WebFX, small business site",
@@ -211,6 +250,12 @@ const INDUSTRY: { who: string; range: string; note: string; href: string }[] = [
     range: "$25,000 to $30,000",
     note: "Real work at a real number, priced for a company that has a procurement department.",
     href: "https://www.outliant.com/website-cost-calculator",
+  },
+  {
+    who: "An offshore studio, custom build",
+    range: "$2,500 to $8,000",
+    note: "Real fixed prices published without a form in front of them, which is more than most studios on this list manage. What the figure does not cover is the distance, because the person building it works a half day out of phase with yours and you will feel that every time something needs deciding.",
+    href: "https://dixieraizpacheco.com/web-design-cost-philippines",
   },
   {
     who: "Squarespace and the builders, do it yourself",
@@ -480,10 +525,87 @@ export default function WebsiteDesignCostCalculatorPage() {
           <p>
             Rush is a percentage of the whole build rather than a line item,
             because urgency taxes every hour of a project and not one task
-            inside it. Branding runs backwards on purpose: the more you already
-            have in hand the less I have to build, so a full system in hand
-            costs nothing and starting from nothing costs{" "}
-            {money(ladderFor("brandingDone")?.[0] ?? 0)}.
+            inside it. It is also the one number that buys you something other
+            than more website: the baseline build takes {weeksLabel(BASELINE)}, and
+            paying the rush premium is paying to move your project in front of
+            everybody else&apos;s, which is why the calculator shows the weeks
+            moving down as the price moves up. Branding runs backwards on
+            purpose: the more you already have in hand the less I have to build,
+            so a full system in hand costs nothing and starting from nothing
+            costs {money(ladderFor("brandingDone")?.[0] ?? 0)}.
+          </p>
+        </div>
+      </SectionShell>
+
+      {/* What the baseline actually buys. Without this the $3,200 is
+          unfalsifiable, and it is also where the "lower, not lesser" argument
+          gets its evidence: a list an engine can lift, rather than a paragraph
+          asking to be believed.
+
+          Nothing here was invented to fill the list out. The accessibility and
+          privacy lines are Chad's call (2026-07-19): both are baselines on
+          every build, and both are stated as PRACTICE rather than as a named
+          standard, so there is no conformance claim to defend. Keep it that
+          way. The same two baselines are stated on /faqs/ and the service
+          pages; they should move together. */}
+      <SectionShell className="svc-block">
+        <h2 className="svc-block__heading svc-fill">
+          What every build includes, whatever the number says
+        </h2>
+        <div className="svc-prose">
+          <p>
+            The calculator moves a lot of things up and down. These are the
+            parts that do not move, because they are not upgrades I sell you on
+            top of a cheaper website. They are what the thing has to do before I
+            am willing to put my name on it.
+          </p>
+        </div>
+        <ul className="cw-included">
+          <li>
+            The code, the domain, and the hosting all end up in your name, on
+            day one.
+          </li>
+          <li>
+            It is designed and built for you, rather than a template that forty
+            other businesses in your industry are also using.
+          </li>
+          <li>
+            It loads fast, because the pages are finished and waiting before
+            anyone asks for them.
+          </li>
+          <li>
+            There is no database sitting behind it for somebody to break into,
+            which is most of what people mean when they say a site got hacked.
+          </li>
+          <li>
+            Hosting a site built this way costs close to nothing, and that bill
+            is yours rather than something routed through me.
+          </li>
+          <li>
+            It works on a phone, checked on real ones and not just by shrinking
+            a browser window.
+          </li>
+          <li>
+            Google is handed a map of your pages and the technical groundwork it
+            needs to actually list you.
+          </li>
+          <li>
+            It works with a keyboard, with a screen reader, and without a mouse,
+            and it respects the setting a visitor turned on to stop things
+            moving.
+          </li>
+          <li>
+            Nothing measures your visitors until they agree to it, and there are
+            no advertising or marketing pixels on it anywhere.
+          </li>
+        </ul>
+        <div className="svc-prose">
+          <p>
+            The first one is worth reading twice. A lot of studios will build
+            you a website and quietly keep the keys, so the day you want to
+            leave you find out you are not leaving with much. Everything I build
+            is yours immediately, including the parts that would make it
+            straightforward for you to go hire somebody else.
           </p>
         </div>
       </SectionShell>
@@ -511,9 +633,59 @@ export default function WebsiteDesignCostCalculatorPage() {
                 {ex.name}. {ex.detail}
               </dt>
               <dd className="rates-ledger__num">{money(price(ex.scope))}</dd>
+              <dd className="rates-ledger__note">
+                Roughly {weeksLabel(ex.scope)} from starting to launched.
+              </dd>
             </div>
           ))}
         </dl>
+      </SectionShell>
+
+      {/* After launch. Answers the question the calculator's number cannot:
+          not what the site costs to build, what it costs to keep. Every figure
+          is computed from the published minutely rate. */}
+      <SectionShell className="svc-block">
+        <h2 className="svc-block__heading svc-fill">
+          What it costs after it launches
+        </h2>
+        <div className="svc-prose">
+          <p>
+            The number above buys a finished website. It does not answer the
+            question you are actually going to have eight months from now, on
+            the Tuesday you notice a price on your services page is wrong and
+            you have to figure out who to call and what they are going to charge
+            you for a sentence.
+          </p>
+          <p>
+            Here is that answer. Nothing recurring comes to me. You will own
+            a domain, which runs about $12 to $20 a year from whoever you
+            registered it with, and the static builds I put most people on cost
+            little or nothing to host because there is no database sitting there
+            waiting to be attacked. When you need me after launch you pay for
+            the minutes I actually spend, at the same {money(MINUTELY)} a minute
+            published on my <Link href="/rates/">rates page</Link>. In practice
+            that looks like this.
+          </p>
+        </div>
+        <dl className="rates-ledger">
+          {AFTER_LAUNCH.map((row) => (
+            <div key={row.task} className="rates-ledger__row">
+              <dt className="rates-ledger__label">{row.task}</dt>
+              <dd className="rates-ledger__num">{costRange(row)}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="svc-prose">
+          <p>
+            Changing a line of text costs about five dollars because changing a
+            line of text takes about a minute. That is the entire philosophy,
+            and it is the reason I do not sell you a monthly plan for work
+            neither of us can promise will exist. If your site runs on WordPress
+            rather than a static build I do offer a care plan, currently $550
+            every six months, because WordPress genuinely needs looking after
+            and pretending otherwise is how people end up hacked.
+          </p>
+        </div>
       </SectionShell>
 
       {/* Cite sources: the strongest lever a page like this has. */}
@@ -547,7 +719,11 @@ export default function WebsiteDesignCostCalculatorPage() {
           <p>
             My baseline of {money(BASE)} sits under most of that, and a finished
             small business site at {money(price(SMALL_BUSINESS))} lands below
-            WebFX&apos;s starting point for the same thing. That gap is not a
+            WebFX&apos;s starting point for the same thing. The offshore tier
+            starts lower than I do and I am not going to pretend otherwise; what
+            you save there you spend on distance, and whether that trade is
+            worth it depends on how much you want to talk to the person building
+            your website. Everywhere else on that list, the gap is not a
             discount and it is not a lesser website. It is arithmetic, and it is
             worth explaining properly.
           </p>

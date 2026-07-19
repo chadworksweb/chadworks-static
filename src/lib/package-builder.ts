@@ -295,6 +295,55 @@ export function rushPremium(s: Scope): number {
 export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 
 // ---------------------------------------------------------------------
+// TIMELINE -- the delivery window.
+//
+// The calculator has always CHARGED for a squeezed timeline without ever
+// saying how long the normal one is, which left rush as a premium with
+// nothing to be a premium over. This derives the window from `subtotal`,
+// the same figure that prices the build, because subtotal already is the
+// measure of how much work there is. One number, two readings.
+//
+// The curve is deliberately sublinear (^0.7): a build twice the size does
+// not take twice the weeks, since a wider scope parallelizes and the fixed
+// start-up cost of any project is paid once. Anchored against the four
+// worked examples on the page, which is what keeps it honest.
+//
+// TUNE THESE, CHAD. Delivery capacity is a promise about your calendar, and
+// nobody else can set it. The shape is defensible; the constants are yours.
+// ---------------------------------------------------------------------
+const WEEKS_FLOOR = 2; // the baseline build, start to launched
+const WEEKS_SPAN = 6; // weeks added by the first $10k of scope past baseline
+const WEEKS_PIVOT = 10000;
+const WEEKS_CURVE = 0.7;
+
+// How far each timeline rung compresses the window. Index-aligned to
+// TIMELINE_MULT, so "costs 15% more" and "lands 20% sooner" stay one choice.
+const TIMELINE_SQUEEZE = [1, 0.8, 0.65];
+
+export type Window = { low: number; high: number };
+
+// The delivery window in weeks, rounded to whole weeks because no client has
+// ever been served by an estimate that pretends to half-week precision.
+export function weeks(s: Scope): Window {
+  const over = Math.max(0, subtotal(s) - BASE);
+  const raw = WEEKS_FLOOR + WEEKS_SPAN * Math.pow(over / WEEKS_PIVOT, WEEKS_CURVE);
+  // NOT at(): that bills an unset ladder as 0, which is right for a price and
+  // wrong for a multiplier (it would collapse the window to nothing).
+  const squeeze =
+    TIMELINE_SQUEEZE[Math.min(TIMELINE_SQUEEZE.length - 1, Math.max(0, Math.round(s.timeline)))];
+  const low = Math.max(1, Math.round(raw * squeeze));
+  // The spread widens with the build: a three page site lands when it lands,
+  // a store has more places for someone else's dependency to slip.
+  const high = low + Math.max(1, Math.round(low * 0.3));
+  return { low, high };
+}
+
+export function weeksLabel(s: Scope): string {
+  const { low, high } = weeks(s);
+  return `${low} to ${high} weeks`;
+}
+
+// ---------------------------------------------------------------------
 // SCREEN CHANNELS -- the augmentation each scope layer drives.
 //
 // Every value here is consumed by PackageScreen as a shader uniform or a

@@ -131,6 +131,15 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The window sits under the figure as its quieter half: the price and the
+   weeks are one answer, so they share the readout rather than competing. */
+.window {
+  composes: micro;
+  opacity: 0.55;
+  margin: 0.65rem 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---- the rail: its own scroll box ---- */
 .rail {
   position: absolute;

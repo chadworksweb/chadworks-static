@@ -25,6 +25,7 @@ import {
   channels,
   money,
   price,
+  weeksLabel,
   type Param,
   type Scope,
 } from "@/lib/package-builder";
@@ -74,6 +75,9 @@ export function PackageBuilderStage() {
         <div className={s.readout}>
           <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
           <p className={s.figure}>{money(total)}</p>
+          {/* The window is the half of the answer the tool used to withhold: it
+              charged for a squeezed timeline without ever naming the normal one. */}
+          <p className={s.window}>{weeksLabel(scope)}</p>
           {dirty ? (
             <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
               Reset
