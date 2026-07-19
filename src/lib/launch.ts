@@ -51,8 +51,9 @@ const LAUNCHED = new Set<string>([
               // item N: authority is published, not case-studied). This lights the
               // footer's Essays link; individual essays inherit the launch and are
               // added to the sitemap from the content dir (see sitemap.xml/route).
-              // NOTE: held back from prod -- local only until the essays work ships.
-              // Prod's launch.ts does not carry this line.
+              // LIVE ON PROD 2026-07-18 with the first essay ("Is Your Agency
+              // Ripping You Off?"). This also flips <GoingToBat /> from the
+              // inline email thread to the teaser capsule everywhere it runs.
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant
