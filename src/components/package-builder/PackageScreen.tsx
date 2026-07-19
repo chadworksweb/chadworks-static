@@ -923,6 +923,62 @@ export function PackageScreen({
     }
     const ICO_VCOUNT = ICO_LINES.length / 3;
 
+    // --- MOTION WAKE (timeline): soft brush streaks -------------------
+    // The tail is a soft violet blur SHAPED into streaks, not a copy of the
+    // slab and not hard speed lines (Chad, 2026-07-19): overlapping soft
+    // brush strokes that together read as a painterly, photographic motion
+    // blur raked off the left edge.
+    //
+    // Each stroke is a textured quad. `brushTex` is the brush: white, opaque at
+    // its RIGHT (sat against the slab's edge) and fading to nothing at the
+    // LEFT tip, feathered soft top and bottom -- so one stroke is already a
+    // little gradient, and a field of them overlapping is a soft smear with
+    // grain. Uploaded premultiplied, tinted violet at draw, like every other
+    // decal on this object.
+    const brushTex = stubTex();
+    {
+      const cvs = document.createElement("canvas");
+      const W = 256, H = 64;
+      cvs.width = W; cvs.height = H;
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, W, H);
+        // Opaque at the right, gone at the left: the stroke's own length fade.
+        const hg = ctx.createLinearGradient(0, 0, W, 0);
+        hg.addColorStop(0, "rgba(255,255,255,0)");
+        hg.addColorStop(0.55, "rgba(255,255,255,0.5)");
+        hg.addColorStop(1, "rgba(255,255,255,1)");
+        ctx.fillStyle = hg;
+        ctx.fillRect(0, 0, W, H);
+        // Feather the top and bottom to nothing so the stroke has no hard edge.
+        ctx.globalCompositeOperation = "destination-in";
+        const vg = ctx.createLinearGradient(0, 0, 0, H);
+        vg.addColorStop(0, "rgba(0,0,0,0)");
+        vg.addColorStop(0.5, "rgba(0,0,0,1)");
+        vg.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "source-over";
+        uploadCanvas(brushTex, cvs);
+      }
+    }
+    // The stroke field, fixed once so it is stable frame to frame; time only
+    // drifts each stroke's length and opacity, and SLOWLY (Chad wants it much
+    // slower), so the wake breathes like a long exposure rather than churning.
+    // Lengths biased short (pow > 1) so a few reach far and most bank at the
+    // edge, which builds the density falloff. `fy` spreads them over (and a
+    // little past) the slab's height.
+    const STREAKS = Array.from({ length: 60 }, () => ({
+      fy: (Math.random() * 2 - 1) * 1.08,
+      rx: -0.02 + Math.random() * 0.08, // right end, at/just under the left edge
+      lenF: 0.18 + Math.pow(Math.random(), 1.7) * 0.82, // biased short
+      thF: 0.028 + Math.random() * 0.07, // thickness (soft, so it can be broad)
+      a: 0.16 + Math.random() * 0.46, // base opacity, kept low so they layer
+      rate: 0.06 + Math.random() * 0.2, // SLOW drift
+      ph: Math.random() * 6.283,
+      lenPh: Math.random() * 6.283,
+    }));
+
     // --- sizing -------------------------------------------------------
     let DPR = 1;
     const resize = () => {
@@ -1335,6 +1391,88 @@ export function PackageScreen({
       // whole, and the slab grows one section-unit taller for each of them.
       gl.uniform1f(us.sections, Math.round(t.sections));
       gl.bindVertexArray(screenBuf.vao);
+
+      // --- MOTION WAKE (timeline): soft brush streaks -----------------
+      // Rush, and more faintly Tightened, drags a soft violet wake off the LEFT
+      // of the slab. It is the blur aesthetic SHAPED into strokes: a low, soft
+      // silhouette smear for the body, then a field of soft brush streaks over
+      // it for the painterly grain (Chad, 2026-07-19). Everything runs slow.
+      //
+      // All of it is premultiplied violet, depth-off, and then covered by the
+      // crisp slab, so the wake tucks in behind the left edge and only its
+      // leftward run shows. `pulse` (0 / 0.5 / 1 over Normal / Tightened / Rush)
+      // drives length and weight together.
+      if (cur.pulse > 0.01) {
+        gl.disable(gl.DEPTH_TEST);
+        gl.depthMask(false);
+        gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // premultiplied
+
+        // The slab's left silhouette edge and half-height in world space (view
+        // has no rotation, so these read as screen coordinates). cos(restRotY)
+        // foreshortens the width; the wake rakes off that edge.
+        const leftEdge = -HW * cur.scale * 0.9;
+        const vExtent = cur.heightHalf * cur.scale;
+
+        // (A) the soft body: a few flat cover copies at very low alpha, so the
+        // wake has an underlying smear the strokes sit in rather than floating
+        // as loose marks. Kept faint -- the strokes carry the read.
+        gl.useProgram(lineProg);
+        gl.uniformMatrix4fv(ul.proj, false, proj);
+        gl.uniformMatrix4fv(ul.view, false, view);
+        gl.uniform3f(ul.col, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+        gl.bindVertexArray(screenBuf.vao);
+        const BODY_N = 24;
+        const bodyLen = cur.pulse * 0.42;
+        for (let i = 1; i <= BODY_N; i++) {
+          const frac = i / BODY_N;
+          const ghost = Mat.mul(Mat.trans(-bodyLen * frac, 0, 0), model);
+          gl.uniformMatrix4fv(ul.model, false, ghost);
+          gl.uniform1f(ul.alpha, 0.022 * cur.pulse * Math.pow(1 - frac, 1.3));
+          gl.drawArrays(gl.TRIANGLES, 0, screenCount);
+        }
+
+        // (B) the brush streaks: soft textured strokes over the body. Each is
+        // opaque at the slab edge and fades to its tip; overlapping strokes of
+        // varied length/thickness/opacity read as painterly motion blur. Slow
+        // clocks on length and alpha so the field drifts, not churns.
+        gl.useProgram(texProg);
+        gl.uniformMatrix4fv(ut.proj, false, proj);
+        gl.uniformMatrix4fv(ut.view, false, view);
+        gl.uniform3f(ut.tint, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+        gl.uniform2f(ut.uvScale, 1, 1);
+        gl.uniform1f(ut.falloff, 0);
+        gl.uniform1f(ut.breath, 1);
+        gl.uniform1f(ut.ripple, 0);
+        gl.uniform1f(ut.holeOn, 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.uniform1i(ut.tex, 0);
+        gl.bindTexture(gl.TEXTURE_2D, brushTex);
+        gl.bindVertexArray(quadBuf.vao);
+        const maxLen = 0.9 * cur.pulse;
+        for (const s of STREAKS) {
+          const lz = 0.6 + 0.4 * Math.sin(time * s.rate + s.lenPh);
+          const len = maxLen * s.lenF * lz;
+          if (len < 0.02) continue;
+          const halfW = len * 0.5;
+          const cx = leftEdge + s.rx - halfW; // right edge tucked at the slab edge
+          const y = s.fy * vExtent;
+          const m = Mat.mul(Mat.trans(cx, y, 0), Mat.scale(halfW, s.thF * 0.5, 1));
+          gl.uniformMatrix4fv(ut.model, false, m);
+          gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, m)));
+          const av = s.a * cur.pulse * (0.6 + 0.4 * Math.sin(time * s.rate * 0.83 + s.ph));
+          if (av <= 0.01) continue;
+          gl.uniform1f(ut.alpha, av);
+          gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);
+        }
+
+        // Back to the cover: its program, its VAO, straight blend, depth on.
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthMask(true);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.useProgram(screenProg);
+        gl.bindVertexArray(screenBuf.vao);
+      }
+
       gl.drawArrays(gl.TRIANGLES, 0, screenCount);
 
       // --- leaves: thin ridged pages appended BEHIND the cover -------
