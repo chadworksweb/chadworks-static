@@ -44,6 +44,7 @@ import {
   money,
   price,
   weeksLabel,
+  wire,
   type Param,
   type Scope,
 } from "@/lib/package-builder";
@@ -141,7 +142,6 @@ const SMALL_BUSINESS: Scope = {
   content: 1,
   editability: 1,
   motion: 1,
-  geo: 1,
 };
 
 const STORE: Scope = {
@@ -155,8 +155,9 @@ const STORE: Scope = {
   editability: 2,
   motion: 1,
   commerce: 2,
-  integrations: 2,
-  geo: 2,
+  // A bitmask now, not a count: subscriptions and a mailing list, which is what
+  // a store of this size actually wires in.
+  integrations: wire(4, 5),
 };
 
 const EXAMPLES: { name: string; detail: string; scope: Scope }[] = [
@@ -169,7 +170,7 @@ const EXAMPLES: { name: string; detail: string; scope: Scope }[] = [
   {
     name: "A small business site",
     detail:
-      "Five pages, a logo in hand but no system around it, light copy cleanup, a bit of motion, and the basics of being readable by the machines.",
+      "Five pages, a logo in hand but no system around it, light copy cleanup, and a bit of motion.",
     scope: SMALL_BUSINESS,
   },
   {
@@ -289,7 +290,7 @@ const FAQS: { q: string; a: ReactNode }[] = [
         forty hours of custom design, and both are saying the word
         &quot;website&quot; at you. The spread is not dishonesty in every case,
         but it is always a sign that nobody has agreed on scope yet. That is the
-        entire reason this calculator makes you move thirteen things instead of
+        entire reason this calculator makes you move twelve things instead of
         picking a tier.
       </>
     ),
@@ -376,7 +377,7 @@ const FAQS: { q: string; a: ReactNode }[] = [
 // ---------------------------------------------------------------------
 // THE RATE CARD ROWS.
 //
-// One panel per scope layer, so the published card has the same 13 groups the
+// One panel per scope layer, so the published card has the same 12 groups the
 // calculator has. A step param lists its ladder; a counted param states its
 // per-unit rate; timeline states its multiplier. Everything reads from the
 // model, so nothing here can drift from what the tool charges.
@@ -587,7 +588,8 @@ export default function WebsiteDesignCostCalculatorPage() {
           </li>
           <li>
             Google is handed a map of your pages and the technical groundwork it
-            needs to actually list you.
+            needs to actually list you, and that same groundwork is what lets
+            ChatGPT and the other engines read you and quote you correctly.
           </li>
           <li>
             It works with a keyboard, with a screen reader, and without a mouse,

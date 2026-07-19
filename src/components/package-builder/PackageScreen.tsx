@@ -559,6 +559,162 @@ export function PackageScreen({
       }
     }
 
+    // --- INTEGRATION marks: one per system the checklist names.
+    //
+    // WHAT EACH ONE IS. The first three are the vendor logos (Calendly,
+    // HubSpot, Zapier) in their Simple Icons / vectorlogo single-path form,
+    // which is authored FOR monochrome use, so drawing them in one colour is
+    // the intended treatment rather than a recolour of a full-colour logo. The
+    // last five are Material glyphs standing for a capability rather than a
+    // brand: a person for memberships, a dollar ringed by recurring arrows for
+    // subscriptions, an envelope for email, a database cylinder for a CRM, and
+    // the letters API for anything else (Chad, 2026-07-19).
+    //
+    // Zapier is the standalone asterisk on a 64 viewBox, NOT the Simple Icons
+    // entry, which is the wordmark in a rounded-square tile and turns to mud at
+    // the size these are drawn.
+    //
+    // `span` is deliberately most of the 256 grid: these have no ring or plate
+    // around them any more, so the glyph itself is the whole mark and it should
+    // fill its texture rather than float in a field of transparent padding,
+    // which is what made them read small no matter how large the cell was drawn.
+    //
+    // `cx,cy` is the path-space centre. It defaults to box/2 (a plain 0..box
+    // viewBox) but is passed explicitly for the Material Symbols glyphs, whose
+    // viewBox is "0 -960 960 960" -- shifted into negative y, so their content
+    // centres on (480, -480), not (480, 480).
+    const MARK_SPAN = 228; // of 256; ~13px transparent margin, room for filtering
+    // A slight top-to-bottom wash, white into the plaque's lavender, laid over
+    // whatever glyph was just filled (Chad, 2026-07-19). `source-atop` paints
+    // only where the glyph already is and keeps its alpha, so it shades the mark
+    // without touching the transparent field around it -- and it works the same
+    // for a path glyph or a word, whatever viewBox it came from, because it runs
+    // in flat 256 screen space after the glyph's own transform is gone.
+    const shadeGlyph = (ctx: CanvasRenderingContext2D) => {
+      ctx.save();
+      ctx.globalCompositeOperation = "source-atop";
+      const g = ctx.createLinearGradient(0, BADGE * 0.12, 0, BADGE * 0.88);
+      g.addColorStop(0, "#ffffff");
+      g.addColorStop(1, "#e5d2f4"); // lilac, the same token the edit disc uses
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, BADGE, BADGE);
+      ctx.restore();
+    };
+    const markTex = (d: string, box: number, cx = box / 2, cy = box / 2) => {
+      const span = MARK_SPAN;
+      const tex = stubTex();
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        ctx.save();
+        ctx.translate(BADGE / 2, BADGE / 2);
+        ctx.scale(span / box, span / box);
+        ctx.translate(-cx, -cy);
+        ctx.fillStyle = "#fff";
+        ctx.fill(new Path2D(d), "nonzero");
+        ctx.restore();
+        shadeGlyph(ctx);
+        uploadCanvas(tex, cvs);
+      }
+      return tex;
+    };
+
+    // A short word as a mark: the "API" case, where the recognisable thing IS
+    // the letters. Heavy weight, fitted to the same span the glyphs use so it
+    // carries the same visual size as its neighbours.
+    const letterTex = (text: string) => {
+      const tex = stubTex();
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        // Measure at a reference size, then rescale so the word spans MARK_SPAN.
+        const REF = 100;
+        ctx.font = `800 ${REF}px system-ui, "Segoe UI", Arial, sans-serif`;
+        const w = ctx.measureText(text).width || REF;
+        const size = REF * (MARK_SPAN / w);
+        ctx.font = `800 ${size}px system-ui, "Segoe UI", Arial, sans-serif`;
+        ctx.fillText(text, BADGE / 2, BADGE / 2 + size * 0.04);
+        shadeGlyph(ctx);
+        uploadCanvas(tex, cvs);
+      }
+      return tex;
+    };
+
+    // Calendly: the ring-and-swoosh mark.
+    const calendlyTex = markTex(
+      "M19.655 14.262c.281 0 .557.023.828.064 0 .005-.005.01-.005.014-.105.267-.234.534-.381.786l-1.219 2.106c-1.112 1.936-3.177 3.127-5.411 3.127h-2.432c-2.23 0-4.294-1.191-5.412-3.127l-1.218-2.106a6.251 6.251 0 0 1 0-6.252l1.218-2.106C6.736 4.832 8.8 3.641 11.035 3.641h2.432c2.23 0 4.294 1.191 5.411 3.127l1.219 2.106c.147.252.271.519.381.786 0 .004.005.009.005.014-.267.041-.543.064-.828.064-1.816 0-2.501-.607-3.291-1.306-.764-.676-1.711-1.517-3.44-1.517h-1.029c-1.251 0-2.387.455-3.2 1.278-.796.805-1.233 1.904-1.233 3.099v1.411c0 1.196.437 2.295 1.233 3.099.813.823 1.949 1.278 3.2 1.278h1.034c1.729 0 2.676-.841 3.439-1.517.791-.703 1.471-1.306 3.287-1.301Zm.005-3.237c.399 0 .794-.036 1.179-.11-.002-.004-.002-.01-.002-.014-.073-.414-.193-.823-.349-1.218.731-.12 1.407-.396 1.986-.819 0-.004-.005-.013-.005-.018-.331-1.085-.832-2.101-1.489-3.03-.649-.915-1.435-1.719-2.331-2.395-1.867-1.398-4.088-2.138-6.428-2.138-1.448 0-2.855.28-4.175.841-1.273.543-2.423 1.315-3.407 2.299S2.878 6.552 2.341 7.83c-.557 1.324-.842 2.726-.842 4.175 0 1.448.281 2.855.842 4.174.542 1.274 1.314 2.423 2.298 3.407s2.129 1.761 3.407 2.299c1.324.556 2.727.841 4.175.841 2.34 0 4.561-.74 6.428-2.137a10.815 10.815 0 0 0 2.331-2.396c.652-.929 1.158-1.949 1.489-3.03 0-.004.005-.014.005-.018-.579-.423-1.255-.699-1.986-.819.161-.395.276-.804.349-1.218.005-.009.005-.014.005-.023.869.166 1.692.506 2.404 1.035.685.505.552 1.075.446 1.416C22.184 20.437 17.619 24 12.221 24c-6.625 0-12-5.375-12-12s5.37-12 12-12c5.398 0 9.963 3.563 11.471 8.464.106.341.239.915-.446 1.421-.717.529-1.535.873-2.404 1.034.128.716.128 1.45 0 2.166-.387-.074-.782-.11-1.182-.11-4.184 0-3.968 2.823-6.736 2.823h-1.029c-1.899 0-3.15-1.357-3.15-3.095v-1.411c0-1.738 1.251-3.094 3.15-3.094h1.034c2.768 0 2.552 2.823 6.731 2.827Z",
+      24
+    );
+
+    // HubSpot: the sprocket.
+    const hubspotTex = markTex(
+      "M18.164 7.93V5.084a2.198 2.198 0 001.267-1.978v-.067A2.2 2.2 0 0017.238.845h-.067a2.2 2.2 0 00-2.193 2.193v.067a2.196 2.196 0 001.252 1.973l.013.006v2.852a6.22 6.22 0 00-2.969 1.31l.012-.01-7.828-6.095A2.497 2.497 0 104.3 4.656l-.012.006 7.697 5.991a6.176 6.176 0 00-1.038 3.446c0 1.343.425 2.588 1.147 3.607l-.013-.02-2.342 2.343a1.968 1.968 0 00-.58-.095h-.002a2.033 2.033 0 102.033 2.033 1.978 1.978 0 00-.1-.595l.005.014 2.317-2.317a6.247 6.247 0 104.782-11.134l-.036-.005zm-.964 9.378a3.206 3.206 0 113.215-3.207v.002a3.206 3.206 0 01-3.207 3.207z",
+      24
+    );
+
+    // Zapier: the eight-point asterisk, on its native 64 box.
+    const zapierTex = markTex(
+      "M63.207 26.418H44.432l13.193-13.193c-1.015-1.522-2.03-2.537-3.045-4.06a29.025 29.025 0 0 1-4.059-3.552L37.33 18.807V.54a17.252 17.252 0 0 0-5.074-.507A15.629 15.629 0 0 0 27.18.54v18.775l-13.7-13.7A13.7 13.7 0 0 0 9.42 9.166c-1.015 1.522-2.537 2.537-3.552 4.06L19.06 26.418H.794l-.507 5.074a15.629 15.629 0 0 0 .507 5.074H19.57l-13.7 13.7a27.198 27.198 0 0 0 7.611 7.611l13.193-13.193V63.46a17.252 17.252 0 0 0 5.074.507 15.629 15.629 0 0 0 5.074-.507V44.686L50.014 57.88a13.7 13.7 0 0 0 4.059-3.552 29.025 29.025 0 0 0 3.552-4.059L44.432 37.074h18.775A17.252 17.252 0 0 0 63.715 32a19.028 19.028 0 0 0-.507-5.582zm-23.342 5.074a25.726 25.726 0 0 1-1.015 6.597 15.223 15.223 0 0 1-6.597 1.015 25.726 25.726 0 0 1-6.597-1.015 15.223 15.223 0 0 1-1.015-6.597 25.726 25.726 0 0 1 1.015-6.597 15.223 15.223 0 0 1 6.597-1.015 25.726 25.726 0 0 1 6.597 1.015 29.684 29.684 0 0 1 1.015 6.597z",
+      64
+    );
+
+    // Memberships and logins: Material "person".
+    const personTex = markTex(
+      "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z",
+      24
+    );
+
+    // Subscriptions and billing: Material "currency_exchange" -- a dollar sign
+    // ringed by two recurring arrows, which is the recurring-money mark exactly.
+    const subTex = markTex(
+      "M12.89 11.1c-1.78-.59-2.64-.96-2.64-1.9 0-1.02 1.11-1.39 1.81-1.39 1.31 0 1.79.99 1.9 1.34l1.58-.67c-.15-.45-.82-1.92-2.54-2.24V5h-2v1.26c-2.48.56-2.49 2.86-2.49 2.96 0 2.27 2.25 2.91 3.35 3.31 1.58.56 2.28 1.07 2.28 2.03 0 1.13-1.05 1.61-1.98 1.61-1.82 0-2.34-1.87-2.4-2.09l-1.66.67c.63 2.19 2.28 2.78 2.9 2.96V19h2v-1.24c.4-.09 2.9-.59 2.9-3.22 0-1.39-.61-2.61-3.01-3.44zM3 21H1v-6h6v2H4.52c1.61 2.41 4.36 4 7.48 4a9 9 0 0 0 9-9h2c0 6.08-4.92 11-11 11-3.72 0-7.01-1.85-9-4.67V21zm-2-9C1 5.92 5.92 1 12 1c3.72 0 7.01 1.85 9 4.67V3h2v6h-6V7h2.48C17.87 4.59 15.12 3 12 3a9 9 0 0 0-9 9H1z",
+      24
+    );
+
+    // Email marketing: Material "mail" -- the envelope.
+    const mailTex = markTex(
+      "M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z",
+      24
+    );
+
+    // A CRM or database of your own: Material Symbols "database" -- the stacked
+    // cylinder. Its viewBox is "0 -960 960 960", so its centre is (480, -480).
+    const dbTex = markTex(
+      "M480-120q-151 0-255.5-46.5T120-280v-400q0-66 105.5-113T480-840q149 0 254.5 47T840-680v400q0 67-104.5 113.5T480-120Zm0-488q86 0 176.5-26.5T773-694q-27-32-117.5-59T480-780q-88 0-177 26t-117 60q28 35 116 60.5T480-608Zm-1 214q42 0 84-4.5t80.5-13.5q38.5-9 73.5-22t63-29v-155q-29 16-64 29t-74 22q-39 9-80 14t-83 5q-42 0-84-5t-80.5-14q-38.5-9-73-22T180-618v155q27 16 61 29t72.5 22q38.5 9 80.5 13.5t85 4.5Zm1 214q48 0 99-8.5t93.5-22.5q42.5-14 72-31t35.5-35v-125q-28 16-63 28.5T643.5-352q-38.5 9-80 13.5T479-334q-43 0-85-4.5T313.5-352q-38.5-9-72.5-21.5T180-402v126q5 17 34 34.5t72 31q43 13.5 94 22t100 8.5Z",
+      960,
+      480,
+      -480
+    );
+
+    // Anything else with an API: the letters, because that is the recognisable
+    // thing when there is no single vendor to draw.
+    const apiTex = letterTex("API");
+
+    // Index-aligned to INTEGRATION_OPTIONS: three vendor logos, then five
+    // capability glyphs.
+    const WIRE_MARKS = [
+      calendlyTex, hubspotTex, zapierTex,
+      personTex, subTex, mailTex, dbTex, apiTex,
+    ];
+    // One eased alpha per option, so checking a box fades THAT mark in rather
+    // than re-timing the whole column. A bitmask cannot be eased as a number,
+    // which is why this is a per-slot array and not a single `cur` channel.
+    const wireOn = new Float32Array(WIRE_MARKS.length);
+    // Eased x,y for each mark (interleaved). The grid re-packs whenever the
+    // checked count or the section count changes, so marks SLIDE to their new
+    // home rather than snapping. A mark that is currently off is snapped to its
+    // target instead of eased, so it fades in already in place.
+    const wirePos = new Float32Array(WIRE_MARKS.length * 2);
+    // Last computed mark half-size. Held across frames so a mark unchecked down
+    // to a count of zero still has a size to fade out AT, rather than collapsing
+    // to nothing the instant it leaves the packed count.
+    let wireMh = 0;
+
     // A product cell: one hairline square of the inventory grid behind the cart.
     const cellTex = stubTex();
     {
@@ -832,6 +988,12 @@ export function PackageScreen({
       cur.edit = ease(cur.edit, t.edit, k);
       cur.motionLevel = ease(cur.motionLevel, t.motionLevel, k);
       cur.commerceLevel = ease(cur.commerceLevel, t.commerceLevel, k);
+      // The mask itself is not eased (it is a set of flags, not a magnitude);
+      // each slot's own alpha is.
+      cur.wired = t.wired;
+      for (let i = 0; i < wireOn.length; i++) {
+        wireOn[i] = ease(wireOn[i], t.wired & (1 << i) ? 1 : 0, k);
+      }
       // Eased at a QUARTER of the morph rate. Everything else on this object
       // snaps to its new shape; the rim light has to arrive slowly or the
       // sustain it is supposed to hold gets announced by a hard switch-on.
@@ -1567,7 +1729,15 @@ export function PackageScreen({
           // panel bottom. Margins are proportional so it stays a valid, in-
           // bounds band at EVERY section size -- the lines never spill past
           // the plaque on a short panel or bunch up on a tall one.
-          const colW = (2 * pxHalf) / 3; // one column of the three
+          // One column of the three. The content is inset from the panel's
+          // LEFT edge by RAIL_INSET (that is where the copy starts), so the
+          // three columns have to be inset from the RIGHT by the same amount or
+          // the third one runs off the frame -- which it did, until the
+          // integrations column landed there and made the overflow visible
+          // (Chad, 2026-07-19). Subtracting both insets before the divide keeps
+          // all three columns, copy and commerce included, inside the plaque.
+          const RAIL_INSET = 0.04;
+          const colW = (2 * pxHalf - RAIL_INSET * 2) / 3;
           const gemBottom = pyHalf - gemMargin - 2 * gh;
           const zoneTop = gemBottom - Math.min(0.025, pyHalf * 0.08);
           // TWO bars per section, evenly led down the zone.
@@ -1788,6 +1958,94 @@ export function PackageScreen({
               decal(cartTex, midX, midY, ch2 * 0.84, ch2 * 0.84, shop);
               gl.uniform3f(ut.tint, 1, 1, 1);
             }
+          }
+
+          // --- INTEGRATIONS: the connector marks -------------------------
+          // The LAST third of the 1/3-1/3-1/3 layout. One mark per system wired
+          // in: the three named systems carry their real logo, every capability
+          // past them the generic API glyph. No tile, no box -- the mark IS the
+          // mark (Chad, 2026-07-19); a border around it only ate the room the
+          // logo needed to be legible.
+          //
+          // WHY THIS IS PACKED, NOT A FIXED GRID. A fixed 2x4 tied its cell
+          // height to the copy zone, so at a low section count the zone went
+          // short, the cells went short, and the marks -- bounded by the
+          // shorter axis -- shrank to dots. The fix is to choose the column
+          // count that makes the cells as SQUARE as possible for the box we
+          // actually have: the classic "fit n squares in a WxH rectangle"
+          // result is columns ~= sqrt(n * W / H). A short, wide box (few
+          // sections) gets more columns and fewer rows; a tall box (many
+          // sections) gets fewer. Either way the mark is as large as the space
+          // allows instead of as small as the height forces.
+          {
+            const lastCx = -pxHalf + RAIL_INSET + colW * 2.5; // last third centre
+            const padX = 0.018;
+            const boxW = Math.max(0.06, colW - padX * 2);
+            // The same vertical band the copy runs down, so the three columns
+            // still share a top and bottom even though this one no longer draws
+            // a grid to prove it.
+            const boxTop = copyTopEdge;
+            const boxH = Math.max(0.04, copyTopEdge - copyBotEdge);
+
+            // Count the checked systems: that is n, the number of squares.
+            let n = 0;
+            for (let i = 0; i < WIRE_MARKS.length; i++) if (cur.wired & (1 << i)) n++;
+
+            if (n > 0) {
+              // Columns that square the cells for THIS box aspect. Clamped to
+              // [1, n] so it is always a real grid.
+              const cols = Math.max(1, Math.min(n, Math.round(Math.sqrt((n * boxW) / boxH))));
+              const rows = Math.ceil(n / cols);
+              const cellW = boxW / cols;
+              const cellH = boxH / rows;
+              // The mark is a square at the cell's SHORTER side, so a non-square
+              // cell never stretches a logo. Half-size; the baked glyph fills
+              // ~0.9 of its own texture, so this lands the mark at ~0.9 of the
+              // cell with a hair of breathing room between neighbours.
+              wireMh = Math.min(cellW, cellH) * 0.5;
+
+              // Slot p (packed, top-to-bottom, left-to-right) -> world x,y. The
+              // last row may be partial, so it is centred on its own count
+              // rather than left-hung under a full row above it.
+              const slotXY = (p: number): [number, number] => {
+                const r = Math.floor(p / cols);
+                const inRow = r === rows - 1 ? n - cols * (rows - 1) : cols;
+                const c = p % cols;
+                const x = lastCx - (inRow * cellW) / 2 + cellW * (c + 0.5);
+                const y = boxTop - cellH * (r + 0.5);
+                return [x, y];
+              };
+
+              // Assign packed slots in option order, ease each mark toward its
+              // home, and draw. A mark that is currently invisible is snapped to
+              // its slot so it fades in already in place; a visible one slides,
+              // so re-packing (a box toggled, or the section count changed)
+              // reads as the set rearranging rather than teleporting.
+              gl.uniform3f(ut.tint, 1, 1, 1);
+              let p = 0;
+              for (let i = 0; i < WIRE_MARKS.length; i++) {
+                if (!(cur.wired & (1 << i))) continue;
+                const [tx, ty] = slotXY(p);
+                p++;
+                if (wireOn[i] < 0.02) {
+                  wirePos[2 * i] = tx;
+                  wirePos[2 * i + 1] = ty;
+                } else {
+                  wirePos[2 * i] = ease(wirePos[2 * i], tx, k);
+                  wirePos[2 * i + 1] = ease(wirePos[2 * i + 1], ty, k);
+                }
+              }
+            }
+
+            // Draw every mark that still carries alpha, at its eased position --
+            // including one fading out after being unchecked, which is no longer
+            // in the packed count but is still on screen.
+            for (let i = 0; i < WIRE_MARKS.length; i++) {
+              const a = appear * wireOn[i];
+              if (a <= 0.01) continue;
+              decal(WIRE_MARKS[i], wirePos[2 * i], wirePos[2 * i + 1], wireMh, wireMh, a);
+            }
+            gl.uniform3f(ut.tint, 1, 1, 1);
           }
 
           gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // restore straight alpha

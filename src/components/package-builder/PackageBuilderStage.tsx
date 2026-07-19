@@ -23,6 +23,7 @@ import {
   BASELINE,
   PARAMS,
   channels,
+  integrationCount,
   money,
   price,
   weeksLabel,
@@ -32,13 +33,19 @@ import {
 import s from "./package-builder.module.css";
 
 // Params that would run too long as a chip row keep a slim slider instead.
-const AS_COUNT = new Set<keyof Scope>(["pages", "sections", "integrations", "locales"]);
+// Integrations left this set on 2026-07-19: it is a named checklist now, so it
+// asks which systems rather than making the reader count them first.
+const AS_COUNT = new Set<keyof Scope>(["pages", "sections", "locales"]);
 
 function valueLabel(p: Param, v: number): string {
   // v < 0 is the UNSET state (no chip picked): show no value, just the label.
   if (p.kind === "steps") return v < 0 ? "" : p.options?.[v] ?? String(v);
+  // A bitmask, so the head summarises with a count rather than a value.
+  if (p.kind === "checks") {
+    const n = integrationCount(v);
+    return n === 0 ? "" : n === 1 ? "1 system" : `${n} systems`;
+  }
   if (p.key === "locales") return v === 1 ? "1 language" : `${v} languages`;
-  if (p.key === "integrations") return v === 1 ? "1 system" : `${v} systems`;
   return String(v);
 }
 
@@ -126,6 +133,32 @@ export function PackageBuilderStage() {
                         />
                         <span className={s.countValue}>{v}</span>
                       </div>
+                    ) : p.kind === "checks" ? (
+                      // Same chip row as the step selectors, but every chip is
+                      // an independent toggle over one bit of the mask, so any
+                      // number can be on at once. The numeral slot carries a
+                      // check instead of a rung number: these are not an order.
+                      <ol className={s.opts} role="group" aria-label={p.label}>
+                        {p.options?.map((opt, i) => {
+                          const on = (v & (1 << i)) !== 0;
+                          return (
+                            <li key={opt} className={s.optItem}>
+                              <button
+                                type="button"
+                                className={`${s.opt}${on ? ` ${s.optOn}` : ""}`}
+                                aria-pressed={on}
+                                aria-label={`${p.label}: ${opt}`}
+                                onClick={() => set(p.key, v ^ (1 << i))}
+                              >
+                                <span className={s.optNum} aria-hidden="true">
+                                  {on ? "x" : ""}
+                                </span>
+                                <span className={s.optText}>{opt}</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ol>
                     ) : (
                       <ol className={s.opts} role="group" aria-label={p.label}>
                         {p.options?.map((opt, i) => (

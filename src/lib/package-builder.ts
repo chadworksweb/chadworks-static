@@ -38,7 +38,10 @@ const CONTENT_PER_PAGE = [0, 60, 140, 240]; // you have it -> I write every word
 const EDITABILITY = [0, 500, 1200, 2000];
 const MOTION = [0, 500, 1400, 3000, 6000];
 const COMMERCE = [0, 900, 2200, 4500, 9000];
-const GEO = [0, 600, 1500, 3000];
+// NO GEO LADDER. Being readable and citable by the machines used to be a
+// priced parameter; it is not one any more (Chad, 2026-07-19), because it is
+// already part of every build. It is stated in the inclusions list instead of
+// sold as a rung, which is also why `washA` is now a constant.
 const TIMELINE_MULT = [1, 1.15, 1.35]; // applied to the whole build, last
 
 // ---------------------------------------------------------------------
@@ -63,13 +66,49 @@ const LADDER_BY_KEY: Partial<Record<keyof Scope, number[]>> = {
   editability: EDITABILITY,
   motion: MOTION,
   commerce: COMMERCE,
-  geo: GEO,
 };
 
 // The step ladder behind a `kind: "steps"` param, index-aligned to its options.
 export function ladderFor(key: keyof Scope): number[] | undefined {
   return LADDER_BY_KEY[key];
 }
+
+// ---------------------------------------------------------------------
+// INTEGRATIONS -- a checklist, not a count.
+//
+// This was a 0-to-8 slider, which asked the reader to translate "what do I
+// need this thing to talk to" into a number before the tool would answer them
+// (Chad, 2026-07-19). Naming the systems asks the question they can actually
+// answer, and it costs nothing on the pricing side: each one is still
+// PER_INTEGRATION, so eight checked is exactly what eight on the slider was.
+//
+// The first three are named systems and carry their real marks on the slab.
+// Everything after is a capability rather than a vendor, because past the ones
+// people ask for by name the question stops being WHICH system.
+//
+// ORDER IS LOAD-BEARING: `Scope.integrations` is a BITMASK over these indices
+// and the slab reads the same indices to pick each tile's mark. Appending is
+// safe; reordering or removing silently rewrites what an existing scope means.
+export const INTEGRATION_OPTIONS = [
+  "Calendly",
+  "HubSpot",
+  "Zapier",
+  "Memberships and logins",
+  "Subscriptions and billing",
+  "Email marketing",
+  "A CRM or database of your own",
+  "Anything else with an API",
+] as const;
+
+/** Bitmask -> how many systems are checked. This is what actually gets billed. */
+export function integrationCount(mask: number): number {
+  let n = 0;
+  for (let i = 0; i < INTEGRATION_OPTIONS.length; i++) if (mask & (1 << i)) n++;
+  return n;
+}
+
+/** Build a mask from option indices. For the worked examples on the page. */
+export const wire = (...idx: number[]) => idx.reduce((m, i) => m | (1 << i), 0);
 
 // The per-unit rates behind the `kind: "range"` params, plus the multiplier.
 export const UNIT_RATES = {
@@ -99,8 +138,9 @@ export type Scope = {
   editability: number;
   motion: number;
   commerce: number;
+  // A BITMASK over INTEGRATION_OPTIONS, not a count. Read it with
+  // integrationCount(); never treat the raw value as a number of systems.
   integrations: number;
-  geo: number;
   timeline: number;
   locales: number;
 };
@@ -122,7 +162,6 @@ export const BASELINE: Scope = {
   motion: 0,
   commerce: 0,
   integrations: 0,
-  geo: 0,
   timeline: 0,
   locales: 1,
 };
@@ -135,7 +174,9 @@ export type Param = {
   key: keyof Scope;
   label: string;
   hint: string;
-  kind: "range" | "steps";
+  // "range" renders a slider, "steps" a single-choice chip row, "checks" a
+  // multi-select chip row backed by a bitmask.
+  kind: "range" | "steps" | "checks";
   min?: number;
   max?: number;
   options?: string[];
@@ -210,17 +251,9 @@ export const PARAMS: Param[] = [
   {
     key: "integrations",
     label: "Integrations",
-    hint: "Calendly, HubSpot, memberships, subscriptions, APIs.",
-    kind: "range",
-    min: 0,
-    max: 8,
-  },
-  {
-    key: "geo",
-    label: "AI visibility",
-    hint: "Whether the machines can read and cite you.",
-    kind: "steps",
-    options: ["Skip it", "The basics", "Structured", "The full pass"],
+    hint: "What the site has to talk to. Check every one that applies.",
+    kind: "checks",
+    options: [...INTEGRATION_OPTIONS],
   },
   {
     key: "timeline",
@@ -271,8 +304,7 @@ export function ledger(s: Scope): LedgerLine[] {
     { label: "Who edits it", amount: at(EDITABILITY, s.editability) },
     { label: "Motion", amount: at(MOTION, s.motion) },
     { label: "Ecommerce", amount: at(COMMERCE, s.commerce) },
-    { label: "Integrations", amount: s.integrations * PER_INTEGRATION },
-    { label: "AI visibility", amount: at(GEO, s.geo) },
+    { label: "Integrations", amount: integrationCount(s.integrations) * PER_INTEGRATION },
     { label: "Languages", amount: Math.max(0, s.locales - 1) * PER_LOCALE },
   ];
   return lines.filter((l) => l.amount > 0);
@@ -374,7 +406,6 @@ export function weeksLabel(s: Scope): string {
 //   commerce     -> washB        (the wash cools toward brand mid) + commerceLevel (the
 //                                 cart + product grid in the middle column)
 //   integrations -> spectrum     (more systems, more chromatic split)
-//   geo          -> washA        (the halo the machines read it by)
 //   timeline     -> pulse        (rush reads as urgency)
 //   locales      -> spread       (the strata fan apart: parallel sites)
 //
@@ -392,6 +423,7 @@ export type Channels = {
   edit: number; // editability level: the edit badge on the panel (0..3)
   motionLevel: number; // motion level: gates the dot field behind the slab (0..4)
   commerceLevel: number; // commerce level: the cart + product grid, middle column (0..4)
+  wired: number; // integrations BITMASK: which connector tiles, last column
   rimGlow: number; // top ambition step only: light sustained inside the bevel
   strata: number;
   spread: number;
@@ -448,7 +480,6 @@ const LILAC: [number, number, number] = [0.898, 0.824, 0.957]; // #e5d2f4
 // periwinkle instead, and less far, so the change reads as the object cooling
 // rather than changing material.
 const MID: [number, number, number] = [0.337, 0.408, 0.678]; // #5668ad
-const INDIGO: [number, number, number] = [0.141, 0.224, 0.537]; // #243989
 
 export function channels(s: Scope): Channels {
   const ambitionT = norm(s.ambition, 0, AMBITION.length - 1);
@@ -486,6 +517,11 @@ export function channels(s: Scope): Channels {
     // plaque: the cart at 2, ringed with 8 cells at 3, filled with 16 at 4,
     // and glowing at 5. Raw level, staged like the others.
     commerceLevel: s.commerce,
+    // Integrations fill the LAST third with one connector tile per system. The
+    // raw BITMASK goes through, not a count, because the slab draws each
+    // checked system's own mark and therefore has to know WHICH are checked,
+    // not just how many. `spectrum` takes the count for the chromatic split.
+    wired: s.integrations,
     // The lit bevel belongs to the LAST ambition step alone. It is the reward
     // for going all the way, so it does not ramp with ambitionT -- it is off at
     // every other level and on at the top. The render loop eases the switch, so
@@ -515,7 +551,10 @@ export function channels(s: Scope): Channels {
     // as the corner plaque (see the plaque channel). White is a neutral
     // multiplier, so the wash carries the colour untouched.
     tint: WHITE,
-    washA: mix3(BRAND, INDIGO, norm(s.geo, 0, GEO.length - 1)),
+    // Constant since the geo ladder was cut. It was the halo the machines read
+    // the object by, ramping brand -> indigo; with nothing driving it the base
+    // brand violet is the level-0 value the slab always opened on.
+    washA: BRAND,
     washB: mix3(BRAND, MID, norm(s.commerce, 0, COMMERCE.length - 1) * 0.42),
     washC: mix3(
       mix3(LILAC, GREY, 0.5),
@@ -525,7 +564,7 @@ export function channels(s: Scope): Channels {
     sheen: norm(s.editability, 0, EDITABILITY.length - 1) * 0.9,
     spin: 0.06 + norm(s.motion, 0, MOTION.length - 1) * 0.5,
     pulse: norm(s.timeline, 0, TIMELINE_MULT.length - 1),
-    spectrum: norm(s.integrations, 0, 8),
+    spectrum: norm(integrationCount(s.integrations), 0, INTEGRATION_OPTIONS.length),
   };
 }
 
