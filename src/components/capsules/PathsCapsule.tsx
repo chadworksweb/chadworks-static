@@ -9,9 +9,16 @@ import { LANE_COLORS } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type PathsCapsuleProps = { paths: NonNullable<Service["paths"]> };
+// `layout` is per-instance, not a fork (Chad, 2026-07-17). The lane chrome is
+// wired through every service page's paths section AND HubTemplate, so the card
+// grid stays the default and a caller opts into "rows" on its own. Adding a
+// second copy of this capsule to vary one axis is how the two gems got tangled.
+export type PathsCapsuleProps = {
+  paths: NonNullable<Service["paths"]>;
+  layout?: "grid" | "rows";
+};
 
-export function PathsCapsule({ paths }: PathsCapsuleProps) {
+export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
   return (
     <SectionShell className="svc-block">
       <h2 className="svc-block__heading">{paths.heading}</h2>
@@ -20,7 +27,7 @@ export function PathsCapsule({ paths }: PathsCapsuleProps) {
           <W value={paths.intro} />
         </p>
       )}
-      <div className="svc-lanes">
+      <div className={`svc-lanes${layout === "rows" ? " svc-lanes--rows" : ""}`}>
         {paths.items.map((p, i) => {
           const style = {
             "--lane-color": LANE_COLORS[i % LANE_COLORS.length],

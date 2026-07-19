@@ -13,13 +13,18 @@ import { SpeedDemon } from "@/components/SpeedDemon";
 export function AboutChadCapsule({
   captionMain = "Yes, this is the whole company.",
   captionSub = "(That's the point.)",
+  className,
 }: {
   captionMain?: string;
   captionSub?: string;
+  // Per-instance hook, forwarded to the section. Used on /web-design/ to close
+  // the gap under the portfolio showcase without moving this block elsewhere.
+  className?: string;
 } = {}) {
   return (
     <MadeByCapsule
       variant="split"
+      className={className}
       made={{
         heading: (
           <>

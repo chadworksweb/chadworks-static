@@ -8,7 +8,7 @@ import { webDevelopment as service } from "@/lib/services/web-development";
 import { webDesign } from "@/lib/services/web-design";
 import { serviceUrl } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
-import { ProcessCapsule, GemRevealCapsule, PortfolioShowcaseCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
+import { ProcessCapsule, GemRevealCapsule, PlatformOptionsCapsule, PortfolioShowcaseCapsule, RatesCapsule, FitCapsule, MainContactCapsule, NextStepsCapsule } from "@/components/capsules";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -60,6 +60,10 @@ export default function WebDevelopmentPage() {
         // Definition of web development as an interactive hint-reveal over the
         // spinning CW gem, between the process and the build options.
         explainer: <GemRevealCapsule />,
+        // Platform Options is now its own shared capsule (Chad, 2026-07-19), so
+        // this page reads the SAME four options as /web-design/ instead of the
+        // page's old divergent copy. Rendered as the horizontal stacked lanes.
+        paths: <PlatformOptionsCapsule prefix="Web Development" />,
         // Swap the light ripple portfolio for the full shared showroom (same one
         // the homepage and web-design render).
         portfolio: <PortfolioShowcaseCapsule archiveHeading="Website Development Showcase" />,

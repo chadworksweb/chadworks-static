@@ -11,6 +11,7 @@ export { ProcessCapsule } from "./ProcessCapsule";
 export { GemPanelCapsule } from "./GemPanelCapsule";
 export { GemRevealCapsule } from "./GemRevealCapsule";
 export { PathsCapsule } from "./PathsCapsule";
+export { PlatformOptionsCapsule } from "./PlatformOptionsCapsule";
 export { TiersCapsule } from "./TiersCapsule";
 export { ProofCapsule } from "./ProofCapsule";
 export { PortfolioCapsule } from "./PortfolioCapsule";

@@ -156,38 +156,8 @@ export const webDevelopment: Service = {
     ],
   },
 
-  paths: {
-    heading: "Development Platform Options",
-    comingSoon: true,
-    // The web-development definition intro moved to its own gem-panel section
-    // (the `explainer` slot) between the process and this build-options funnel.
-    items: [
-      {
-        label: "Custom Coded / Static",
-        detail:
-          "The fastest, most secure route. Custom-built with nothing to update or break, and yours completely. Best for ambitious, unique and creative builds that require no limits.",
-        href: "/custom-coded-static/",
-      },
-      {
-        label: "WordPress",
-        detail:
-          "WordPress powers over 40% of the internet. It's great for when you need to manage a lot of content or publishing schedules, or have a team of people that need to contribute to the site. Tried and true. (But might be overkill these days!)",
-        href: "/wordpress/",
-      },
-      {
-        label: "Ecommerce",
-        detail:
-          "Custom coded plus shopping! Custom products, cart, payments, checkout, etc. I'll build whatever you need from the ground up. Nothing more, nothing less. Ultimate flexibility and reduced bloat.",
-        href: "/ecommerce/",
-      },
-      {
-        label: "Shopify",
-        detail:
-          "Commercial grade, pre-built ecommerce with all the basics. Low budget entry point, but comes with monthly fees and extra features can add up.",
-        href: "/shopify/",
-      },
-    ],
-  },
+  // Platform Options now render from the shared PlatformOptionsCapsule (Chad,
+  // 2026-07-19), so this page carries no build-options list of its own.
 
   price: {
     heading: "What it costs, plainly",

@@ -15,12 +15,10 @@ import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { WebDesignHeroArt } from "@/components/art/WebDesignHeroArt";
 import { DesignReveal } from "@/components/art/DesignReveal";
-import {
-  CustomCodedViz,
-  WordPressViz,
-  EcommerceViz,
-  ShopifyViz,
-} from "@/components/art/BuildPathViz";
+// No BuildPathViz icons on this page's platform lanes (Chad, 2026-07-17). The
+// icons are per-item DATA (`viz`), not part of PathsCapsule, so dropping them
+// here is scoped to /web-design/ and needs no fork: the capsule renders `viz`
+// only when an item carries one. /websites/ and /ecommerce/ keep theirs.
 
 export const webDesign: Service = {
   slug: "web-design",
@@ -156,46 +154,14 @@ export const webDesign: Service = {
     ],
   },
 
-  paths: {
-    heading: "Web Design Platform Options",
-    intro:
-      "I offer four different platforms on which I can build your website. When you call for your free consultation, we'll discuss the options and likely settle on the option that is best for your situation.",
-    items: [
-      {
-        label: "Custom Coded",
-        detail:
-          "Custom code is how websites were built before CMS platforms like WordPress and builders like Squarespace came along, and in the age of deep internet saturation, custom coded websites are rising again as the go-to for those who want to stand out in a world of templates. Custom coded sites have total control over the design and the function of the website. It's like a block of clay that you get to sculpt into anything you want.",
-        href: "/custom-coded-static/",
-        viz: <CustomCodedViz />,
-      },
-      {
-        label: "WordPress",
-        detail:
-          "WordPress powers over 40% of the internet, and for good reason. WordPress is a CMS (content management system), which is a type of website platform that has a user-friendly interface that allows non-web designers to edit not only the content of their site, but much of the design, layout and surface level code, without knowing any code. The thing is, WordPress became ubiquitous. An entire economy has been built up around it, which creates amazing opportunity, but also has led to the templatization of the web. If it makes sense to use WordPress for your project, I'll make sure it's not a cookie cutter design.",
-        href: "/wordpress/",
-        viz: <WordPressViz />,
-      },
-      {
-        label: "Ecommerce",
-        detail:
-          "Ecommerce is a website with a product and payment system built in. This can be as simple as a PDF download or as complex as a multi-line fashion label. Ecommerce websites aren't necessarily their own type of platform, but rather a set of functions and features that can be built custom, built into WordPress or built on Shopify. If you want to sell online, ecommerce is what you want.",
-        href: "/ecommerce/",
-        viz: <EcommerceViz />,
-      },
-      {
-        label: "Shopify",
-        detail:
-          "Shopify is the DIY / Squarespace of ecommerce. While I can build everything Shopify does as a bespoke website you own and control 100%, Shopify is an option if you need to get online on a budget. The trade-off for the speed and convenience is that you'll be using templates, and monthly costs can pile up for special features. I will happily work with Shopify, but I will always tell my clients if building custom is better for their long-term needs.",
-        href: "/shopify/",
-        viz: <ShopifyViz />,
-      },
-    ],
-  },
+  // Platform Options now live in the shared PlatformOptionsCapsule (Chad,
+  // 2026-07-19), the single source for the four build platforms across the
+  // Websites lane. This page renders it via the `paths` slot override.
 
   price: {
     heading: "What design costs, plainly",
     body:
-      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 floor. Most builds settle near $6,200, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.",
+      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 baseline. Most builds settle between $5,000 and $10,000, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.",
   },
 
   faqLead:
@@ -204,7 +170,9 @@ export const webDesign: Service = {
   faqs: [
     {
       q: "What is web design?",
-      a: "Website design is the visual aspect of a website. This includes the UI (user interface), which includes colors, fonts, images and other media. It also covers UX (user experience), which is the way a visitor explores the website; the path they take, the links they click and where those links go, the forms they fill out and the buttons they push. UI and UX work together to make it easy for your visitors to find what they're looking for. The design is the aesthetic of that interface and experience. Without design, you'd be looking at indecipherable lines of code and spreadsheet-like data, and would not be able to find what you need.",
+      // Blank lines are paragraph breaks (FaqAccordion splits on them). Chad's
+      // wording is untouched; only the breaks are new.
+      a: "Website design is the visual aspect of a website.\n\nThis includes the UI (user interface), which includes colors, fonts, images and other media. It also covers UX (user experience), which is the way a visitor explores the website; the path they take, the links they click and where those links go, the forms they fill out and the buttons they push.\n\nUI and UX work together to make it easy for your visitors to find what they're looking for. The design is the aesthetic of that interface and experience.\n\nWithout design, you'd be looking at indecipherable lines of code and spreadsheet-like data, and would not be able to find what you need.",
     },
     {
       q: "Do you design from templates or themes?",
@@ -288,8 +256,8 @@ export const webDesign: Service = {
         label: "Budget Posture",
         span: "half",
         options: [
-          { value: "floor", label: "Around the $3,200 floor" },
-          { value: "typical", label: "Around the $6,200 typical build" },
+          { value: "baseline", label: "Around the $3,200 baseline" },
+          { value: "typical", label: "The typical build ($5,000 to $10,000)" },
           { value: "beyond", label: "Bigger vision, bigger number" },
           { value: "unsure", label: "Tell me what it takes" },
         ],
@@ -318,15 +286,9 @@ export const webDesign: Service = {
     ],
   },
 
-  assurance: {
-    heading: "chadworks tenets of transparency",
-    items: [
-      "Everything I create for you is legally yours, upon final payment.",
-      "Every project includes at least one week of post-launch coverage.",
-      "No nonsense or fluff. Direct questions and direct answers, in the name of protecting your business goals.",
-      "No lock-in, no long-term contracts or chadworks' proprietary technology or platforms that hold your project hostage should you want to leave.",
-    ],
-  },
+  // No assurance slot: the tenets of transparency moved to /about/ on
+  // 2026-07-17 and now live in TenetsCapsule, which is their canonical home.
+  // Do not retype them here.
 
   nextSteps: {
     heading: "What happens after you reach out",

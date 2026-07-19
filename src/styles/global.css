@@ -1241,15 +1241,17 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-crumbs a:hover { color: var(--accent); }
 .svc-crumbs [aria-current] { color: var(--text-secondary); }
 
-/* Inline text link (used inside lede / prose) */
+/* Inline text link (used inside lede / prose). It ALWAYS sits inside a <p>, so
+   it rides the animated `p a` tracing underline (the house style, same as the
+   plain prose links on the homepage) instead of drawing its own. It used to add
+   a static `text-decoration: underline` here, which layered a SECOND underline
+   over the animated trace -- the double underline in the hero lede (Chad,
+   2026-07-19). No static underline, and no `transition`/`:hover` of its own
+   either, or they would override the trace's background-size animation. Only the
+   colour hook stays (the `.svc-dark .svc-inline-link` override needs it). */
 .svc-inline-link {
   color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
-  text-decoration-thickness: 1px;
-  transition: color var(--duration-fast) var(--ease-smooth);
 }
-.svc-inline-link:hover { color: var(--text-primary); }
 
 /* Hero -- equal top + bottom (see --hero-pad-y). Overrides the .section default.
    LINE-FOR-LINE the web-development hero (Chad, 2026-06-11): no atmosphere
@@ -7868,6 +7870,17 @@ html.cw-motion-paused *::after {
   html:not(.cw-force-motion) {
     .cw-pxdiv__cell { transition: none; }
   }
+}
+
+/* /web-design/ page-scoped spacing (Chad, 2026-07-19): the testimonials ride
+   the assurance slot between the FAQ and the contact section, tightened up. */
+.section.cw-wd-testimonials {
+  padding-top: calc(var(--section-pad-y) * 0.5);
+}
+
+/* Closes the gap between the portfolio showcase and the About Chad block. */
+.section.cw-wd-made {
+  padding-top: calc(var(--section-pad-y) * 0.35);
 }
 
 /* ---------------------------------------------------------------------
