@@ -51,6 +51,11 @@ export const Mat = {
     // prettier-ignore
     return new Float32Array([c,0,-s,0, 0,1,0,0, s,0,c,0, 0,0,0,1]);
   },
+  rotZ(a: number): Float32Array {
+    const c = Math.cos(a), s = Math.sin(a);
+    // prettier-ignore
+    return new Float32Array([c,s,0,0, -s,c,0,0, 0,0,1,0, 0,0,0,1]);
+  },
   mul(a: Float32Array, b: Float32Array): Float32Array {
     const o = new Float32Array(16);
     for (let c = 0; c < 4; c++) {
@@ -546,11 +551,110 @@ in vec2 vUv;
 uniform sampler2D uTex;
 uniform float uAlpha;
 uniform vec3 uTint;
+// Both default to the identity for every decal on the plaque (uUvScale 1,1 and
+// uFalloff 0), so the marks that were here first are untouched. They exist for
+// the motion dot field, which is the one quad stretched to a non-square shape.
+uniform vec2 uUvScale; // tiles the texture so a stretched quad keeps round dots
+uniform float uFalloff; // 1 = fade out toward the quad edge instead of a hard cut
+// The motion field's two states. uBreath is the whole-field level the CPU
+// computes (the steady 25-75% fade); uRipple crossfades that for a wave
+// travelling across the field. They REPLACE each other rather than stacking, so
+// at uRipple 1 the steady fade is gone entirely. Defaults (1, 0) leave every
+// other decal at full strength.
+uniform float uTime;
+uniform float uBreath;
+uniform float uRipple;
+// A circular bite taken out of the quad, in vUv space (xy = centre, zw = radii,
+// elliptical because a cell is not square). The product grid uses it so its
+// rules stop at the cart's circle instead of running under it: the circle reads
+// as always present, even at the tier that draws no disc.
+uniform vec4 uHole;
+uniform float uHoleOn;
 out vec4 frag;
 void main(){
-  vec4 t = texture(uTex, vUv);
-  frag = vec4(t.rgb * uTint, t.a) * uAlpha;
+  if (uHoleOn > 0.5) {
+    vec2 hd = (vUv - uHole.xy) / max(uHole.zw, vec2(0.0001));
+    if (dot(hd, hd) < 1.0) discard;
+  }
+  vec2 uv = (vUv - 0.5) * uUvScale + 0.5;
+  vec4 t = texture(uTex, uv);
+  float lvl = uBreath;
+  if (uRipple > 0.001) {
+    // Measured in quad space so the wave crosses the field's own shape. Mostly
+    // horizontal with a little vertical lean, which reads as a wave passing
+    // through rather than a bar sliding sideways.
+    //
+    // Made deliberately loud (Chad, 2026-07-19). Three things carry that, and
+    // it needed all three: a LONGER wave (1.25 cycles across the field, not
+    // 1.8) so the crest is a broad band instead of fine corrugation, a POWER
+    // curve that pushes most of the field down into the trough and leaves the
+    // crest as a distinct travelling brightness, and a full-depth swing to 1.0
+    // instead of topping out at 0.75.
+    // The 1.7 is the travel speed: about 3.7s per pass, up from ~7s.
+    float phase = (vUv.x * 0.82 + vUv.y * 0.18) * 7.85 - uTime * 1.7;
+    float w = 0.5 + 0.5 * sin(phase);
+    w = pow(w, 2.4);
+    lvl = mix(uBreath, mix(0.22, 1.0, w), uRipple);
+  }
+  // Measured in QUAD space, where vUv runs 0..1 on both axes whatever the real
+  // proportions are, so the fade is a circle in UV and lands as an ellipse of
+  // the quad's own shape in the world. That is what makes an elongated field
+  // die out along its own edges rather than inside a circle.
+  float f = 1.0;
+  if (uFalloff > 0.5) {
+    float d = length(vUv - 0.5) * 2.0;
+    f = 1.0 - smoothstep(0.84, 1.0, d);
+  }
+  frag = vec4(t.rgb * uTint, t.a) * uAlpha * f * lvl;
 }`;
+
+// ---------------------------------------------------------------------
+// ICOSAHEDRON EDGES -- the wireframe the showroom-grade atmospheric shapes
+// fold through. Ported from chadlewine's PsycheAura, which builds the 12
+// vertices as cyclic (0, +/-1, +/-PHI) permutations pushed onto the unit
+// sphere, then DERIVES the 30 edges as the vertex pairs at minimum separation
+// rather than hand-listing them, so the pairing can never drift out of sync
+// with the vertices.
+// ---------------------------------------------------------------------
+export const ICO_LINES: Float32Array = (() => {
+  const PHI = (1 + Math.sqrt(5)) / 2;
+  const raw: [number, number, number][] = [];
+  for (const a of [-1, 1])
+    for (const b of [-1, 1]) {
+      raw.push([0, a, b * PHI]);
+      raw.push([a, b * PHI, 0]);
+      raw.push([b * PHI, 0, a]);
+    }
+  const v = raw.map((p) => {
+    const l = Math.hypot(p[0], p[1], p[2]);
+    return [p[0] / l, p[1] / l, p[2] / l] as [number, number, number];
+  });
+  const dist = (a: number, b: number) =>
+    Math.hypot(v[a][0] - v[b][0], v[a][1] - v[b][1], v[a][2] - v[b][2]);
+  let min = Infinity;
+  for (let i = 0; i < v.length; i++)
+    for (let j = i + 1; j < v.length; j++) min = Math.min(min, dist(i, j));
+  const out: number[] = [];
+  const tol = min * 1.05;
+  for (let i = 0; i < v.length; i++)
+    for (let j = i + 1; j < v.length; j++)
+      if (dist(i, j) <= tol) out.push(...v[i], ...v[j]);
+  return new Float32Array(out);
+})();
+
+// Flat hairline shader for those wireframes. Writes PREMULTIPLIED, because the
+// pass it draws in runs the premultiplied blend.
+export const lineVert = `#version 300 es
+layout(location=0) in vec3 aPos;
+uniform mat4 uProj, uView, uModel;
+void main(){ gl_Position = uProj * uView * uModel * vec4(aPos, 1.0); }`;
+
+export const lineFrag = `#version 300 es
+precision highp float;
+uniform vec3 uCol;
+uniform float uAlpha;
+out vec4 frag;
+void main(){ frag = vec4(uCol * uAlpha, uAlpha); }`;
 
 // ---------------------------------------------------------------------
 // DEFAULTS -- this engine's own locked look. Not the gem's.

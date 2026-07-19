@@ -138,6 +138,9 @@
   opacity: 0.55;
   margin: 0.65rem 0 0;
   font-variant-numeric: tabular-nums;
+  /* 50% up from the .micro 0.62rem it composes (Chad, 2026-07-19). The window
+     is half the answer, so it was reading as a footnote to the price. */
+  font-size: 0.93rem;
 }
 
 /* ---- the rail: its own scroll box ---- */

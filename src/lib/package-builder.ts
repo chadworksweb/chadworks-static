@@ -311,7 +311,16 @@ export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 // TUNE THESE, CHAD. Delivery capacity is a promise about your calendar, and
 // nobody else can set it. The shape is defensible; the constants are yours.
 // ---------------------------------------------------------------------
-const WEEKS_FLOOR = 2; // the baseline build, start to launched
+// Tuned 2026-07-19 (Chad), in two passes. The floor took the 1.5x and kept it,
+// because even the smallest build has a start-up cost that does not shrink.
+// The span came back down to 6 after the 1.5x pass pushed a store to 12-16
+// weeks, which overshot: a store should read as two to three months, not four.
+//
+// Chad's calibration case is Salpattica, which converted in about a month, but
+// that build started from an existing site with Square already wired up, so it
+// is the FLOOR of what a store can take rather than the typical figure. The
+// curve is aimed at a store built from nothing.
+const WEEKS_FLOOR = 3; // the baseline build, start to launched
 const WEEKS_SPAN = 6; // weeks added by the first $10k of scope past baseline
 const WEEKS_PIVOT = 10000;
 const WEEKS_CURVE = 0.7;
@@ -358,9 +367,12 @@ export function weeksLabel(s: Scope): string {
 //   brandingDone -> brandContent (the plaque panel is constant; this ladder lays
 //                                 marks on it: gem @2, + wordmark @3, + cloud @4)
 //   content      -> washC        (the wash gains its third color)
-//   editability  -> sheen        (surface you can touch)
-//   motion       -> spin         (how alive it is)
-//   commerce     -> washB        (copper enters the wash)
+//   editability  -> edit         (an edit badge in the panel's top-right: the
+//                                 pencil @2, ringed @3, filled @4) + sheen
+//   motion       -> spin         (how alive it is) + motionLevel (the braille
+//                                 dot field breathing in behind the slab @2+)
+//   commerce     -> washB        (the wash cools toward brand mid) + commerceLevel (the
+//                                 cart + product grid in the middle column)
 //   integrations -> spectrum     (more systems, more chromatic split)
 //   geo          -> washA        (the halo the machines read it by)
 //   timeline     -> pulse        (rush reads as urgency)
@@ -377,6 +389,9 @@ export type Channels = {
   plaque: number; // constant: the brand plaque panel, held at its level-2 state
   brandContent: number; // brandingDone level: the marks laid on the plaque
   copy: number; // content level: skeleton copy lines laid under the gem (0..3)
+  edit: number; // editability level: the edit badge on the panel (0..3)
+  motionLevel: number; // motion level: gates the dot field behind the slab (0..4)
+  commerceLevel: number; // commerce level: the cart + product grid, middle column (0..4)
   rimGlow: number; // top ambition step only: light sustained inside the bevel
   strata: number;
   spread: number;
@@ -428,7 +443,11 @@ const GREY: [number, number, number] = [0.62, 0.62, 0.66];
 const WHITE: [number, number, number] = [1, 1, 1];
 const BRAND: [number, number, number] = [0.502, 0.329, 0.737]; // #8054bc
 const LILAC: [number, number, number] = [0.898, 0.824, 0.957]; // #e5d2f4
-const COPPER: [number, number, number] = [0.831, 0.647, 0.455]; // #d4a574
+// Commerce used to pull the wash toward COPPER, which turned the whole slab
+// reddish (Chad, 2026-07-19). It still shifts, just toward the brand mid
+// periwinkle instead, and less far, so the change reads as the object cooling
+// rather than changing material.
+const MID: [number, number, number] = [0.337, 0.408, 0.678]; // #5668ad
 const INDIGO: [number, number, number] = [0.141, 0.224, 0.537]; // #243989
 
 export function channels(s: Scope): Channels {
@@ -453,6 +472,20 @@ export function channels(s: Scope): Channels {
     // content level also lays skeleton "copy" lines under the gem: 1 line at the
     // first level up to 4 at "Every word".
     copy: s.content,
+    // Editability lays an edit badge in the panel's top-right, opposite the
+    // gem. Level 1 is bare (you are not editing anything, so no badge), 2 is
+    // the pencil alone, 3 rings it, 4 fills the ring with the brand gradient.
+    // Raw level, like brandContent and copy, because the reveal is staged
+    // rather than ramped.
+    edit: s.editability,
+    // Motion also lays the braille dot field in behind the slab from level 2
+    // up. Raw level, because the field is a staged reveal; `spin` still carries
+    // the continuous ramp.
+    motionLevel: s.motion,
+    // Commerce builds a cart-and-inventory mark in the middle third of the
+    // plaque: the cart at 2, ringed with 8 cells at 3, filled with 16 at 4,
+    // and glowing at 5. Raw level, staged like the others.
+    commerceLevel: s.commerce,
     // The lit bevel belongs to the LAST ambition step alone. It is the reward
     // for going all the way, so it does not ramp with ambitionT -- it is off at
     // every other level and on at the top. The render loop eases the switch, so
@@ -483,7 +516,7 @@ export function channels(s: Scope): Channels {
     // multiplier, so the wash carries the colour untouched.
     tint: WHITE,
     washA: mix3(BRAND, INDIGO, norm(s.geo, 0, GEO.length - 1)),
-    washB: mix3(BRAND, COPPER, norm(s.commerce, 0, COMMERCE.length - 1) * 0.65),
+    washB: mix3(BRAND, MID, norm(s.commerce, 0, COMMERCE.length - 1) * 0.42),
     washC: mix3(
       mix3(LILAC, GREY, 0.5),
       LILAC,

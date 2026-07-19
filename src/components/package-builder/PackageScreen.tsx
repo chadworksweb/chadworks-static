@@ -29,6 +29,9 @@ import {
   screenFrag,
   plugFrag,
   texFrag,
+  lineVert,
+  lineFrag,
+  ICO_LINES,
   SCREEN,
 } from "@/lib/package-screen-core";
 import type { Channels } from "@/lib/package-builder";
@@ -45,6 +48,16 @@ const ELECTRIC: [number, number, number] = [1.0, 0.95, 0.6];
 // plug pins, so the object reads as one material family.
 const PLAQUE_DIM: [number, number, number] = [0.3, 0.27, 0.42];
 const PLAQUE_LIT: [number, number, number] = [0.66, 0.58, 0.78];
+// The slab's own violet (#8054bc), the hue the whole object is built from. The
+// edit badge's ring wears it so the badge reads as part of the slab rather than
+// a second brand colour sitting on top of it.
+const SLAB_VIOLET: [number, number, number] = [0.502, 0.329, 0.737];
+// Showroom-grade wireframes, ported from chadlewine's PsycheAura. Three shells
+// rather than its four: these are a fraction of the size, and the fourth just
+// muddies into the third. BASE_SPIN stays very low, as it is there.
+const PHI = (1 + Math.sqrt(5)) / 2;
+const SOLID_SHELLS = 3;
+const BASE_SPIN = 0.055;
 
 export function PackageScreen({
   channels,
@@ -88,10 +101,12 @@ export function PackageScreen({
     // A lost context (browser WebGL cap hit during SPA nav) fails compiles with
     // an empty log. Bail quietly rather than throwing out of the effect.
     let screenProg: WebGLProgram, plugProg: WebGLProgram, texProg: WebGLProgram;
+    let lineProg: WebGLProgram;
     try {
       screenProg = link(screenVert, screenFrag);
       plugProg = link(screenVert, plugFrag);
       texProg = link(screenVert, texFrag);
+      lineProg = link(lineVert, lineFrag);
     } catch (err) {
       console.warn("PackageScreen: WebGL shader build failed; object omitted.", err);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -166,6 +181,11 @@ export function PackageScreen({
     // clear of the rim it is supposed to be meeting -- the wider the bevel, the
     // more that hover shows. This is a z-fight guard, not a design gap.
     const PLAQUE_GAP = 0.003;
+    // The corner studs. Named because the edit badge has to clear the top-right
+    // one, and a badge that clears a hardcoded 0.055 would drift the day these
+    // move. Both the rivet draw and the badge placement read these.
+    const RIVET_OFF = 0.055; // stud centre, inset from the plaque edge
+    const RIVET_R = 0.014; // stud half-size
     const rivetBuf = mkVao();
     const rivetMesh = buildScreen(1, 1, 0.5, 0.34, 1); // a beveled disc
     upload(rivetBuf, rivetMesh);
@@ -183,10 +203,32 @@ export function PackageScreen({
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 0, 0, 0]));
     let gemReady = false;
     let gemAspect = 480 / 300; // the mark's real w/h; corrected once it decodes
+    // Where the MARK actually starts inside its own PNG, as a fraction of the
+    // image width. The file carries transparent padding, so the quad's left
+    // edge is not the logo's left edge, and copy squared to the quad sits
+    // visibly left of the gem. Measured rather than eyeballed, so re-exporting
+    // the PNG with different padding re-aligns the copy on its own.
+    let gemInkL = 0;
     const gemImg = new Image();
     gemImg.onload = () => {
       if (gemImg.naturalWidth && gemImg.naturalHeight) {
         gemAspect = gemImg.naturalWidth / gemImg.naturalHeight;
+        // Scanned at a reduced width: this only needs to find a column, and a
+        // full-size scan of a large PNG would block the decode callback.
+        const SW = 160;
+        const SH = Math.max(1, Math.round(SW / gemAspect));
+        const sc = document.createElement("canvas");
+        sc.width = SW; sc.height = SH;
+        const sctx = sc.getContext("2d", { willReadFrequently: true });
+        if (sctx) {
+          sctx.drawImage(gemImg, 0, 0, SW, SH);
+          const d = sctx.getImageData(0, 0, SW, SH).data;
+          let firstCol = -1;
+          for (let x = 0; x < SW && firstCol < 0; x++)
+            for (let y = 0; y < SH; y++)
+              if (d[(y * SW + x) * 4 + 3] > 12) { firstCol = x; break; }
+          if (firstCol > 0) gemInkL = firstCol / SW;
+        }
       }
       gl.bindTexture(gl.TEXTURE_2D, gemTex);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -288,6 +330,311 @@ export function PackageScreen({
       }
     }
 
+    // --- the braille DOT FIELD (motion level 2+), laid in BEHIND the slab.
+    // The same field the "Is your agency ripping you off?" teaser puts behind
+    // the cutout on the homepage (.cw-bat__grain), which itself came off the
+    // showroom's .metaCorner. Ported rather than reinvented so the two read as
+    // one texture: the 4.5px cell, the deep-blue dot, and the small white
+    // highlight offset into the cell's top-left at 38%/38%.
+    //
+    // Baked with its radial falloff already in the alpha (the CSS does this
+    // with mask-image), so the field pools in the middle and dies out at the
+    // edges instead of ending on a hard rectangle.
+    const dotsTex = stubTex();
+    {
+      const cvs = document.createElement("canvas");
+      // A SEAMLESS TILE now, not a one-shot stamp: the field is stretched to the
+      // slab's proportions, so the texture repeats at a fixed WORLD cell size
+      // (see DOT_CELL at the draw) and the quad's shape no longer touches how
+      // round a dot is. 64 divides 1024 exactly, which is what keeps the grid
+      // from breaking at the wrap seam.
+      const D = 1024;
+      const CELLS = 64;
+      cvs.width = D; cvs.height = D;
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, D, D);
+        const cell = D / CELLS;
+        const deep = "rgba(36,57,137,0.26)"; // --grad-deep at 26%, as the CSS
+        for (let y = 0; y < CELLS; y++) {
+          for (let x = 0; x < CELLS; x++) {
+            const cxp = x * cell, cyp = y * cell;
+            ctx.fillStyle = deep;
+            ctx.beginPath();
+            ctx.arc(cxp + cell * 0.5, cyp + cell * 0.5, cell * 0.19, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.beginPath();
+            ctx.arc(cxp + cell * 0.38, cyp + cell * 0.38, cell * 0.075, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        // No mask baked in any more: the falloff moved into texFrag, where it
+        // is measured in quad space and so takes the field's elongated shape
+        // instead of always being a circle.
+        uploadCanvas(dotsTex, cvs);
+        // Tiling is the whole point of this texture, so it wraps. uploadCanvas
+        // leaves everything clamped for the plaque decals, which must not.
+        gl.bindTexture(gl.TEXTURE_2D, dotsTex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+      }
+    }
+
+    // --- ATMOSPHERIC SHAPES (motion level 4), sprinkled around the field ------
+    // On-brand means this object's own vocabulary rather than the soft gradient
+    // blobs a marketing page reaches for: thin-stroked facet outlines, the same
+    // clinical line-art language the slab's bevel and the CW gem already speak.
+    // chadlewine's aura fields are the reference for the ATMOSPHERE; the forms
+    // are chadworks'.
+    //
+    // Two builds, drawn white and tinted per instance so a handful of shapes
+    // costs two textures rather than a dozen.
+    // Returns the texture AND a coarse alpha map, which is what makes hover
+    // land on the drawn strokes instead of a bounding circle. The map is
+    // reduced by taking the MAX alpha in each block, so a hairline survives
+    // downsampling and picks up a pixel of slack, which is the difference
+    // between "accurate" and "impossible to hit".
+    const HIT = 64;
+    const shapeTex = (sides: number, inner: boolean) => {
+      const tex = stubTex();
+      const hit = new Uint8Array(HIT * HIT);
+      const cvs = document.createElement("canvas");
+      const S = 256;
+      cvs.width = S; cvs.height = S;
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, S, S);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        const r = S * 0.40;
+        const poly = (rad: number) => {
+          ctx.beginPath();
+          for (let i = 0; i < sides; i++) {
+            const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+            const x = S / 2 + Math.cos(a) * rad;
+            const y = S / 2 + Math.sin(a) * rad;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.closePath();
+          ctx.stroke();
+        };
+        poly(r);
+        // The inner echo is what makes it read as a facet rather than a plain
+        // outline: two shells, the way the gem is cut.
+        if (inner) {
+          ctx.globalAlpha = 0.55;
+          ctx.lineWidth = 2.5;
+          poly(r * 0.54);
+          ctx.globalAlpha = 1;
+        }
+        const px = ctx.getImageData(0, 0, S, S).data;
+        const block = S / HIT;
+        for (let gy = 0; gy < HIT; gy++) {
+          for (let gx = 0; gx < HIT; gx++) {
+            let mx = 0;
+            for (let y = 0; y < block; y++) {
+              for (let x = 0; x < block; x++) {
+                const sx = gx * block + x, sy = gy * block + y;
+                const a = px[(sy * S + sx) * 4 + 3];
+                if (a > mx) mx = a;
+              }
+            }
+            hit[gy * HIT + gx] = mx;
+          }
+        }
+        uploadCanvas(tex, cvs);
+      }
+      return { tex, hit };
+    };
+    const hexShape = shapeTex(6, true);
+    const triShape = shapeTex(3, false);
+
+    // Where each shape sits, as an angle around the field and a radius in units
+    // of the field's own half-extent. All are past 1.0, which is what keeps them
+    // in the OUTER area, out past the slab, sprinkled through the dot grain
+    // rather than laid over the cover.
+    // `rad` is in units of the field's half-extent. Everything stays past 1.0 so
+    // the shapes sit outside the cover, but the far ring was pulled in from
+    // 1.18-1.24 to 1.10-1.14 (Chad, 2026-07-19): out at 1.24 they drifted into
+    // the dead space past the grain and read as strays rather than atmosphere.
+    // chadworks palette ONLY (Chad, 2026-07-19): the accent violet, grad-deep
+    // indigo, grad-mid, grad-peak lilac, accent-strong. The copper that was
+    // here belongs to the gem and the dark-band border, not to this brand.
+    const C_VIOLET: [number, number, number] = SLAB_VIOLET; // #8054bc
+    const C_INDIGO: [number, number, number] = [0.141, 0.224, 0.537]; // #243989
+    const C_MID: [number, number, number] = [0.337, 0.408, 0.678]; // #5668ad
+    const C_LILAC: [number, number, number] = [0.898, 0.824, 0.957]; // #e5d2f4
+    const C_DEEPPUR: [number, number, number] = [0.212, 0.118, 0.612]; // #361e9c
+
+    // `rad` pulled in again to 0.86-1.0 (Chad): still the field's outer band,
+    // but hugging the object rather than floating off it.
+    // `full` gives a shape a complete revolution on a tilted axis instead of
+    // the slow incommensurate drift, so the cluster is not uniformly meditative.
+    // `dim` takes some of them down so the ring reads as depth, not a row.
+    const SHAPES: {
+      ang: number; rad: number; size: number; spin: number; drift: number;
+      shape: { tex: WebGLTexture | null; hit: Uint8Array };
+      col: [number, number, number]; dim: number;
+      full: boolean; rate: number; tiltX: number; tiltZ: number;
+    }[] = [
+      { ang: 0.42, rad: 0.94, size: 0.115, spin: 0.6, drift: 0.0, shape: hexShape, col: C_VIOLET, dim: 0.72, full: true, rate: 0.55, tiltX: 0.7, tiltZ: 0.3 },
+      { ang: 1.15, rad: 1.0, size: 0.075, spin: -0.9, drift: 1.7, shape: triShape, col: C_MID, dim: 0.52, full: false, rate: 0, tiltX: 0.2, tiltZ: 1.9 },
+      { ang: 2.05, rad: 0.88, size: 0.095, spin: 0.45, drift: 3.1, shape: hexShape, col: C_INDIGO, dim: 0.616, full: true, rate: -0.38, tiltX: 1.4, tiltZ: 0.9 },
+      { ang: 2.85, rad: 0.99, size: 0.065, spin: 1.1, drift: 0.8, shape: triShape, col: C_DEEPPUR, dim: 0.592, full: false, rate: 0, tiltX: 2.4, tiltZ: 0.6 },
+      { ang: 3.62, rad: 0.98, size: 0.105, spin: -0.5, drift: 2.4, shape: hexShape, col: C_VIOLET, dim: 0.68, full: false, rate: 0, tiltX: 0.9, tiltZ: 2.7 },
+      { ang: 4.5, rad: 0.98, size: 0.07, spin: 0.8, drift: 4.2, shape: triShape, col: C_DEEPPUR, dim: 0.56, full: true, rate: 0.72, tiltX: 1.9, tiltZ: 1.2 },
+      { ang: 5.25, rad: 0.86, size: 0.09, spin: -0.7, drift: 1.1, shape: hexShape, col: C_MID, dim: 0.64, full: false, rate: 0, tiltX: 0.4, tiltZ: 2.2 },
+      { ang: 5.95, rad: 0.97, size: 0.06, spin: 0.95, drift: 5.0, shape: triShape, col: C_MID, dim: 0.576, full: true, rate: -0.6, tiltX: 2.8, tiltZ: 0.15 },
+    ];
+    // Eased hover response per shape, so a shape lights and settles rather than
+    // snapping the frame the pointer crosses it.
+    const shapeHover = new Float32Array(SHAPES.length);
+
+    // --- the EDIT badge (editability), three layers drawn on one 256px grid so
+    // they register exactly when stacked: the pencil glyph, the ring around it,
+    // and the brand-gradient disc that fills the ring at the top level.
+    // All three are white/premultiplied and tinted at draw time, except the
+    // disc, which carries the brand gradient as its own colour.
+    const BADGE = 256;
+    const badgeCanvas = () => {
+      const cvs = document.createElement("canvas");
+      cvs.width = BADGE; cvs.height = BADGE;
+      return cvs;
+    };
+
+    // The pencil: the standard Material "edit" glyph, stroked as a real icon
+    // path rather than built out of polygons here. A hand-drawn pencil reads
+    // cartoonish at this size (Chad, 2026-07-19); a production icon path does
+    // not, and it matches the icon vocabulary the rest of the site already uses.
+    //
+    // Drawn in its native 24x24 space and centred on the badge by its own
+    // viewBox centre (12,12), which is what puts it DEAD CENTRE of the ring:
+    // both are placed from the same origin, so nothing has to be nudged.
+    // Solid white, tinted at draw time.
+    const pencilTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        const p = new Path2D(
+          "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+        );
+        const span = 138; // icon box across the 256 badge; clears the ring
+        ctx.save();
+        ctx.translate(BADGE / 2, BADGE / 2);
+        ctx.scale(span / 24, span / 24);
+        ctx.translate(-12, -12);
+        ctx.fillStyle = "#fff";
+        ctx.fill(p);
+        ctx.restore();
+        uploadCanvas(pencilTex, cvs);
+      }
+    }
+
+    // The cart: the Material shopping-cart glyph, drawn the same way the edit
+    // pencil is (real icon path, centred by its own 24x24 viewBox) so the two
+    // marks on this plaque read as one icon set rather than two styles.
+    const cartTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        const p = new Path2D(
+          "M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"
+        );
+        const span = 132;
+        ctx.save();
+        ctx.translate(BADGE / 2, BADGE / 2);
+        ctx.scale(span / 24, span / 24);
+        ctx.translate(-12, -12);
+        ctx.fillStyle = "#fff";
+        ctx.fill(p);
+        ctx.restore();
+        uploadCanvas(cartTex, cvs);
+      }
+    }
+
+    // A product cell: one hairline square of the inventory grid behind the cart.
+    const cellTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        ctx.strokeStyle = "#fff";
+        // Stroked INSIDE the edge, so butting cells read as a shared rule
+        // rather than a double-thick seam.
+        ctx.lineWidth = 7;
+        ctx.strokeRect(3.5, 3.5, BADGE - 7, BADGE - 7);
+        uploadCanvas(cellTex, cvs);
+      }
+    }
+
+    // The grid's own circle: same stroke weight as a cell, at the exact radius
+    // the cells are cut to. Drawn with them, so where each cell's inner corner
+    // stops this arc carries on and the four (or eight, or sixteen) corners
+    // read as ONE rounded circle rather than four clipped squares. The circle
+    // is therefore made OUT of the boxes, not laid over them.
+    const GRID_RING_R = 118; // of 128 half; must match holeR's 0.92 at the draw
+    const gridRingTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 7; // the cell stroke, so the join is invisible
+        ctx.beginPath();
+        ctx.arc(BADGE / 2, BADGE / 2, GRID_RING_R, 0, Math.PI * 2);
+        ctx.stroke();
+        uploadCanvas(gridRingTex, cvs);
+      }
+    }
+
+    // The ring: an outline circle, level 3's "circle around it".
+    const ringTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        ctx.strokeStyle = "#fff";
+        // Halved from 11 (Chad, 2026-07-19). The arc radius is unchanged, so
+        // the ring thins around its own centreline rather than shrinking.
+        ctx.lineWidth = 5.5;
+        ctx.beginPath();
+        ctx.arc(BADGE / 2, BADGE / 2, BADGE / 2 - 14, 0, Math.PI * 2);
+        ctx.stroke();
+        uploadCanvas(ringTex, cvs);
+      }
+    }
+
+    // The disc: the ring filled at level 4, in white settling into lavender
+    // (Chad, 2026-07-19). It carries its own colour and is drawn untinted, so
+    // it stays a light plate on the dark panel no matter what the washes are
+    // doing. The ring stays the dark blue theme colour on top of it.
+    const discTex = stubTex();
+    {
+      const cvs = badgeCanvas();
+      const ctx = cvs.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, BADGE, BADGE);
+        const g = ctx.createLinearGradient(30, 30, BADGE - 30, BADGE - 30);
+        g.addColorStop(0, "#ffffff");
+        g.addColorStop(1, "#e5d2f4"); // lilac
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(BADGE / 2, BADGE / 2, BADGE / 2 - 14, 0, Math.PI * 2);
+        ctx.fill();
+        uploadCanvas(discTex, cvs);
+      }
+    }
+
     // A soft feathered rectangle: the halo behind a copy line at levels 3-4.
     // Tinted + scaled at draw time; blurred so its edges read as a glow.
     const glowTex = stubTex();
@@ -374,7 +721,31 @@ export function PackageScreen({
       proj: U(texProg, "uProj"), view: U(texProg, "uView"),
       model: U(texProg, "uModel"), normal: U(texProg, "uNormal"),
       tex: U(texProg, "uTex"), alpha: U(texProg, "uAlpha"), tint: U(texProg, "uTint"),
+      uvScale: U(texProg, "uUvScale"), falloff: U(texProg, "uFalloff"),
+      time: U(texProg, "uTime"), breath: U(texProg, "uBreath"),
+      ripple: U(texProg, "uRipple"),
+      hole: U(texProg, "uHole"), holeOn: U(texProg, "uHoleOn"),
     };
+    const ul = {
+      proj: U(lineProg, "uProj"), view: U(lineProg, "uView"),
+      model: U(lineProg, "uModel"), col: U(lineProg, "uCol"),
+      alpha: U(lineProg, "uAlpha"),
+    };
+
+    // The icosahedron edge buffer: positions only, drawn as GL_LINES. Its own
+    // minimal VAO rather than mkVao's pos/normal/uv layout, which this needs
+    // none of.
+    const icoVao = gl.createVertexArray();
+    {
+      const buf = gl.createBuffer();
+      gl.bindVertexArray(icoVao);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, ICO_LINES, gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+      gl.bindVertexArray(null);
+    }
+    const ICO_VCOUNT = ICO_LINES.length / 3;
 
     // --- sizing -------------------------------------------------------
     let DPR = 1;
@@ -423,6 +794,10 @@ export function PackageScreen({
     let plugHover = false; // pointer is over the plug AND the plug is clickable
     let hoverAmt = 0; // eased plugHover: the lift that says "this is a control"
     const plugScreen = { x: -1, y: -1 }; // plug body centre in canvas px
+    // Pointer in canvas CSS px, for the level-4 atmospheric shapes. Parked far
+    // off-canvas when the pointer is away, so "nothing is hovered" needs no
+    // separate flag: every shape is simply too far to react.
+    const ptr = { x: -9999, y: -9999 };
 
     const reduce = prefersReducedMotion();
     let raf = 0, running = false, t0 = 0, prevTs = 0;
@@ -454,6 +829,9 @@ export function PackageScreen({
       cur.plaque = ease(cur.plaque, t.plaque, k);
       cur.brandContent = ease(cur.brandContent, t.brandContent, k);
       cur.copy = ease(cur.copy, t.copy, k);
+      cur.edit = ease(cur.edit, t.edit, k);
+      cur.motionLevel = ease(cur.motionLevel, t.motionLevel, k);
+      cur.commerceLevel = ease(cur.commerceLevel, t.commerceLevel, k);
       // Eased at a QUARTER of the morph rate. Everything else on this object
       // snaps to its new shape; the rim light has to arrive slowly or the
       // sustain it is supposed to hold gets announced by a hard switch-on.
@@ -536,6 +914,211 @@ export function PackageScreen({
           plugCharge = 1 - smooth(0, 1, z); // the plug drains as it fires
           plugWipe = smooth(0, 1, z) * 1.05; // wavefront crosses fully (past 1)
           plugZap = Math.min(1, z / 0.08) * (1 - smooth(0.82, 1, z)); // rise, hold, fall
+        }
+      }
+
+      // --- the braille dot field, laid in behind everything ------------
+      // Motion level 2 and up (Chad, 2026-07-19). Deliberately a STILL plane:
+      // it takes neither the slab's drift nor its tilt, so the object floats
+      // against the field and the two separate in depth. A field that moved
+      // with the slab would read as a sticker on its back.
+      //
+      // Drawn first with depth writes OFF, so it can never occlude the object
+      // in front of it regardless of how far the leaves spread back.
+      {
+        const fieldA = smooth(0.4, 1.0, cur.motionLevel);
+        if (fieldA > 0.01) {
+          // 40% to 90% and back across ten seconds, five up and five down. The
+          // band was 25-75% and came up 15 points (Chad, 2026-07-19); the span
+          // is unchanged, so the fade travels the same distance, just brighter
+          // at both ends. Cosine rather than a triangle so the turns are soft
+          // rather than hitting a corner at each end. Reduced motion holds the
+          // midpoint: the texture stays, the breathing stops.
+          const A_LO = 0.4, A_HI = 0.9;
+          const breath = reduce
+            ? (A_LO + A_HI) / 2
+            : A_LO + ((A_HI - A_LO) / 2) * (1 - Math.cos((time * Math.PI * 2) / 10));
+          // ELONGATED to the slab's own proportions (Chad, 2026-07-19), each
+          // axis taken from the matching half-dimension rather than one shared
+          // radius. The slab runs from about 4:1 wide at two sections to taller
+          // than wide at ten, so a square field was only ever right at one
+          // setting.
+          //
+          // How far past the slab the grain reaches, now per axis (Chad,
+          // 2026-07-19). Y runs wider than X because the cover is a wide,
+          // shortish shape at most section counts, so an equal multiple on both
+          // axes spends most of its reach sideways and leaves the top and
+          // bottom edges looking clipped. The two are independent knobs.
+          const PEEK_X = 1.65;
+          const PEEK_Y = 2.15;
+          // Level 4 opens the field out another 15% to make room for the
+          // atmospheric shapes that sprinkle its outer area (Chad, 2026-07-19).
+          // Ramped on the eased level so the field grows into it.
+          const grow = 1 + 0.15 * smooth(2.4, 3.0, cur.motionLevel);
+          const hw = HW * cur.scale * PEEK_X * grow;
+          const hh = cur.heightHalf * cur.scale * PEEK_Y * grow;
+          const dm = Mat.mul(Mat.trans(0, 0, -1.2), Mat.scale(hw, hh, 1));
+          // Dots keep a constant WORLD size, so stretching the quad or widening
+          // the spread changes how much field there is and never how dense or
+          // how round it is. Repeats = the quad's span over one tile's span.
+          const DOT_CELL = 0.0243; // world units per cell
+          const tile = 64 * DOT_CELL;
+          const uvx = (2 * hw) / tile;
+          const uvy = (2 * hh) / tile;
+          gl.depthMask(false);
+          // The texture is premultiplied (uploadCanvas), so this pass needs the
+          // premultiplied blend. Restored to the standard one below.
+          gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+          gl.useProgram(texProg);
+          gl.uniformMatrix4fv(ut.proj, false, proj);
+          gl.uniformMatrix4fv(ut.view, false, view);
+          gl.uniformMatrix4fv(ut.model, false, dm);
+          gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, dm)));
+          gl.activeTexture(gl.TEXTURE0);
+          gl.uniform1i(ut.tex, 0);
+          gl.uniform3f(ut.tint, 1, 1, 1);
+          gl.uniform2f(ut.uvScale, uvx, uvy);
+          gl.uniform1f(ut.falloff, 1);
+          gl.uniform1f(ut.holeOn, 0);
+          // Level 3 ("Animated") swaps the whole-field fade for a wave crossing
+          // the dots. Crossfaded on the eased level rather than switched at a
+          // threshold, so moving between the two rungs does not pop. At full
+          // ripple the steady fade is gone: they replace, never stack.
+          gl.uniform1f(ut.breath, breath);
+          gl.uniform1f(ut.ripple, smooth(1.4, 2.0, cur.motionLevel));
+          // Frozen under reduced motion: the wave stays as a static pattern in
+          // the field instead of travelling.
+          gl.uniform1f(ut.time, reduce ? 0 : time);
+          gl.bindTexture(gl.TEXTURE_2D, dotsTex);
+          gl.uniform1f(ut.alpha, fieldA);
+          gl.bindVertexArray(quadBuf.vao);
+          gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);
+
+          // --- the atmospheric shapes, level 4 --------------------------
+          // Placed in the field's OUTER area (every radius is past 1.0), so
+          // they sprinkle the grain rather than sitting over the cover. Hover
+          // is deliberately small: a touch of lift and light, enough to say the
+          // thing responds without turning the backdrop into a toy.
+          const atmoA = smooth(2.4, 3.0, cur.motionLevel);
+          const solidA = smooth(3.4, 4.0, cur.motionLevel); // showroom grade
+          if (atmoA > 0.01) {
+            gl.uniform2f(ut.uvScale, 1, 1);
+            gl.uniform1f(ut.falloff, 0);
+            gl.uniform1f(ut.breath, 1);
+            gl.uniform1f(ut.ripple, 0);
+            const zS = -1.15; // just in front of the grain, still behind the slab
+            const vz = zS + SCREEN.camZ;
+            for (let i = 0; i < SHAPES.length; i++) {
+              const sp = SHAPES[i];
+              const bob = Math.sin(time * 0.28 + sp.drift) * 0.04;
+              const px = Math.cos(sp.ang) * hw * sp.rad;
+              const py = Math.sin(sp.ang) * hh * sp.rad + bob;
+
+              const rot = time * sp.spin * 0.11 + sp.ang;
+
+              // Hover hits the DRAWN STROKES, not a bounding circle (Chad,
+              // 2026-07-19). The pointer is walked back through the shape's own
+              // transform into its local square, then the baked alpha map is
+              // sampled: outside the quad, or inside it but on empty ground
+              // between the strokes, both read as no hover.
+              let want = 0;
+              if (vz < -0.001) {
+                const sx = ((proj[0] * px) / -vz * 0.5 + 0.5) * canvas.clientWidth;
+                const sy = (1 - ((proj[5] * py) / -vz * 0.5 + 0.5)) * canvas.clientHeight;
+                // World units per screen pixel at this depth, per axis.
+                const ppx = (proj[0] / -vz) * 0.5 * canvas.clientWidth;
+                const ppy = (proj[5] / -vz) * 0.5 * canvas.clientHeight;
+                // Screen y grows downward, world y upward, hence the flip.
+                const wx = (ptr.x - sx) / ppx;
+                const wy = -(ptr.y - sy) / ppy;
+                const c = Math.cos(rot), s = Math.sin(rot);
+                const szNow = sp.size * cur.scale * (1 + shapeHover[i] * 0.15);
+                const lx = (wx * c + wy * s) / szNow;
+                const ly = (-wx * s + wy * c) / szNow;
+                if (lx >= -1 && lx <= 1 && ly >= -1 && ly <= 1) {
+                  const gx = Math.min(HIT - 1, Math.max(0, Math.floor((lx * 0.5 + 0.5) * HIT)));
+                  // The texture uploads flipped, so local +y is the map's top.
+                  const gy = Math.min(HIT - 1, Math.max(0, Math.floor((1 - (ly * 0.5 + 0.5)) * HIT)));
+                  want = sp.shape.hit[gy * HIT + gx] > 24 ? 1 : 0;
+                }
+              }
+              shapeHover[i] = ease(shapeHover[i], want, Math.min(1, dt * 6));
+              const hv = shapeHover[i];
+
+              const sz = sp.size * cur.scale * (1 + hv * 0.15);
+              const sm = Mat.mul(
+                Mat.trans(px, py, zS),
+                Mat.mul(Mat.rotZ(rot), Mat.scale(sz, sz, 1))
+              );
+              gl.uniformMatrix4fv(ut.model, false, sm);
+              gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, sm)));
+              gl.uniform3f(ut.tint, sp.col[0], sp.col[1], sp.col[2]);
+              gl.bindTexture(gl.TEXTURE_2D, sp.shape.tex);
+              // The flat outline hands over to the wireframe at level 5.
+              gl.uniform1f(ut.alpha, atmoA * (0.34 + hv * 0.4) * sp.dim * (1 - solidA));
+              gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);
+            }
+          }
+
+          // --- showroom grade: each shape folds into a mini PsycheAura ------
+          // Ported from chadlewine's field: nested icosahedra on a golden-ratio
+          // scale falloff, each shell turning on its own incommensurate triad
+          // so the moire between them never repeats. Shrunk to atmosphere size
+          // and given the shape's own brand colour.
+          if (solidA > 0.01) {
+            gl.useProgram(lineProg);
+            gl.uniformMatrix4fv(ul.proj, false, proj);
+            gl.uniformMatrix4fv(ul.view, false, view);
+            gl.bindVertexArray(icoVao);
+            const zS = -1.15;
+            for (let i = 0; i < SHAPES.length; i++) {
+              const sp = SHAPES[i];
+              const hv = shapeHover[i];
+              const bob = Math.sin(time * 0.28 + sp.drift) * 0.04;
+              const px = Math.cos(sp.ang) * hw * sp.rad;
+              const py = Math.sin(sp.ang) * hh * sp.rad + bob;
+              const base = sp.size * cur.scale * (1 + hv * 0.15) * 1.15;
+              // A `full` shape is tipped to its own fixed odd angle and then
+              // turns a COMPLETE revolution about that tipped axis, so it reads
+              // as a solid rolling over rather than a cluster shimmering in
+              // place. The rest keep PsycheAura's slow incommensurate drift.
+              const tip = sp.full
+                ? Mat.mul(Mat.rotZ(sp.tiltZ), Mat.rotX(sp.tiltX))
+                : null;
+              for (let s = 0; s < SOLID_SHELLS; s++) {
+                const k = Math.pow(1 / PHI, s); // 1, 0.618, 0.382
+                const t2 = time * BASE_SPIN + sp.drift;
+                const sc = Mat.scale(base * k, base * k, base * k);
+                const spinM = sp.full
+                  ? Mat.mul(
+                      tip!,
+                      // Shells share the axis but not the rate, so they still
+                      // slip against each other while the body rolls as one.
+                      Mat.mul(Mat.rotY(time * sp.rate * (1 + s * 0.22) + sp.drift), sc)
+                    )
+                  : Mat.mul(
+                      Mat.rotY(t2 * (0.93 - s * 0.13)),
+                      Mat.mul(
+                        Mat.rotX(t2 * (0.61 + s * 0.17)),
+                        Mat.mul(Mat.rotZ(t2 * (0.29 + s * 0.09)), sc)
+                      )
+                    );
+                const m = Mat.mul(Mat.trans(px, py, zS), spinM);
+                gl.uniformMatrix4fv(ul.model, false, m);
+                gl.uniform3f(ul.col, sp.col[0], sp.col[1], sp.col[2]);
+                // Inner shells recede, and hover lifts the whole cluster.
+                gl.uniform1f(
+                  ul.alpha,
+                  solidA * atmoA * (0.5 - s * 0.13) * (0.62 + hv * 0.55) * sp.dim
+                );
+                gl.drawArrays(gl.LINES, 0, ICO_VCOUNT);
+              }
+            }
+            gl.bindVertexArray(quadBuf.vao);
+          }
+
+          gl.depthMask(true);
+          gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         }
       }
 
@@ -828,9 +1411,9 @@ export function PackageScreen({
         // correction, against their own (greater) lift -- otherwise the corner
         // rivet creeps outward off the plaque it is supposed to be pinning.
         const rivetShrink = liftScale(rivetZ);
-        const cx = Math.max(0.06, HW - OV_INSET - 0.055) * rivetShrink;
-        const cy = Math.max(0.04, hh - OV_INSET - 0.055) * rivetShrink;
-        const rr = 0.014 * appear;
+        const cx = Math.max(0.06, HW - OV_INSET - RIVET_OFF) * rivetShrink;
+        const cy = Math.max(0.04, hh - OV_INSET - RIVET_OFF) * rivetShrink;
+        const rr = RIVET_R * appear;
         for (const sx of [-1, 1])
           for (const sy of [-1, 1]) {
             const rm = Mat.mul(
@@ -864,6 +1447,14 @@ export function PackageScreen({
           gl.activeTexture(gl.TEXTURE0);
           gl.uniform1i(ut.tex, 0);
           gl.uniform3f(ut.tint, 1, 1, 1);
+          // Back to the identity after the dot field, which is the only draw
+          // that tiles or fades. Without this the gem would inherit its UV
+          // scale and repeat across the plaque.
+          gl.uniform2f(ut.uvScale, 1, 1);
+          gl.uniform1f(ut.falloff, 0);
+          gl.uniform1f(ut.breath, 1); // full strength; the fade is the field's alone
+          gl.uniform1f(ut.ripple, 0);
+          gl.uniform1f(ut.holeOn, 0); // only the product grid bites a hole
           gl.bindVertexArray(quadBuf.vao);
 
           const markZ = faceZ + PLAQUE_GAP + 2 * OV_HD + 0.005; // just above the panel
@@ -919,32 +1510,119 @@ export function PackageScreen({
             decal(gemTex, -pxHalf + gw + 0.04, pyHalf - gh - gemMargin, gw, gh, gemA);
           }
 
+          // --- the EDIT badge (editability), top-right, opposite the gem ---
+          // "Who edits it" is the one scope layer the client operates rather
+          // than receives, so it gets a control on the panel instead of a
+          // material change to it. Staged: bare at level 1 (you are not editing
+          // anything), the pencil at 2, ringed at 3, and at 4 the ring fills
+          // with the brand gradient, which is the badge going from a marking on
+          // the surface to a button that belongs to you.
+          //
+          // All three layers draw at the SAME half-size: they were painted on
+          // one 256px grid, so the pencil lands inside the ring by construction
+          // rather than by a fudged scale factor here.
+          {
+            const bh = Math.min(0.082, pyHalf * 0.3); // badge half-size (square)
+            // Tucked inside the top-right stud rather than under it (Chad,
+            // 2026-07-19). Clearing the stud's INNER edge on both axes puts the
+            // badge fully inside the corner it pins, and reading the offset off
+            // RIVET_OFF/RIVET_R means moving the studs moves the badge with them.
+            // The 0.018 is the visible gap between stud and badge. It is padded
+            // past bare contact because the studs take a perspective shrink
+            // (rivetShrink) that this decal pass does not, which walks them a
+            // little further inboard than their flat coordinates suggest.
+            const studClear = RIVET_OFF + RIVET_R + 0.018;
+            const bx = pxHalf - bh - studClear;
+            const by = pyHalf - bh - studClear;
+            const pencilA = smooth(0.4, 1.0, cur.edit) * appear;
+            if (pencilA > 0.01) {
+              const ringA = smooth(1.4, 2.0, cur.edit) * appear;
+              const discA = smooth(2.4, 3.0, cur.edit) * appear;
+              // Back to front: the light disc, the dark blue ring, the pencil.
+              // The disc carries its own colour, so it draws untinted.
+              if (discA > 0.01) decal(discTex, bx, by, bh, bh, discA);
+              if (ringA > 0.01) {
+                gl.uniform3f(ut.tint, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+                decal(ringTex, bx, by, bh, bh, ringA);
+              }
+              // The pencil starts light, because until the disc arrives it sits
+              // on the dim panel, and turns indigo once the white/lavender plate
+              // is behind it, where a pale glyph would vanish.
+              const pl = 0.93 + (0.141 - 0.93) * discA;
+              const pg = 0.9 + (0.224 - 0.9) * discA;
+              const pb = 0.98 + (0.537 - 0.98) * discA;
+              gl.uniform3f(ut.tint, pl, pg, pb);
+              decal(pencilTex, bx, by, bh, bh, pencilA);
+              gl.uniform3f(ut.tint, 1, 1, 1);
+            }
+          }
+
+          // --- SHARED COLUMN METRICS ------------------------------------
+          // Hoisted out of the copy block so the product grid beside it reads
+          // the SAME numbers rather than recomputing them. The grid is aligned
+          // to the copy's real top and bottom edges, so any drift between two
+          // copies of this arithmetic would show up as a visible misalignment.
+          //
+          // The zone runs from just under the (capped) gem to just inside the
+          // panel bottom. Margins are proportional so it stays a valid, in-
+          // bounds band at EVERY section size -- the lines never spill past
+          // the plaque on a short panel or bunch up on a tall one.
+          const colW = (2 * pxHalf) / 3; // one column of the three
+          const gemBottom = pyHalf - gemMargin - 2 * gh;
+          const zoneTop = gemBottom - Math.min(0.025, pyHalf * 0.08);
+          // TWO bars per section, evenly led down the zone.
+          const nLines = Math.max(2, Math.round(t.sections) * 2);
+
+          // THE BOTTOM STUD. The proportional bottom margin scales with the
+          // panel, but the stud does NOT below a few sections: its centre is
+          // pinned by a Math.max floor. So on a short panel the margin shrinks
+          // past a stud that has stopped moving, and the last copy bar kisses
+          // the bottom-left one (Chad, 2026-07-19).
+          //
+          // Solved rather than padded, so it costs nothing at the section counts
+          // that already clear. Take the natural zone; if the last bar lands
+          // below the stud's clearance line, re-solve the leading so it lands ON
+          // that line instead. Iterated because barHalfH is itself a function of
+          // the leading, so one pass would undershoot.
+          // The gap left above the stud. 0.008 was enough to stop them
+          // OVERLAPPING and nowhere near enough to stop them touching: at four
+          // sections it left three thousandths, which reads as a kiss. The bar's
+          // left end sits over the stud horizontally, so this vertical gap is
+          // the only thing separating them and it has to be a real one.
+          const nailCy = Math.max(0.04, pyHalf - RIVET_OFF);
+          const nailClear = -nailCy + RIVET_R + 0.028;
+          let zoneBot = -pyHalf + Math.min(0.03, pyHalf * 0.12);
+          let gap = 0, barHalfH = 0, botEdge = 0;
+          for (let it = 0; it < 4; it++) {
+            gap = Math.max(0.0005, (zoneTop - zoneBot) / (nLines + 1));
+            barHalfH = Math.min(0.01, gap * 0.3);
+            botEdge = zoneTop - gap * (nLines - 0.5) - barHalfH;
+            if (botEdge >= nailClear) break;
+            const g = Math.max(
+              0.0005,
+              (zoneTop - nailClear - barHalfH) / (nLines - 0.5)
+            );
+            zoneBot = zoneTop - g * (nLines + 1);
+          }
+          const zoneH = Math.max(0.02, zoneTop - zoneBot);
+          // Where the copy actually STARTS and STOPS, which is inside the zone
+          // rather than at its edges: the first bar hangs half a leading below
+          // zoneTop and the last stops well above zoneBot.
+          const copyTopEdge = zoneTop - gap * 0.5 + barHalfH;
+          const copyBotEdge = botEdge;
+
           // --- skeleton COPY lines: the first third of a 1/3-1/3-1/3 layout
           // under the gem. TWO squared placeholder bars per section, left-aligned
           // like text and distributed down the zone, so more sections means more
           // copy at a steady density. The content LEVEL styles every line:
           // nothing at 1, a border at 2, a glow at 3, a stronger glow at 4. ---
           {
-            const colW = (2 * pxHalf) / 3; // first column of the three
-            const leftX = -pxHalf + 0.04; // align to the gem's left inset
-            const fullBarW = Math.max(0.04, colW - 0.06);
-            // The zone runs from just under the (capped) gem to just inside the
-            // panel bottom. Margins are proportional so it stays a valid, in-
-            // bounds band at EVERY section size -- the lines never spill past
-            // the plaque on a short panel or bunch up on a tall one.
-            const gemBottom = pyHalf - gemMargin - 2 * gh;
-            const zoneTop = gemBottom - Math.min(0.025, pyHalf * 0.08);
-            const zoneBot = -pyHalf + Math.min(0.03, pyHalf * 0.12);
-            const zoneH = Math.max(0.02, zoneTop - zoneBot);
-            // A FIXED number of copy lines (not one-per-section): adding sections
-            // does NOT add lines, it SPACES THE SAME LINES OUT. The leading is a
-            // fraction of the (section-driven) zone, so it is reduced from an
-            // even fill yet grows as the panel gets taller.
-            const nLines = Math.max(2, Math.round(t.sections) * 2); // 2 per section
-            // Even leading down the zone; reduced from a loose fill but never a
-            // solid block. More sections => more lines at a steady density.
-            const gap = zoneH / (nLines + 1);
-            const barHalfH = Math.min(0.01, gap * 0.3);
+            // Squared to the gem's INK, not its quad: the copy starts where the
+            // logo starts (Chad, 2026-07-19). The right edge holds, so the bars
+            // shorten by exactly the padding baked into the PNG.
+            const inkShift = gemInkL * 2 * gw;
+            const leftX = -pxHalf + 0.04 + inkShift;
+            const fullBarW = Math.max(0.04, colW - 0.06 - inkShift);
             const widthFrac = [1.0, 0.9, 0.97, 0.72, 0.86, 0.94]; // ragged copy
             // Content level -> lines + styling, each effect one level later than
             // the last: level 1 draws the lines as a hollow BORDER (no fill),
@@ -989,6 +1667,129 @@ export function PackageScreen({
             }
             gl.uniform3f(ut.tint, 1, 1, 1); // reset for any later decals
           }
+
+          // --- ECOMMERCE: the cart on its inventory grid ------------------
+          // The MIDDLE third of the 1/3-1/3-1/3 layout, beside the copy lines.
+          // A stackable mark: the grid is the inventory and the cart is the
+          // thing that moves it, so growing the catalogue divides the SAME
+          // footprint into more cells rather than sprawling.
+          //   2  a few products : cart + 4 cells
+          //   3  a real store   : 4 -> 8 cells
+          //   4  a catalog      : 8 -> 16, the disc fills, the outline goes violet
+          //   5  a platform     : 16 -> 32, plus the copy lines' violet bloom
+          {
+            const midX = -pxHalf + 0.04 + colW * 1.5; // centre of the middle third
+
+            const shop = smooth(0.4, 1.0, cur.commerceLevel); // 2+
+            const store = smooth(1.4, 2.0, cur.commerceLevel); // 3+
+            const cat = smooth(2.4, 3.0, cur.commerceLevel); // 4+
+            const plat = smooth(3.4, 4.0, cur.commerceLevel); // 5
+
+            if (shop > 0.01) {
+              // The grid keeps ONE footprint at every tier; only the division
+              // changes. Square-ish and bounded by the shorter axis so it never
+              // spills the column on a wide panel or the zone on a short one.
+              // --- the grid flexes with sections, like the copy beside it ---
+              // The box fills the SAME zone the copy lines run down, so both
+              // columns grow together and the block stays top-aligned to the
+              // first copy bar.
+              //
+              // THE DOUBLING IS THE CONSTRAINT. Rows have to scale with
+              // sections, but if each tier rounded its own row count the 1:2:4:8
+              // ladder would break at odd section counts: at 3 sections,
+              // round(2*.75)=2 and round(4*.75)=3 turns 4 -> 8 into 4 -> 6.
+              //
+              // So ONE integer flexes and the tiers are fixed multipliers of it.
+              // rowUnit is the tier-1 row count; the four tiers are then
+              // (cols,rows) = (2,1u) (2,2u) (4,2u) (4,4u), giving 2u : 4u : 8u :
+              // 16u. That ratio is exact for every rowUnit, so the doubling
+              // survives whatever sections does, and cell HEIGHT stays roughly
+              // constant because the zone and the row count grow together.
+              const padX = 0.018;
+              const boxW = Math.max(0.06, colW - padX * 2);
+              // Flush with the copy's REAL edges, not the zone's: the first bar
+              // hangs half a leading below zoneTop and the last stops short of
+              // zoneBot, so squaring the grid to the zone left it overhanging
+              // the copy at both ends (Chad, 2026-07-19).
+              const boxTop = copyTopEdge;
+              const boxH = Math.max(0.04, copyTopEdge - copyBotEdge);
+              const midY = boxTop - boxH / 2;
+              const rowUnit = Math.max(1, Math.round(Math.round(t.sections) / 2));
+              // The circle is sized off the COLUMN, not the zone: the box gets
+              // tall at high section counts and a zone-sized circle would swell
+              // out of its own column.
+              const ch2 = Math.min(boxW * 0.3, boxH * 0.34);
+              const holeR = ch2 * 0.92; // the arc's own radius, plus a hair
+              const grid = (cols: number, rowMul: number, a: number) => {
+                if (a <= 0.01) return;
+                const rows = rowUnit * rowMul;
+                const cw = boxW / cols / 2;
+                const ch = boxH / rows / 2;
+                gl.uniform1f(ut.holeOn, 1);
+                for (let r = 0; r < rows; r++)
+                  for (let c = 0; c < cols; c++) {
+                    const cx = midX - boxW / 2 + cw * (2 * c + 1);
+                    const cy = midY + boxH / 2 - ch * (2 * r + 1);
+                    // The circle expressed in THIS cell's own uv box, so every
+                    // cell bites the same world-space circle out of itself.
+                    gl.uniform4f(
+                      ut.hole,
+                      0.5 + (midX - cx) / (2 * cw),
+                      0.5 + (midY - cy) / (2 * ch),
+                      holeR / (2 * cw),
+                      holeR / (2 * ch)
+                    );
+                    decal(cellTex, cx, cy, cw, ch, a);
+                  }
+                gl.uniform1f(ut.holeOn, 0);
+              };
+              gl.uniform3f(ut.tint, 0.93, 0.9, 0.98);
+              // Crossfaded rather than switched, so 4 -> 8 -> 16 is a division
+              // arriving, not a pop.
+              // cols x rowMul: 2x1u, 2x2u, 4x2u, 4x4u -> 2u : 4u : 8u : 16u.
+              // At the 4-section default rowUnit is 2, so this is the original
+              // 4 / 8 / 16 / 32.
+              grid(2, 1, shop * (1 - store) * 0.85);
+              grid(2, 2, store * (1 - cat) * 0.85);
+              grid(4, 2, cat * (1 - plat) * 0.85);
+              grid(4, 4, plat * 0.85);
+              // The arc that closes every cell's cut corner. Part of the grid,
+              // present from the first tier, at the grid's own weight and tone.
+              decal(gridRingTex, midX, midY, ch2, ch2, shop * 0.85);
+
+              // The cart, seated over the grid's centre.
+              if (plat > 0.01) {
+                // The same additive violet bloom the top copy level uses, so
+                // "a platform" and "every word" read as the same top rung.
+                gl.blendFunc(gl.ONE, gl.ONE);
+                gl.uniform3f(ut.tint, 0.5, 0.36, 0.95);
+                decal(glowTex, midX, midY, ch2 * 1.9, ch2 * 1.9, plat * 0.55 * shop);
+                gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+              }
+              if (cat > 0.01) {
+                gl.uniform3f(ut.tint, 1, 1, 1);
+                decal(discTex, midX, midY, ch2, ch2, cat * shop);
+              }
+              if (cat > 0.01) {
+                // The outline holds the grid's white through level 3 and only
+                // takes brand violet at level 4 (Chad, 2026-07-19), arriving
+                // with the filled disc rather than ahead of it. Same arc, not a
+                // second circle a few pixels off it.
+                gl.uniform3f(ut.tint, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+                decal(gridRingTex, midX, midY, ch2, ch2, cat * shop);
+              }
+              // Light on the bare panel, indigo once the disc is behind it --
+              // the same flip the edit pencil makes.
+              const cl = 0.93 + (0.141 - 0.93) * cat;
+              const cg = 0.9 + (0.224 - 0.9) * cat;
+              const cb = 0.98 + (0.537 - 0.98) * cat;
+              gl.uniform3f(ut.tint, cl, cg, cb);
+              // The glyph fills much more of its circle now (Chad, 2026-07-19).
+              decal(cartTex, midX, midY, ch2 * 0.84, ch2 * 0.84, shop);
+              gl.uniform3f(ut.tint, 1, 1, 1);
+            }
+          }
+
           gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); // restore straight alpha
           gl.depthMask(true);
         }
@@ -1045,10 +1846,18 @@ export function PackageScreen({
     const onMove = (e: MouseEvent) => {
       plugHover = lastElectric && near(e);
       canvas.style.cursor = plugHover ? "pointer" : "";
+      const rect = canvas.getBoundingClientRect();
+      ptr.x = e.clientX - rect.left;
+      ptr.y = e.clientY - rect.top;
     };
     // The pointer can leave the canvas without a final move inside it, which
     // would strand the plug lit. Clearing on leave is what keeps hover honest.
-    const onLeave = () => { plugHover = false; canvas.style.cursor = ""; };
+    const onLeave = () => {
+      plugHover = false;
+      canvas.style.cursor = "";
+      ptr.x = -9999;
+      ptr.y = -9999;
+    };
     canvas.addEventListener("click", onClick);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerleave", onLeave);
