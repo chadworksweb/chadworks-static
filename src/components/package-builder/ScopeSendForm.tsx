@@ -2,22 +2,24 @@
 
 // SEND-THIS-SCOPE FORM -- the dedicated capsule under the calculator.
 //
-// Styled EXACTLY like the global contact CTA (ContactCapsule): the dark
-// band-dark cw-contact band, the glow orbs, the copy-left / form-right split.
-// The left copy column carries a live recap of the current scope instead of the
-// reach-direct details. It shares the calculator's scope (passed from
-// ScopeCalculator), so the recap always matches the number on the stage above.
-// The scope is sent as DATA via LeadForm's getExtraData hook, read live at
-// submit, so there is no prefilled field to drift and nothing to reach across
-// the DOM for. Posts through the same LEIT endpoint as every other form.
+// Structure is its own: heading + intro, then a two-column split of the scope
+// recap table (left) and the form (right). The STYLE borrows the global contact
+// capsule's dark palette (band-dark: indigo bg, lilac type) so it reads as the
+// same family, and the form chrome is the shared .cw-form dark styling.
+//
+// It shares the calculator's scope (passed from ScopeCalculator), so the recap
+// always matches the number on the stage above, and the scope is sent as DATA
+// via LeadForm's getExtraData hook (read live at submit) -- no prefilled field
+// to drift, nothing to reach across the DOM for. Posts through the same LEIT
+// endpoint as every other form.
 
 import { LeadForm } from "@/components/forms/LeadForm";
-import { ContactOrbs } from "@/components/art/ContactOrbs";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import {
-  describeScope,
+  BASE,
   money,
   price,
+  scopeRows,
   scopeSummaryText,
   weeksLabel,
   type Scope,
@@ -44,44 +46,52 @@ const SCOPE_FORM: LeadFormConfig = {
 };
 
 export function ScopeSendForm({ scope }: { scope: Scope }) {
-  const rows = describeScope(scope);
+  const rows = scopeRows(scope);
   const total = price(scope);
 
   return (
-    <SectionShell id="your-scope" full className={`band-dark cw-contact ${s.section}`}>
-      <ContactOrbs />
-      <div className="cw-contact__inner">
-        <div className="cw-contact__layout">
-          <div className="cw-contact__copy">
-            <h2 className="svc-cta__heading">Send me this scope</h2>
-            <p className="cw-contact__note">
-              Here is what you have built and what it comes to. Add your name and
-              email and it lands with me exactly as you scoped it.
-            </p>
+    <SectionShell id="your-scope" full className={`band-dark ${s.section}`}>
+      <h2 className={s.heading}>Send me this scope</h2>
+      <p className={s.intro}>
+        Here is what you have built and what it comes to. Add your name and email
+        and it lands with me exactly as you scoped it.
+      </p>
 
-            <div className={s.recap}>
-              <p className={s.estimate}>{money(total)}</p>
-              <p className={s.window}>{weeksLabel(scope)}</p>
-              <ul className={s.rows}>
-                {rows.map((r) => (
-                  <li key={r.label} className={s.row}>
-                    <strong className={s.rowLabel}>{r.label}:</strong> {r.value}
-                  </li>
-                ))}
-              </ul>
+      <div className={s.layout}>
+        {/* the live recap table: every field, its level, and its cost */}
+        <div className={s.recap}>
+          <p className={s.estimate}>{money(total)}</p>
+          <p className={s.window}>{weeksLabel(scope)}</p>
+
+          <dl className={s.table}>
+            <div className={s.row}>
+              <dt className={s.rowLabel}>The baseline build</dt>
+              <dd className={s.rowAmt}>{money(BASE)}</dd>
             </div>
-          </div>
-
-          {/* the form: scope travels as data, not as a prefilled field */}
-          <LeadForm
-            config={SCOPE_FORM}
-            getExtraData={() => ({
-              estimate: money(price(scope)),
-              timeline: weeksLabel(scope),
-              scope_summary: scopeSummaryText(scope),
-            })}
-          />
+            {rows.map((r) => (
+              <div key={r.label} className={s.row}>
+                <dt className={s.rowLabel}>
+                  <strong>{r.label}:</strong> {r.value}
+                </dt>
+                <dd className={s.rowAmt}>{r.amount > 0 ? money(r.amount) : "—"}</dd>
+              </div>
+            ))}
+            <div className={`${s.row} ${s.totalRow}`}>
+              <dt className={s.rowLabel}>Estimate</dt>
+              <dd className={s.totalAmt}>{money(total)}</dd>
+            </div>
+          </dl>
         </div>
+
+        {/* the form: scope travels as data, not as a prefilled field */}
+        <LeadForm
+          config={SCOPE_FORM}
+          getExtraData={() => ({
+            estimate: money(price(scope)),
+            timeline: weeksLabel(scope),
+            scope_summary: scopeSummaryText(scope),
+          })}
+        />
       </div>
     </SectionShell>
   );

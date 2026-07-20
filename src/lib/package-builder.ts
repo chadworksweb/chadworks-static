@@ -324,6 +324,37 @@ export function rushPremium(s: Scope): number {
   return price(s) - Math.round(subtotal(s) / 50) * 50;
 }
 
+// The price contribution of ONE parameter, for the recap table. Mirrors the
+// per-line math in ledger(), keyed by param so the table can pair each field's
+// chosen level with its own cost. Timeline is a whole-build multiplier, so its
+// "line" is the rush premium.
+export function paramAmount(key: keyof Scope, s: Scope): number {
+  switch (key) {
+    case "pages": return Math.max(0, s.pages - PAGES_INCLUDED) * PER_PAGE;
+    case "sections": return Math.max(0, s.sections - SECTIONS_INCLUDED) * PER_SECTION * s.pages;
+    case "ambition": return at(AMBITION, s.ambition);
+    case "mathDev": return at(MATH_DEV, s.mathDev);
+    case "brandingDone": return at(BRANDING_DONE, s.brandingDone);
+    case "content": return at(CONTENT_PER_PAGE, s.content) * s.pages;
+    case "editability": return at(EDITABILITY, s.editability);
+    case "motion": return at(MOTION, s.motion);
+    case "commerce": return at(COMMERCE, s.commerce);
+    case "integrations": return integrationCount(s.integrations) * PER_INTEGRATION;
+    case "locales": return Math.max(0, s.locales - 1) * PER_LOCALE;
+    case "timeline": return rushPremium(s);
+    default: return 0;
+  }
+}
+
+// Every parameter as a table row: label, chosen level, and its cost.
+export function scopeRows(s: Scope): { label: string; value: string; amount: number }[] {
+  return PARAMS.map((p) => ({
+    label: p.label,
+    value: paramValue(p, s),
+    amount: paramAmount(p.key, s),
+  }));
+}
+
 export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 
 // ---------------------------------------------------------------------

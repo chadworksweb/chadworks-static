@@ -1,19 +1,50 @@
-/* SEND-THIS-SCOPE FORM -- the recap that lives in the LEFT copy column of the
-   dark contact capsule. The band, the orbs, the split and the form chrome all
-   come from the global .cw-contact / .cw-form styles (this section reuses them
-   verbatim); only the scope recap needs its own type, tuned for the dark band. */
+/* SEND-THIS-SCOPE FORM -- own structure (heading + intro + recap-table / form
+   split), recolored to the global contact capsule's dark palette so it reads as
+   the same family. The form chrome comes from the shared global .cw-form dark
+   styling; only the band, the type and the recap table are set here. */
 
 .section {
+  /* The dark band, matching the contact capsule. */
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
   /* The finish-line link is a fragment anchor to this section; land it below
      the sticky nav rather than tucked under it. */
   scroll-margin-top: calc(var(--nav-height, 72px) + 1rem);
 }
 
-.recap {
-  display: flex;
-  flex-direction: column;
+.heading {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.75rem;
+  color: var(--dark-text);
 }
 
+.intro {
+  color: var(--dark-muted);
+  line-height: var(--leading-body, 1.6);
+  max-width: 46ch;
+  margin: 0 0 clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+}
+
+/* ---- the recap table ---- */
 .estimate {
   font-family: var(--font-display);
   font-size: clamp(2.2rem, 4vw, 3rem);
@@ -31,27 +62,59 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--dark-muted);
-  margin: 0.55rem 0 1.35rem;
+  margin: 0.55rem 0 1.4rem;
 }
 
-.rows {
-  list-style: none;
+.table {
   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
 }
 
 .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.92rem;
   line-height: 1.4;
-  color: var(--dark-muted);
 }
 
 /* Label (bold): level selected. */
 .rowLabel {
+  color: var(--dark-muted);
+}
+
+.rowLabel strong {
   color: var(--dark-text);
   font-weight: 600;
-  margin-right: 0.35rem;
+}
+
+.rowAmt {
+  color: var(--dark-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* The total sits apart from the line items and reads as the sum. */
+.totalRow {
+  border-bottom: none;
+  border-top: 2px solid rgba(255, 255, 255, 0.25);
+  margin-top: 0.4rem;
+  padding-top: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.totalRow .rowLabel {
+  color: var(--dark-text);
+}
+
+.totalAmt {
+  color: var(--dark-text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
