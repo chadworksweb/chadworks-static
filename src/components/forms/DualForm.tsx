@@ -15,9 +15,12 @@ interface Props {
   detailedLabel?: string;
   quick: LeadFormConfig;
   detailed: LeadFormConfig;
+  // Extra payload merged into whichever side submits (read live at submit) --
+  // e.g. the calculator's current scope. Passed through to both LeadForms.
+  getExtraData?: () => Record<string, string>;
 }
 
-export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detailed Inquiry", quick, detailed }: Props) {
+export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detailed Inquiry", quick, detailed, getExtraData }: Props) {
   const [active, setActive] = useState<"quick" | "detailed">("quick");
 
   return (
@@ -45,10 +48,10 @@ export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detail
       </div>
 
       <div className={`cw-dualform__form${active === "quick" ? " is-active" : ""}`}>
-        <LeadForm config={quick} />
+        <LeadForm config={quick} getExtraData={getExtraData} />
       </div>
       <div className={`cw-dualform__form${active === "detailed" ? " is-active" : ""}`}>
-        <LeadForm config={detailed} />
+        <LeadForm config={detailed} getExtraData={getExtraData} />
       </div>
     </div>
   );

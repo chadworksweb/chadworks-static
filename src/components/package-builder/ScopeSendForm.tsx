@@ -13,7 +13,7 @@
 // to drift, nothing to reach across the DOM for. Posts through the same LEIT
 // endpoint as every other form.
 
-import { LeadForm } from "@/components/forms/LeadForm";
+import { DualForm } from "@/components/forms/DualForm";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import {
   BASE,
@@ -27,21 +27,58 @@ import {
 import type { LeadFormConfig } from "@/lib/forms";
 import s from "./scope-send-form.module.css";
 
-const SCOPE_FORM: LeadFormConfig = {
-  source: "cost calculator scope",
-  subject: "New scope from the Website Design Cost Calculator (chadworks)",
+// The same two forms the global contact capsule uses (quick <-> detailed),
+// pointed at the calculator so the subject/source say "scope". The scope itself
+// rides along as data via getExtraData, on whichever side the visitor submits.
+const SUCCESS = "Got it. Your scope is on its way to me, and I will be in touch.";
+
+const QUICK: LeadFormConfig = {
+  source: "cost calculator scope (quick)",
+  subject: "New scope (quick) from the Website Design Cost Calculator (chadworks)",
   submitLabel: "Send this scope to Chad",
-  successMessage: "Got it. Your scope is on its way to me, and I will be in touch.",
+  successMessage: SUCCESS,
   fields: [
-    { kind: "text", name: "first_name", label: "First name", required: true, autocomplete: "given-name", span: "half" },
+    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
     { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
     {
       kind: "textarea",
-      name: "note",
-      label: "Anything to add?",
-      rows: 3,
-      placeholder: "Context, a deadline, a question. Optional.",
+      name: "message",
+      label: "What's going on?",
+      required: true,
+      rows: 4,
+      placeholder: "The business, and where it's stuck right now.",
     },
+  ],
+};
+
+const DETAILED: LeadFormConfig = {
+  source: "cost calculator scope (detailed)",
+  subject: "New scope (detailed) from the Website Design Cost Calculator (chadworks)",
+  submitLabel: "Send this scope to Chad",
+  successMessage: SUCCESS,
+  fields: [
+    { kind: "text", name: "first_name", label: "First Name", required: true, autocomplete: "given-name", span: "half" },
+    { kind: "text", name: "last_name", label: "Last Name", required: true, autocomplete: "family-name", span: "half" },
+    { kind: "email", name: "email", label: "Email", required: true, autocomplete: "email", span: "half" },
+    { kind: "text", name: "business", label: "Business Name", span: "half" },
+    { kind: "url", name: "current_url", label: "Existing domain or URL", autocomplete: "url", placeholder: "yourdomain.com" },
+    {
+      kind: "textarea",
+      name: "background",
+      label: "Provide some background info on you or the org",
+      required: true,
+      rows: 4,
+      placeholder: "Who you are, and what the business or organization does.",
+    },
+    {
+      kind: "textarea",
+      name: "details",
+      label: "Describe the idea or scope of the project",
+      required: true,
+      rows: 5,
+      placeholder: "What the site needs to do, and where it's stuck today.",
+    },
+    { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
   ],
 };
 
@@ -83,9 +120,13 @@ export function ScopeSendForm({ scope }: { scope: Scope }) {
           </dl>
         </div>
 
-        {/* the form: scope travels as data, not as a prefilled field */}
-        <LeadForm
-          config={SCOPE_FORM}
+        {/* the form: the same quick/detailed dual form as the global contact
+            capsule, with the scope attached as data (not a prefilled field) */}
+        <DualForm
+          quick={QUICK}
+          detailed={DETAILED}
+          quickLabel="Quick message"
+          detailedLabel="Detailed inquiry"
           getExtraData={() => ({
             estimate: money(price(scope)),
             timeline: weeksLabel(scope),
