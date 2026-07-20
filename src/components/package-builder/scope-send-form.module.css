@@ -37,10 +37,22 @@
   align-items: start;
 }
 
+/* The form rides along as you read the recap. The grid uses align-items:start,
+   so this column is content-height and free to stick within the section. */
+.formCol {
+  position: sticky;
+  top: calc(var(--nav-height, 72px) + 1.5rem);
+}
+
 @media (max-width: 1024px) {
   .layout {
     grid-template-columns: 1fr;
     gap: 2.25rem;
+  }
+
+  /* Stacked: nothing to stick beside, so let it flow. */
+  .formCol {
+    position: static;
   }
 }
 

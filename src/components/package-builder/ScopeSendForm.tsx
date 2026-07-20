@@ -121,18 +121,21 @@ export function ScopeSendForm({ scope }: { scope: Scope }) {
         </div>
 
         {/* the form: the same quick/detailed dual form as the global contact
-            capsule, with the scope attached as data (not a prefilled field) */}
-        <DualForm
-          quick={QUICK}
-          detailed={DETAILED}
-          quickLabel="Quick message"
-          detailedLabel="Detailed inquiry"
-          getExtraData={() => ({
-            estimate: money(price(scope)),
-            timeline: weeksLabel(scope),
-            scope_summary: scopeSummaryText(scope),
-          })}
-        />
+            capsule, with the scope attached as data (not a prefilled field).
+            Sticky, so it stays in view while the recap column scrolls past. */}
+        <div className={s.formCol}>
+          <DualForm
+            quick={QUICK}
+            detailed={DETAILED}
+            quickLabel="Quick message"
+            detailedLabel="Detailed inquiry"
+            getExtraData={() => ({
+              estimate: money(price(scope)),
+              timeline: weeksLabel(scope),
+              scope_summary: scopeSummaryText(scope),
+            })}
+          />
+        </div>
       </div>
     </SectionShell>
   );
