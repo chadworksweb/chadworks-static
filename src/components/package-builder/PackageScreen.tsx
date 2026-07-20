@@ -1006,20 +1006,36 @@ export function PackageScreen({
         Math.min(1, Math.max(0, base[2] + j())),
       ];
     };
-    const STREAKS = Array.from({ length: 104 }, () => {
-      // A share of the field is warm light; the rest is purple. Warm streaks
-      // run a touch brighter so the yellow reads as light, not a tint.
+    // Each streak carries TWO tones and crossfades between them, so the field
+    // changes colour over time (Chad, 2026-07-19) -- purple<->cream, purple<->
+    // purple, etc., a selection of tones rather than a hue sweep. The crossfade
+    // runs on its own faster clock (`colRate`); length/alpha still drift slow.
+    const pick2 = () => {
       const warm = Math.random() < 0.36;
+      return { col: warm ? pickCol(WAKE_YELLOWS) : pickCol(WAKE_PURPLES), warm };
+    };
+    const STREAKS = Array.from({ length: 150 }, () => {
+      const A = pick2();
+      const B = pick2();
       return {
         fy: Math.random() * 2 - 1, // normalized height, -1..1; scaled + inset below
-        lenF: 0.2 + Math.pow(Math.random(), 1.7) * 0.8, // biased short
+        // Tight length range: this is a CONSTANT wind, so streaks are RELATIVELY
+        // the same length. What variance there is comes from the flowing wind
+        // molecules over time, not from big static per-streak differences.
+        lenF: 0.9 + Math.random() * 0.1,
         thF: 0.05 + Math.random() * 0.11, // thick glow-band height
-        a: warm ? 0.4 + Math.random() * 0.48 : 0.22 + Math.random() * 0.5,
-        col: warm ? pickCol(WAKE_YELLOWS) : pickCol(WAKE_PURPLES),
-        warm,
-        rate: 0.06 + Math.random() * 0.2, // SLOW drift
-        ph: Math.random() * 6.283,
-        lenPh: Math.random() * 6.283,
+        a: 0.24 + Math.random() * 0.56,
+        colA: A.col,
+        colB: B.col,
+        warmA: A.warm ? 1 : 0,
+        warmB: B.warm ? 1 : 0,
+        // Only ~25% tuck their origin behind the panel (a little more cut off);
+        // the rest start right at the edge, fully seen.
+        deep: Math.random() < 0.25,
+        jitPh: Math.random() * 6.283, // molecular jitter phases (fine, per-streak)
+        jitPh2: Math.random() * 6.283,
+        colRate: 0.35 + Math.random() * 0.75, // colour crossfade
+        colPh: Math.random() * 6.283,
       };
     });
 
@@ -1444,18 +1460,17 @@ export function PackageScreen({
       //
       // All of it is premultiplied violet, depth-off, and then covered by the
       // crisp slab, so the wake tucks in behind the left edge and only its
-      // leftward run shows. `pulse` (0 / 0.5 / 1 over Normal / Tightened / Rush)
-      // drives length and weight together.
-      if (cur.pulse > 0.01) {
+      // leftward run shows.
+      //
+      // INTENSITY = `wake` = pulse (Chad, 2026-07-19). The x2 "double" Rush was
+      // too much: Rush now lands at what Tightened used to be, and Tightened is
+      // toned down below it. pulse 0/0.5/1 -> wake 0/0.5/1 over Normal/
+      // Tightened/Rush.
+      const wake = cur.pulse;
+      if (wake > 0.01) {
         gl.disable(gl.DEPTH_TEST);
         gl.depthMask(false);
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); // premultiplied
-
-        // The slab's left silhouette edge and half-height in world space (view
-        // has no rotation, so these read as screen coordinates). cos(restRotY)
-        // foreshortens the width; the wake rakes off that edge.
-        const leftEdge = -HW * cur.scale * 0.9;
-        const vExtent = cur.heightHalf * cur.scale;
 
         // (A) the EDGE BLEED: the slab's trailing edge dissolving into the
         // wake instead of ending on a hard line (Chad, 2026-07-19). Flat violet
@@ -1474,12 +1489,12 @@ export function PackageScreen({
         gl.uniform1f(ul.yHalf, cur.heightHalf);
         gl.bindVertexArray(screenBuf.vao);
         const EDGE_N = 18;
-        const edgeLen = cur.pulse * 0.17; // short: the edge blur, not an outline
+        const edgeLen = Math.min(0.28, wake * 0.16); // short: the edge blur, not an outline
         for (let i = 1; i <= EDGE_N; i++) {
           const frac = i / EDGE_N;
           const ghost = Mat.mul(Mat.trans(-edgeLen * frac, 0, 0), model);
           gl.uniformMatrix4fv(ul.model, false, ghost);
-          gl.uniform1f(ul.alpha, 0.05 * cur.pulse * Math.pow(1 - frac, 0.85));
+          gl.uniform1f(ul.alpha, 0.03 * Math.min(1.4, wake) * Math.pow(1 - frac, 0.85));
           gl.drawArrays(gl.TRIANGLES, 0, screenCount);
         }
         gl.uniform1f(ul.yFade, 0); // back to no fade for any later line pass
@@ -1500,30 +1515,59 @@ export function PackageScreen({
         gl.uniform1i(ut.tex, 0);
         gl.bindTexture(gl.TEXTURE_2D, brushTex);
         gl.bindVertexArray(quadBuf.vao);
-        const maxLen = 1.05 * cur.pulse;
+        // The wake is attached to the LEAVES, not the slab (Chad, 2026-07-19):
+        // built in the object's LOCAL space and carried by the same orient+scale
+        // the pages use, seated at the leaf-stack depth. So it tilts and grows
+        // WITH the object -- at high section counts it tracks the tall, tilted
+        // slab instead of drifting off it (the ss11 bug) -- and it trails from
+        // the pages behind the cover rather than off the front face.
+        const leafN = Math.max(0, Math.round(curStrata));
+        const zWake = -(cur.depth + LEAF_HD + LEAF_GROOVE + Math.min(leafN, 6) * 0.5 * LEAF_PITCH);
+        const sWake = Mat.mul(
+          Mat.mul(orient, Mat.trans(0, 0, zWake)),
+          Mat.scale(cur.scale, cur.scale, 1)
+        );
+        const maxLenL = 0.95 * wake; // local units; scales with wake
+        const hhL = cur.heightHalf; // local half-height, so the field fills the slab
         for (const s of STREAKS) {
-          const lz = 0.6 + 0.4 * Math.sin(time * s.rate + s.lenPh);
-          const len = maxLen * s.lenF * lz;
-          if (len < 0.02) continue;
-          const halfW = len * 0.5;
-          // The origin (the streak's bright right end) must sit INSIDE the
-          // slab's silhouette so it is always covered. The slab only sways
-          // (no drift), so a fixed base inset clears that; the fy^2 term pushes
-          // top and bottom streaks deeper still, because the rounded corners
-          // and the Y-tilt curl the left edge rightward there -- which is
-          // exactly where a streak was poking out above the top before.
-          const y = s.fy * vExtent * 0.9;
-          const originX = leftEdge + 0.14 + 0.2 * s.fy * s.fy;
-          const cx = originX - halfW; // right edge = originX, tucked under the slab
-          const m = Mat.mul(Mat.trans(cx, y, 0), Mat.scale(halfW, s.thF * 0.5, 1));
+          // CONSTANT WIND with molecular jitter. Not gusts -- a steady flow at
+          // one speed, so every streak holds nearly the same length; a couple of
+          // fine, fast, low-amplitude waves (the wind's molecules varying as
+          // they pass over the shape) nudge it a few percent. No big surging,
+          // no see-saw.
+          const flow =
+            0.9 +
+            0.06 * Math.sin(time * 2.6 + s.jitPh) +
+            0.04 * Math.sin(time * 4.3 + s.jitPh2);
+          // The top/bottom-most streaks stay VERY faint and short.
+          const fringe = 1 - smooth(0.55, 1.0, Math.abs(s.fy)) * 0.9;
+          const lenL = maxLenL * s.lenF * flow * fringe;
+          if (lenL < 0.02) continue;
+          const halfWL = lenL * 0.5;
+          const yL = s.fy * hhL * 0.9;
+          // Local coords: deep origins tuck inside the left edge (-HW), inset
+          // growing with fy^2 for the rounded corners; shallow ones sit right at
+          // the edge. The transform handles the tilt, so nothing pokes out.
+          const inset = s.deep ? 0.15 + 0.18 * s.fy * s.fy : 0.04;
+          const cxL = -HW + inset - halfWL;
+          const m = Mat.mul(
+            sWake,
+            Mat.mul(Mat.trans(cxL, yL, 0), Mat.scale(halfWL, s.thF * 0.5, 1))
+          );
           gl.uniformMatrix4fv(ut.model, false, m);
           gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, m)));
-          // The streak's chosen tone, straight from its bucket. Warm streaks
-          // get a brightness bump so the pale yellow reads as light.
-          gl.uniform3f(ut.tint, s.col[0], s.col[1], s.col[2]);
-          const av =
-            s.a * cur.pulse * (0.62 + 0.38 * Math.sin(time * s.rate * 0.83 + s.ph)) *
-            (s.warm ? 1.35 : 1.0);
+          // Colour crossfades between the streak's two tones on its own clock.
+          const cm = 0.5 + 0.5 * Math.sin(time * s.colRate + s.colPh);
+          const r = s.colA[0] + (s.colB[0] - s.colA[0]) * cm;
+          const g = s.colA[1] + (s.colB[1] - s.colA[1]) * cm;
+          const b = s.colA[2] + (s.colB[2] - s.colA[2]) * cm;
+          gl.uniform3f(ut.tint, r, g, b);
+          const warmth = s.warmA + (s.warmB - s.warmA) * cm;
+          // Brightness holds nearly steady with only a small molecular flicker,
+          // so the wind reads as constant. Fringe keeps the edges faint; overall
+          // alpha kept low.
+          const flick = 0.9 + 0.1 * Math.sin(time * 3.1 + s.jitPh2);
+          const av = s.a * wake * flick * (1 + warmth * 0.35) * 0.7 * fringe;
           if (av <= 0.01) continue;
           gl.uniform1f(ut.alpha, av);
           gl.drawArrays(gl.TRIANGLES, 0, quadMesh.count);
