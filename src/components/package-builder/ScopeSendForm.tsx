@@ -88,15 +88,14 @@ export function ScopeSendForm({ scope }: { scope: Scope }) {
 
   return (
     <SectionShell id="your-scope" full className={`band-dark ${s.section}`}>
-      <h2 className={s.heading}>Send me this scope</h2>
-      <p className={s.intro}>
-        Here is what you have built and what it comes to. Add your name and email
-        and it lands with me exactly as you scoped it.
-      </p>
-
       <div className={s.layout}>
-        {/* the live recap table: every field, its level, and its cost */}
+        {/* the live recap: heading, intro, then every field, its level, cost */}
         <div className={s.recap}>
+          <h2 className={s.heading}>Send me this scope</h2>
+          <p className={s.intro}>
+            Here is what you have built and what it comes to. Add your name and
+            email and it lands with me exactly as you scoped it.
+          </p>
           <p className={s.estimate}>{money(total)}</p>
           <p className={s.window}>{weeksLabel(scope)}</p>
 

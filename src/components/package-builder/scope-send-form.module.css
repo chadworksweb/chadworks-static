@@ -92,6 +92,12 @@
   line-height: 1.4;
 }
 
+/* The last line item (just above the total) drops its own rule, so only the
+   thicker total rule sits between it and the estimate. */
+.row:nth-last-child(2) {
+  border-bottom: none;
+}
+
 /* Label (bold): level selected. */
 .rowLabel {
   color: var(--dark-muted);
@@ -111,7 +117,7 @@
 /* The total sits apart from the line items and reads as the sum. */
 .totalRow {
   border-bottom: none;
-  border-top: 2px solid rgba(255, 255, 255, 0.25);
+  border-top: 3px solid rgba(255, 255, 255, 0.25);
   margin-top: 0.4rem;
   padding-top: 0.85rem;
   font-family: var(--font-mono);
