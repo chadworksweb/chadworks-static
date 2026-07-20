@@ -167,6 +167,44 @@ export const BASELINE: Scope = {
 };
 
 // ---------------------------------------------------------------------
+// WORKED-EXAMPLE SCOPES -- shared by the calculator page and the cost guide.
+//
+// These two scopes are quoted as real numbers on BOTH /website-design-cost-
+// calculator/ and /how-much-does-a-website-cost/. They live here, priced by the
+// one model, so the two pages can never disagree about what a small business
+// site or a store costs. Retuning a ladder moves both pages in the same edit.
+// ---------------------------------------------------------------------
+
+// Five pages, a logo in hand but no system around it, light copy cleanup, a bit
+// of motion. The everyday small business build.
+export const SMALL_BUSINESS: Scope = {
+  ...BASELINE,
+  pages: 5,
+  ambition: 1,
+  brandingDone: 1, // "A logo" -- a logo in hand, no system around it (matches the copy)
+  content: 1,
+  editability: 1,
+  motion: 1,
+};
+
+// Eight pages carrying a catalog, a payment path, subscriptions and a mailing
+// list wired in, and enough custom logic that it stops being a brochure.
+export const STORE: Scope = {
+  ...BASELINE,
+  pages: 8,
+  sections: 5,
+  ambition: 2,
+  mathDev: 1,
+  brandingDone: 2,
+  content: 1,
+  editability: 2,
+  motion: 1,
+  commerce: 2,
+  // Subscriptions and a mailing list: a bitmask over INTEGRATION_OPTIONS.
+  integrations: wire(4, 5),
+};
+
+// ---------------------------------------------------------------------
 // PARAMETER TABLE -- drives the controls AND the ledger labels.
 // `kind: "range"` renders a slider; `kind: "steps"` renders option chips.
 // ---------------------------------------------------------------------

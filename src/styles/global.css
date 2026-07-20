@@ -628,6 +628,30 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: transparent;
 }
 
+/* ---------------------------------------------------------------------------
+   SITE-WIDE DESCENDER FIX for gradient (background-clip: text) headings.
+
+   `background-clip: text` paints the gradient only inside the element's
+   background box (the padding box). With the tight display line-heights we use,
+   that box ends just below the baseline, so glyph tails -- the g, y, p, q, j --
+   fall past it and render transparent (they look "cut off"). See ss1: the g in
+   "Design". padding-bottom grows the paint box downward to cover the tails,
+   with no effect on the letters themselves.
+
+   Applies to every gradient carrier that renders WORDS. Number-only gradient
+   text (prices, stat figures, indexes) has no descenders and is intentionally
+   left out. Any NEW background-clip:text element carrying words should be added
+   here. --------------------------------------------------------------------- */
+.text-gradient,
+.svc-fill,
+.home-hero__word,
+.chroma-letter,
+.dr-a__h1 em,
+.cw-art-hero__h1 em,
+.cw-art-copysample__h1 em {
+  padding-bottom: 0.15em;
+}
+
 /* Dark band: indigo full-width section with inverted text */
 .band-dark {
   background: var(--dark-bg);
@@ -1764,6 +1788,155 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .svc-prose { color: var(--dark-muted); }
 .svc-dark .svc-prose h3,
 .svc-faq-section--dark .svc-prose h3 { color: var(--dark-text, #fff); }
+
+/* --- Prose hierarchy ------------------------------------------------------
+   .svc-prose renders at the LEAD size (--text-lg). One opening line at that
+   size reads as a lead; a whole section built from it reads as wall-to-wall
+   lede. `--lead` keeps the first paragraph at lead size and drops the rest to
+   plain body copy; `--plain` sets the whole block to body size. */
+.svc-prose--lead > p + p { font-size: var(--text-base); }
+.svc-prose--plain > * { font-size: var(--text-base); }
+
+/* --- Section kicker: the mono .eyebrow used as a per-section label. The reset
+   zeroes margins, and the shell grid has no row-gap, so add the gap here. On
+   dark bands the purple accent goes low-contrast, so lift it to lavender. */
+.svc-block > .eyebrow,
+.svc-faq__intro > .eyebrow { display: block; margin-bottom: var(--space-2xs); }
+.svc-dark .eyebrow,
+.svc-faq-section--dark .eyebrow { color: #c9b3ec; }
+
+/* --- Cost-calculator intro: prose beside a static "at a glance" panel. The
+   panel is server-rendered HTML (not the WebGL readout at the top of the page),
+   so a crawler that never runs the calculator still reads the baseline, the
+   scope breadth and the turnaround as plain text. */
+.cw-calc-intro {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: clamp(var(--space-md), 4vw, var(--space-xl));
+  align-items: start;
+  margin-top: var(--space-md);
+}
+@media (max-width: 820px) { .cw-calc-intro { grid-template-columns: 1fr; } }
+.cw-calc-glance { padding: clamp(1.4rem, 3vw, 2rem); }
+.cw-calc-glance__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+.cw-calc-glance dl { margin: 0; display: grid; }
+.cw-calc-glance__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.cw-calc-glance__row:first-of-type { border-top: none; padding-top: 0; }
+.cw-calc-glance__k { margin: 0; color: var(--text-secondary); font-size: var(--text-base); }
+.cw-calc-glance__v {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* --- Worked-example builds (the dark "examples of website cost" band). Each
+   build is its own block: an h3 that STATES the cost, the scope detail as plain
+   body, and the turnaround. A divider + padding give the builds real separation
+   so a label never runs into its description. */
+.cw-builds { display: grid; margin-top: var(--space-lg); }
+.cw-build {
+  padding: var(--space-md) 0;
+  border-top: 1px solid rgba(229, 210, 244, 0.16);
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(var(--space-sm), 3vw, var(--space-xl));
+  align-items: center;
+  overflow: visible;
+}
+.cw-build:first-child { border-top: none; padding-top: 0; }
+.cw-build__body { position: relative; z-index: 2; }
+/* Every shape image is the same width with the slab in the same place, so the
+   slab reads at an identical size on every row (filling the right third). The
+   image is drawn WIDER than its column: the transparent left margin, and any
+   motion trail, bleed leftward UNDER the copy. It sits behind the text and
+   ignores the pointer. */
+.cw-build__shape {
+  width: 155%;
+  height: auto;
+  justify-self: end;
+  display: block;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+@media (max-width: 680px) {
+  .cw-build { grid-template-columns: 1fr; gap: var(--space-sm); }
+  .cw-build__shape { width: 86%; justify-self: start; margin-top: var(--space-xs); }
+}
+.cw-build__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: #e5d2f4;
+}
+.cw-build__price {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--dark-muted), #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cw-build__detail {
+  margin-top: var(--space-xs);
+  color: var(--dark-muted);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  max-width: 68ch;
+}
+.cw-build__meta {
+  margin-top: var(--space-2xs);
+  color: rgba(229, 210, 244, 0.74);
+  font-size: var(--text-sm);
+}
+/* The exact scope behind the build, ticked off under the timeline. Wraps into a
+   tidy multi-column list; each item carries a CSS-drawn check (no glyph, so it
+   stays ASCII-clean). */
+.cw-build__scope {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.15rem;
+}
+.cw-build__scope-item {
+  position: relative;
+  padding-left: 1.4em;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: rgba(229, 210, 244, 0.82);
+}
+.cw-build__scope-item::before {
+  content: "";
+  position: absolute;
+  left: 0.16em;
+  top: 0.26em;
+  width: 0.34em;
+  height: 0.62em;
+  border: solid var(--accent-teal);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 
 /* RATE CARD -- the model's ladders, published as grouped static tables.
    One panel per scope layer (13, matching the calculator's params exactly) so
@@ -4949,6 +5122,17 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .rates-ledger__row { border-top-color: rgba(229, 210, 244, 0.16); }
 /* Task name lavender, duration white (the reverse of the light-band ledger). */
 .svc-faq-section--dark .rates-ledger__label { color: #e5d2f4; }
+/* The figure runs a text-clip gradient whose dark stop disappears on the
+   inverted band (same failure the .svc-statement--ondark rule fixes). Shift the
+   ramp lighter, and lift the sub-note off the light-band grey onto the dark
+   palette so both read against the dark ground. */
+.svc-faq-section--dark .rates-ledger__num {
+  background: linear-gradient(135deg, var(--dark-muted), #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.svc-faq-section--dark .rates-ledger__note { color: rgba(229, 210, 244, 0.74); }
 .cw-rate-explainer .rates-ledger__num {
   font-size: clamp(1rem, 0.82rem + 0.7vw, 1.3rem);
   background: none;

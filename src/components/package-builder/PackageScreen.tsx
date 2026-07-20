@@ -62,12 +62,19 @@ const BASE_SPIN = 0.055;
 export function PackageScreen({
   channels,
   className,
+  capture,
 }: {
   channels: Channels;
   className?: string;
+  // Dev-only (the /shapecap harness). Turns on preserveDrawingBuffer so a
+  // headless capture can read the canvas with toDataURL. Left off in the live
+  // calculator so the drawing buffer stays cheap.
+  capture?: boolean;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const captureRef = useRef(capture);
+  captureRef.current = capture;
   // The live target. Written every render, read by the loop. Never a dep.
   const target = useRef<Channels>(channels);
   target.current = channels;
@@ -77,7 +84,7 @@ export function PackageScreen({
     const canvas = canvasRef.current;
     if (!host || !canvas) return;
 
-    const gl = canvas.getContext("webgl2", { antialias: true, alpha: true });
+    const gl = canvas.getContext("webgl2", { antialias: true, alpha: true, preserveDrawingBuffer: !!captureRef.current });
     if (!gl) return; // no WebGL: the ledger beside it still tells the whole story
 
     const compile = (type: number, src: string) => {
