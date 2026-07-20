@@ -1,7 +1,7 @@
-/* SEND-THIS-SCOPE FORM -- the dedicated capsule directly under the calculator.
-   Left: a live read-only recap of the current scope (the price breakdown the
-   calculator is showing). Right: name + email + optional note. The scope rides
-   to Chad as data, so the recap never has to be an editable field. */
+/* SEND-THIS-SCOPE FORM -- the recap that lives in the LEFT copy column of the
+   dark contact capsule. The band, the orbs, the split and the form chrome all
+   come from the global .cw-contact / .cw-form styles (this section reuses them
+   verbatim); only the scope recap needs its own type, tuned for the dark band. */
 
 .section {
   /* The finish-line link is a fragment anchor to this section; land it below
@@ -9,84 +9,49 @@
   scroll-margin-top: calc(var(--nav-height, 72px) + 1rem);
 }
 
-.layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.5rem, 4vw, 3.25rem);
-  align-items: start;
+.recap {
+  display: flex;
+  flex-direction: column;
 }
 
-@media (max-width: 820px) {
-  .layout {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-}
-
-/* ---- the recap ---- */
 .estimate {
-  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3rem);
   font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1;
   margin: 0;
-  color: #243989;
+  color: var(--dark-text);
   font-variant-numeric: tabular-nums;
 }
 
 .window {
-  font-family: var(--font-mono, ui-monospace, monospace);
+  font-family: var(--font-mono);
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.6;
+  color: var(--dark-muted);
   margin: 0.55rem 0 1.35rem;
 }
 
 .rows {
+  list-style: none;
   margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 .row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(36, 57, 137, 0.1);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--dark-muted);
 }
 
-.row:last-child {
-  border-bottom: none;
-}
-
+/* Label (bold): level selected. */
 .rowLabel {
-  color: #243989;
-  opacity: 0.82;
-}
-
-.rowAmt {
-  color: #8054bc;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-/* The total row sits apart from the line items and reads as the sum. */
-.total {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 0.85rem;
-  padding-top: 0.85rem;
-  border-top: 2px solid rgba(36, 57, 137, 0.2);
-  font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.totalAmt {
-  color: #243989;
+  color: var(--dark-text);
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  margin-right: 0.35rem;
 }
