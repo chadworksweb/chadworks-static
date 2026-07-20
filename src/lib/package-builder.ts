@@ -421,6 +421,7 @@ export type Channels = {
   brandContent: number; // brandingDone level: the marks laid on the plaque
   copy: number; // content level: skeleton copy lines laid under the gem (0..3)
   edit: number; // editability level: the edit badge on the panel (0..3)
+  locales: number; // language count (1..6): drives the xN badge on the copy column
   motionLevel: number; // motion level: gates the dot field behind the slab (0..4)
   commerceLevel: number; // commerce level: the cart + product grid, middle column (0..4)
   wired: number; // integrations BITMASK: which connector tiles, last column
@@ -509,6 +510,11 @@ export function channels(s: Scope): Channels {
     // Raw level, like brandContent and copy, because the reveal is staged
     // rather than ramped.
     edit: s.editability,
+    // Languages stamp an xN multiplier over the copy column's bottom-right
+    // corner: one language is included (no badge), each extra one is another
+    // copy of the whole site to keep true, so it reads as x2, x3, and up. Raw
+    // count, like the staged levels above; the badge appears from 2.
+    locales: s.locales,
     // Motion also lays the braille dot field in behind the slab from level 2
     // up. Raw level, because the field is a staged reveal; `spin` still carries
     // the continuous ramp.

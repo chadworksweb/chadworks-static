@@ -480,46 +480,119 @@
   opacity: 1;
 }
 
-/* ---- narrow: stack it. The object keeps the top, the rail follows. ---- */
+/* ---- tablet: KEEP the row. rail | object | number stays a row down to the
+   gate, instead of collapsing to a vertical stack. Everything at or below 600px
+   is the mobile gate, so there is no narrow single-column state left to serve;
+   the three sectors read as a row at every width the tool actually renders.
+   The rail token narrows on its own (min(19rem, 22vw) + 50px), so the object
+   just gets the space left over. ---- */
 @media (max-width: 900px) {
+  /* The desktop rail token (min(19rem, 22vw) + 50px) collapses to ~180px at the
+     narrow end, which clips the head values ("Straightforward", "I handle edits").
+     Give the rail a floor so the row holds its content at every tablet width;
+     the object just takes whatever space is left over. */
+  .wrap {
+    --rail-w: clamp(14.5rem, 34vw, 20rem);
+  }
+
+  /* Tighter inner padding buys the label a little more room before it wraps. */
+  .rail {
+    padding: 0.4rem;
+  }
+
+  .head {
+    padding-left: 0.6rem;
+  }
+}
+
+/* ---- the gate: the tool needs a real landscape screen. ----
+   Mobile stays DARK either way. Hidden by default; the show conditions below
+   flip it on. The visual dark lives here so both conditions share it and only
+   have to toggle `display`. */
+.mobileGate {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  min-height: 70vh;
+  padding: 2.5rem 1.5rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
+  color: #ede7f6; /* --bg-surface, now the light on the dark */
+  /* Brand dark: the object's own indigo, deepened, with a violet bloom -- the
+     same indigo -> brand family the slab is built from. */
+  background:
+    radial-gradient(78% 58% at 50% 32%, rgba(128, 84, 188, 0.42) 0%, rgba(128, 84, 188, 0) 62%),
+    linear-gradient(162deg, #243989 0%, #1a2a63 54%, #120f2e 100%);
+}
+
+.gateKicker {
+  composes: micro;
+  color: #b79cff; /* lifted violet, legible on the dark */
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* The page title is the hero of the gate: mobile still says what this page is,
+   with the desktop-only note sitting under it as the quieter half. */
+.gateTitle {
+  font-size: clamp(1.7rem, 8.5vw, 2.3rem);
+  font-weight: 300;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+/* Demoted from the hero to a secondary line under the title: still clear, no
+   longer competing with the page name for the eye. */
+.gateHeading {
+  composes: micro;
+  font-size: 0.82rem;
+  color: #b79cff;
+  opacity: 0.92;
+  margin: 0.35rem 0 0;
+}
+
+/* Two messages share the one heading line. Portrait shows "rotate"; a phone in
+   landscape (already turned, still too small) shows "view on desktop" instead. */
+.gateMsgDesktop {
+  display: none;
+}
+
+/* SHOW THE GATE. Two conditions, OR'd:
+   1. Any portrait screen -- the tool is a landscape instrument, so upright never
+      runs it (this is what keeps a phone dark in portrait, and a tablet too).
+   2. A landscape screen small enough to be a phone (short AND narrow) -- turning
+      a phone sideways still is not enough room, so mobile stays dark. The
+      max-width guard keeps a wide-but-short desktop window out of the gate. */
+@media (orientation: portrait),
+  (orientation: landscape) and (max-width: 950px) and (max-height: 600px) {
+  /* The tool and its chrome both go; the gate is all that renders. */
+  .canvasLayer,
+  .inner {
+    display: none;
+  }
+
   .wrap {
     height: auto;
-    padding-bottom: 1.5rem;
+    padding-bottom: 0;
+    /* The gate carries its own dark; drop the lavender wash under it. */
+    background: none;
   }
 
-  .canvasLayer {
-    position: relative;
-    inset: auto;
-    height: 42vh;
-    min-height: 230px;
+  .mobileGate {
+    display: flex;
+  }
+}
+
+/* Phone in landscape: swap the rotate prompt for the desktop one, since it is
+   already turned as far as it goes. */
+@media (orientation: landscape) and (max-width: 950px) and (max-height: 600px) {
+  .gateMsgRotate {
+    display: none;
   }
 
-  .readout,
-  .rail,
-  .finish {
-    position: relative;
-    inset: auto;
-    top: auto;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    width: auto;
-    max-width: none;
-    margin: 0;
-  }
-
-  .readout {
-    text-align: left;
-    margin-bottom: 1rem;
-  }
-
-  .rail {
-    overflow: visible;
-    max-height: none;
-  }
-
-  .finish {
-    justify-content: flex-start;
-    margin-top: 1.2rem;
+  .gateMsgDesktop {
+    display: inline;
   }
 }

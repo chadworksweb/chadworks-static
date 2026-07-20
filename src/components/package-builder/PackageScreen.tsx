@@ -559,6 +559,37 @@ export function PackageScreen({
       }
     }
 
+    // The language multiplier: "xN" set as a glyph on the same 256 badge grid
+    // the edit pencil uses, so the disc + ring it sits inside register with it
+    // by construction. Solid white, tinted at draw time exactly like the pencil,
+    // and fitted so the two characters clear the ring with a margin. One texture
+    // per language count the range param allows (2..6); 1 is the included first
+    // language, which stamps no badge.
+    const mulTex: (WebGLTexture | null)[] = [];
+    {
+      const build = (label: string) => {
+        const tex = stubTex();
+        const cvs = badgeCanvas();
+        const ctx = cvs.getContext("2d");
+        if (ctx) {
+          ctx.clearRect(0, 0, BADGE, BADGE);
+          ctx.fillStyle = "#fff";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          const REF = 100;
+          ctx.font = `800 ${REF}px system-ui, "Segoe UI", Arial, sans-serif`;
+          const w = ctx.measureText(label).width || REF;
+          const SPAN = 128; // width across the 256 badge; clears the ring
+          const size = REF * (SPAN / w);
+          ctx.font = `800 ${size}px system-ui, "Segoe UI", Arial, sans-serif`;
+          ctx.fillText(label, BADGE / 2, BADGE / 2 + size * 0.06);
+          uploadCanvas(tex, cvs);
+        }
+        return tex;
+      };
+      for (let n = 2; n <= 6; n++) mulTex[n] = build(`x${n}`);
+    }
+
     // --- INTEGRATION marks: one per system the checklist names.
     //
     // WHAT EACH ONE IS. The first three are the vendor logos (Calendly,
@@ -1122,6 +1153,7 @@ export function PackageScreen({
       cur.brandContent = ease(cur.brandContent, t.brandContent, k);
       cur.copy = ease(cur.copy, t.copy, k);
       cur.edit = ease(cur.edit, t.edit, k);
+      cur.locales = ease(cur.locales, t.locales, k);
       cur.motionLevel = ease(cur.motionLevel, t.motionLevel, k);
       cur.commerceLevel = ease(cur.commerceLevel, t.commerceLevel, k);
       // The mask itself is not eased (it is a set of flags, not a magnitude);
@@ -2102,6 +2134,33 @@ export function PackageScreen({
               decal(barTex, cx + bw, cy, ft, barHalfH, lineA); // right
             }
             gl.uniform3f(ut.tint, 1, 1, 1); // reset for any later decals
+
+            // --- the LANGUAGE multiplier: xN stamped over the copy's corner.
+            // Extra languages are extra copies of the whole site, so the badge
+            // lives ON the copy column rather than getting its own material: it
+            // straddles the bottom-right corner of the copy block, overlapping
+            // the last bar. Same disc + ring + glyph treatment as the edit
+            // badge, so the two read as one control vocabulary; the first
+            // language is included, so it only appears from two.
+            const langA = smooth(1.4, 2.0, cur.locales) * appear;
+            if (langA > 0.01) {
+              const mh = Math.min(0.066, pyHalf * 0.26); // a notch under the edit badge
+              const mx = leftX + fullBarW; // right end of the widest copy bar
+              // Rest the badge's bottom ON the column content floor rather than
+              // straddling it: copyBotEdge is the line the copy bars and the
+              // ecommerce grid both stop at, and the badge holds to it too.
+              const my = copyBotEdge + mh;
+              const mn = Math.max(2, Math.min(6, Math.round(cur.locales)));
+              // Back to front, exactly like the edit badge's top level: the
+              // light disc (its own colour, untinted), the dark-blue ring, then
+              // the indigo glyph that reads on the pale plate.
+              decal(discTex, mx, my, mh, mh, langA);
+              gl.uniform3f(ut.tint, SLAB_VIOLET[0], SLAB_VIOLET[1], SLAB_VIOLET[2]);
+              decal(ringTex, mx, my, mh, mh, langA);
+              gl.uniform3f(ut.tint, 0.141, 0.224, 0.537);
+              decal(mulTex[mn], mx, my, mh, mh, langA);
+              gl.uniform3f(ut.tint, 1, 1, 1);
+            }
           }
 
           // --- ECOMMERCE: the cart on its inventory grid ------------------

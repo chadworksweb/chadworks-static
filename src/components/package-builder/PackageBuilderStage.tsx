@@ -129,7 +129,23 @@ export function PackageBuilderStage() {
                           step={1}
                           value={v}
                           aria-label={p.label}
-                          onChange={(e) => set(p.key, Number(e.target.value))}
+                          onChange={(e) => {
+                            const nv = Number(e.target.value);
+                            // Reaching for languages before copy has been
+                            // picked implies copy exists to translate: the xN
+                            // badge sits on the copy column, so promote unset
+                            // copy to level 1 in the same move rather than
+                            // stamping it over an empty column.
+                            if (p.key === "locales") {
+                              setScope((prev) => ({
+                                ...prev,
+                                locales: nv,
+                                content: prev.content < 0 ? 0 : prev.content,
+                              }));
+                            } else {
+                              set(p.key, nv);
+                            }
+                          }}
                         />
                         <span className={s.countValue}>{v}</span>
                       </div>
@@ -192,6 +208,23 @@ export function PackageBuilderStage() {
             Send this scope to Chad
           </a>
         </div>
+      </div>
+
+      {/* The tool needs a real landscape screen -- the rail, the object and the
+          price sit in a row. Mobile stays DARK either way: a portrait device gets
+          the rotate prompt, and a phone in landscape (too short to run it) still
+          darks out and points at the desktop. Only a landscape screen with tablet
+          or desktop height shows the tool. Always in the DOM, toggled by CSS, so
+          there is no hydration flash and the static export needs no client gate. */}
+      <div className={s.mobileGate}>
+        <p className={s.gateKicker}>chadworks</p>
+        {/* The page title still lands even though the tool is dark, so the fold
+            says what this page is rather than only that it is unavailable. */}
+        <p className={s.gateTitle}>Website Design Cost Calculator</p>
+        <p className={s.gateHeading}>
+          <span className={s.gateMsgRotate}>Rotate your device to landscape</span>
+          <span className={s.gateMsgDesktop}>Please view on desktop</span>
+        </p>
       </div>
     </div>
   );
