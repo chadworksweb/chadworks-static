@@ -96,8 +96,7 @@ export function ScopeSendForm({ scope }: { scope: Scope }) {
             Here&apos;s a summary of your project&apos;s scope and an estimate of
             what it might cost. All you need to do is fill out a quick or detailed
             message and it will all get sent to me for review. I usually reply
-            within 24 business hours. Thank you for considering chadworks for your
-            project.
+            within 24 business hours.
           </p>
           <p className={s.estimate}>{money(total)}</p>
           <p className={s.window}>{weeksLabel(scope)}</p>
@@ -136,6 +135,11 @@ export function ScopeSendForm({ scope }: { scope: Scope }) {
               timeline: weeksLabel(scope),
               scope_summary: scopeSummaryText(scope),
             })}
+            beforeSubmit={
+              <div className={s.thanks}>
+                <p>Thank you for considering chadworks for your project.</p>
+              </div>
+            }
           />
         </div>
       </div>

@@ -7,7 +7,7 @@
 // contact-form.js), adapted to React: refs + DOM classes, uncontrolled
 // inputs, the same has-error behavior, the same JSON POST shape.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { FormField, LeadFormConfig } from "@/lib/forms";
 
 // The centralized LEIT contact-form endpoint (leit-dashboard on le-projects-01):
@@ -88,6 +88,7 @@ function groupFields(fields: FormField[]) {
 export function LeadForm({
   config,
   getExtraData,
+  beforeSubmit,
 }: {
   config: LeadFormConfig;
   // Extra payload merged in at SUBMIT time (read live, not at render), so a
@@ -95,6 +96,8 @@ export function LeadForm({
   // current scope -- without prefilling any field. Overrides collected fields
   // on key collision.
   getExtraData?: () => Record<string, string>;
+  // Optional node rendered just before the submit button (e.g. a sign-off).
+  beforeSubmit?: ReactNode;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const tsRef = useRef<HTMLInputElement>(null);
@@ -241,6 +244,8 @@ export function LeadForm({
         if (g.span === "third") return <div key={gi} className="cw-form-grid cw-form-grid--3">{inner}</div>;
         return <div key={gi}>{inner}</div>;
       })}
+
+      {beforeSubmit}
 
       <button type="submit" className="svc-btn cw-form__submit" disabled={status === "sending"}>
         <span className="svc-btn__label">

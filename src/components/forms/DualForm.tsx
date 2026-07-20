@@ -6,7 +6,7 @@
 // cleared on switch. Each side is a full LeadForm (the engine handles its
 // own validation/submission/messages). Used by the /contact/ page.
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { LeadForm } from "./LeadForm";
 import type { LeadFormConfig } from "@/lib/forms";
 
@@ -18,9 +18,11 @@ interface Props {
   // Extra payload merged into whichever side submits (read live at submit) --
   // e.g. the calculator's current scope. Passed through to both LeadForms.
   getExtraData?: () => Record<string, string>;
+  // Node rendered just before each side's submit button.
+  beforeSubmit?: ReactNode;
 }
 
-export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detailed Inquiry", quick, detailed, getExtraData }: Props) {
+export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detailed Inquiry", quick, detailed, getExtraData, beforeSubmit }: Props) {
   const [active, setActive] = useState<"quick" | "detailed">("quick");
 
   return (
@@ -48,10 +50,10 @@ export function DualForm({ quickLabel = "Quick Contact", detailedLabel = "Detail
       </div>
 
       <div className={`cw-dualform__form${active === "quick" ? " is-active" : ""}`}>
-        <LeadForm config={quick} getExtraData={getExtraData} />
+        <LeadForm config={quick} getExtraData={getExtraData} beforeSubmit={beforeSubmit} />
       </div>
       <div className={`cw-dualform__form${active === "detailed" ? " is-active" : ""}`}>
-        <LeadForm config={detailed} getExtraData={getExtraData} />
+        <LeadForm config={detailed} getExtraData={getExtraData} beforeSubmit={beforeSubmit} />
       </div>
     </div>
   );
