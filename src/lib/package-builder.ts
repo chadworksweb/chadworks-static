@@ -327,6 +327,37 @@ export function rushPremium(s: Scope): number {
 export const money = (n: number) => `$${n.toLocaleString("en-US")}`;
 
 // ---------------------------------------------------------------------
+// SCOPE DESCRIPTION -- the human-readable choices, for the send-to-Chad form.
+//
+// The visible recap in the form uses ledger() (label + price). This is the
+// OTHER half: the actual selection behind each parameter, so the message that
+// reaches Chad says "Visual ambition: Layered" rather than just a dollar figure.
+// ---------------------------------------------------------------------
+
+// The chosen option, in words, for one parameter.
+export function paramValue(p: Param, s: Scope): string {
+  const v = s[p.key];
+  if (p.kind === "checks") {
+    const names = (p.options ?? []).filter((_, i) => v & (1 << i));
+    return names.length ? names.join(", ") : "None";
+  }
+  if (p.kind === "steps") return v < 0 ? "Not selected" : p.options?.[v] ?? String(v);
+  if (p.key === "locales") return v === 1 ? "1 language" : `${v} languages`;
+  return String(v); // pages, sections
+}
+
+export function describeScope(s: Scope): { label: string; value: string }[] {
+  return PARAMS.map((p) => ({ label: p.label, value: paramValue(p, s) }));
+}
+
+// The full scope as one message body, for the form payload that reaches Chad.
+export function scopeSummaryText(s: Scope): string {
+  const head = `Estimate: ${money(price(s))} (${weeksLabel(s)})`;
+  const lines = describeScope(s).map((d) => `${d.label}: ${d.value}`);
+  return [head, "", ...lines].join("\n");
+}
+
+// ---------------------------------------------------------------------
 // TIMELINE -- the delivery window.
 //
 // The calculator has always CHARGED for a squeezed timeline without ever

@@ -17,7 +17,7 @@
 // (lib/package-builder), never two implementations of it.
 // =====================================================================
 
-import { useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 import PackageScreen from "@/components/package-builder/PackageScreen";
 import {
   BASELINE,
@@ -49,8 +49,16 @@ function valueLabel(p: Param, v: number): string {
   return String(v);
 }
 
-export function PackageBuilderStage() {
-  const [scope, setScope] = useState<Scope>(BASELINE);
+// Scope is CONTROLLED by the parent (ScopeCalculator) so the send-to-Chad form
+// can read the same state the calculator writes. Only the open-panel set is
+// local -- it is pure UI and nothing else needs it.
+export function PackageBuilderStage({
+  scope,
+  setScope,
+}: {
+  scope: Scope;
+  setScope: Dispatch<SetStateAction<Scope>>;
+}) {
   // Not an accordion: any number of panels can be open, so two layers can be
   // compared without one closing the other.
   const [open, setOpen] = useState<ReadonlySet<keyof Scope>>(new Set(["pages"]));
@@ -202,9 +210,11 @@ export function PackageBuilderStage() {
           })}
         </div>
 
-        {/* the finish line */}
+        {/* the finish line: a native anchor to the send form right below the
+            stage. No JS, no DOM reach-across -- the browser scrolls to the form,
+            which already carries the live scope. */}
         <div className={s.finish}>
-          <a className={s.finishLink} href="/contact/">
+          <a className={s.finishLink} href="#your-scope">
             Send this scope to Chad
           </a>
         </div>

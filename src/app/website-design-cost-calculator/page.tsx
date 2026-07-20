@@ -33,7 +33,7 @@ import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { PackageBuilderStage } from "@/components/package-builder/PackageBuilderStage";
+import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
 import {
   BASE,
   BASELINE,
@@ -443,8 +443,9 @@ const CARD_GROUPS: { param: Param; rows: CardRow[] }[] = PARAMS.map((param) => (
 export default function WebsiteDesignCostCalculatorPage() {
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
-      {/* The tool owns the fold. Everything below it is the citation layer. */}
-      <PackageBuilderStage />
+      {/* The tool owns the fold, and the send-this-scope form sits right under
+          it. Everything below that is the citation layer. */}
+      <ScopeCalculator />
 
       {/* The hook: what this is, and why it is not like the others. */}
       <SectionShell className="svc-block">

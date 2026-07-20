@@ -85,7 +85,17 @@ function groupFields(fields: FormField[]) {
   return groups;
 }
 
-export function LeadForm({ config }: { config: LeadFormConfig }) {
+export function LeadForm({
+  config,
+  getExtraData,
+}: {
+  config: LeadFormConfig;
+  // Extra payload merged in at SUBMIT time (read live, not at render), so a
+  // caller can attach state that changes after mount -- e.g. the calculator's
+  // current scope -- without prefilling any field. Overrides collected fields
+  // on key collision.
+  getExtraData?: () => Record<string, string>;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const tsRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
@@ -153,6 +163,8 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
     // Report the actual page the form was sent from (like chadlewine's
     // source_page). config._source is the semantic slot; this is the real URL.
     data.source_page = window.location.pathname;
+    // Merge caller-supplied data (read now, so it reflects current state).
+    if (getExtraData) Object.assign(data, getExtraData());
 
     fetch(FORM_ENDPOINT, {
       method: "POST",
