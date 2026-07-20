@@ -1187,6 +1187,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-size: var(--text-sm);
   border-radius: 999px;                       /* pill */
   border: 1px solid transparent;
+  /* Native <button> defaults to the arrow cursor; force the pointer so a real
+     button reads as clickable like the <a> variants of this class. */
+  cursor: pointer;
   transition: color 0.35s cubic-bezier(0.21, 0.6, 0.35, 1);
 }
 /* bg_slide_right (mirrors the chadworks.co Avada button): the hover gradient

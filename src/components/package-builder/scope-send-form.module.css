@@ -144,7 +144,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 12px;
-  padding: 0.85rem 1.1rem;
+  padding: 0.85rem 1.15rem;
   margin: 1.6rem 0 0.25rem;
   background: linear-gradient(
     120deg,
@@ -155,7 +155,10 @@
   );
   background-size: 220% 220%;
   border: 1px solid rgba(229, 210, 244, 0.16);
-  animation: thanks-drift 9s ease-in-out infinite;
+  /* pops in when the form completes, then drifts */
+  animation:
+    thanks-pop 0.45s cubic-bezier(0.21, 0.9, 0.35, 1) both,
+    thanks-drift 9s ease-in-out infinite;
 }
 
 /* the sheen band that sweeps across */
@@ -178,8 +181,17 @@
   z-index: 1;
   margin: 0;
   color: var(--dark-text);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  /* Handwritten script for the personal sign-off; sized up since script faces
+     read smaller than the sans around them. */
+  font-family: var(--font-script), ui-rounded, cursive;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+@keyframes thanks-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
 }
 
 @keyframes thanks-drift {

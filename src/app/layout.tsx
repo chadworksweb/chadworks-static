@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Lexend, Instrument_Sans, JetBrains_Mono } from "next/font/google";
+import { Lexend, Instrument_Sans, JetBrains_Mono, Caveat } from "next/font/google";
 import "@/styles/global.css";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
@@ -44,6 +44,14 @@ const mono = JetBrains_Mono({
   variable: "--font-mono",
   display: "swap",
 });
+// Handwritten script, used for personal sign-offs (e.g. the calculator's
+// thank-you note). Not a general body/heading face.
+const script = Caveat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-script",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -72,7 +80,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${body.variable} ${mono.variable}`}
+      className={`${display.variable} ${body.variable} ${mono.variable} ${script.variable}`}
       // The reduced-motion boot script (in <body>) may add `cw-force-motion`
       // here before hydration; suppress the expected className mismatch.
       suppressHydrationWarning

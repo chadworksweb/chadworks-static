@@ -103,6 +103,10 @@ export function LeadForm({
   const tsRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [mailtoHref, setMailtoHref] = useState<string>("");
+  // Whether every required field is filled (and any email is valid). Gates the
+  // optional beforeSubmit node, so a sign-off only appears once the form is
+  // ready to send.
+  const [complete, setComplete] = useState(false);
   const idBase = `cwf-${config.source.replace(/[^a-z0-9]+/gi, "-")}`;
 
   // LEIT anti-spam timestamp: base64(now) set on mount and after each reset,
@@ -111,13 +115,27 @@ export function LeadForm({
     if (tsRef.current) tsRef.current.value = btoa(String(Math.floor(Date.now() / 1000)));
   }, [status]);
 
-  // Clear field error when the user starts typing again (source behavior).
+  // Are all required fields filled (and any email well-formed)? Read live off
+  // the DOM, since the inputs are uncontrolled.
+  function isComplete(form: HTMLFormElement) {
+    let ok = true;
+    form.querySelectorAll<HTMLInputElement>("[required]").forEach((field) => {
+      const v = (field.value || "").trim();
+      if (!v) ok = false;
+      else if (field.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) ok = false;
+    });
+    return ok;
+  }
+
+  // Clear field error when the user starts typing again (source behavior), and
+  // re-evaluate whether the form is complete so the sign-off can appear.
   function onInput(e: React.FormEvent) {
     const group = (e.target as HTMLElement).closest(".cw-form-field");
     if (group && group.classList.contains("has-error")) {
       const v = (e.target as HTMLInputElement).value || "";
       if (v.trim()) group.classList.remove("has-error");
     }
+    if (formRef.current) setComplete(isComplete(formRef.current));
   }
 
   function validateForm(form: HTMLFormElement) {
@@ -245,7 +263,9 @@ export function LeadForm({
         return <div key={gi}>{inner}</div>;
       })}
 
-      {beforeSubmit}
+      {/* Only once every required field is filled, so a sign-off pops in when
+          the form is actually ready to send. */}
+      {complete ? beforeSubmit : null}
 
       <button type="submit" className="svc-btn cw-form__submit" disabled={status === "sending"}>
         <span className="svc-btn__label">
