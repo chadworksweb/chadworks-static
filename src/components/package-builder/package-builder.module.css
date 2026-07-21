@@ -560,12 +560,15 @@
 }
 
 /* SHOW THE GATE. Two conditions, OR'd:
-   1. Any portrait screen -- the tool is a landscape instrument, so upright never
-      runs it (this is what keeps a phone dark in portrait, and a tablet too).
+   1. A NARROW portrait screen (<= 600px wide) -- a phone upright. The tool
+      renders its row down to 600px (see the tablet rule above), so the portrait
+      gate carries the same 600px floor: above it there is real width to run the
+      tool, and a wide-but-portrait window (a tall desktop window, a portrait
+      monitor, a large tablet upright) is NOT gated just for its aspect ratio.
    2. A landscape screen small enough to be a phone (short AND narrow) -- turning
       a phone sideways still is not enough room, so mobile stays dark. The
       max-width guard keeps a wide-but-short desktop window out of the gate. */
-@media (orientation: portrait),
+@media (orientation: portrait) and (max-width: 600px),
   (orientation: landscape) and (max-width: 950px) and (max-height: 600px) {
   /* The tool and its chrome both go; the gate is all that renders. */
   .canvasLayer,

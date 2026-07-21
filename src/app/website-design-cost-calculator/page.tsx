@@ -48,7 +48,9 @@ import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import ManifestoAmbient from "@/components/ManifestoAmbient";
 import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
+import { PackageAssemble } from "@/components/package-builder/PackageAssemble";
 import {
   BASE,
   BASELINE,
@@ -63,9 +65,9 @@ import {
 import { CALCULATORS } from "@/lib/pricing";
 
 const PAGE_URL = `${SITE_URL}/website-design-cost-calculator/`;
-const TITLE = "Website Design Cost Calculator: Priced to the Dollar | chadworks";
+const TITLE = "chadworks Website Design Cost Calculator";
 const DESCRIPTION =
-  "A website design cost calculator running one studio's real rate card. Set your project scope and it prices the build to the dollar: a $3,200 baseline plus published figures for pages, custom development, branding, and a rush timeline.";
+  "Use this free website cost calculator to estimate the budget required to build your ideal website.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -158,96 +160,179 @@ const breadcrumbJsonLd = {
 // this page still needs (for the differentiator below) live in lib/pricing as
 // CALCULATORS. The Kimberly testimonial stayed here, attached to that section.
 
-// The calculator's own questions. Cost questions ("what is the most expensive
-// part", "can I update it myself", "why do quotes vary") moved to the guide with
-// the rest of the cost content; what stays is about the TOOL.
-const FAQS: { q: string; a: ReactNode }[] = [
+// The intro TOC and the "about the calculator" sections it links to. Chad turned
+// the tool's FAQ into first-class sections (2026-07-21): the five questions people
+// ask about the calculator each become a headed section, and the old "no form" and
+// "accuracy" answers fold into the "why" and "difference" sections. The rate card,
+// the always-included list and the worked-examples link stay as their own sections.
+// The TOC links to every section, in page order.
+const TOC: { href: string; label: string }[] = [
+  { href: "#rate-card", label: "The rate card" },
+  { href: "#included", label: "What every build includes" },
+  { href: "#how-built", label: "How I built it" },
+  { href: "#purpose", label: "What it's for" },
+  { href: "#who", label: "Who it's for" },
+  { href: "#other-calculators", label: "Other calculators I can build" },
+  { href: "#why", label: "Why I built it" },
+  { href: "#difference", label: "What makes it different" },
+];
+
+// Chad's headings, in his order. Each body is the exact answer text from the old
+// FAQ, verbatim; the "why" section carries the old "no form" answer as its second
+// paragraph. The "accuracy" answer is folded into the difference section below.
+const META_SECTIONS: {
+  id: string;
+  eyebrow: string;
+  heading: string;
+  body: ReactNode;
+  modules?: { label: string; items: string[] }[];
+  aside?: ReactNode;
+  lede?: ReactNode;
+}[] = [
   {
-    q: "What is a website cost calculator for?",
-    a: (
-      <>
-        It turns a vague question, what will my website cost, into a real number
-        you can act on. You describe the site you actually need, and it prices
-        that exact scope off a published rate card instead of handing you an
-        industry average or a range wide enough to hide in. The point is to let
-        you find out where you stand before you spend a phone call finding out.
-      </>
-    ),
-  },
-  {
-    q: "Who would use a website cost calculator?",
-    a: (
-      <>
-        Anyone trying to budget a site before they talk to a builder. A small
-        business owner sizing up a first real website, a founder checking whether
-        a store is a few thousand dollars or a few tens of thousands, a marketer
-        pricing a redesign for a boss who wants a number by Friday. It is for the
-        moment before the conversation, when you just need to know the shape of
-        the spend.
-      </>
-    ),
-  },
-  {
-    q: "How did you build this calculator?",
-    a: (
-      <>
+    id: "how-built",
+    eyebrow: "Under the hood",
+    heading: "How did you build the website cost calculator?",
+    body: (
+      <p>
         It runs on a small pricing model I wrote, the same one I use to quote in
-        real life: a {money(BASE)} baseline plus a published figure for each
+        real life: a {money(BASE)}{" "}baseline plus a published figure for each
         thing that moves the number, pages and development and branding and
         commerce and the rest. Nothing is a lookup of somebody&apos;s averages.
         Every figure on the rate card above is generated straight from that model,
         so the tool and the table can never say two different numbers.
+      </p>
+    ),
+  },
+  {
+    id: "purpose",
+    eyebrow: "The purpose",
+    heading: "What is the purpose of a website cost calculator?",
+    aside: <PackageAssemble />,
+    lede: (
+      <>
+        This calculator turns a vague idea or question into a visual entity with a
+        number attached. Its purpose is to make scoping your website project and
+        budgeting for it easier and clearer than ever.
+      </>
+    ),
+    body: (
+      <p>
+        It was built to help clients figure out where their idea sits in their own
+        realm of financial possibility. It also helps clients mix and mold their
+        features to fit their budget, without having to talk to someone or without
+        knowing what each and every technical aspect means and does. Its purpose is
+        to translate complicated tech scopes into easy to read and understand
+        packages so they feel comfortable enough and educated enough to start a
+        conversation with me about their project.
+      </p>
+    ),
+  },
+  {
+    id: "who",
+    eyebrow: "Who it's for",
+    heading: "Who would use a website cost calculator?",
+    body: (
+      <>
+        <p>
+          I built this website cost calculator for the client that has been
+          shafted in the past. The web design world can be misleading and scammy.
+          It often runs on the charm-offensive. I created this website calculator
+          for clients that aren&apos;t that familiar with website design and
+          development. I built this website cost calculator for:
+        </p>
+        <ul className="cw-glow-list">
+          <li>
+            Clients that want to build their own package and have a better idea of
+            what costs are involved.
+          </li>
+          <li>
+            Clients that aren&apos;t ready to have a direct call or face to face
+            meeting, but still want to be informed.
+          </li>
+          <li>
+            Clients that want a visualization rather than a list of features they
+            have no context of.
+          </li>
+          <li>
+            Clients that want to know what they&apos;re getting for their
+            investment.
+          </li>
+          <li>
+            Clients that want an easy way to spec and budget their website or web
+            development projects.
+          </li>
+        </ul>
       </>
     ),
   },
   {
-    q: "Why did you build it?",
-    a: (
-      <>
-        Because every other website cost calculator I found either hid the number
-        behind a form or made one up. I already price this way in person, off a
-        rate card I am happy to publish, so putting that same card behind a tool
-        cost me nothing and saved you a sales call. I would rather you read the
-        total, decide I am too expensive, and never email me, than gate the answer
-        to farm your contact details.
-      </>
+    id: "other-calculators",
+    eyebrow: "Custom calculator builds",
+    heading: "Can you build other types of calculators?",
+    body: (
+      <p>
+        If your calculations run on numbers, I can build it. I&apos;m no
+        mathematician, but I do know how to explain ideas and get them out of your
+        head and into the real (digital) world. I can build calculators for all
+        kinds of situations and businesses, like these.
+      </p>
     ),
+    modules: [
+      {
+        label: "Geographic",
+        items: [
+          "Delivery radius checkers",
+          "Shipping cost calculators",
+          "Service-area and travel-fee estimators",
+        ],
+      },
+      {
+        label: "Business",
+        items: [
+          "Instant price quotes",
+          "Package and scope builders (like this one)",
+          "Product configurators",
+        ],
+      },
+      {
+        label: "Financial",
+        items: [
+          "Savings and ROI calculators",
+          "Financing and payment schedules",
+          "Cost and material estimators",
+        ],
+      },
+      {
+        label: "Fun and misc",
+        items: [
+          "Quizzes and assessments",
+          "Tests and scorecards",
+          "Unit and measurement converters",
+        ],
+      },
+    ],
   },
   {
-    q: "Can you build a calculator like this for my business?",
-    a: (
+    id: "why",
+    eyebrow: "Why it exists",
+    heading: "Why did you build the website cost calculator?",
+    body: (
       <>
-        Yes, and it is some of my favorite work. A pricing tool, a quote builder,
-        a savings or ROI calculator, an estimator that reads your inputs and
-        returns a real answer: this page is one example of the kind of custom
-        interactive tool I build. If you have a number your customers keep asking
-        you for, I can put it behind a tool like this one. Tell me what it should
-        work out.
-      </>
-    ),
-  },
-  {
-    q: "Is this calculator accurate?",
-    a: (
-      <>
-        It is accurate about my rates and honest about your project. Every
-        number it adds up is published in the table above, so you can check the
-        arithmetic yourself. What it cannot know is that your booking system has
-        to talk to a twelve year old scheduling database, and that kind of thing
-        is exactly where estimates die. Treat the number as a real starting point
-        for a real conversation. It becomes a quote once we have talked through
-        the parts a slider cannot see.
-      </>
-    ),
-  },
-  {
-    q: "Why is there no form on this page?",
-    a: (
-      <>
-        Because your budget is yours. You get the number here, and you email me
-        only if you want to. Read the total, decide I am too expensive, and we
-        both just saved a phone call. Nothing you do with this calculator reaches
-        me until you send it.
+        <p>
+          Because every other website cost calculator I found either hid the
+          number behind a form or made one up. I already price this way in person,
+          off a rate card I am happy to publish, so putting that same card behind a
+          tool cost me nothing and saved you a sales call. I would rather you read
+          the total, decide I am too expensive, and never email me, than gate the
+          answer to farm your contact details.
+        </p>
+        <p>
+          Because your budget is yours. You get the number here, and you email me
+          only if you want to. Read the total, decide I am too expensive, and we
+          both just saved a phone call. Nothing you do with this calculator reaches
+          me until you send it.
+        </p>
       </>
     ),
   },
@@ -329,55 +414,49 @@ export default function WebsiteDesignCostCalculatorPage() {
       {/* The hook: an answer-first, keyphrase-led intro (Yoast/GEO -- the phrase
           in sentence one, the baseline inside the first ~200 words) beside a
           static at-a-glance panel a JS-less crawler can still read. */}
-      <SectionShell className="svc-block">
-        <p className="eyebrow">The calculator, in the open</p>
-        <h1 className="svc-block__heading svc-fill">
-          Website Design Cost Calculator
-        </h1>
+      <SectionShell className="svc-block cw-calc-hero" bg={<ManifestoAmbient />}>
         <div className="cw-calc-intro">
-          <div className="svc-prose svc-prose--lead">
-            <p>
-              This website design cost calculator prices a custom website to the
-              dollar, from a {money(BASE)} baseline. Set your scope on the tool
-              above and the estimate builds line by line off one working
-              studio&apos;s published rate card, covering pages, custom
-              development, branding, ecommerce, and a rushed timeline.
-            </p>
-            <p>
-              I am Chad, and I have designed and built custom websites for twenty
-              years. This cost calculator runs on my own rates, priced the way I
-              would quote your project in person. The full ladder is published
-              below, so you can estimate your website down to the line without
-              ever talking to me. Nothing is sent until you send it.
-            </p>
+          <div className="cw-calc-intro__lead">
+            <p className="eyebrow">Easy web design budgeting</p>
+            <h1 className="svc-block__heading svc-fill">
+              Website Design Cost Calculator
+            </h1>
+            <div className="svc-prose svc-prose--lead">
+              <p>
+                This website design cost calculator prices a custom website to the
+                dollar, from a {money(BASE)}{" "}baseline. Set your scope on the tool
+                above and the estimate builds line by line off one working
+                studio&apos;s published rate card, covering pages, custom
+                development, branding, ecommerce, and a rushed timeline.
+              </p>
+              <p>
+                Hi, I&apos;m <Link href="/about/">Chad D.L.</Link> and I got tired
+                of all the boring, or complicated, or gated, or outdated website
+                cost calculators out there, so I built my own. My brand is built on
+                transparency and novel design. This calculator started as a vision
+                in my head and I built it from scratch. I can do the same for your
+                project. <Link href="/contact/">Contact me here.</Link>
+              </p>
+            </div>
           </div>
-          <aside className="panel cw-calc-glance">
-            <p className="cw-calc-glance__title">At a glance</p>
-            <dl>
-              <div className="cw-calc-glance__row">
-                <dt className="cw-calc-glance__k">Baseline</dt>
-                <dd className="cw-calc-glance__v">{money(BASE)}</dd>
-              </div>
-              <div className="cw-calc-glance__row">
-                <dt className="cw-calc-glance__k">Cost factors priced</dt>
-                <dd className="cw-calc-glance__v">{PARAMS.length}</dd>
-              </div>
-              <div className="cw-calc-glance__row">
-                <dt className="cw-calc-glance__k">Baseline turnaround</dt>
-                <dd className="cw-calc-glance__v">{weeksLabel(BASELINE)}</dd>
-              </div>
-              <div className="cw-calc-glance__row">
-                <dt className="cw-calc-glance__k">Email to see it</dt>
-                <dd className="cw-calc-glance__v">Never</dd>
-              </div>
-            </dl>
-          </aside>
+          {/* Table of contents: an in-page nav to every section below, in page
+              order. Replaces the old "at a glance" stat panel. */}
+          <nav className="panel cw-calc-toc" aria-label="On this page">
+            <p className="cw-calc-toc__title">On this page</p>
+            <ol className="cw-calc-toc__list">
+              {TOC.map((t) => (
+                <li key={t.href}>
+                  <a href={t.href}>{t.label}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
         </div>
       </SectionShell>
 
       {/* The rate card. THE citation layer: static HTML, generated from the
           model, readable by an engine that will never run the calculator. */}
-      <SectionShell className="svc-block">
+      <SectionShell className="svc-block" id="rate-card">
         <p className="eyebrow">The rate card</p>
         <h2 className="svc-block__heading svc-fill">
           What a website costs here, line by line
@@ -454,7 +533,7 @@ export default function WebsiteDesignCostCalculatorPage() {
           standard, so there is no conformance claim to defend. Keep it that
           way. The same two baselines are stated on /faqs/ and the service
           pages; they should move together. */}
-      <SectionShell className="svc-block">
+      <SectionShell className="svc-block" id="included">
         <p className="eyebrow">Always included</p>
         <h2 className="svc-block__heading svc-fill">
           What every build includes, whatever the number says
@@ -516,26 +595,40 @@ export default function WebsiteDesignCostCalculatorPage() {
         </div>
       </SectionShell>
 
-      {/* Worked examples moved to the guide on 2026-07-20 (informational
-          intent). This cross-link points at them so a reader who wants real
-          priced builds can jump straight there. */}
-      <SectionShell className="svc-block">
-        <p className="eyebrow">Worked examples</p>
-        <h2 className="svc-block__heading svc-fill">
-          See it priced as real projects
-        </h2>
-        <div className="svc-prose">
-          <p>
-            Real builds, from a focused baseline site up to a custom marketplace
-            platform, each scoped and priced to the dollar by the same model that
-            runs this calculator. They live on the{" "}
-            <Link href="/how-much-does-a-website-cost/#worked-examples">
-              how much a website costs
-            </Link>{" "}
-            guide.
-          </p>
-        </div>
-      </SectionShell>
+      {/* The "about the calculator" cluster: Chad's questions, each its own headed
+          section, in his order (2026-07-21). Bodies are the old-FAQ answers,
+          verbatim. The difference section below closes the cluster. */}
+      {META_SECTIONS.map((s) => (
+        <SectionShell key={s.id} className="svc-block" id={s.id}>
+          <p className="eyebrow">{s.eyebrow}</p>
+          <h2 className="svc-block__heading svc-fill">{s.heading}</h2>
+          {s.aside ? (
+            <div className="cw-purpose-grid">
+              <div className="cw-purpose-text">
+                {s.lede ? <p className="svc-lede">{s.lede}</p> : null}
+                <div className="svc-prose svc-prose--plain">{s.body}</div>
+              </div>
+              <div className="cw-purpose-aside">{s.aside}</div>
+            </div>
+          ) : (
+            <div className="svc-prose">{s.body}</div>
+          )}
+          {s.modules && (
+            <div className="cw-calc-kinds">
+              {s.modules.map((cat) => (
+                <div key={cat.label} className="panel cw-calc-kinds__module">
+                  <p className="cw-calc-kinds__cat">{cat.label}</p>
+                  <ul className="cw-calc-kinds__list">
+                    {cat.items.map((it) => (
+                      <li key={it}>{it}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionShell>
+      ))}
 
       {/* What makes this calculator different: the no-gate, real-rate-card
           argument, with the other calculators cited (CALCULATORS from the hub,
@@ -548,6 +641,7 @@ export default function WebsiteDesignCostCalculatorPage() {
         full
         className="svc-block svc-faq-section"
         trailingClassName="svc-faq-section--dark"
+        id="difference"
       >
         <p className="eyebrow">The difference</p>
         <h2 className="svc-block__heading svc-fill">
@@ -590,6 +684,15 @@ export default function WebsiteDesignCostCalculatorPage() {
             and never email me, than gate the answer to farm your contact
             details.
           </p>
+          <p>
+            It is accurate about my rates and honest about your project. Every
+            number it adds up is published in the table above, so you can check the
+            arithmetic yourself. What it cannot know is that your booking system has
+            to talk to a twelve year old scheduling database, and that kind of thing
+            is exactly where estimates die. Treat the number as a real starting point
+            for a real conversation. It becomes a quote once we have talked through
+            the parts a slider cannot see.
+          </p>
         </div>
 
         {/* A real client corroborating the no-upsell claim. Same markup as
@@ -612,35 +715,6 @@ export default function WebsiteDesignCostCalculatorPage() {
             </p>
           </figcaption>
         </figure>
-      </SectionShell>
-
-      {/* The FAQ. Content-first, question-shaped, no FAQPage markup (see the
-          JSON-LD note above). The phrasings are the ones people really use. */}
-      <SectionShell
-        full
-        className="svc-block svc-faq-section"
-        trailingClassName="svc-faq-section--dark"
-      >
-        <div className="svc-faq__layout">
-          <div className="svc-faq__intro">
-            <p className="eyebrow">About the tool</p>
-            <h2 className="svc-block__heading svc-fill">
-              Questions about this calculator
-            </h2>
-            <p className="svc-faq__lead">
-              What it is, who it is for, and how it works, answered the way I
-              would answer them on the phone.
-            </p>
-          </div>
-          <div className="cw-rate-explainer__body">
-            {FAQS.map((f) => (
-              <div key={f.q} className="svc-prose svc-prose--plain">
-                <h3>{f.q}</h3>
-                <p>{f.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </SectionShell>
 
       <PathsCapsule

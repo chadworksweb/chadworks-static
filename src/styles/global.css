@@ -1845,6 +1845,207 @@ p, li, dd, figcaption { text-wrap: pretty; }
   white-space: nowrap;
 }
 
+/* --- Cost-calculator TOC: the in-page nav that replaced the "at a glance" panel.
+   Sits in the intro's right column; numbered anchor links, one per section, in
+   page order. Same panel shell + mono/lavender accents as the old glance box. */
+.cw-calc-toc { padding: clamp(1.4rem, 3vw, 2rem); }
+.cw-calc-toc__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+.cw-calc-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: cw-toc;
+  display: grid;
+}
+.cw-calc-toc__list li {
+  counter-increment: cw-toc;
+  border-top: 1px solid var(--border-subtle);
+}
+.cw-calc-toc__list li:first-child { border-top: none; }
+.cw-calc-toc__list a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.6rem 0;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-base);
+  transition: color 0.15s ease;
+}
+.cw-calc-toc__list a::before {
+  content: counter(cw-toc, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent);
+  opacity: 0.7;
+}
+.cw-calc-toc__list a:hover { color: var(--text-primary); }
+.cw-calc-toc__list a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* --- Custom-calculator kinds: the "what else I can build" list as a grid of
+   category modules (geographic / business / financial / fun), three examples
+   each. Panels reuse the shared .panel shell. */
+.cw-calc-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+.cw-calc-kinds__module { padding: clamp(1.2rem, 2.4vw, 1.6rem); }
+.cw-calc-kinds__cat {
+  font-family: var(--font-mono);
+  font-size: calc(var(--text-xs) * 1.25);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 var(--space-sm);
+}
+.cw-calc-kinds__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.cw-calc-kinds__list li {
+  position: relative;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+.cw-calc-kinds__list li::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+/* --- Purpose section: prose (2/3) beside the package-assemble object (1/3). */
+.cw-purpose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  align-items: stretch; /* the animation fills the row height of the prose */
+  margin-top: var(--space-md);
+}
+@media (max-width: 760px) {
+  .cw-purpose-grid { grid-template-columns: 1fr; }
+}
+.cw-purpose-aside { display: flex; min-height: 0; min-width: 0; }
+.cw-purpose-text .svc-prose { margin-top: var(--space-sm); }
+
+/* The deconstruct/reassemble object: the WebGL canvas fills the whole right
+   column (matching the prose height) and is itself the click target. The prose
+   drives the row height; the canvas flex-grows into it. */
+.cw-assemble {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font: inherit;
+}
+.cw-assemble__canvas {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.cw-assemble__hint {
+  flex: 0 0 auto;
+  display: block;
+  margin-top: var(--space-xs);
+  text-align: center;
+}
+.cw-assemble__label {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.cw-assemble__click {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.cw-assemble:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+@media (max-width: 760px) {
+  /* stacked: give the canvas an explicit height since there is no tall prose
+     column beside it to inherit from */
+  .cw-assemble__canvas { height: 78vw; flex: 0 0 auto; }
+}
+
+/* --- Glow-square bullets, lifted from the showroom interior module
+   (.bursts li::before): an 8px rounded square, lavender-to-purple gradient with a
+   soft purple glow. Overrides the default svc-prose disc markers. */
+.svc-prose ul.cw-glow-list {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.svc-prose ul.cw-glow-list li {
+  position: relative;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+.svc-prose ul.cw-glow-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #aeb9ea, #6629bc);
+  box-shadow: 0 0 10px rgba(102, 41, 188, 0.6);
+}
+
+/* --- Cost-calculator hero backdrop: the shared manifesto cloud (the pale-indigo
+   fbm field, <ManifestoAmbient />) passed as the SectionShell `bg`, so it renders
+   full-bleed in .cw-shell__bg at z-index 0 behind the intro. Masked to fade to
+   nothing across the bottom half, so it dissolves into the rate card below with
+   no hard band edge. Fade is BOTTOM-only (opaque at the top). */
+.cw-calc-hero > .cw-shell__bg {
+  /* Full-bleed: this hero is a content-width section, so break the cloud out to
+     the full viewport width. The page already clips overflow-x, so no h-scroll. */
+  left: 50%;
+  right: auto;
+  width: 100vw;
+  transform: translateX(-50%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+}
+
 /* --- Worked-example builds (the dark "examples of website cost" band). Each
    build is its own block: an h3 that STATES the cost, the scope detail as plain
    body, and the turnaround. A divider + padding give the builds real separation
