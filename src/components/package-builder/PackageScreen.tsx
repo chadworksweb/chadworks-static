@@ -17,7 +17,7 @@
 // down and rebuild the context on each drag frame.
 // =====================================================================
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
 import {
   Mat,
@@ -58,11 +58,20 @@ const SLAB_VIOLET: [number, number, number] = [0.502, 0.329, 0.737];
 const PHI = (1 + Math.sqrt(5)) / 2;
 const SOLID_SHELLS = 3;
 const BASE_SPIN = 0.055;
+// Assembly-mode helpers (see the `assembly` prop): a full turn, and the ease
+// the build progress runs through.
+const ATWO_PI = Math.PI * 2;
+// The assembled package grows to this multiple of the scattered scale as the
+// pieces come together, so the finished object fills roughly 75% of the column
+// width instead of floating small in it. Scattered (built 0) stays at 1x for
+// room. ~2.0 lands the plug-to-cover span near 75% without clipping the frame.
+const ASM_ZOOM = 2.0;
 
 export function PackageScreen({
   channels,
   className,
   capture,
+  assembly,
 }: {
   channels: Channels;
   className?: string;
@@ -70,11 +79,26 @@ export function PackageScreen({
   // headless capture can read the canvas with toDataURL. Left off in the live
   // calculator so the drawing buffer stays cheap.
   capture?: boolean;
+  // ASSEMBLY MODE (the purpose section's deconstruct/reassemble object). When
+  // set, the SAME real object -- fed a fixed scope -- disperses its genuine
+  // parts (cover, page leaves, plug, and the branding panel with its real gem /
+  // copy skeleton / ecommerce grid) across the frame and click-assembles into
+  // the finished package. Nothing is a stand-in: the dispersal is layered ON
+  // the real per-part draw calls. When `assembly` is unset the object renders
+  // exactly as the live calculator does (gOrient below collapses to `orient`).
+  assembly?: boolean;
 }) {
-  const hostRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const captureRef = useRef(capture);
   captureRef.current = capture;
+  const assemblyRef = useRef(!!assembly);
+  assemblyRef.current = !!assembly;
+  // Assembly build target: 0 scattered, 1 built. A ref so the click never
+  // re-runs the setup effect; the loop eases toward it.
+  const builtTargetRef = useRef(0);
+  // Mirror of the target for the caption only (the loop reads the ref).
+  const [built, setBuilt] = useState(false);
   // The live target. Written every render, read by the loop. Never a dep.
   const target = useRef<Channels>(channels);
   target.current = channels;
@@ -84,7 +108,7 @@ export function PackageScreen({
     const canvas = canvasRef.current;
     if (!host || !canvas) return;
 
-    const gl = canvas.getContext("webgl2", { antialias: true, alpha: true, preserveDrawingBuffer: !!captureRef.current });
+    const gl = canvas.getContext("webgl2", { antialias: true, alpha: true, preserveDrawingBuffer: !!captureRef.current || !!assemblyRef.current });
     if (!gl) return; // no WebGL: the ledger beside it still tells the whole story
 
     const compile = (type: number, src: string) => {
@@ -1136,6 +1160,66 @@ export function PackageScreen({
     // NO cursor interaction. The object is staged and floats; the scope is the
     // only thing that moves it.
 
+    // --- ASSEMBLY: the deconstruct/reassemble layer ------------------------
+    // Off entirely unless this instance is the purpose-section object. When on,
+    // each drawn PART is a GROUP with its own scatter home; a single build
+    // progress (0..1, eased) blends every group between its scattered pose and
+    // its real seated pose. gOrient(key,...) returns `orient` untouched when
+    // assembly is off, so the live calculator path is byte-identical.
+    const asm = assemblyRef.current;
+    // Reduced motion opens already built and never disperses.
+    if (asm && reduce) { builtTargetRef.current = 1; setBuilt(true); }
+    let built01 = asm ? builtTargetRef.current : 1; // eased build progress
+    const gspin = new Map<string, number>(); // per-group accrued self-spin
+    const norm3 = (x: number, y: number, z: number): [number, number, number] => {
+      const l = Math.hypot(x, y, z) || 1;
+      return [x / l, y / l, z / l];
+    };
+    const ahash = (k: number, s: number) => {
+      const x = Math.sin((k + 1) * 12.9898 + s * 78.233) * 43758.5453;
+      return x - Math.floor(x); // 0..1
+    };
+    // Deterministic scatter descriptor per group, seeded by first-seen order
+    // (stable because the draw order is fixed). A base position spread across
+    // the frame, an independent xyz drift, a self-spin axis + rate.
+    type GParam = {
+      nx: number; ny: number; nz: number;
+      amp: [number, number, number]; frq: [number, number, number]; phs: [number, number, number];
+      axis: [number, number, number]; spinBase: number; spinDir: number;
+    };
+    const GP = new Map<string, GParam>();
+    let gpN = 0;
+    const gpFor = (key: string): GParam => {
+      const hit = GP.get(key);
+      if (hit) return hit;
+      const i = gpN++;
+      const gp: GParam = {
+        nx: (ahash(i, 1) * 2 - 1) * 0.9,
+        ny: (ahash(i, 2) * 2 - 1) * 0.9,
+        nz: ahash(i, 3) * 2 - 1,
+        amp: [0.16 + ahash(i, 4) * 0.2, 0.13 + ahash(i, 5) * 0.16, 0.2 + ahash(i, 6) * 0.28],
+        frq: [0.11 + ahash(i, 7) * 0.13, 0.09 + ahash(i, 8) * 0.12, 0.08 + ahash(i, 9) * 0.1],
+        phs: [ahash(i, 10) * ATWO_PI, ahash(i, 11) * ATWO_PI, ahash(i, 12) * ATWO_PI],
+        axis: norm3(Math.sin(i * 1.7) + 0.2, Math.cos(i * 2.3), Math.sin(i * 0.9) + 0.3),
+        spinBase: 0.05 + ((i * 5) % 4) * 0.018, // halved with the flourish (Chad)
+        spinDir: i % 2 ? 1 : -1,
+      };
+      GP.set(key, gp);
+      return gp;
+    };
+    // A rotation about an arbitrary unit axis (angle in radians), column-major.
+    const rotAxisMat = (a: [number, number, number], ang: number): Float32Array => {
+      const c = Math.cos(ang), s = Math.sin(ang), t = 1 - c;
+      const [x, y, z] = a;
+      // prettier-ignore
+      return new Float32Array([
+        t * x * x + c,     t * x * y + s * z, t * x * z - s * y, 0,
+        t * x * y - s * z, t * y * y + c,     t * y * z + s * x, 0,
+        t * x * z + s * y, t * y * z - s * x, t * z * z + c,     0,
+        0, 0, 0, 1,
+      ]);
+    };
+
     const draw = (now: number) => {
       if (!t0) { t0 = now; prevTs = now; }
       const time = (now - t0) / 1000;
@@ -1217,12 +1301,76 @@ export function PackageScreen({
       );
       const posed = Mat.mul(Mat.trans(driftX, driftY, 0), orient);
 
+      // --- ASSEMBLY: ease the build progress + the per-group dispersal -------
+      // The whole object assembles together, so ONE progress drives every group.
+      // March toward the target and snap within a step so it settles exactly at
+      // 0 or 1 and holds (no endpoint dither). Scattered homes fill the frame's
+      // visible extent minus the part's own reach, so nothing ever clips.
+      if (asm) {
+        const tgt = builtTargetRef.current;
+        const step = dt * 0.27; // unhurried collect; ~2-turn flourish on the way in
+        if (Math.abs(tgt - built01) <= step) built01 = tgt;
+        else built01 += tgt > built01 ? step : -step;
+      }
+      const eBuilt = built01 <= 0 ? 0 : built01 >= 1 ? 1 : built01 * built01 * (3 - 2 * built01);
+      const visH = Math.tan(((SCREEN.fov * Math.PI) / 180) / 2) * Math.abs(SCREEN.camZ);
+      const visW = visH * (w / Math.max(1, h));
+      // The built package is nudged UP by 50 CSS px (75 up, then 25 back down --
+      // Chad). Converted to world units (a full canvas height spans 2*visH), and
+      // ramped with the build so the object rises as it assembles.
+      const builtLift = (100 / (canvas.clientHeight || 1)) * visH * eBuilt;
+      // gOrient replaces `orient` for one part-group. Built (or assembly off) it
+      // returns `orient` exactly; scattered it flies the group out to its home
+      // and spins it. The pivot (px,py,pz) is the group's local centre, so the
+      // spin turns the part about itself rather than orbiting the whole object.
+      const gOrient = (
+        key: string, px: number, py: number, pz: number, ext: number
+      ): Float32Array => {
+        if (!asm) return orient;
+        // The whole object grows from 1x (scattered) to ASM_ZOOM (built), so the
+        // pieces scale UP as they come together and the finished package fills the
+        // column. Applied about the object centre, ahead of the dispersal.
+        const zoom = 1 + (ASM_ZOOM - 1) * eBuilt;
+        const gp = gpFor(key);
+        let sp = gspin.get(key) ?? 0;
+        // Self-spin only accrues while scattered, so a click never rewinds the
+        // accumulated path.
+        if (eBuilt < 0.02) { sp += dt * gp.spinBase; gspin.set(key, sp); }
+        const spun = ((sp % ATWO_PI) + ATWO_PI) % ATWO_PI;
+        const ang0 = spun > Math.PI ? spun - ATWO_PI : spun; // shortest route to flat
+        // ONE whole turn on the way in and out (halved from two, Chad), always
+        // landing flat (a whole number of turns = identity, so at built the Dg is
+        // the identity and only the zoom remains). Monotonic in eBuilt.
+        const effSpin = ang0 * (1 - eBuilt) + gp.spinDir * 1 * ATWO_PI * eBuilt;
+        const s = 1 - eBuilt;
+        const rx = Math.max(0, visW * 0.9 - ext - gp.amp[0]);
+        const ry = Math.max(0, visH * 0.9 - ext - gp.amp[1]);
+        const ox = gp.nx * rx + Math.sin(time * gp.frq[0] + gp.phs[0]) * gp.amp[0];
+        const oy = gp.ny * ry + Math.sin(time * gp.frq[1] + gp.phs[1]) * gp.amp[1];
+        const oz = gp.nz * 1.0 + Math.sin(time * gp.frq[2] + gp.phs[2]) * gp.amp[2];
+        // Dg = Trans(P + off*s) * Rot(effSpin) * Trans(-P): spin about the pivot,
+        // then blend the scattered offset in by the un-built fraction.
+        const Dg = Mat.mul(
+          Mat.trans(px + ox * s, py + oy * s, pz + oz * s),
+          Mat.mul(rotAxisMat(gp.axis, effSpin), Mat.trans(-px, -py, -pz))
+        );
+        // Trans(builtLift) is world-space (leftmost), so the lift is a clean
+        // screen-vertical shift, unaffected by the zoom or the group scale.
+        return Mat.mul(
+          Mat.trans(0, builtLift, 0),
+          Mat.mul(orient, Mat.mul(Mat.scale(zoom, zoom, zoom), Dg))
+        );
+      };
+
       // Electric ONE-SHOT for the level-5 plug: charge builds, then a longer
       // zap wipes clean across the slab, then it rests. Fires once when level 5
       // is selected and again on every plug click -- never on a loop.
       const electricOn = Math.round(target.current.plug) >= 4;
       lastElectric = electricOn;
-      if (electricOn && !firedElectric) { triggerT = time; firedElectric = true; }
+      // The plug reads as the electric level-5 connector (its idle energy shader)
+      // but it must NOT fire in the assembly object (Chad): no charge-and-zap
+      // one-shot, so it never wipes the cover. Suppressed by skipping the trigger.
+      if (electricOn && !firedElectric && !asm) { triggerT = time; firedElectric = true; }
       if (!electricOn) { firedElectric = false; insertT = -999; }
       if (clickPulse) { triggerT = time; insertT = time; clickPulse = false; }
 
@@ -1466,7 +1614,7 @@ export function PackageScreen({
       gl.useProgram(screenProg);
       gl.uniformMatrix4fv(us.proj, false, proj);
       gl.uniformMatrix4fv(us.view, false, view);
-      const model = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
+      const model = Mat.mul(gOrient("cover", 0, 0, 0, 0.82), Mat.scale(cur.scale, cur.scale, 1));
       const mv = Mat.mul(view, model);
       gl.uniformMatrix4fv(us.model, false, model);
       gl.uniformMatrix3fv(us.normal, false, Mat.normalMat(mv));
@@ -1658,7 +1806,7 @@ export function PackageScreen({
         for (let i = 0; i < count; i++) {
           const z = -(back + LEAF_GROOVE + i * LEAF_PITCH);
           const lm = Mat.mul(
-            Mat.mul(orient, Mat.trans(0, 0, z)),
+            Mat.mul(gOrient("leaf" + i, 0, 0, 0, 0.82), Mat.trans(0, 0, z)),
             Mat.scale(cur.scale, cur.scale, 1)
           );
           const lmv = Mat.mul(view, lm);
@@ -1685,7 +1833,9 @@ export function PackageScreen({
         const g = cur.plug; // eased 1..4 -> smooth body growth
         const pinN = 1 + Math.round(t.plug); // pin COUNT snaps (2..5)
         const electric = Math.round(t.plug) >= 4;
-        const S = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
+        // The plug flies as ONE unit (body, cable, pins); its pivot is the body
+        // centre just off the cover's left edge.
+        const S = Mat.mul(gOrient("plug", LEFT - 0.1, 0, 0, 0.32), Mat.scale(cur.scale, cur.scale, 1));
 
         const bodyHx = 0.07;
         const bodyHy = 0.05 + g * 0.018;
@@ -1803,9 +1953,26 @@ export function PackageScreen({
       const appear = 1;
       if (overlayCount > 0) {
         const polish = 0; // reserved; the plate holds its calm dim tone
-        const S = Mat.mul(orient, Mat.scale(cur.scale, cur.scale, 1));
+        // The branding panel and everything laminated on it -- the real gem, the
+        // copy skeleton bars, the ecommerce grid, the manifesto wash -- share
+        // this one S, so in assembly mode they disperse and reseat as a single
+        // genuine element rather than as separate stand-ins.
+        const S = Mat.mul(gOrient("plaque", 0, 0, cur.depth, 0.72), Mat.scale(cur.scale, cur.scale, 1));
         const hh = cur.heightHalf;
         const faceZ = cur.depth; // the cover's front cap
+
+        // In assembly mode each thing laminated on the panel disperses as its OWN
+        // element (Chad): the CW logo, the copy bars, the ecommerce grid, and the
+        // corner nails, plus the panel (S) itself. Off assembly, gOrient collapses
+        // to `orient`, so every one of these equals the old single S and the live
+        // calculator is byte-identical. The pivot is the group's rough face centre
+        // -- it sets only the spin centre; the seated pose is exact at any pivot.
+        const Sg = (key: string, px: number, py: number, ext: number) =>
+          Mat.mul(gOrient(key, px, py, faceZ, ext), Mat.scale(cur.scale, cur.scale, 1));
+        const S_nails = Sg("nails", 0, 0, 0.68);
+        const S_logo = Sg("logo", -HW * 0.5, hh * 0.5, 0.2);
+        const S_copy = Sg("copy", -HW * 0.5, -hh * 0.12, 0.32);
+        const S_ecom = Sg("ecom", 0, -hh * 0.05, 0.26);
 
         gl.useProgram(screenProg);
         gl.uniformMatrix4fv(us.proj, false, proj);
@@ -1884,7 +2051,7 @@ export function PackageScreen({
         for (const sx of [-1, 1])
           for (const sy of [-1, 1]) {
             const rm = Mat.mul(
-              S,
+              S_nails,
               Mat.mul(
                 Mat.trans(sx * cx * appear, sy * cy * appear, rivetZ),
                 Mat.scale(rr, rr, rr * 0.8)
@@ -1927,12 +2094,16 @@ export function PackageScreen({
           const markZ = faceZ + PLAQUE_GAP + 2 * OV_HD + 0.005; // just above the panel
           const pxHalf = HW - OV_INSET, pyHalf = hh - OV_INSET;
           // A flat quad seated on the plaque face at local (lx,ly), sharing the
-          // slab's orient + scale so it moves as part of the face.
+          // slab's orient + scale so it moves as part of the face. `decalS` is the
+          // dispersal group the following decals belong to; it is reassigned at
+          // the top of each sub-element block (logo / copy / ecom) and is the
+          // plaque group otherwise. Off assembly every group equals the old S.
+          let decalS = S;
           const decal = (
             tex: WebGLTexture | null, lx: number, ly: number,
             halfW: number, halfH: number, alpha: number
           ) => {
-            const m = Mat.mul(S, Mat.mul(Mat.trans(lx, ly, markZ), Mat.scale(halfW, halfH, 1)));
+            const m = Mat.mul(decalS, Mat.mul(Mat.trans(lx, ly, markZ), Mat.scale(halfW, halfH, 1)));
             gl.uniformMatrix4fv(ut.model, false, m);
             gl.uniformMatrix3fv(ut.normal, false, Mat.normalMat(Mat.mul(view, m)));
             gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -1948,8 +2119,9 @@ export function PackageScreen({
           // level 4 -- so both 3 and 4 carry the wash, 4 the strongest.
           const cloudA = smooth(1.0, 3.0, cur.brandContent) * appear;
           if (cloudA > 0.01 && cloudCount > 0) {
+            // The manifesto wash belongs to the branding/logo element.
             const cm = Mat.mul(
-              S,
+              S_logo,
               Mat.mul(
                 Mat.trans(0, 0, faceZ + (2 * OV_HD + PLAQUE_GAP + 0.004) * appear),
                 Mat.scale(appear, appear, 1)
@@ -1973,6 +2145,7 @@ export function PackageScreen({
           const gw = gh * gemAspect;
           const gemMargin = Math.min(0.04, pyHalf * 0.14);
           const gemA = smooth(0.4, 1.0, cur.brandContent) * appear;
+          decalS = S_logo; // the CW logo is its own element
           if (gemA > 0.01 && gemReady) {
             decal(gemTex, -pxHalf + gw + 0.04, pyHalf - gh - gemMargin, gw, gh, gemA);
           }
@@ -1989,6 +2162,7 @@ export function PackageScreen({
           // one 256px grid, so the pencil lands inside the ring by construction
           // rather than by a fudged scale factor here.
           {
+            decalS = S; // the edit badge rides the panel
             const bh = Math.min(0.082, pyHalf * 0.3); // badge half-size (square)
             // Tucked inside the top-right stud rather than under it (Chad,
             // 2026-07-19). Clearing the stud's INNER edge on both axes puts the
@@ -2092,6 +2266,7 @@ export function PackageScreen({
           // copy at a steady density. The content LEVEL styles every line:
           // nothing at 1, a border at 2, a glow at 3, a stronger glow at 4. ---
           {
+            decalS = S_copy; // the copy bars (and the language badge) are one element
             // Squared to the gem's INK, not its quad: the copy starts where the
             // logo starts (Chad, 2026-07-19). The right edge holds, so the bars
             // shorten by exactly the padding baked into the PNG.
@@ -2180,6 +2355,7 @@ export function PackageScreen({
           //   4  a catalog      : 8 -> 16, the disc fills, the outline goes violet
           //   5  a platform     : 16 -> 32, plus the copy lines' violet bloom
           {
+            decalS = S_ecom; // the ecommerce grid + cart are one element
             const midX = -pxHalf + 0.04 + colW * 1.5; // centre of the middle third
 
             const shop = smooth(0.4, 1.0, cur.commerceLevel); // 2+
@@ -2310,6 +2486,7 @@ export function PackageScreen({
           // sections) gets fewer. Either way the mark is as large as the space
           // allows instead of as small as the height forces.
           {
+            decalS = S; // the integration marks ride the panel
             const lastCx = -pxHalf + RAIL_INSET + colW * 2.5; // last third centre
             const padX = 0.018;
             const boxW = Math.max(0.06, colW - padX * 2);
@@ -2432,8 +2609,11 @@ export function PackageScreen({
       const dy = e.clientY - rect.top - plugScreen.y;
       return Math.hypot(dx, dy) < 78;
     };
-    const onClick = (e: MouseEvent) => { if (lastElectric && near(e)) clickPulse = true; };
+    // In assembly mode the wrapping button owns the click (build/unbuild), and
+    // there is no clickable plug, so the plug hit-testing is skipped entirely.
+    const onClick = (e: MouseEvent) => { if (!asm && lastElectric && near(e)) clickPulse = true; };
     const onMove = (e: MouseEvent) => {
+      if (asm) return;
       plugHover = lastElectric && near(e);
       canvas.style.cursor = plugHover ? "pointer" : "";
       const rect = canvas.getBoundingClientRect();
@@ -2452,6 +2632,36 @@ export function PackageScreen({
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerleave", onLeave);
 
+    // ASSEMBLY hover: the object sits on a mostly-transparent canvas, so hover
+    // must fire only over the ACTUAL rendered pieces, not the empty rectangle
+    // (Chad). Read the alpha of the pixel under the cursor from the drawing
+    // buffer (kept live by preserveDrawingBuffer) and toggle the hint + the
+    // brightness lift with it. The hint also tracks the cursor here.
+    let stageEl: HTMLElement | null = null;
+    let tipEl: HTMLElement | null = null;
+    const pix = new Uint8Array(4);
+    const asmMove = (e: PointerEvent) => {
+      if (!asm) return;
+      if (!stageEl) stageEl = host.querySelector(".cw-assemble__stage");
+      if (!tipEl) tipEl = host.querySelector(".cw-assemble__tip");
+      const rect = canvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+      if (tipEl) { tipEl.style.left = `${cx}px`; tipEl.style.top = `${cy}px`; }
+      if (!rect.width || !rect.height) return;
+      // Device pixels; WebGL's origin is bottom-left, so y is flipped.
+      const dx = Math.max(0, Math.min(canvas.width - 1, Math.round((cx / rect.width) * canvas.width)));
+      const dy = Math.max(0, Math.min(canvas.height - 1, Math.round(canvas.height - (cy / rect.height) * canvas.height)));
+      gl.readPixels(dx, dy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pix);
+      const over = pix[3] > 8; // a rendered piece is under the cursor
+      canvas.style.cursor = over ? "pointer" : "";
+      stageEl?.classList.toggle("is-over", over);
+    };
+    const asmLeave = () => { stageEl?.classList.remove("is-over"); canvas.style.cursor = ""; };
+    if (asm) {
+      canvas.addEventListener("pointermove", asmMove);
+      canvas.addEventListener("pointerleave", asmLeave);
+    }
+
     return () => {
       stop();
       unsub();
@@ -2461,6 +2671,8 @@ export function PackageScreen({
       canvas.removeEventListener("click", onClick);
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerleave", onLeave);
+      canvas.removeEventListener("pointermove", asmMove);
+      canvas.removeEventListener("pointerleave", asmLeave);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, []);
@@ -2470,10 +2682,42 @@ export function PackageScreen({
     hostRef.current?.dispatchEvent(new CustomEvent("cw-repaint"));
   }, [channels]);
 
+  // ASSEMBLY: a proper h3 titles the column; the object below it is the click
+  // target (build / take apart) and surfaces its hint as the site's "coming soon"
+  // dark-bubble tooltip on hover, rather than a persistent button.
+  if (assembly) {
+    return (
+      <div
+        ref={(el) => { hostRef.current = el; }}
+        className={"cw-assemble" + (built ? " is-built" : "") + (className ? " " + className : "")}
+      >
+        <h3 className="cw-assemble__plan">
+          WEBSITE PLAN<br />
+          {built ? "after chadworks" : "before chadworks"}
+        </h3>
+        <button
+          type="button"
+          className="cw-assemble__stage"
+          aria-pressed={built}
+          onClick={() => {
+            const next = !built;
+            setBuilt(next);
+            builtTargetRef.current = next ? 1 : 0;
+          }}
+        >
+          <canvas className="cw-assemble__canvas" ref={canvasRef} aria-hidden="true" />
+          <span className="cw-assemble__tip" role="tooltip">
+            {built ? "click to take it apart" : "click to build"}
+          </span>
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       className={"cw-pkgscreen" + (className ? " " + className : "")}
-      ref={hostRef}
+      ref={(el) => { hostRef.current = el; }}
       aria-hidden="true"
     >
       <canvas className="cw-pkgscreen__canvas" ref={canvasRef} />

@@ -1934,19 +1934,26 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-family: var(--font-mono);
 }
 
-/* --- Purpose section: prose (2/3) beside the package-assemble object (1/3). */
+/* The rate card follows the purpose section directly, so it drops its top
+   padding to sit tight under it. */
+#rate-card { padding-top: 0; }
+
+/* --- Purpose section: prose beside the package-assemble object. */
 .cw-purpose-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
-  align-items: stretch; /* the animation fills the row height of the prose */
+  align-items: start; /* both columns top-align; the object sizes itself */
   margin-top: var(--space-md);
 }
 @media (max-width: 760px) {
   .cw-purpose-grid { grid-template-columns: 1fr; }
 }
-.cw-purpose-aside { display: flex; min-height: 0; min-width: 0; }
+.cw-purpose-aside { display: flex; min-width: 0; }
 .cw-purpose-text .svc-prose { margin-top: var(--space-sm); }
+/* Top-align the left column: its first element (the lede) drops its default
+   top margin so it starts level with the object's title in the right column. */
+.cw-purpose-text > :first-child { margin-top: 0; }
 
 /* The deconstruct/reassemble object: the WebGL canvas fills the whole right
    column (matching the prose height) and is itself the click target. The prose
@@ -1955,51 +1962,87 @@ p, li, dd, figcaption { text-wrap: pretty; }
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-height: 0;
   min-width: 0;
+}
+/* The column title: a proper h3 in the default heading style, centered. Only
+   spacing + alignment are set here; the type + colour come from the global
+   heading rule (do NOT inherit the secondary grey the object canvas doesn't
+   need). */
+.cw-assemble__plan {
+  flex: 0 0 auto;
+  margin: 0 0 var(--space-sm);
+  text-align: center;
+  color: var(--text-primary);
+}
+/* The object itself is the click target (build / take apart); it carries no
+   button chrome. `position: relative` anchors the hover tooltip. The stage sizes
+   to the canvas, which owns its own aspect box (so the object is no longer
+   height-tied to the prose column). */
+.cw-assemble__stage {
+  position: relative;
+  display: block;
+  width: 100%;
   border: 0;
   background: none;
   padding: 0;
   margin: 0;
   cursor: pointer;
-  color: var(--text-secondary);
   font: inherit;
+  color: inherit;
 }
 .cw-assemble__canvas {
   display: block;
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
+  aspect-ratio: 3 / 2;
+  height: auto;
+  /* 15% brightness lift on hover, so pointing at it reads as "this is a control". */
+  transition: filter 180ms ease;
 }
-.cw-assemble__hint {
-  flex: 0 0 auto;
-  display: block;
-  margin-top: var(--space-xs);
-  text-align: center;
+/* Brightness lifts only when the cursor is over an actual rendered piece
+   (`.is-over` is toggled by the canvas alpha hit-test), not the empty canvas. */
+.cw-assemble__stage.is-over .cw-assemble__canvas,
+.cw-assemble__stage:focus-visible .cw-assemble__canvas {
+  filter: brightness(1.15);
 }
-.cw-assemble__label {
-  display: block;
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-.cw-assemble__click {
-  display: block;
-  margin-top: 2px;
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.cw-assemble:focus-visible {
+.cw-assemble__stage:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
   border-radius: var(--radius);
 }
-@media (max-width: 760px) {
-  /* stacked: give the canvas an explicit height since there is no tall prose
-     column beside it to inherit from */
-  .cw-assemble__canvas { height: 78vw; flex: 0 0 auto; }
+/* The hint is the site's "coming soon" tooltip (the svc-lane dark bubble). It
+   TRACKS THE CURSOR: JS sets left/top to the pointer position within the stage,
+   and the transform floats the bubble just above the pointer. */
+.cw-assemble__tip {
+  position: absolute;
+  left: 50%; /* default before the first pointer move / on keyboard focus */
+  top: 50%;
+  transform: translate(-50%, calc(-100% - 14px));
+  z-index: 3;
+  white-space: nowrap;
+  padding: 0.32rem 0.6rem;
+  border-radius: 7px;
+  background: var(--dark-bg);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease-smooth);
+}
+.cw-assemble__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.cw-assemble__stage.is-over .cw-assemble__tip,
+.cw-assemble__stage:focus-visible .cw-assemble__tip {
+  opacity: 1;
 }
 
 /* --- Glow-square bullets, lifted from the showroom interior module

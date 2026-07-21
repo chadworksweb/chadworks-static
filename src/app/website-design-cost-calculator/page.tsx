@@ -165,12 +165,13 @@ const breadcrumbJsonLd = {
 // ask about the calculator each become a headed section, and the old "no form" and
 // "accuracy" answers fold into the "why" and "difference" sections. The rate card,
 // the always-included list and the worked-examples link stay as their own sections.
-// The TOC links to every section, in page order.
+// The TOC links to every section, in page order. Purpose leads (it sits right
+// under the hero), then the rate card and the rest.
 const TOC: { href: string; label: string }[] = [
+  { href: "#purpose", label: "What it's for" },
   { href: "#rate-card", label: "The rate card" },
   { href: "#included", label: "What every build includes" },
   { href: "#how-built", label: "How I built it" },
-  { href: "#purpose", label: "What it's for" },
   { href: "#who", label: "Who it's for" },
   { href: "#other-calculators", label: "Other calculators I can build" },
   { href: "#why", label: "Why I built it" },
@@ -405,6 +406,41 @@ const CARD_GROUPS: { param: Param; rows: CardRow[] }[] = PARAMS.map((param) => (
 })).sort((a, b) => b.rows.length - a.rows.length);
 
 export default function WebsiteDesignCostCalculatorPage() {
+  // One template for every "about the calculator" section. Used for the purpose
+  // section (hoisted up under the hero) and the rest (rendered in place below).
+  const renderMetaSection = (s: (typeof META_SECTIONS)[number]) => (
+    <SectionShell key={s.id} className="svc-block" id={s.id}>
+      <p className="eyebrow">{s.eyebrow}</p>
+      <h2 className="svc-block__heading svc-fill">{s.heading}</h2>
+      {s.aside ? (
+        <div className="cw-purpose-grid">
+          <div className="cw-purpose-text">
+            {s.lede ? <p className="svc-lede">{s.lede}</p> : null}
+            <div className="svc-prose svc-prose--plain">{s.body}</div>
+          </div>
+          <div className="cw-purpose-aside">{s.aside}</div>
+        </div>
+      ) : (
+        <div className="svc-prose">{s.body}</div>
+      )}
+      {s.modules && (
+        <div className="cw-calc-kinds">
+          {s.modules.map((cat) => (
+            <div key={cat.label} className="panel cw-calc-kinds__module">
+              <p className="cw-calc-kinds__cat">{cat.label}</p>
+              <ul className="cw-calc-kinds__list">
+                {cat.items.map((it) => (
+                  <li key={it}>{it}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </SectionShell>
+  );
+  const purposeSection = META_SECTIONS.find((s) => s.id === "purpose");
+
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
       {/* The tool owns the fold, and the send-this-scope form sits right under
@@ -453,6 +489,10 @@ export default function WebsiteDesignCostCalculatorPage() {
           </nav>
         </div>
       </SectionShell>
+
+      {/* The purpose section leads, right under the hero: the assemble object is
+          the strongest visual on the page, so it opens the citation layer. */}
+      {purposeSection && renderMetaSection(purposeSection)}
 
       {/* The rate card. THE citation layer: static HTML, generated from the
           model, readable by an engine that will never run the calculator. */}
@@ -597,38 +637,9 @@ export default function WebsiteDesignCostCalculatorPage() {
 
       {/* The "about the calculator" cluster: Chad's questions, each its own headed
           section, in his order (2026-07-21). Bodies are the old-FAQ answers,
-          verbatim. The difference section below closes the cluster. */}
-      {META_SECTIONS.map((s) => (
-        <SectionShell key={s.id} className="svc-block" id={s.id}>
-          <p className="eyebrow">{s.eyebrow}</p>
-          <h2 className="svc-block__heading svc-fill">{s.heading}</h2>
-          {s.aside ? (
-            <div className="cw-purpose-grid">
-              <div className="cw-purpose-text">
-                {s.lede ? <p className="svc-lede">{s.lede}</p> : null}
-                <div className="svc-prose svc-prose--plain">{s.body}</div>
-              </div>
-              <div className="cw-purpose-aside">{s.aside}</div>
-            </div>
-          ) : (
-            <div className="svc-prose">{s.body}</div>
-          )}
-          {s.modules && (
-            <div className="cw-calc-kinds">
-              {s.modules.map((cat) => (
-                <div key={cat.label} className="panel cw-calc-kinds__module">
-                  <p className="cw-calc-kinds__cat">{cat.label}</p>
-                  <ul className="cw-calc-kinds__list">
-                    {cat.items.map((it) => (
-                      <li key={it}>{it}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
-        </SectionShell>
-      ))}
+          verbatim. Purpose is hoisted above (under the hero); the rest render
+          here. The difference section below closes the cluster. */}
+      {META_SECTIONS.filter((s) => s.id !== "purpose").map(renderMetaSection)}
 
       {/* What makes this calculator different: the no-gate, real-rate-card
           argument, with the other calculators cited (CALCULATORS from the hub,
