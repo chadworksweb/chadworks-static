@@ -1817,6 +1817,18 @@ p, li, dd, figcaption { text-wrap: pretty; }
   margin-top: var(--space-md);
 }
 @media (max-width: 820px) { .cw-calc-intro { grid-template-columns: 1fr; } }
+/* Two paragraph rhythms on the calculator page (Chad): "lede tight" and "p".
+   Every LEAD-SIZE opening paragraph takes the snug lede rhythm -- that is a
+   bare .svc-prose block (all of whose paragraphs render at lead size) plus the
+   first paragraph of a .svc-prose--lead block. Body copy stays at --leading-body:
+   .svc-prose--plain blocks and the 2nd+ paragraphs of a --lead block. .svc-lede
+   is already --leading-snug globally. `main:has(.cw-calc-hero)` scopes all of
+   this to the calculator page alone (that hero class is unique to it), so no
+   other page's prose is touched. */
+main:has(.cw-calc-hero) .svc-prose:not(.svc-prose--lead):not(.svc-prose--plain) > p,
+main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
+  line-height: var(--leading-snug);
+}
 .cw-calc-glance { padding: clamp(1.4rem, 3vw, 2rem); }
 .cw-calc-glance__title {
   font-family: var(--font-mono);

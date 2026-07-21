@@ -467,7 +467,7 @@ export default function WebsiteDesignCostCalculatorPage() {
                 click.
               </p>
               <p>
-                Hi, I&apos;m <Link href="/about/">Chad D.L.</Link> and I got tired
+                Hi, I&apos;m <Link href="/about/">Chad Lewine</Link> and I got tired
                 of all the boring, or complicated, or gated, or outdated website
                 cost calculators out there, so I built my own. My brand is built on
                 transparency and novel design. This calculator started as a vision
