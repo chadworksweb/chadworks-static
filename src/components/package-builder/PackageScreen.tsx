@@ -1220,6 +1220,13 @@ export function PackageScreen({
       ]);
     };
 
+    // ASSEMBLY: the hint tooltip may show only in a SETTLED state (fully built
+    // or fully apart), never while a build/deconstruct is in flight (Chad). The
+    // draw loop owns this -- a build can start while the cursor sits still, so
+    // pointer events alone would strand the tooltip visible through the whole
+    // transition. `is-building` (toggled below) hides the hint in CSS.
+    let asmStageEl: HTMLElement | null = null;
+
     const draw = (now: number) => {
       if (!t0) { t0 = now; prevTs = now; }
       const time = (now - t0) / 1000;
@@ -1311,6 +1318,10 @@ export function PackageScreen({
         const step = dt * 0.27; // unhurried collect; ~2-turn flourish on the way in
         if (Math.abs(tgt - built01) <= step) built01 = tgt;
         else built01 += tgt > built01 ? step : -step;
+        // Settled == built01 has snapped exactly onto its target; anything else
+        // is a transition in flight, so flag it and CSS hides the hint tooltip.
+        if (!asmStageEl) asmStageEl = host.querySelector(".cw-assemble__stage");
+        asmStageEl?.classList.toggle("is-building", built01 !== tgt);
       }
       const eBuilt = built01 <= 0 ? 0 : built01 >= 1 ? 1 : built01 * built01 * (3 - 2 * built01);
       const visH = Math.tan(((SCREEN.fov * Math.PI) / 180) / 2) * Math.abs(SCREEN.camZ);
@@ -2693,7 +2704,7 @@ export function PackageScreen({
       >
         <h3 className="cw-assemble__plan">
           WEBSITE PLAN<br />
-          {built ? "after chadworks" : "before chadworks"}
+          {built ? "after chadworks:" : "before chadworks:"}
         </h3>
         <button
           type="button"

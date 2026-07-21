@@ -2044,6 +2044,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .cw-assemble__stage:focus-visible .cw-assemble__tip {
   opacity: 1;
 }
+/* While a build/deconstruct is animating (`is-building`, set by the draw loop),
+   the hint stays hidden even under hover or focus -- it returns only once the
+   object settles fully built or fully apart. Higher specificity than the show
+   rules above so it wins without !important. */
+.cw-assemble__stage.is-building.is-over .cw-assemble__tip,
+.cw-assemble__stage.is-building:focus-visible .cw-assemble__tip {
+  opacity: 0;
+}
 
 /* --- Glow-square bullets, lifted from the showroom interior module
    (.bursts li::before): an 8px rounded square, lavender-to-purple gradient with a

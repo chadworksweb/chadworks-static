@@ -459,11 +459,12 @@ export default function WebsiteDesignCostCalculatorPage() {
             </h1>
             <div className="svc-prose svc-prose--lead">
               <p>
-                This website design cost calculator prices a custom website to the
-                dollar, from a {money(BASE)}{" "}baseline. Set your scope on the tool
-                above and the estimate builds line by line off one working
-                studio&apos;s published rate card, covering pages, custom
-                development, branding, ecommerce, and a rushed timeline.
+                This website design cost calculator specs/scopes and prices a
+                custom website to the dollar (estimate), starting from a{" "}
+                {money(BASE)}{" "}baseline. Set your preferred scope parameters
+                like number of pages, visual ambition and features, and watch
+                both the estimate and the scope visualizer change with each
+                click.
               </p>
               <p>
                 Hi, I&apos;m <Link href="/about/">Chad D.L.</Link> and I got tired
