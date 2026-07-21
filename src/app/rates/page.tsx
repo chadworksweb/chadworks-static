@@ -10,6 +10,8 @@ import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { BASE, money } from "@/lib/package-builder";
+import { MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
 
 // The minutely-rate explainer: real task -> real time, shown in the page's
 // existing show-the-math ledger (label + mono figure per row).
@@ -29,7 +31,7 @@ const RATE_EXAMPLES: { task: string; time: string }[] = [
 const PAGE_URL = `${SITE_URL}/rates/`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
-  "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land between $5,000 and $10,000. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
+  `Work bills at ${money(MINUTELY)} a minute. The smallest engagement is ${money(BASE)}, and most websites land between $5,000 and $10,000. WordPress care runs ${money(WORDPRESS_CARE)} every 6 months. The real numbers, on the table before you decide, with the math showing.`;
 
 export const metadata: Metadata = {
   title: TITLE,

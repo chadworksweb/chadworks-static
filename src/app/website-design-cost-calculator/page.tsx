@@ -26,12 +26,18 @@
 // not buy.
 //
 // THE INTENT SPLIT (2026-07-20). This page serves TOOL intent only. The
-// informational cluster ("how much does a website cost", cost by build method,
-// the component breakdown, the USA framing) moved to
-// /how-much-does-a-website-cost/, because that query returns a different SERP
-// of editorial guides, not calculators (WebFX runs one page per intent). The
-// two pages cross-link, and both read the SMALL_BUSINESS/STORE example scopes
-// from lib/package-builder so their figures can never disagree.
+// informational cluster (cost by build method, the component breakdown, worked
+// examples, after-launch costs, the market table, the "where the number comes
+// from" economics, and the USA framing) moved to /how-much-does-a-website-cost/,
+// because that query returns a different SERP of editorial guides, not
+// calculators (WebFX runs one page per intent). What stays here is about the
+// TOOL: the live calculator, its published rate card, and the questions people
+// ask about the calculator itself.
+//
+// ONE HUB (2026-07-20). Every figure that is not the calculator's own live
+// state comes from lib/pricing (MINUTELY, the worked-example scopes, the market
+// and other-calculator references). Both pages read it, so a number changes in
+// one place and cascades. This page pulls CALCULATORS for the differentiator.
 //
 // NOT in launch.ts, so the layout's noindex default keeps this sealed.
 
@@ -39,6 +45,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
@@ -47,43 +54,13 @@ import {
   BASELINE,
   PARAMS,
   PER_PAGE_LADDER_KEYS,
-  SMALL_BUSINESS,
-  STORE,
   UNIT_RATES,
   ladderFor,
   money,
-  paramValue,
-  price,
   weeksLabel,
-  wire,
   type Param,
-  type Scope,
 } from "@/lib/package-builder";
-
-// The exact scope behind an example, as ticks under its timeline. Pages and
-// sections always show (the spine of any build); everything else shows only
-// when it is actually engaged, so the list reads as "what is in THIS build".
-function scopeTicks(s: Scope): { label: string; value: string }[] {
-  return PARAMS.filter((p) => {
-    const v = s[p.key] as number;
-    switch (p.key) {
-      case "pages":
-      case "sections":
-        return true;
-      case "locales":
-        return v > 1;
-      case "integrations":
-        return v !== 0;
-      case "timeline":
-        return v > 0;
-      case "brandingDone":
-      case "content":
-        return v >= 0; // a real choice was made (baseline leaves these unset)
-      default:
-        return v > 0; // ambition, mathDev, editability, motion, commerce
-    }
-  }).map((p) => ({ label: p.label, value: paramValue(p, s) }));
-}
+import { CALCULATORS } from "@/lib/pricing";
 
 const PAGE_URL = `${SITE_URL}/website-design-cost-calculator/`;
 const TITLE = "Website Design Cost Calculator: Priced to the Dollar | chadworks";
@@ -94,6 +71,9 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  // Index only when launched (layout default is noindex). Tied to launch.ts so
+  // the two states move together.
+  robots: { index: isLaunched("/website-design-cost-calculator/"), follow: true },
   openGraph: {
     title: "Website Design Cost Calculator | chadworks",
     description:
@@ -172,184 +152,77 @@ const breadcrumbJsonLd = {
   ],
 };
 
-// ---------------------------------------------------------------------
-// WORKED EXAMPLES -- real scopes, priced by the real model at build time.
-//
-// Every figure is computed by price(), never typed by hand, so retuning a
-// ladder rewrites these in the same edit. The rushed example is the small
-// business scope with the timeline switched on, so the multiplier reads
-// straight off the pair.
-// ---------------------------------------------------------------------
-// SMALL_BUSINESS and STORE now live in lib/package-builder, shared with the
-// /how-much-does-a-website-cost/ guide so the two pages quote the same figures
-// to the dollar. EXAMPLES composes them below.
-// Each example carries a `slug` that also names its shape PNG in public/shapes/
-// (a transparent render of the object at that scope, generated once from this
-// same model). Keep the slug and the scope in step: a scope change means the
-// shape PNG must be regenerated, or the picture drifts from the number.
-const EXAMPLES: { slug: string; name: string; detail: string; scope: Scope }[] = [
-  {
-    slug: "baseline",
-    name: "A baseline website build costs",
-    detail:
-      "Three pages at four sections each, your brand already settled and your words already written. Focused, correct, and it does one job well.",
-    scope: BASELINE,
-  },
-  {
-    slug: "small-business",
-    name: "A small business website costs",
-    detail:
-      "Five pages, a logo in hand but no system around it, light copy cleanup, and a bit of motion.",
-    scope: SMALL_BUSINESS,
-  },
-  {
-    slug: "ecommerce",
-    name: "A real ecommerce store costs",
-    detail:
-      "Eight pages carrying a catalog, a payment path, a couple of systems wired in, and enough custom logic that it stops being a brochure.",
-    scope: STORE,
-  },
-  {
-    slug: "rushed",
-    name: "A rushed business website costs",
-    detail:
-      "Identical scope to the small business site above with the timeline squeezed. Rush multiplies the whole build, because moving your project to the front of the line moves everything else back.",
-    scope: { ...SMALL_BUSINESS, timeline: 2 },
-  },
-  {
-    slug: "bespoke-motion",
-    name: "A bespoke site with motion costs",
-    detail:
-      "Six pages art-directed end to end, with showroom-grade motion and a brand system built from scratch. The kind of site that has to feel like nobody else's.",
-    scope: { ...BASELINE, pages: 6, ambition: 4, motion: 4, brandingDone: 3, content: 2, editability: 1 },
-  },
-  {
-    slug: "multilingual",
-    name: "A three-language website costs",
-    detail:
-      "A six page site built once and kept true in three languages, because each language is another whole site to maintain.",
-    scope: { ...BASELINE, pages: 6, content: 2, editability: 1, locales: 3 },
-  },
-  {
-    slug: "publication",
-    name: "A multi-author digital publication costs",
-    detail:
-      "Fourteen pages with several people editing their own sections behind logins, on the custom structure a real publication runs on.",
-    scope: { ...BASELINE, pages: 14, sections: 5, content: 1, editability: 3, mathDev: 1, integrations: wire(3), motion: 1 },
-  },
-  {
-    slug: "web-app",
-    name: "A custom web application costs",
-    detail:
-      "Six pages wrapped around real software: custom logic that has to be right every time, with a couple of systems wired in.",
-    scope: { ...BASELINE, pages: 6, mathDev: 3, integrations: wire(3, 4, 6), editability: 2, ambition: 2 },
-  },
-  {
-    slug: "service-booking",
-    name: "A booking-driven service site costs",
-    detail:
-      "Five pages with a booking calendar and a CRM wired in, plus a couple of products to sell.",
-    scope: { ...BASELINE, pages: 5, integrations: wire(0, 1), commerce: 1, ambition: 2, motion: 2, content: 2, brandingDone: 2 },
-  },
-  {
-    slug: "membership",
-    name: "A membership website costs",
-    detail:
-      "Eight pages behind a login wall, with subscriptions billed and the logic that keeps the right people in.",
-    scope: { ...BASELINE, pages: 8, integrations: wire(3, 4), editability: 2, content: 1, mathDev: 2 },
-  },
-];
+// After-launch costs, the competitor market, and the "where the number comes
+// from" economics moved to /how-much-does-a-website-cost/ on 2026-07-20: that is
+// website-cost content, not calculator content. The other-calculator references
+// this page still needs (for the differentiator below) live in lib/pricing as
+// CALCULATORS. The Kimberly testimonial stayed here, attached to that section.
 
-// ---------------------------------------------------------------------
-// AFTER LAUNCH -- the ongoing-cost question, held to the same discipline as
-// the build.
-//
-// The biggest hole in every calculator on this SERP, including this one until
-// now: they price the build and go quiet about everything after it. The
-// anxiety underneath the query was never "what does it cost to make". It is
-// "what happens the first time I need a word changed and I have to call
-// somebody". A page that answers that outranks a page that dodges it.
-//
-// NOTHING HERE IS A NEW PRICE. Every figure is the minutely rate already
-// published on /rates/ applied to the task times already published on
-// /rates/, computed rather than typed so the two pages cannot drift.
-// ---------------------------------------------------------------------
-const MINUTELY = 5.25; // $/min. Also stated in /rates/, /faqs/ and RatesCapsule.
-
-// Minutes are lifted from RATE_EXAMPLES on /rates/. Keep them in step.
-const AFTER_LAUNCH: { task: string; min: number; max: number }[] = [
-  { task: "Changing the text on a page", min: 1, max: 1 },
-  { task: "Swapping an image", min: 1, max: 1 },
-  { task: "Adding a page you did not plan for", min: 10, max: 10 },
-  { task: "Fixing something small that broke", min: 10, max: 20 },
-  { task: "Building a whole new page template", min: 30, max: 30 },
-];
-
-const cost = (mins: number) => money(Math.round(mins * MINUTELY));
-const costRange = (r: { min: number; max: number }) =>
-  r.min === r.max ? cost(r.min) : `${cost(r.min)} to ${cost(r.max)}`;
-
-// What the rest of the industry quotes. Sourced, linked, and set against the
-// numbers above, because citing sources is the strongest GEO lever available
-// to a page that does not already rank (Princeton GEO, KDD 2024: rank-5 pages
-// gained +115% visibility from citing sources, while rank-1 pages LOST 30%
-// from the same move).
-//
-// VERIFY THESE FIGURES AGAIN BEFORE LAUNCH. They are other people's prices and
-// they go stale, and a wrong one is chadworks' credibility, not theirs.
-//
-// Last verified 2026-07-19. WebFX, Pronto and Outliant all re-confirmed
-// against their live pages, wording unchanged.
-//
-// SQUARESPACE IS THE SOFT ONE. Their pricing page renders the numbers in JS,
-// so there is no first-party HTML to check them against; $16 to $99 is the
-// annual-billing ladder corroborated by a third party (Website Builder Expert,
-// June 2026), not read off Squarespace itself. Monthly billing runs $21 to
-// $119. Chad: eyeball that one in a browser before this page goes public.
-const INDUSTRY: { who: string; range: string; note: string; href: string }[] = [
-  {
-    who: "WebFX, small business site",
-    range: "$6,500 to $15,000",
-    note: "An agency whose baseline sits above most of my finished builds.",
-    href: "https://www.webfx.com/web-design/pricing/",
-  },
-  {
-    who: "Pronto, brochure site of 1 to 6 pages",
-    range: "$2,000 to $10,000",
-    note: "A five times spread on one sentence, which tells you the number was never the point.",
-    href: "https://www.prontomarketing.com/website-cost-calculator/",
-  },
-  {
-    who: "Outliant, basic custom build",
-    range: "$25,000 to $30,000",
-    note: "Real work at a real number, priced for a company that has a procurement department.",
-    href: "https://www.outliant.com/website-cost-calculator",
-  },
-  {
-    who: "An offshore studio, custom build",
-    range: "$2,500 to $8,000",
-    note: "Real fixed prices published without a form in front of them, which is more than most studios on this list manage. What the figure does not cover is the distance, because the person building it works a half day out of phase with yours and you will feel that every time something needs deciding.",
-    href: "https://dixieraizpacheco.com/web-design-cost-philippines",
-  },
-  {
-    who: "Squarespace and the builders, do it yourself",
-    range: "$16 to $99 a month",
-    note: "Cheap until you count the year, notice the template everyone else is also using, and realize you never own it.",
-    href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
-  },
-];
-
+// The calculator's own questions. Cost questions ("what is the most expensive
+// part", "can I update it myself", "why do quotes vary") moved to the guide with
+// the rest of the cost content; what stays is about the TOOL.
 const FAQS: { q: string; a: ReactNode }[] = [
   {
-    q: "Why do website design quotes vary so much?",
+    q: "What is a website cost calculator for?",
     a: (
       <>
-        Because most quotes are for different websites that share a word. One
-        studio prices a template with your logo dropped in; another prices forty
-        hours of custom design. A wide spread means the scope has not been pinned
-        down yet. That is why this calculator gives you twelve real controls,
-        pages and development and branding and commerce each priced on its own, so
-        the number reflects your actual project.
+        It turns a vague question, what will my website cost, into a real number
+        you can act on. You describe the site you actually need, and it prices
+        that exact scope off a published rate card instead of handing you an
+        industry average or a range wide enough to hide in. The point is to let
+        you find out where you stand before you spend a phone call finding out.
+      </>
+    ),
+  },
+  {
+    q: "Who would use a website cost calculator?",
+    a: (
+      <>
+        Anyone trying to budget a site before they talk to a builder. A small
+        business owner sizing up a first real website, a founder checking whether
+        a store is a few thousand dollars or a few tens of thousands, a marketer
+        pricing a redesign for a boss who wants a number by Friday. It is for the
+        moment before the conversation, when you just need to know the shape of
+        the spend.
+      </>
+    ),
+  },
+  {
+    q: "How did you build this calculator?",
+    a: (
+      <>
+        It runs on a small pricing model I wrote, the same one I use to quote in
+        real life: a {money(BASE)} baseline plus a published figure for each
+        thing that moves the number, pages and development and branding and
+        commerce and the rest. Nothing is a lookup of somebody&apos;s averages.
+        Every figure on the rate card above is generated straight from that model,
+        so the tool and the table can never say two different numbers.
+      </>
+    ),
+  },
+  {
+    q: "Why did you build it?",
+    a: (
+      <>
+        Because every other website cost calculator I found either hid the number
+        behind a form or made one up. I already price this way in person, off a
+        rate card I am happy to publish, so putting that same card behind a tool
+        cost me nothing and saved you a sales call. I would rather you read the
+        total, decide I am too expensive, and never email me, than gate the answer
+        to farm your contact details.
+      </>
+    ),
+  },
+  {
+    q: "Can you build a calculator like this for my business?",
+    a: (
+      <>
+        Yes, and it is some of my favorite work. A pricing tool, a quote builder,
+        a savings or ROI calculator, an estimator that reads your inputs and
+        returns a real answer: this page is one example of the kind of custom
+        interactive tool I build. If you have a number your customers keep asking
+        you for, I can put it behind a tool like this one. Tell me what it should
+        work out.
       </>
     ),
   },
@@ -364,32 +237,6 @@ const FAQS: { q: string; a: ReactNode }[] = [
         is exactly where estimates die. Treat the number as a real starting point
         for a real conversation. It becomes a quote once we have talked through
         the parts a slider cannot see.
-      </>
-    ),
-  },
-  {
-    q: "What is the most expensive part of a website?",
-    a: (
-      <>
-        Almost never the design. Visual ambition on the table tops out at{" "}
-        {money(ladderFor("ambition")?.at(-1) ?? 0)}. Custom development reaches{" "}
-        {money(ladderFor("mathDev")?.at(-1) ?? 0)} and commerce reaches{" "}
-        {money(ladderFor("commerce")?.at(-1) ?? 0)}, both far past it. The
-        expensive part is machinery: logic that has to be right every single
-        time, and systems that keep talking to each other long after I am gone.
-      </>
-    ),
-  },
-  {
-    q: "Can I update the site myself after launch?",
-    a: (
-      <>
-        As much as you want to pay for. It is a real line on the calculator,
-        because editability is something I build into the site, and how much you
-        get is priced by how much you want. Swapping text and images is close to
-        free. Rebuilding a page layout on your own is{" "}
-        {money(ladderFor("editability")?.at(-1) ?? 0)}, because I have to build
-        you something that cannot break when you use it.
       </>
     ),
   },
@@ -669,129 +516,60 @@ export default function WebsiteDesignCostCalculatorPage() {
         </div>
       </SectionShell>
 
-      {/* Worked examples: the ladder turned into four real projects. */}
+      {/* Worked examples moved to the guide on 2026-07-20 (informational
+          intent). This cross-link points at them so a reader who wants real
+          priced builds can jump straight there. */}
+      <SectionShell className="svc-block">
+        <p className="eyebrow">Worked examples</p>
+        <h2 className="svc-block__heading svc-fill">
+          See it priced as real projects
+        </h2>
+        <div className="svc-prose">
+          <p>
+            Real builds, from a focused baseline site up to a custom marketplace
+            platform, each scoped and priced to the dollar by the same model that
+            runs this calculator. They live on the{" "}
+            <Link href="/how-much-does-a-website-cost/#worked-examples">
+              how much a website costs
+            </Link>{" "}
+            guide.
+          </p>
+        </div>
+      </SectionShell>
+
+      {/* What makes this calculator different: the no-gate, real-rate-card
+          argument, with the other calculators cited (CALCULATORS from the hub,
+          the source-citation GEO lever) and the Kimberly testimonial backing the
+          no-upsell ethos (Quotation Addition, the strongest measured GEO lever;
+          it stayed here from the moved economics section because it is about the
+          tool's honesty, not about website cost). Dark for weight; the sections
+          around it are light. */}
       <SectionShell
         full
         className="svc-block svc-faq-section"
         trailingClassName="svc-faq-section--dark"
       >
-        <p className="eyebrow">Worked examples</p>
+        <p className="eyebrow">The difference</p>
         <h2 className="svc-block__heading svc-fill">
-          Four Real-World Examples of Website Cost
-        </h2>
-        <div className="svc-prose">
-          <p>
-            Every figure here comes from the same model running the tool above,
-            computed at build time. These are prices I would quote you today.
-          </p>
-        </div>
-        <div className="cw-builds">
-          {EXAMPLES.map((ex) => (
-            <article key={ex.slug} className="cw-build">
-              <div className="cw-build__body">
-                <h3 className="cw-build__title">
-                  {ex.name}{" "}
-                  <span className="cw-build__price">
-                    {money(price(ex.scope))}
-                  </span>
-                </h3>
-                <p className="cw-build__detail">{ex.detail}</p>
-                <p className="cw-build__meta">
-                  Roughly {weeksLabel(ex.scope)} from starting to launched.
-                </p>
-                <ul className="cw-build__scope">
-                  {scopeTicks(ex.scope).map((t) => (
-                    <li key={t.label} className="cw-build__scope-item">
-                      {t.label}: {t.value}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {/* The object at this exact scope, rendered once from the model to
-                  a transparent PNG. Decorative, so alt is empty. */}
-              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
-              <img
-                className="cw-build__shape"
-                src={`/shapes/${ex.slug}.webp`}
-                alt=""
-                width="860"
-                height="500"
-                loading="lazy"
-                decoding="async"
-              />
-            </article>
-          ))}
-        </div>
-      </SectionShell>
-
-      {/* After launch. Answers the question the calculator's number cannot:
-          not what the site costs to build, what it costs to keep. Every figure
-          is computed from the published minutely rate. */}
-      <SectionShell className="svc-block">
-        <p className="eyebrow">After launch</p>
-        <h2 className="svc-block__heading svc-fill">
-          What it costs after it launches
+          What makes this different from other website cost calculators
         </h2>
         <div className="svc-prose svc-prose--lead">
           <p>
-            The number above buys a finished website. It does not answer the
-            question you are actually going to have eight months from now, on
-            the Tuesday you notice a price on your services page is wrong and
-            you have to figure out who to call and what they are going to charge
-            you for a sentence.
+            Every other website cost calculator I tried does one of two things.
+            It hides the number behind a form, so you answer a page of questions
+            and then wait for a salesperson to email you a range. Or it makes the
+            number up, averaging industry data into a figure no actual studio
+            charges for an actual website. Either way you leave without the one
+            thing you came for.
           </p>
           <p>
-            Here is that answer. Nothing recurring comes to me. You will own
-            a domain, which runs about $12 to $20 a year from whoever you
-            registered it with, and the static builds I put most people on cost
-            little or nothing to host because there is no database sitting there
-            waiting to be attacked. When you need me after launch you pay for
-            the minutes I actually spend, at the same {money(MINUTELY)} a minute
-            published on my <Link href="/rates/">rates page</Link>. In practice
-            that looks like this.
+            This one publishes a real rate card and prices your exact scope off
+            it, in the open, with no email gate. Here is what the others hand you
+            instead.
           </p>
         </div>
         <dl className="rates-ledger">
-          {AFTER_LAUNCH.map((row) => (
-            <div key={row.task} className="rates-ledger__row">
-              <dt className="rates-ledger__label">{row.task}</dt>
-              <dd className="rates-ledger__num">{costRange(row)}</dd>
-            </div>
-          ))}
-        </dl>
-        <div className="svc-prose svc-prose--plain">
-          <p>
-            Changing a line of text costs about five dollars because it takes
-            about a minute. That is the whole model: you pay for the minutes the
-            work takes, with no monthly plan for work that may never come. A
-            WordPress site is the exception. It needs regular care, so it carries
-            a plan at $550 every six months, because a WordPress site left alone
-            is a WordPress site that gets hacked.
-          </p>
-        </div>
-      </SectionShell>
-
-      {/* Cite sources: the strongest lever a page like this has. */}
-      <SectionShell className="svc-block">
-        <p className="eyebrow">The market</p>
-        <h2 className="svc-block__heading svc-fill">
-          What everybody else quotes for the same website
-        </h2>
-        <div className="svc-prose">
-          <p>
-            Here is what the pages you probably just came from are quoting. Watch
-            the spreads. A five times range on a six page brochure site is a way
-            of putting the answer off until you are on a sales call. For the whole
-            market broken down by who builds it, from a builder subscription up to
-            an agency invoice, see{" "}
-            <Link href="/how-much-does-a-website-cost/">
-              how much a website costs
-            </Link>
-            .
-          </p>
-        </div>
-        <dl className="rates-ledger">
-          {INDUSTRY.map((row) => (
+          {CALCULATORS.map((row) => (
             <div key={row.who} className="rates-ledger__row">
               <dt className="rates-ledger__label">
                 <a href={row.href} rel="nofollow noopener" target="_blank">
@@ -799,117 +577,41 @@ export default function WebsiteDesignCostCalculatorPage() {
                 </a>
                 . {row.note}
               </dt>
-              <dd className="rates-ledger__num">{row.range}</dd>
+              <dd className="rates-ledger__num">{row.tag}</dd>
             </div>
           ))}
         </dl>
         <div className="svc-prose svc-prose--plain">
           <p>
-            My baseline of {money(BASE)} and a finished small business site at{" "}
-            {money(price(SMALL_BUSINESS))} sit under most of that table. The
-            offshore tier starts lower than mine, and there you trade the savings
-            for distance: a builder working a half day out of phase with you is a
-            cost you pay in every decision. The gap between my numbers and the
-            agency numbers is arithmetic, and it is worth walking through.
+            Mine is the one that just shows you the card. Every figure it adds up
+            is published above, computed by the same model I quote from, so you
+            can check the arithmetic and walk away without ever telling me your
+            name. I would rather you read the total, decide I am too expensive,
+            and never email me, than gate the answer to farm your contact
+            details.
           </p>
         </div>
-      </SectionShell>
 
-      {/* THE ARGUMENT. Why the baseline is lower without the work being lesser:
-          agency capability, one person's overhead, no investors and no
-          stakeholders, priced on what Chad needs plus what the thing is worth.
-          Carries the honest downside too, because a claim this good is not
-          believable without one. Dark for weight; rule 9 holds (the section
-          before and after it are both light). */}
-      <SectionShell
-        full
-        className="svc-block svc-faq-section"
-        trailingClassName="svc-faq-section--dark"
-      >
-        <p className="eyebrow">The economics</p>
-        <h2 className="svc-block__heading svc-fill">
-          Where the number actually comes from
-        </h2>
-        <div className="cw-onep__layout">
-        <div className="svc-prose svc-prose--lead">
-          <p>
-            When an agency quotes {INDUSTRY[0].range} for a five page website,
-            most of that number pays for the building it happened in. An account
-            manager answers your email, a salesperson booked a commission the day
-            you signed, a project manager relays messages between them and the
-            person doing the work, and everyone sits in an office the owners
-            expect a margin on. The build underneath might be forty hours.
-          </p>
-          <p>
-            I do not have any of that. There is no investor here waiting on a
-            return, no board asking why revenue did not grow this quarter, no
-            stakeholder who has never met you holding an opinion about your
-            invoice, and nobody upstairs who needs this year to beat last year.
-            There is me. So my number gets built out of two things and nothing
-            else: what I need to earn as one person to keep doing this properly,
-            and what the finished thing is actually worth to your business. No
-            growth target is priced into your quote, because there is no growth
-            target.
-          </p>
-          <p>
-            The capability holds even as the overhead falls away. I have designed
-            since I was eleven and built client websites since 2008, and I do both
-            the design and the code myself, so your idea reaches the browser
-            without a handoff that could dilute it. You get the full craft, and
-            one person who carries the whole project start to finish.
-          </p>
-          <p>
-            One person is one calendar. There is no bench to throw at your
-            project when it doubles in size, and no second shift picking it up
-            overnight. If I am booked, you wait or you go elsewhere. A project
-            that genuinely needs guaranteed capacity and a backup team is a
-            project for an agency, and I will say so on the call.
-          </p>
-          <p>
-            My baseline is {money(BASE)} and it holds. Below it I would be cutting
-            the parts that make a website worth building, so it stays where it is.
-            You are paying for the work, and for the twenty years that make the
-            work good and fast. That is the whole of the number.
-          </p>
-
-          {/* A real client corroborating the claim the section just made.
-              Quotation Addition is the strongest measured GEO lever there is
-              (Princeton, KDD 2024: 27.8% against a 19.5% baseline, +22% on
-              live Perplexity), and a page that says "I will not upsell you"
-              is worth more when somebody else says it. Same markup as
-              TestimonialsCapsule so it inherits the styling and the headshot
-              instead of inventing a second quote treatment. */}
-          <figure className="svc-testimonial cw-onep__quote">
-            <blockquote className="svc-testimonial__quote">
-              Chad is very professional, talented and skilled. He does not try
-              to sell you on products or services that you don&apos;t need.
-            </blockquote>
-            <figcaption className="svc-testimonial__byline">
-              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
-              <img
-                className="svc-testimonial__avatar"
-                src="/people/kimberly-dolan.webp"
-                alt=""
-                loading="lazy"
-              />
-              <p className="svc-testimonial__by">
-                Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)
-              </p>
-            </figcaption>
-          </figure>
-        </div>
-          {/* The portrait IS the argument: the section claims one person, so it
-              shows the person rather than a logo. */}
-          <figure className="cw-onep__figure">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* A real client corroborating the no-upsell claim. Same markup as
+            TestimonialsCapsule so it inherits the styling and the headshot. */}
+        <figure className="svc-testimonial">
+          <blockquote className="svc-testimonial__quote">
+            Chad is very professional, talented and skilled. He does not try to
+            sell you on products or services that you don&apos;t need.
+          </blockquote>
+          <figcaption className="svc-testimonial__byline">
+            {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
             <img
-              src="/about/cutouts/chad_cutout_home.webp"
-              alt="Chad, the one person who designs and builds every chadworks site"
-              decoding="async"
+              className="svc-testimonial__avatar"
+              src="/people/kimberly-dolan.webp"
+              alt=""
               loading="lazy"
             />
-          </figure>
-        </div>
+            <p className="svc-testimonial__by">
+              Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)
+            </p>
+          </figcaption>
+        </figure>
       </SectionShell>
 
       {/* The FAQ. Content-first, question-shaped, no FAQPage markup (see the
@@ -921,13 +623,13 @@ export default function WebsiteDesignCostCalculatorPage() {
       >
         <div className="svc-faq__layout">
           <div className="svc-faq__intro">
-            <p className="eyebrow">Questions</p>
+            <p className="eyebrow">About the tool</p>
             <h2 className="svc-block__heading svc-fill">
-              The questions people actually ask about website cost
+              Questions about this calculator
             </h2>
             <p className="svc-faq__lead">
-              Answered the way I would answer them on the phone, with the
-              numbers left in.
+              What it is, who it is for, and how it works, answered the way I
+              would answer them on the phone.
             </p>
           </div>
           <div className="cw-rate-explainer__body">

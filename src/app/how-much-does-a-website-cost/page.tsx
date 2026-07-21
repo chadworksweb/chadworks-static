@@ -27,9 +27,31 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
+import { HeroCapsule } from "@/components/capsules/HeroCapsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
-import { BASE, SMALL_BUSINESS, STORE, money, price } from "@/lib/package-builder";
+import {
+  BASE,
+  PARAMS,
+  SMALL_BUSINESS,
+  STORE,
+  ladderFor,
+  money,
+  paramValue,
+  price,
+  weeksLabel,
+  type Scope,
+} from "@/lib/package-builder";
+import {
+  AFTER_LAUNCH,
+  AGENCY_SMALL_BUSINESS_RANGE,
+  COMPONENTS,
+  EXAMPLES,
+  MARKET,
+  MINUTELY,
+  WORDPRESS_CARE,
+} from "@/lib/pricing";
 
 const PAGE_URL = `${SITE_URL}/how-much-does-a-website-cost/`;
 const TITLE = "How Much Does a Website Cost in 2026? A Real Price Breakdown | chadworks";
@@ -40,6 +62,9 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
+  // Index only when launched (layout default is noindex). Tied to launch.ts so
+  // the two states move together.
+  robots: { index: isLaunched("/how-much-does-a-website-cost/"), follow: true },
   openGraph: {
     title: "How Much Does a Website Cost in 2026? | chadworks",
     description:
@@ -104,80 +129,14 @@ const breadcrumbJsonLd = {
   ],
 };
 
-const MINUTELY = 5.25; // $/min. Mirrors /rates/, /faqs/ and the calculator page.
+// Market figures (by build method), the website anatomy (COMPONENTS), the
+// after-launch task ledger, MINUTELY and WORDPRESS_CARE all come from the hub
+// (lib/pricing) now, so a number changes in one place and cascades here.
 
-// ---------------------------------------------------------------------
-// COST BY BUILD METHOD -- the first thing that moves the number.
-//
-// VERIFY THESE FIGURES BEFORE LAUNCH. They are other people's prices and they
-// go stale. A wrong one is chadworks' credibility, not theirs.
-//
-// Last verified 2026-07-19 against the calculator page's INDUSTRY block (WebFX,
-// Outliant, offshore re-confirmed). The DIY builder range is the soft one: the
-// builders render pricing in JS, so $16 to $99 is the annual-billing ladder
-// corroborated by a third party, not read off a first-party HTML page. Eyeball
-// it in a browser before this page goes public.
-// ---------------------------------------------------------------------
-const BUILD_METHODS: { method: string; range: string; note: ReactNode; href: string }[] = [
-  {
-    method: "Do it yourself on a builder",
-    range: "$16 to $99 a month",
-    note: "Squarespace, Wix, and the rest. Cheap until you count the year, notice the template other businesses are also using, and realize you never own it.",
-    href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
-  },
-  {
-    method: "Hire a freelancer",
-    range: "$500 to $5,000",
-    note: "One person, one invoice, and a wide range because a freelancer might mean a student on a template or a twenty year veteran writing custom code. The word covers both.",
-    href: "https://www.forbes.com/advisor/business/software/how-much-does-a-website-cost/",
-  },
-  {
-    method: "Hire an agency",
-    range: "$6,500 to $30,000+",
-    note: "WebFX starts a small business site at $6,500, and a custom build from a firm like Outliant runs $25,000 to $30,000. Much of that is overhead and margin, not the website itself.",
-    href: "https://www.webfx.com/web-design/pricing/",
-  },
-  {
-    method: "Send it offshore",
-    range: "$2,500 to $8,000",
-    note: "Real fixed prices, often published without a form. What the figure leaves out is the distance: the person building it works a half day out of phase with yours, and you feel that every time something needs deciding.",
-    href: "https://dixieraizpacheco.com/web-design-cost-philippines",
-  },
-];
-
-// ---------------------------------------------------------------------
-// COMPONENT COSTS -- what a website is actually made of.
-//
-// The recurring pieces, with the market range and the chadworks reality side by
-// side. Domain and maintenance figures mirror the calculator page and /rates/.
-// ---------------------------------------------------------------------
-const COMPONENTS: { part: string; range: string; note: ReactNode }[] = [
-  {
-    part: "Domain name",
-    range: "$12 to $20 a year",
-    note: "The address itself, renewed yearly. On my builds it is registered in your name from day one, not held by me.",
-  },
-  {
-    part: "Hosting",
-    range: "$0 to $1,000 a month",
-    note: "The whole spread of the industry. Most of my builds are static, so hosting is often free or close to it, and the bill is yours rather than routed through me.",
-  },
-  {
-    part: "Design and the build",
-    range: "the variable one",
-    note: "Everything above rides on top of this. It is the piece that moves from a few thousand to six figures, and it is the piece the calculator prices to the dollar.",
-  },
-  {
-    part: "Content and photos",
-    range: "$0 to a few thousand",
-    note: "Free if you write and shoot it, more if you want it done for you. On my calculator, copy is a line you can turn up or leave off.",
-  },
-  {
-    part: "Maintenance",
-    range: "$0 to $200 a month",
-    note: "A static site can sit and cost nothing. WordPress genuinely needs looking after, so it does not. With me there is no forced retainer; you pay for the minutes you actually use.",
-  },
-];
+// The after-launch tasks price out at MINUTELY, computed rather than typed.
+const cost = (mins: number) => money(Math.round(mins * MINUTELY));
+const costRange = (r: { min: number; max: number }) =>
+  r.min === r.max ? cost(r.min) : `${cost(r.min)} to ${cost(r.max)}`;
 
 // ---------------------------------------------------------------------
 // COST BY SITE TYPE -- four real shapes, priced by the real model.
@@ -211,6 +170,38 @@ const SITE_TYPES: { type: string; detail: string; figure: string }[] = [
     figure: "$20,000 and up",
   },
 ];
+
+// ---------------------------------------------------------------------
+// WORKED EXAMPLES -- the use-case list now lives in lib/pricing (EXAMPLES), so
+// the guide gallery and the shapecap harness render one source. Every figure is
+// computed by price() at render, never typed, so a ladder retune rewrites them
+// all in the same edit.
+// ---------------------------------------------------------------------
+
+// The exact scope behind an example, as ticks under its timeline. Pages and
+// sections always show (the spine of any build); everything else shows only
+// when it is actually engaged, so the list reads as "what is in THIS build".
+function scopeTicks(s: Scope): { label: string; value: string }[] {
+  return PARAMS.filter((p) => {
+    const v = s[p.key] as number;
+    switch (p.key) {
+      case "pages":
+      case "sections":
+        return true;
+      case "locales":
+        return v > 1;
+      case "integrations":
+        return v !== 0;
+      case "timeline":
+        return v > 0;
+      case "brandingDone":
+      case "content":
+        return v >= 0; // a real choice was made (baseline leaves these unset)
+      default:
+        return v > 0; // ambition, mathDev, editability, motion, commerce
+    }
+  }).map((p) => ({ label: p.label, value: paramValue(p, s) }));
+}
 
 const FAQS: { q: string; a: ReactNode }[] = [
   {
@@ -257,8 +248,8 @@ const FAQS: { q: string; a: ReactNode }[] = [
         hosting together. If someone builds you a custom site, the monthly cost
         can be close to zero: you own a domain at about $12 to $20 a year, and a
         static site hosts for little or nothing. There is no monthly fee to me
-        unless you put me on a WordPress care plan, currently $550 every six
-        months.
+        unless you put me on a WordPress care plan, currently {money(WORDPRESS_CARE)}{" "}
+        every six months.
       </>
     ),
   },
@@ -268,9 +259,9 @@ const FAQS: { q: string; a: ReactNode }[] = [
       <>
         A static site can sit for a year and cost you nothing. A site running on
         WordPress or a similar system needs regular updates or it drifts toward
-        getting hacked, which is why I offer WordPress care at $550 every six
-        months. Any other change I make after launch is billed at the minutes it
-        takes, {money(Math.round(MINUTELY))} a minute, on the{" "}
+        getting hacked, which is why I offer WordPress care at {money(WORDPRESS_CARE)}{" "}
+        every six months. Any other change I make after launch is billed at the
+        minutes it takes, {money(Math.round(MINUTELY))} a minute, on the{" "}
         <Link href="/rates/">rates page</Link>.
       </>
     ),
@@ -315,26 +306,64 @@ const FAQS: { q: string; a: ReactNode }[] = [
       </>
     ),
   },
+  {
+    q: "What is the most expensive part of a website?",
+    a: (
+      <>
+        Almost never the design. Visual ambition on my calculator tops out at{" "}
+        {money(ladderFor("ambition")?.at(-1) ?? 0)}. Custom development reaches{" "}
+        {money(ladderFor("mathDev")?.at(-1) ?? 0)} and commerce reaches{" "}
+        {money(ladderFor("commerce")?.at(-1) ?? 0)}, both far past it. The
+        expensive part is machinery: logic that has to be right every single
+        time, and systems that keep talking to each other long after I am gone.
+      </>
+    ),
+  },
+  {
+    q: "Can I update the site myself after launch?",
+    a: (
+      <>
+        As much as you want to pay for. Editability is a real line on the{" "}
+        <Link href="/website-design-cost-calculator/">calculator</Link>, because
+        it is something I build into the site, and how much you get is priced by
+        how much you want. Swapping text and images is close to free. Rebuilding a
+        page layout on your own is {money(ladderFor("editability")?.at(-1) ?? 0)},
+        because I have to build you something that cannot break when you use it.
+      </>
+    ),
+  },
 ];
 
 export default function HowMuchDoesAWebsiteCostPage() {
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
-      {/* The direct answer, number-first, because the query is a question. */}
+      {/* Standard hero: breadcrumb + eyebrow + gradient H1 + answer-first lede
+          + CTA to the tool, matching /rates/ and /faqs/. The lede is the page's
+          verbatim opening sentence; the rest of the opener runs in the content
+          section right below. */}
+      <HeroCapsule
+        className="cost-guide-hero"
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Websites", href: "/websites/" },
+          { label: "How much does a website cost?" },
+        ]}
+        eyebrow="Real prices, not averages"
+        title="How much does a website cost?"
+        lede="A website in 2026 costs anywhere from nothing to six figures, and that spread is the honest answer rather than a dodge."
+        cta={{ href: "/website-design-cost-calculator/", buttonLabel: "Price your project" }}
+      />
+
+      {/* The direct answer continues, number-first, because the query is a question. */}
       <SectionShell className="svc-block">
-        <h1 className="svc-block__heading svc-fill">
-          How much does a website cost?
-        </h1>
         <div className="svc-prose">
           <p>
-            A website in 2026 costs anywhere from nothing to six figures, and
-            that spread is the honest answer rather than a dodge. What you
-            actually pay comes down to one question the guides tend to bury: who
-            builds it, and how much of it belongs to you when they are done.
-            Build it yourself on a template and you are paying little more than a
-            monthly subscription. Hire someone to design and code a site you
-            actually own and you are into the thousands, sometimes the tens of
-            thousands once an agency with a sales team and an office adds its
+            What you actually pay comes down to one question the guides tend to
+            bury: who builds it, and how much of it belongs to you when they are
+            done. Build it yourself on a template and you are paying little more
+            than a monthly subscription. Hire someone to design and code a site
+            you actually own and you are into the thousands, sometimes the tens
+            of thousands once an agency with a sales team and an office adds its
             overhead on top. The common routes, and what each really runs, are
             broken out just below.
           </p>
@@ -369,7 +398,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
           </p>
         </div>
         <dl className="rates-ledger">
-          {BUILD_METHODS.map((row) => (
+          {MARKET.map((row) => (
             <div key={row.method} className="rates-ledger__row">
               <dt className="rates-ledger__label">
                 <a href={row.href} rel="nofollow noopener" target="_blank">
@@ -388,12 +417,79 @@ export default function HowMuchDoesAWebsiteCostPage() {
             baseline is {money(BASE)} and a finished small business site is{" "}
             {money(price(SMALL_BUSINESS))}, under most agency starting points for
             the same work. The reason that is possible, and the honest downside
-            that comes with it, is laid out on the{" "}
-            <Link href="/website-design-cost-calculator/">
-              calculator page
-            </Link>
-            .
+            that comes with it, is laid out just below.
           </p>
+        </div>
+      </SectionShell>
+
+      {/* Where the number comes from: the agency-overhead argument, moved from
+          the calculator because it is website-cost content. Dark for weight, and
+          it sits between two light sections so the band rhythm holds. The
+          Kimberly testimonial stayed on the calculator (it backs the no-gate
+          ethos, not the cost breakdown); the portrait moves here because the
+          section's whole claim is "one person". */}
+      <SectionShell
+        full
+        className="svc-block svc-faq-section"
+        trailingClassName="svc-faq-section--dark"
+      >
+        <h2 className="svc-block__heading svc-fill">
+          Where the number actually comes from
+        </h2>
+        <div className="cw-onep__layout">
+          <div className="svc-prose svc-prose--lead">
+            <p>
+              When an agency quotes {AGENCY_SMALL_BUSINESS_RANGE} for a five page
+              website, most of that number pays for the building it happened in.
+              An account manager answers your email, a salesperson booked a
+              commission the day you signed, a project manager relays messages
+              between them and the person doing the work, and everyone sits in an
+              office the owners expect a margin on. The build underneath might be
+              forty hours.
+            </p>
+            <p>
+              I do not have any of that. There is no investor here waiting on a
+              return, no board asking why revenue did not grow this quarter, no
+              stakeholder who has never met you holding an opinion about your
+              invoice, and nobody upstairs who needs this year to beat last year.
+              There is me. So my number gets built out of two things and nothing
+              else: what I need to earn as one person to keep doing this properly,
+              and what the finished thing is actually worth to your business. No
+              growth target is priced into your quote, because there is no growth
+              target.
+            </p>
+            <p>
+              The capability holds even as the overhead falls away. I have
+              designed since I was eleven and built client websites since 2008,
+              and I do both the design and the code myself, so your idea reaches
+              the browser without a handoff that could dilute it. You get the full
+              craft, and one person who carries the whole project start to finish.
+            </p>
+            <p>
+              One person is one calendar. There is no bench to throw at your
+              project when it doubles in size, and no second shift picking it up
+              overnight. If I am booked, you wait or you go elsewhere. A project
+              that genuinely needs guaranteed capacity and a backup team is a
+              project for an agency, and I will say so on the call.
+            </p>
+            <p>
+              My baseline is {money(BASE)} and it holds. Below it I would be
+              cutting the parts that make a website worth building, so it stays
+              where it is. You are paying for the work, and for the twenty years
+              that make the work good and fast. That is the whole of the number.
+            </p>
+          </div>
+          {/* The portrait IS the argument: the section claims one person, so it
+              shows the person rather than a logo. */}
+          <figure className="cw-onep__figure">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/about/cutouts/chad_cutout_home.webp"
+              alt="Chad, the one person who designs and builds every chadworks site"
+              decoding="async"
+              loading="lazy"
+            />
+          </figure>
         </div>
       </SectionShell>
 
@@ -491,12 +587,88 @@ export default function HowMuchDoesAWebsiteCostPage() {
             and stay fine. A site on WordPress or a similar system needs regular
             care or it drifts toward getting hacked, which most people budget for
             at $50 to $200 a month with an agency. My version of that is a
-            WordPress care plan at $550 every six months, and for anything else I
-            bill the minutes the work takes at {money(Math.round(MINUTELY))} a
-            minute, listed in full on the <Link href="/rates/">rates page</Link>.
+            WordPress care plan at {money(WORDPRESS_CARE)} every six months, and
+            for anything else I bill the minutes the work takes at{" "}
+            {money(Math.round(MINUTELY))} a minute, listed in full on the{" "}
+            <Link href="/rates/">rates page</Link>.
             There is no retainer humming in the background that you did not ask
             for.
           </p>
+          <p>
+            In practice, once a site of mine is live, the ordinary things you
+            will need cost about this much, every figure the same{" "}
+            {money(MINUTELY)} a minute applied to the time the job takes.
+          </p>
+        </div>
+        <dl className="rates-ledger">
+          {AFTER_LAUNCH.map((row) => (
+            <div key={row.task} className="rates-ledger__row">
+              <dt className="rates-ledger__label">{row.task}</dt>
+              <dd className="rates-ledger__num">{costRange(row)}</dd>
+            </div>
+          ))}
+        </dl>
+      </SectionShell>
+
+      {/* Worked examples: the ladder turned into real projects, each priced by
+          the same model to the dollar. Dark for weight, and it sits in the
+          light-light gap so the band alternation holds (rule 9). The shapes are
+          transparent renders that live on this dark band. */}
+      <SectionShell
+        full
+        id="worked-examples"
+        className="svc-block svc-faq-section"
+        trailingClassName="svc-faq-section--dark"
+      >
+        <h2 className="svc-block__heading svc-fill">
+          Examples of What A Website Costs
+        </h2>
+        <div className="svc-prose">
+          <p>
+            Every figure here is computed at build time by the same model behind
+            the{" "}
+            <Link href="/website-design-cost-calculator/">
+              website cost calculator
+            </Link>
+            . These are prices I would quote you today.
+          </p>
+        </div>
+        <div className="cw-builds">
+          {EXAMPLES.map((ex) => (
+            <article key={ex.slug} className="cw-build">
+              <div className="cw-build__body">
+                <h3 className="cw-build__title">
+                  {ex.name}{" "}
+                  <span className="cw-build__price">
+                    {money(price(ex.scope))}
+                  </span>
+                </h3>
+                <p className="cw-build__detail">{ex.detail}</p>
+                <p className="cw-build__meta">
+                  Roughly {weeksLabel(ex.scope)} from starting to launched.
+                </p>
+                <ul className="cw-build__scope">
+                  {scopeTicks(ex.scope).map((t) => (
+                    <li key={t.label} className="cw-build__scope-item">
+                      {t.label}: {t.value}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* The object at this exact scope, rendered once from the model to
+                  a transparent PNG. Decorative, so alt is empty. */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
+              <img
+                className="cw-build__shape"
+                src={`/shapes/${ex.slug}.webp`}
+                alt=""
+                width="860"
+                height="500"
+                loading="lazy"
+                decoding="async"
+              />
+            </article>
+          ))}
         </div>
       </SectionShell>
 

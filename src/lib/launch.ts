@@ -33,6 +33,9 @@ const LAUNCHED = new Set<string>([
   "/website-design-for-foundation-repair/",
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
   "/faqs/", // launched 2026-07-17 -- FAQ page (FAQPage JSON-LD, four themed groups)
+  "/website-design-cost-calculator/", // launched 2026-07-20 -- the scope calculator (tool intent)
+  "/how-much-does-a-website-cost/", // launched 2026-07-20 -- the cost guide (informational intent).
+                                    // Launch WITH the calculator so their cross-links resolve.
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant

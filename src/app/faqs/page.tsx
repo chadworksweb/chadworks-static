@@ -16,6 +16,8 @@ import {
   MainContactCapsule,
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
+import { BASE, money } from "@/lib/package-builder";
+import { MINUTELY } from "@/lib/pricing";
 
 const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
@@ -117,17 +119,18 @@ const GROUPS: FaqGroup[] = [
         a: (
           <FaqParas
             items={[
-              "My baseline fee for full builds, including redesigns, is $3,200. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000.",
+              `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000.`,
               <>
                 If your website needs work, not a redesign, I charge by the minute
-                at $5.25/min, which adds up to $315/hour. Read more about my fees
-                on my <LaunchLink href="/rates/">rates page</LaunchLink>.
+                at {money(MINUTELY)}/min, which adds up to {money(MINUTELY * 60)}/hour.
+                Read more about my fees on my{" "}
+                <LaunchLink href="/rates/">rates page</LaunchLink>.
               </>,
             ]}
           />
         ),
         aText:
-          "My baseline fee for full builds, including redesigns, is $3,200. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at $5.25/min, which adds up to $315/hour. Read more about my fees on my rates page.",
+          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${money(MINUTELY * 60)}/hour. Read more about my fees on my rates page.`,
       },
       {
         q: "Do you have a lower rate for special cases?",

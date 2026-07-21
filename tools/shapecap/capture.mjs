@@ -65,7 +65,18 @@ async function cropAll(page) {
 }
 
 async function main() {
-  const browser = await chromium.launch();
+  // Headless Chromium (119+) will not run WebGL on the plain launch: it needs a
+  // software-GL backend explicitly enabled, or every canvas comes back blank
+  // (transparent), which writes ~800-byte empty webps. ANGLE over SwiftShader
+  // gives a deterministic software renderer that matches the on-screen object.
+  const browser = await chromium.launch({
+    args: [
+      "--use-gl=angle",
+      "--use-angle=swiftshader",
+      "--enable-unsafe-swiftshader",
+      "--ignore-gpu-blocklist",
+    ],
+  });
   const context = await browser.newContext({
     reducedMotion: "reduce", // holds every object at one static front pose
     viewport: { width: 2360, height: 4700 },
