@@ -87,6 +87,43 @@ export const Mat = {
       b21 * det, (-a21 * a00 + a01 * a20) * det, (a11 * a00 - a01 * a10) * det,
     ]);
   },
+  // A point through a matrix (w assumed 1). Column-major, so the translation
+  // lives in the last column.
+  pt(m: Float32Array, x: number, y: number, z: number): [number, number, number] {
+    return [
+      m[0] * x + m[4] * y + m[8] * z + m[12],
+      m[1] * x + m[5] * y + m[9] * z + m[13],
+      m[2] * x + m[6] * y + m[10] * z + m[14],
+    ];
+  },
+  // Inverse of an AFFINE matrix -- rotation, scale and translation, no
+  // projection. Its use here is to put the CAMERA into an object's own local
+  // space, which is what a perspective-correct lamination needs: a decal lifted
+  // off a face has to shrink toward the eye, and "toward the eye" is only the
+  // local z axis when the object happens to be facing you square on.
+  invAffine(m: Float32Array): Float32Array {
+    const a = m[0], b = m[4], c = m[8];
+    const d = m[1], e = m[5], f = m[9];
+    const g = m[2], h = m[6], i = m[10];
+    const A = e * i - f * h, B = f * g - d * i, C = d * h - e * g;
+    const det = a * A + b * B + c * C;
+    if (!det) return Mat.ident();
+    const s = 1 / det;
+    const n00 = A * s, n01 = (c * h - b * i) * s, n02 = (b * f - c * e) * s;
+    const n10 = B * s, n11 = (a * i - c * g) * s, n12 = (c * d - a * f) * s;
+    const n20 = C * s, n21 = (b * g - a * h) * s, n22 = (a * e - b * d) * s;
+    const tx = m[12], ty = m[13], tz = m[14];
+    // prettier-ignore
+    return new Float32Array([
+      n00, n10, n20, 0,
+      n01, n11, n21, 0,
+      n02, n12, n22, 0,
+      -(n00 * tx + n01 * ty + n02 * tz),
+      -(n10 * tx + n11 * ty + n12 * tz),
+      -(n20 * tx + n21 * ty + n22 * tz),
+      1,
+    ]);
+  },
 };
 
 // ---------------------------------------------------------------------

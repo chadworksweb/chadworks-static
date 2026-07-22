@@ -2196,14 +2196,47 @@ export function PackageScreen({
         // Scaling by the ratio of the two eye distances makes the lifted panel
         // project at exactly the footprint it would have had lying on the cap,
         // so it still meets the bevel and stops overhanging it.
-        const camDist = -SCREEN.camZ;
-        const liftScale = (z: number) => (camDist - z) / (camDist - faceZ);
+        //
+        // Corrected 2026-07-22 (Chad: "the plaque is extending off the slab").
+        // The old form was (camDist - z) / (camDist - faceZ), which places the
+        // eye at local (0, 0, camDist). It is there only when the object faces
+        // the camera square on, unscaled, at the origin. None of that holds:
+        // `orient` turns the slab, so the local +z the panel is lifted along
+        // maps to world (+0.41, 0, +0.91) -- lifting the panel pushes it RIGHT
+        // as well as forward -- and in assembly mode ASM_ZOOM doubles the lift
+        // in world terms while this formula still measured it unscaled. The eye
+        // really sits near local (-1.28, -0.43, 1.97), so the panel was
+        // under-shrunk and slid outward, showing a 40px purple frame down the
+        // near edge and 7px of overhang past the far rim.
+        //
+        // Put the eye in the panel's OWN space and the correction is exact: the
+        // lifted point that projects onto a given point of the cap is the one
+        // collinear with it and the eye, so the panel scales by the ratio of the
+        // two eye distances ABOUT THE EYE'S OWN xy, not about the local origin.
+        // That offset is the whole asymmetry. It is derived from S each frame,
+        // so it stays right through the zoom, the scatter and the sway.
+        const camLocal = Mat.pt(Mat.invAffine(S), -shiftX, -shiftY, -SCREEN.camZ);
+        const liftScale = (z: number) => (z - camLocal[2]) / (faceZ - camLocal[2]);
         const ovShrink = liftScale(faceZ + (OV_HD + PLAQUE_GAP) * appear);
+        // A panel laminated on the front cap can never be WIDER than the cap.
+        // The mesh is cut to HW - OV_INSET, but the cap is only HW - bevel, and
+        // at the top ambition step the bevel (0.075) finally overtakes OV_INSET
+        // (0.07) -- so the plate outgrows the face it sits on by BEVEL_SEAL and
+        // the surplus is what hangs over the rim. Clamped to the cap per axis,
+        // because the slab is wide and short and the two ratios differ. Below
+        // that step the bevel is narrower than the inset and both are exactly 1,
+        // so nothing else on the ambition ramp moves.
+        const fitX = Math.min(1, Math.max(0.05, HW - cur.bevel) / Math.max(0.05, HW - OV_INSET));
+        const fitY = Math.min(1, Math.max(0.03, hh - cur.bevel) / Math.max(0.03, hh - OV_INSET));
         const ovModel = Mat.mul(
           S,
           Mat.mul(
-            Mat.trans(0, 0, faceZ + (OV_HD + PLAQUE_GAP) * appear),
-            Mat.scale(appear * ovShrink, appear * ovShrink, appear)
+            Mat.trans(
+              camLocal[0] * (1 - ovShrink),
+              camLocal[1] * (1 - ovShrink),
+              faceZ + (OV_HD + PLAQUE_GAP) * appear
+            ),
+            Mat.scale(appear * ovShrink * fitX, appear * ovShrink * fitY, appear)
           )
         );
         gl.uniformMatrix4fv(us.model, false, ovModel);
@@ -2231,15 +2264,24 @@ export function PackageScreen({
         // correction, against their own (greater) lift -- otherwise the corner
         // rivet creeps outward off the plaque it is supposed to be pinning.
         const rivetShrink = liftScale(rivetZ);
-        const cx = Math.max(0.06, HW - OV_INSET - RIVET_OFF) * rivetShrink;
-        const cy = Math.max(0.04, hh - OV_INSET - RIVET_OFF) * rivetShrink;
+        // The studs ride the plate, so they take the plate's cap-fit with it --
+        // otherwise trimming the panel would leave the corner rivets behind,
+        // sitting out on the bevel.
+        const cx = Math.max(0.06, HW - OV_INSET - RIVET_OFF) * fitX;
+        const cy = Math.max(0.04, hh - OV_INSET - RIVET_OFF) * fitY;
         const rr = RIVET_R * appear;
+        // Same correction as the panel, and for the same reason -- but a stud
+        // sits at a CORNER, not on the axis, so it cannot be scaled by a bare
+        // multiply. Each one is drawn toward the eye's own xy, which is why the
+        // four are no longer a mirrored pair of numbers.
+        const rvX = (sx: number) => camLocal[0] + (sx * cx * appear - camLocal[0]) * rivetShrink;
+        const rvY = (sy: number) => camLocal[1] + (sy * cy * appear - camLocal[1]) * rivetShrink;
         for (const sx of [-1, 1])
           for (const sy of [-1, 1]) {
             const rm = Mat.mul(
               S_nails,
               Mat.mul(
-                Mat.trans(sx * cx * appear, sy * cy * appear, rivetZ),
+                Mat.trans(rvX(sx), rvY(sy), rivetZ),
                 Mat.scale(rr, rr, rr * 0.8)
               )
             );
