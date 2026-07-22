@@ -1231,7 +1231,14 @@ export function PackageScreen({
         ny: Math.max(-1, Math.min(1, (halton(i, 3) * 2 - 1) * 0.94 + (ahash(i, 22) * 2 - 1) * 0.06)),
         nz: ahash(i, 3) * 2 - 1,
         amp: [0.16 + ahash(i, 4) * 0.2, 0.13 + ahash(i, 5) * 0.16, 0.2 + ahash(i, 6) * 0.28],
-        frq: [0.11 + ahash(i, 7) * 0.13, 0.09 + ahash(i, 8) * 0.12, 0.08 + ahash(i, 9) * 0.1],
+        // Float rate, 10% quicker than it was (Chad). Scoped to the scattered
+        // parts' own drift: the object's shared sway lives in `orient` and is
+        // the live calculator's too, so it is left alone.
+        frq: [
+          (0.11 + ahash(i, 7) * 0.13) * 1.1,
+          (0.09 + ahash(i, 8) * 0.12) * 1.1,
+          (0.08 + ahash(i, 9) * 0.1) * 1.1,
+        ],
         phs: [ahash(i, 10) * ATWO_PI, ahash(i, 11) * ATWO_PI, ahash(i, 12) * ATWO_PI],
         axis: norm3(Math.sin(i * 1.7) + 0.2, Math.cos(i * 2.3), Math.sin(i * 0.9) + 0.3),
         spinBase: 0.05 + ((i * 5) % 4) * 0.018, // halved with the flourish (Chad)
@@ -1402,8 +1409,7 @@ export function PackageScreen({
       // and spins it. The pivot (px,py,pz) is the group's local centre, so the
       // spin turns the part about itself rather than orbiting the whole object.
       const gOrient = (
-        key: string, px: number, py: number, pz: number,
-        extX: number, extY: number = extX
+        key: string, px: number, py: number, pz: number, ext: number
       ): Float32Array => {
         if (!asm) return orient;
         // The whole object grows from 1x (scattered) to ASM_ZOOM (built), so the
@@ -1422,33 +1428,52 @@ export function PackageScreen({
         // the identity and only the zoom remains). Monotonic in eBuilt.
         const effSpin = ang0 * (1 - eBuilt) + gp.spinDir * 1 * ATWO_PI * eBuilt;
         const s = 1 - eBuilt;
-        // DEPTH FIRST. It decides how large the part PAINTS, so the in-frame
-        // budget cannot be worked out until it is known: a part pulled toward
-        // the camera magnifies by up to 1.35x here, which is what used to push
-        // the cover and the plaque off a narrow canvas even though `ext` had
-        // supposedly been subtracted.
+        // WHERE THE PART ALREADY IS, before any scatter. Dg turns the group about
+        // its pivot, so the pivot is the one point the spin leaves fixed: it is
+        // the part's anchor, and every vertex stays within `ext` of it at any
+        // angle. `orient` then swings that anchor away from the object's origin,
+        // and THAT is the term the budget used to miss -- every group was costed
+        // as though it sat on the origin. The plug's pivot hangs a full 0.91 off
+        // the cover's left edge, so it was placed most of a half-width further
+        // left than the scatter believed, and walked off the canvas.
+        const ax = orient[0] * px * zoom + orient[4] * py * zoom + orient[8] * pz * zoom;
+        const ay = orient[1] * px * zoom + orient[5] * py * zoom + orient[9] * pz * zoom;
+        const az = orient[2] * px * zoom + orient[6] * py * zoom + orient[10] * pz * zoom;
+        // Depth settles first: it decides how large the part PAINTS, so no
+        // in-frame budget can be worked out until it is known. A part pulled
+        // toward the camera magnifies by up to 1.35x here, which is what used to
+        // push the cover and the plaque off a narrow canvas even though `ext`
+        // had supposedly been subtracted.
         const oz = gp.nz * 1.0 + Math.sin(time * gp.frq[2] + gp.phs[2]) * gp.amp[2];
-        const mag = Math.abs(SCREEN.camZ) / Math.max(0.1, Math.abs(SCREEN.camZ) - oz);
-        // The budget is worked out in FRAME FRACTIONS (0 = centre, 1 = edge),
-        // then converted back to world units, rather than the other way round.
-        // In world units the vertical budget was visH (a fixed 1.41) minus one
-        // isotropic `ext`, so a wide, short part like the cover -- 0.73 across
-        // but only 0.36 tall -- was charged its WIDTH against the height and
-        // came out with 0.25 of travel where it had 0.71 to give. That is why
-        // the parts sat in a horizontal band. Per axis, they each get their own.
-        const ux = Math.max(0, ASM_MARGIN - (extX * mag + gp.amp[0]) / visW);
-        const uy = Math.max(0, ASM_MARGIN - (extY * mag + gp.amp[1]) / visH);
-        // The float is scaled by how much room the part HAS. A big part is
-        // necessarily penned near the centre, and at full amplitude its drift was
-        // most of its whole range -- which is how the cover and a leaf ended up
-        // passing through each other. Tying the two together means the confined
-        // parts breathe less and the free ones keep their full life, with no
-        // amplitude constant to tune.
-        const u = gp.nx * ux + (Math.sin(time * gp.frq[0] + gp.phs[0]) * gp.amp[0] * (ux / ASM_MARGIN)) / visW;
-        const v = gp.ny * uy + (Math.sin(time * gp.frq[1] + gp.phs[1]) * gp.amp[1] * (uy / ASM_MARGIN)) / visH;
-        // Frame fractions back to world units at this part's own depth.
-        const ox = (u * visW) / mag;
-        const oy = (v * visH) / mag;
+        const mag =
+          Math.abs(SCREEN.camZ) / Math.max(0.1, Math.abs(SCREEN.camZ) - (az + oz * s));
+        // `ext` is a SWEPT RADIUS about the pivot, not a half-width. The part
+        // spins freely while it is apart, so the only bound that holds at every
+        // angle is a sphere -- splitting it per axis would let a wide slab clip
+        // the moment it turned upright. As a fraction of each half-axis:
+        const rx = (ext * zoom * mag) / visW;
+        const ry = (ext * zoom * mag) / visH;
+        // What is left of the frame once the part's own painted radius is taken
+        // out. ASM_MARGIN is breathing room ON TOP of that, never the thing
+        // keeping the part in frame.
+        const freeX = Math.max(0, 1 - rx), freeY = Math.max(0, 1 - ry);
+        // The float is scaled by the room the part HAS, and is spent from the
+        // same budget as the home rather than added on top of it -- so the sum
+        // can never reach the edge. A big part penned near the centre breathes
+        // less instead of drifting through its neighbours, with no amplitude
+        // constant to tune.
+        const dxN = (gp.amp[0] * freeX) / visW, dyN = (gp.amp[1] * freeY) / visH;
+        const homeX = Math.max(0, freeX * ASM_MARGIN - dxN);
+        const homeY = Math.max(0, freeY * ASM_MARGIN - dyN);
+        let u = gp.nx * homeX + Math.sin(time * gp.frq[0] + gp.phs[0]) * dxN;
+        let v = gp.ny * homeY + Math.sin(time * gp.frq[1] + gp.phs[1]) * dyN;
+        // HARD STOP. Whatever the home and the float between them asked for, the
+        // part's painted disc has to sit inside the frame. This is a guarantee,
+        // not a tuning knob: with the budget above it should never bind, and it
+        // is here so that a understated `ext` still cannot drop a part off the
+        // canvas.
+        u = Math.max(-freeX, Math.min(freeX, u));
+        v = Math.max(-freeY, Math.min(freeY, v));
         // Dg = Trans(P) * Rot(effSpin) * Trans(-P): the spin, about the group's
         // own centre. The scattered offset is NO LONGER folded in here -- see
         // below.
@@ -1456,22 +1481,23 @@ export function PackageScreen({
           Mat.trans(px, py, pz),
           Mat.mul(rotAxisMat(gp.axis, effSpin), Mat.trans(-px, -py, -pz))
         );
-        // The offset is applied in WORLD space (leftmost, beside the lift) and
-        // not inside `orient`, for the same reason builtLift is. Inside the
-        // rotation, rotY(0.42) kept only 91% of the horizontal budget and fed
-        // the depth offset back into screen X as +/-0.41 of unasked-for drift,
-        // so a home computed against visW never landed at visW.
+        // The translation that carries the ANCHOR from where `orient` leaves it
+        // to the frame position just chosen. It is applied in world space
+        // (leftmost, beside the lift) and not inside `orient`, for the same
+        // reason builtLift is: inside the rotation, rotY(0.42) kept only 91% of
+        // the horizontal budget and fed the depth offset back into screen X as
+        // +/-0.41 of drift nobody asked for.
         //
-        // -shift*s re-centres the cloud on the FRAME rather than on the world
-        // origin. The assembly lens shift above moves the painted centre right
-        // and down (it is what centres the ASSEMBLED object, and it is correct);
-        // the scatter simply never knew about it, so every part inherited that
-        // displacement -- 20% of a half-width right and up to 36% of a
-        // half-height down. Ramped by the un-built fraction `s`, so it is gone
-        // by the time the object is together and the measured built framing is
-        // untouched.
+        // shiftX/shiftY are CANCELLED here, not modified. The lens shift centres
+        // the ASSEMBLED object and is correct, but it also moves the painted
+        // centre, and the scatter never knew about it -- so every part inherited
+        // 20% of a half-width right and up to 36% of a half-height down. Ramped
+        // by the un-built fraction `s`, so it is gone by the time the object is
+        // together and the measured built framing is untouched.
+        const tx = (u * visW) / mag - ax - shiftX;
+        const ty = (v * visH) / mag - ay - shiftY;
         return Mat.mul(
-          Mat.trans((ox - shiftX) * s, builtLift + (oy - shiftY) * s, oz * s),
+          Mat.trans(tx * s, builtLift + ty * s, oz * s),
           Mat.mul(orient, Mat.mul(Mat.scale(zoom, zoom, zoom), Dg))
         );
       };
@@ -1728,11 +1754,11 @@ export function PackageScreen({
       gl.useProgram(screenProg);
       gl.uniformMatrix4fv(us.proj, false, proj);
       gl.uniformMatrix4fv(us.view, false, view);
-      // Real half-extents, per axis, taken from the geometry that is actually
-      // built (buildScreen(HW, heightHalf, ...) then scaled by cur.scale) rather
-      // than one isotropic guess. The cover is a wide, short slab.
-      const coverEX = HW * cur.scale, coverEY = cur.heightHalf * cur.scale;
-      const model = Mat.mul(gOrient("cover", 0, 0, 0, coverEX, coverEY), Mat.scale(cur.scale, cur.scale, 1));
+      // Swept radius about the pivot, from the geometry that is actually built
+      // (buildScreen(HW, heightHalf, depth) then scaled by cur.scale) rather
+      // than a literal, so it tracks the slab as sections change its height.
+      const coverR = Math.hypot(HW * cur.scale, cur.heightHalf * cur.scale, cur.depth);
+      const model = Mat.mul(gOrient("cover", 0, 0, 0, coverR), Mat.scale(cur.scale, cur.scale, 1));
       const mv = Mat.mul(view, model);
       gl.uniformMatrix4fv(us.model, false, model);
       gl.uniformMatrix3fv(us.normal, false, Mat.normalMat(mv));
@@ -1924,9 +1950,14 @@ export function PackageScreen({
         for (let i = 0; i < count; i++) {
           const z = -(back + LEAF_GROOVE + i * LEAF_PITCH);
           const lm = Mat.mul(
-            // Leaves share the cover's footprint exactly (one rebuild, same
-            // HW / heightHalf), so they take the same per-axis extents.
-            Mat.mul(gOrient("leaf" + i, 0, 0, 0, HW * cur.scale, cur.heightHalf * cur.scale), Mat.trans(0, 0, z)),
+            // Leaves share the cover's footprint (one rebuild, same HW and
+            // heightHalf) but sit BEHIND it, and the pivot stays at z=0, so each
+            // leaf's swept radius has to carry its own stack depth as well.
+            Mat.mul(
+              gOrient("leaf" + i, 0, 0, 0,
+                Math.hypot(HW * cur.scale, cur.heightHalf * cur.scale, Math.abs(z) + LEAF_HD)),
+              Mat.trans(0, 0, z)
+            ),
             Mat.scale(cur.scale, cur.scale, 1)
           );
           const lmv = Mat.mul(view, lm);
@@ -1953,18 +1984,41 @@ export function PackageScreen({
         const g = cur.plug; // eased 1..4 -> smooth body growth
         const pinN = 1 + Math.round(t.plug); // pin COUNT snaps (2..5)
         const electric = Math.round(t.plug) >= 4;
-        // The plug flies as ONE unit (body, cable, pins); its pivot is the body
-        // centre just off the cover's left edge.
-        const S = Mat.mul(gOrient("plug", LEFT - 0.1, 0, 0, 0.32), Mat.scale(cur.scale, cur.scale, 1));
-
         const bodyHx = 0.07;
         const bodyHy = 0.05 + g * 0.018;
         const bodyHz = 0.045 + g * 0.02;
+        // The plug flies as ONE unit (body, cable, pins); its pivot is the body
+        // centre just off the cover's left edge.
+        //
+        // Its swept radius is measured from THAT pivot, and the pins are the
+        // reach that matters: they run right, into the slab, roughly 0.28 past
+        // the pivot once cur.scale is applied, against 0.11 of body to the left.
+        // A literal 0.32 covered it, but only by luck -- derived, it tracks the
+        // pin count and the seating travel. The dimensions are hoisted above the
+        // gOrient call because the radius is an input to it, not an output.
         // Seating travel. Small on purpose: the plug should look like it took a
         // firm push home, not like it launched itself at the slab. Moving the
         // BODY is enough -- the pins are positioned off bodyPx, so they ride in
         // with it and stay bridged the whole way.
         const PLUG_TRAVEL = 0.045;
+        const PIN_HX = 0.1, PIN_GAP = 0.032, PIN_HY = 0.012;
+        const plugPX = LEFT - 0.1;
+        // Body travel is bounded by the seating: fully out at plugInsert 0,
+        // PLUG_TRAVEL further in at 1. Take the extreme of each direction so the
+        // radius holds through the whole seating animation.
+        const bodyOut = LEFT - 0.1 - g * 0.01;
+        const bodyIn = bodyOut + PLUG_TRAVEL;
+        // Dg spins about plugPX in POST-scale space while the geometry is scaled
+        // by cur.scale, so both ends are converted before the distance is taken.
+        const plugR = Math.hypot(
+          Math.max(
+            Math.abs((bodyIn + bodyHx + 2 * PIN_HX - 0.02) * cur.scale - plugPX),
+            Math.abs((bodyOut - bodyHx) * cur.scale - plugPX)
+          ),
+          Math.max(bodyHy, ((pinN - 1) / 2) * PIN_GAP + PIN_HY) * cur.scale,
+          bodyHz
+        );
+        const S = Mat.mul(gOrient("plug", plugPX, 0, 0, plugR), Mat.scale(cur.scale, cur.scale, 1));
         const bodyPx = LEFT - 0.1 - g * 0.01 + plugInsert * PLUG_TRAVEL;
         const bodyModel = Mat.mul(
           S,
@@ -2052,12 +2106,12 @@ export function PackageScreen({
           pinSheen = 0.9 + hoverAmt * 0.08;
         }
 
-        const pinHx = 0.1;
+        const pinHx = PIN_HX;
         const pinPx = bodyPx + bodyHx + pinHx - 0.02;
-        const gap = 0.032;
+        const gap = PIN_GAP;
         for (let i = 0; i < pinN; i++) {
           const py = (i - (pinN - 1) / 2) * gap;
-          box(pinPx, py, 0, pinHx, 0.012, 0.012, pinCol, pinSheen, pinTint);
+          box(pinPx, py, 0, pinHx, PIN_HY, PIN_HY, pinCol, pinSheen, pinTint);
         }
       }
 
@@ -2077,11 +2131,15 @@ export function PackageScreen({
         // copy skeleton bars, the ecommerce grid, the manifesto wash -- share
         // this one S, so in assembly mode they disperse and reseat as a single
         // genuine element rather than as separate stand-ins.
-        // The panel is the cover inset by OV_INSET on both axes, so its extents
-        // follow the cover's -- again wide and short, not square.
-        const plaqEX = Math.max(0.05, HW - OV_INSET) * cur.scale;
-        const plaqEY = Math.max(0.03, cur.heightHalf - OV_INSET) * cur.scale;
-        const S = Mat.mul(gOrient("plaque", 0, 0, cur.depth, plaqEX, plaqEY), Mat.scale(cur.scale, cur.scale, 1));
+        // The panel is the cover inset by OV_INSET on both axes, and its pivot
+        // sits forward on the front cap, so the swept radius is taken about that
+        // point and carries the lamination gap in z.
+        const plaqR = Math.hypot(
+          Math.max(0.05, HW - OV_INSET) * cur.scale,
+          Math.max(0.03, cur.heightHalf - OV_INSET) * cur.scale,
+          PLAQUE_GAP + 2 * OV_HD + 0.006 + RIVET_R
+        );
+        const S = Mat.mul(gOrient("plaque", 0, 0, cur.depth, plaqR), Mat.scale(cur.scale, cur.scale, 1));
         const hh = cur.heightHalf;
         const faceZ = cur.depth; // the cover's front cap
 
@@ -2091,11 +2149,13 @@ export function PackageScreen({
         // to `orient`, so every one of these equals the old single S and the live
         // calculator is byte-identical. The pivot is the group's rough face centre
         // -- it sets only the spin centre; the seated pose is exact at any pivot.
-        const Sg = (key: string, px: number, py: number, ext: number, extY: number = ext) =>
-          Mat.mul(gOrient(key, px, py, faceZ, ext, extY), Mat.scale(cur.scale, cur.scale, 1));
-        // The four nails sit on the panel's corners, so the set spans the panel:
-        // wide and short like it, not the 0.68 square it used to claim.
-        const S_nails = Sg("nails", 0, 0, plaqEX, plaqEY);
+        const Sg = (key: string, px: number, py: number, ext: number) =>
+          Mat.mul(gOrient(key, px, py, faceZ, ext), Mat.scale(cur.scale, cur.scale, 1));
+        // The four studs sit on the panel's corners, so the set they form is
+        // bounded by the panel itself -- the same swept radius, which is an
+        // over-estimate by exactly the corner inset and safe in the direction
+        // that matters.
+        const S_nails = Sg("nails", 0, 0, plaqR);
         const S_logo = Sg("logo", -HW * 0.5, hh * 0.5, 0.2);
         const S_copy = Sg("copy", -HW * 0.5, -hh * 0.12, 0.32);
         const S_ecom = Sg("ecom", 0, -hh * 0.05, 0.26);
