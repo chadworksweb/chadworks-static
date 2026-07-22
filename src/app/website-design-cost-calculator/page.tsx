@@ -622,14 +622,25 @@ export default function WebsiteDesignCostCalculatorPage() {
           asking to be believed.
 
           Nothing here was invented to fill the list out; the whole list is
-          Chad's copy (2026-07-22). Two claims in it are load-bearing. The
-          ACCESSIBILITY line names ADA and ARIA outright, which is a conformance
-          claim the old practice-stated wording ("works with a keyboard and a
-          screen reader") deliberately avoided. /faqs/ and the service pages
-          still carry that old wording, so the two no longer match and should
-          move together. The old privacy line is gone, replaced by the DATA
-          COMPLIANT and ANALYTICS bullets, which promise specific artifacts (a
-          privacy policy, a terms page, cookie controls) rather than a practice.
+          Chad's copy (2026-07-22). The old privacy line is gone, replaced by
+          the DATA COMPLIANT and ANALYTICS bullets, which promise specific
+          artifacts (a privacy policy, a terms page, cookie controls) rather
+          than a practice.
+
+          ACCESSIBILITY is deliberately practice-stated (Chad, 2026-07-22). It
+          briefly read "meets baseline ADA and ARIA requirements", which is a
+          conformance claim, and it was reverted for two reasons. The ADA is a
+          statute with no technical spec for private-sector websites, so the
+          measurable standard is WCAG rather than the ADA itself; and ARIA is an
+          authoring spec for describing custom widgets, not a bar a site can
+          "meet". The wording now matches the same promise made on /faqs/ (the
+          "Can people with disabilities use my site?" answer, which also feeds
+          the FAQPage JSON-LD) and the one-line version on the five service
+          pages. All three describe what the build does, name no standard, and
+          say the same thing. If a named claim is ever wanted, the defensible
+          form is WCAG 2.2 AA, and it wants an audit behind it -- automated
+          tooling only catches a third or so of the criteria. Move all three
+          together or they drift apart again.
           Every build has to actually ship them. */}
       {/* THE INVERTED BAND (Chad, 2026-07-22). This borrows the FAQ section's
           shape wholesale: `full` breakout, the dark plum->navy gradient with its
@@ -717,8 +728,12 @@ export default function WebsiteDesignCostCalculatorPage() {
             and fee.
           </li>
           <li>
-            <strong>Accessible.</strong> All chadworks websites meet baseline
-            ADA and ARIA requirements. Further compliance available as needed.
+            <strong>Accessible.</strong> Every site works with a keyboard for
+            the people who cannot use a mouse, labels its buttons and images so
+            a screen reader can say what they are out loud, keeps enough
+            contrast between text and background to stay readable, and honors
+            the setting a visitor switched on to stop things from moving.
+            Further compliance available as needed.
           </li>
           <li>
             <strong>Analytics.</strong> Google Analytics and PostHog are both
