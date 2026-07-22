@@ -5,6 +5,16 @@ dek: ""
 # description: ""   # optional SEO meta; falls back to dek when blank
 # image: "/essays/your-image.jpg"   # optional featured image, shown 1200x630 on the archive card
 # imageAlt: ""
+# section: "Essays"   # optional; becomes articleSection
+# llmsSummary: ""     # optional; the llms.txt line. Falls back to description, then dek
+# GEO fields below. Optional, but an essay that fills them is far more likely to
+# get quoted by an AI answer surface. See the GEO notes in the comment.
+# topics:            # becomes schema keywords + about (Thing nodes)
+#   - ""
+#   - ""
+# takeaways:         # renders "The short version" + feeds speakable
+#   - ""
+#   - ""
 ---
 
 <!--
@@ -27,6 +37,22 @@ dek: ""
   colors, sizes -- the site applies its own typography.
 
   LENGTH: manifesto length, ~300 to 400 words. Short, dense, punchy. Not long-form.
+
+  GEO (getting quoted by AI answers):
+  - `takeaways:` is the highest-leverage field. Write each one as a sentence that
+    is still true and still attributable after somebody lifts it out of the
+    essay. If it needs the paragraph around it to make sense, rewrite it.
+  - `topics:` are the entities the essay is about, not keywords to rank for.
+    Three to six, named the way a person would say them.
+  - Use ## headings when the essay has real sections. Every h2 and h3 gets an
+    automatic anchor id, which is what lets an answer engine cite one section
+    instead of the whole page. No headings is fine for a short manifesto.
+  - public/llms.txt updates itself. `npm run build` regenerates the ## Essays
+    section from these files (scripts/sync-llms-essays.mjs), so nothing to do.
+    The line reads from `llmsSummary:` if present, then `description:`, then
+    `dek:`. Write an llmsSummary when the essay deserves a fuller line than its
+    meta description: say what the piece ARGUES, not what it is about.
+    The rest of llms.txt is still hand-written; only this section is generated.
 
   THE BAR (every essay must clear it before it ships): only chadworks could have
   written this, and it makes an intelligent reader stop and think. Not an SEO

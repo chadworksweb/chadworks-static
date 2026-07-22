@@ -12,7 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { markdownToHtml } from "@/lib/markdown";
+import { markdownToHtml, markdownToPlainText } from "@/lib/markdown";
 
 const ESSAYS_DIR = path.join(process.cwd(), "src", "content", "essays");
 
@@ -35,9 +35,16 @@ export type EssayMeta = {
   topics?: string[]; // frontmatter `topics:`; becomes schema keywords + about
   section?: string; // frontmatter `section:`; becomes articleSection
   wordCount: number; // computed from the markdown body, for Article.wordCount
+  // GEO: the essay's claims as standalone sentences (frontmatter `takeaways:`).
+  // Rendered as a visible block AND fed to the schema, because answer engines
+  // quote self-contained assertions, not paragraphs that need their context.
+  takeaways?: string[];
 };
 
-export type Essay = EssayMeta & { bodyHtml: string };
+export type Essay = EssayMeta & {
+  bodyHtml: string;
+  bodyText: string; // plain prose, for the schema's abstract + articleBody
+};
 
 // Every publishable essay file: *.md, minus the _-prefixed template/drafts.
 function essayFiles(): string[] {
@@ -74,16 +81,23 @@ function readMeta(slug: string): { meta: EssayMeta; content: string } | null {
     .replace(/\{\{\s*\w+\s*\}\}/g, " ")
     .split(/\s+/)
     .filter(Boolean).length;
-  const topics = Array.isArray(data.topics)
-    ? data.topics.map((t: unknown) => t?.toString().trim()).filter(Boolean)
-    : undefined;
+  const toStringList = (raw: unknown): string[] | undefined => {
+    if (!Array.isArray(raw)) return undefined;
+    const list = raw
+      .map((t: unknown) => t?.toString().trim())
+      .filter((t): t is string => Boolean(t));
+    return list.length ? list : undefined;
+  };
+  const topics = toStringList(data.topics);
+  const takeaways = toStringList(data.takeaways);
   const meta: EssayMeta = {
     slug,
     title,
     date,
     updated,
     wordCount,
-    topics: topics && topics.length ? (topics as string[]) : undefined,
+    topics,
+    takeaways,
     section: data.section ? data.section.toString().trim() : undefined,
     dek: (data.dek ?? "").toString().trim(),
     description: data.description ? data.description.toString().trim() : undefined,
@@ -113,5 +127,5 @@ export async function getEssay(slug: string): Promise<Essay | null> {
   const read = readMeta(slug);
   if (!read) return null;
   const bodyHtml = await markdownToHtml(read.content);
-  return { ...read.meta, bodyHtml };
+  return { ...read.meta, bodyHtml, bodyText: markdownToPlainText(read.content) };
 }

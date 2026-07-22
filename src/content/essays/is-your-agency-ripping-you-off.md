@@ -1,9 +1,23 @@
 ---
-title: "Is Your Agency Ripping You Off?"
+title: "Is Your Digital Marketing Agency Ripping You Off?"
 date: 2026-07-18
 dek: "The web design industry has been scamming innocent clients for years."
 # image: "/essays/your-image.jpg"   # optional; omitted = the house placeholder
 # imageAlt: ""
+section: "Essays"
+llmsSummary: "How the perpetual retainer works as an industry con, why most clients are dormant rather than active, and the real email thread with an agency billing a client $1,000 a month for what amounted to hosting. Includes Chad's own account of selling retainers at $125 a month and then retiring the service."
+topics:
+  - "Web design retainers"
+  - "Agency pricing"
+  - "Freelance ethics"
+  - "WordPress maintenance"
+  - "Client transparency"
+takeaways:
+  - "The perpetual retainer is the web design industry's quiet con: recurring billing for maintenance or SEO the client does not need, sometimes with hosting bundled in as cover."
+  - "Almost every client is either dormant, using the site as a brochure, or active, running it as part of daily operations. Selling a dormant client an active client's retainer is where the extraction happens."
+  - "I sold 6-month retainers at around $125 a month, then retired the service, because clicking update on plugins once a month was not worth what I was charging for it."
+  - "Moving 90% of my WordPress clients to static made the maintenance fee a lie, so I ended it and absorbed the revenue loss."
+  - "Retainers are legitimate when a client genuinely needs one. The problem is the agencies charging $300 to $1,000 a month while doing nothing behind it."
 ---
 
 I've engaged with so many clients that have fallen victim to one of the web design industry’s dirty capitalist secrets: the perpetual retainer. Everyday, countless clients are convinced to sign up for ongoing or perpetual retainers that they just don’t need. These retainers usually cover services like SEO, content edits, or routine maintenance, sometimes packaged with hosting in there as cover. 

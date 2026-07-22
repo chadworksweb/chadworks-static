@@ -8893,6 +8893,100 @@ html.cw-motion-paused *::after {
    section rhythm on top -- the band already provided the separation. */
 .essay-article--tail { padding-top: var(--space-lg); }
 
+/* ANCHORED HEADINGS -- every h2/h3 in an essay body carries an id (see
+   src/lib/markdown.ts), so a section can be linked and cited on its own. The
+   header is fixed, so a jump without scroll-margin lands with the heading
+   hidden underneath it. */
+.essay-prose h2,
+.essay-prose h3,
+.essay-takeaways__kicker,
+.essay-more__kicker { scroll-margin-top: calc(var(--header-h, 72px) + var(--space-md)); }
+
+/* THE SHORT VERSION -- the essay's claims as standalone sentences, above the
+   prose. Answer engines quote assertions that survive being lifted out of
+   their paragraph; this block is those sentences, and it is what the
+   BlogPosting's speakable selector points at. Optional: only essays with
+   `takeaways:` in the frontmatter render it. */
+.essay-takeaways {
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-md) var(--space-md) var(--space-lg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: color-mix(in srgb, var(--bg-surface) 45%, var(--bg-base));
+}
+.essay-takeaways__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-xs);
+}
+.essay-takeaways__list {
+  list-style: disc;
+  padding-left: 1.1em;
+  display: grid;
+  gap: 0.5rem;
+}
+.essay-takeaways__list li {
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  color: var(--text-primary);
+  padding-left: 0.25em;
+}
+
+/* The prose has to clear the block, or the first paragraph reads as the last
+   bullet's continuation. */
+.essay-takeaways + .essay-prose { margin-top: var(--space-lg); }
+
+/* RELATED POSTS -- sibling essays, so no essay is a dead end for a reader or an
+   orphan for a crawler. Sits above the footer row. */
+.essay-more { margin-top: var(--space-2xl); }
+.essay-more__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-sm);
+}
+.essay-more__list {
+  display: grid;
+  gap: var(--space-md);
+  list-style: none;
+  padding: 0;
+}
+.essay-more__item {
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-subtle);
+}
+/* Meta link: opts out of the canonical animated prose bar. */
+.essay-more__item a {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  line-height: 1.25;
+  color: var(--text-primary);
+  text-decoration: none;
+  background-image: none;
+  padding-bottom: 0;
+}
+.essay-more__item a:hover { color: var(--accent); }
+.essay-more__dek {
+  margin-top: 0.25rem;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--text-secondary);
+}
+@media (min-width: 720px) {
+  .essay-more__list { grid-template-columns: 1fr 1fr; }
+  /* Two columns is the shape, but a lone sibling should not sit in a half-width
+     column with dead space beside it. */
+  .essay-more__item:only-child { grid-column: 1 / -1; }
+}
+
 /* AUTHOR BIO BOX -- portrait + the About line, closing the essay. Backs the
    Person node in the JSON-LD with something a reader (and a crawler) can see. */
 .essay-bio {
