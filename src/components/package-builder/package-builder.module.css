@@ -343,6 +343,23 @@
   margin: 0;
 }
 
+/* Jumps to this line's disclaimer on the rate card below. Kept at full opacity
+   against the dimmed hint so it reads as a control rather than more hint text,
+   and underlined by default because it is a link inside a paragraph. */
+.noteRef {
+  font-size: inherit;
+  font-weight: 600;
+  white-space: nowrap;
+  color: inherit;
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.noteRef:hover,
+.noteRef:focus-visible {
+  text-decoration: underline;
+}
+
 /* Ordered option list. Was a row of bare numbered chips, where the option text
    lived only in a tooltip -- the number told you nothing and the choice could
    not be read without hovering. Every option now states itself, in rank order,

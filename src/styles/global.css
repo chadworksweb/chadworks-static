@@ -2224,13 +2224,20 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 310px), 1fr));
   gap: var(--space-md);
   margin-top: var(--space-lg);
-  align-items: start;
+  /* stretch, not start: the panels now run in the calculator's own order, so a
+     one-row panel can land beside a five-row one. Stretching squares off every
+     panel in a row against the tallest of that row, which is what keeps the
+     card from reading as a ragged pile. */
+  align-items: stretch;
 }
 .cw-ratecard__group {
   border: 1px solid var(--border-subtle);
   border-radius: 14px;
   overflow: hidden;
   background: var(--bg-elevated);
+  /* Column flex so the rows area, not the head, absorbs the stretched height. */
+  display: flex;
+  flex-direction: column;
 }
 .cw-ratecard__head {
   padding: var(--space-xs) var(--space-sm);
@@ -2246,12 +2253,14 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   color: var(--text-primary);
 }
 .cw-ratecard__hint {
-  margin-top: 0.1rem;
+  margin-top: 0.32rem;
   font-size: 0.86rem;
   line-height: 1.4;
   color: var(--text-secondary);
 }
-.cw-ratecard__rows { display: grid; }
+/* Takes the slack from the stretch. align-content keeps the rows packed at the
+   top so a short panel gains empty card, not stretched-out rows. */
+.cw-ratecard__rows { display: grid; flex: 1; align-content: start; }
 .cw-ratecard__row {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -2260,6 +2269,82 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding: 0.55rem var(--space-sm);
 }
 .cw-ratecard__row:nth-child(odd) { background: rgba(128, 84, 188, 0.05); }
+/* The asterisked caveat under a panel's rows. Sits below the last divider and
+   reads as an aside, not another row. */
+.cw-ratecard__note {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  /* Clear of the sticky header when the asterisk link jumps here. */
+  scroll-margin-top: 6rem;
+}
+.cw-ratecard__note:focus { outline: none; }
+
+/* THE ARRIVAL HIGHLIGHT -- two states, driven from the link's click handler.
+   `--held` goes on at click and stays lit for the whole ride down, so the
+   reader can see where they are being taken before they get there. `--pulse`
+   replaces it the moment the scroll lands: two slow one-second breaths, two
+   full seconds, then the class comes off and the note returns to normal.
+   Deliberately NOT :target -- a hash highlight would stick until the hash
+   changed, and this is meant to be a flash, not a permanent state. */
+.cw-ratecard__note--held,
+.cw-ratecard__note--pulse {
+  border-radius: 6px;
+}
+.cw-ratecard__note--held {
+  background: rgba(250, 204, 21, 0.85);
+  color: #1a1a1a;
+}
+/* THREE flashes, then a fade down to nothing. The tail is the point: ending on
+   a lit frame and then dropping the class snaps the highlight off mid-cycle,
+   which reads as a glitch. The last stretch carries the yellow from its third
+   peak to fully transparent, so by the time the class comes off there is
+   nothing left to remove. Peaks land at 0s, 0.8s and 1.6s; the fade runs
+   1.6s to 2.4s. */
+@keyframes cw-note-pulse {
+  0% {
+    background: rgba(250, 204, 21, 0.85);
+    color: #1a1a1a;
+  }
+  17% {
+    background: rgba(250, 204, 21, 0.1);
+    color: var(--text-secondary);
+  }
+  33% {
+    background: rgba(250, 204, 21, 0.85);
+    color: #1a1a1a;
+  }
+  50% {
+    background: rgba(250, 204, 21, 0.1);
+    color: var(--text-secondary);
+  }
+  67% {
+    background: rgba(250, 204, 21, 0.85);
+    color: #1a1a1a;
+  }
+  100% {
+    background: rgba(250, 204, 21, 0);
+    color: var(--text-secondary);
+  }
+}
+.cw-ratecard__note--pulse {
+  animation: cw-note-pulse 2.4s ease-in-out 1;
+}
+/* Motion off: hold the highlight steady for the same two seconds instead of
+   breathing it. The reader still gets told where they landed. */
+@media (prefers-reduced-motion: reduce) {
+  .cw-ratecard__note--pulse {
+    animation: none;
+    background: rgba(250, 204, 21, 0.85);
+    color: #1a1a1a;
+  }
+}
+/* Closes the list in a panel that got stretched past its rows. Without it the
+   final row bleeds into the empty card below it and the table reads unfinished.
+   In a panel that fills its row this lands on the card's own bottom border, so
+   it costs nothing there. */
+.cw-ratecard__row:last-child { border-bottom: 1px solid var(--border-subtle); }
 .cw-ratecard__opt {
   font-size: 0.97rem;
   line-height: 1.35;

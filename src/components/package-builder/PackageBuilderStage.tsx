@@ -32,6 +32,90 @@ import {
 } from "@/lib/package-builder";
 import s from "./package-builder.module.css";
 
+// ---------------------------------------------------------------------
+// SCROLL TO A PARAM'S DISCLAIMER, then flash it.
+//
+// The scroll is animated here rather than handed to the browser. Native smooth
+// scrolling is a per-browser preference (Firefox ships it off in more than one
+// configuration), and a fragment jump would land hard with no travel at all.
+// Owning the tween means the motion is the same everywhere AND there is an
+// exact moment the scroll finishes, which is when the pulse has to start.
+//
+// The highlight is on before the first frame of travel, so the reader can see
+// what they are being carried to while it is still off screen.
+// ---------------------------------------------------------------------
+const HELD = "cw-ratecard__note--held";
+const PULSE = "cw-ratecard__note--pulse";
+const TRAVEL_MS = 750;
+// Must outlast the whole cw-note-pulse animation in global.css: three flashes
+// (peaks at 0s, 0.8s, 1.6s) plus a 0.8s fade down. Cutting the class before the
+// fade completes is exactly the mid-cycle snap the tail exists to avoid.
+const PULSE_MS = 2500;
+
+function scrollToNote(el: HTMLElement) {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  el.classList.remove(PULSE);
+  el.classList.add(HELD);
+
+  const land = () => {
+    el.classList.remove(HELD);
+    el.classList.add(PULSE);
+    window.setTimeout(() => el.classList.remove(PULSE), PULSE_MS);
+  };
+
+  // Centre the note, clamped to the real scroll range so a target near either
+  // end still lands instead of asking for an impossible offset.
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const startY = window.scrollY;
+  const endY = Math.max(
+    0,
+    Math.min(
+      maxY,
+      startY + el.getBoundingClientRect().top - (window.innerHeight - el.offsetHeight) / 2,
+    ),
+  );
+
+  // EVERY scroll here passes behavior "instant" on purpose. global.css sets
+  // `scroll-behavior: smooth` on the root, which silently upgrades a bare
+  // scrollTo into an animated one -- so the per-frame writes below would each
+  // start their own smooth scroll and fight the easing. Instant makes this
+  // function the only thing moving the page.
+  const jump = (y: number) => window.scrollTo({ top: y, behavior: "instant" });
+
+  if (reduced || Math.abs(endY - startY) < 2) {
+    jump(endY);
+    land();
+    return;
+  }
+
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    jump(endY);
+    land();
+  };
+
+  const t0 = performance.now();
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const step = (now: number) => {
+    if (done) return;
+    const prog = Math.min(1, (now - t0) / TRAVEL_MS);
+    jump(startY + (endY - startY) * ease(prog));
+    if (prog < 1) requestAnimationFrame(step);
+    else finish();
+  };
+  requestAnimationFrame(step);
+
+  // Watchdog. rAF does not always run: a background or throttled tab can starve
+  // it indefinitely, and some automation contexts never fire it at all. Without
+  // this the reader would sit on a highlighted line they cannot see, having
+  // been moved nowhere. If the tween has not finished by the time it should
+  // have, land the hard way.
+  window.setTimeout(finish, TRAVEL_MS + 400);
+}
+
 // Params that would run too long as a chip row keep a slim slider instead.
 // Integrations left this set on 2026-07-19: it is a named checklist now, so it
 // asks which systems rather than making the reader count them first.
@@ -125,7 +209,27 @@ export function PackageBuilderStage({
                 {/* Always mounted so it can animate open and shut. */}
                 <div className={`${s.body}${isOpen ? ` ${s.bodyOpen}` : ""}`} id={panelId}>
                   <div className={s.bodyInner} inert={!isOpen ? true : undefined}>
-                    <p className={s.hint}>{p.hint}</p>
+                    <p className={s.hint}>
+                      {p.hint}
+                      {p.note ? (
+                        <>
+                          {" "}
+                          <a
+                            className={s.noteRef}
+                            href={`#note-${p.key}`}
+                            aria-label={`${p.label}: read the disclaimer on this line`}
+                            onClick={(e) => {
+                              const el = document.getElementById(`note-${p.key}`);
+                              if (!el) return; // no target: let the href do it
+                              e.preventDefault();
+                              scrollToNote(el);
+                            }}
+                          >
+                            (read disclaimer)
+                          </a>
+                        </>
+                      ) : null}
+                    </p>
 
                     {AS_COUNT.has(p.key) ? (
                       <div className={s.count}>

@@ -218,6 +218,12 @@ export type Param = {
   min?: number;
   max?: number;
   options?: string[];
+  // Optional caveat, published under that param's table on the rate card and
+  // marked with an asterisk on the title. For a ladder whose real effort does
+  // not track the unit it bills in (copy bills per page, but a 10-section page
+  // holds far more words than a 4-section one), so the table says so out loud
+  // rather than implying a precision the model does not have.
+  note?: string;
 };
 
 export const PARAMS: Param[] = [
@@ -231,22 +237,22 @@ export const PARAMS: Param[] = [
   },
   {
     key: "sections",
-    label: "Sections per page",
-    hint: "How much each page has to say.",
+    label: "Sections per Page",
+    hint: "Average number of visually distinct sections on a page. (Header and footer are included, not counted).",
     kind: "range",
     min: 2,
     max: 10,
   },
   {
     key: "ambition",
-    label: "Visual ambition",
-    hint: "How much of the page gets art direction.",
+    label: "Visual Ambition",
+    hint: "Level of graphic design involved.",
     kind: "steps",
     options: ["Straightforward", "Considered", "Layered", "Art-directed", "The (chad)works"],
   },
   {
     key: "mathDev",
-    label: "Math and development",
+    label: "Math and Development",
     hint: "Custom logic under the hood.",
     kind: "steps",
     options: ["None", "A little", "Real features", "An application", "Rising Compass"],
@@ -254,28 +260,29 @@ export const PARAMS: Param[] = [
   {
     key: "brandingDone",
     label: "Branding",
-    hint: "What you bring versus what I build.",
+    hint: "Level of branding work I do based on what you deliver. (A website inherits branding, but branding itself is a separate set of skills and services.)",
     kind: "steps",
-    options: ["Nothing yet", "A logo", "A brand guide", "A full system"],
+    options: ["Nothing provided", "A logo", "A brand guide", "A full system"],
   },
   {
     key: "content",
-    label: "Copy (Text content)",
-    hint: "Who writes the copy.",
+    label: "Copy (The words on the page)",
+    hint: "Level of copywriting I'll be doing.",
     kind: "steps",
     options: ["Client provides", "Cleanup", "Most of it", "Every word"],
+    note: "Effort to bring copy to production level will vary greatly per situation. This is a rough estimate, not a promise. Copy will be discussed thoroughly during the consultation process.",
   },
   {
     key: "editability",
-    label: "Who edits it",
-    hint: "How much you change without me.",
+    label: "Who Edits It",
+    hint: "How much you need to be able to change on your own.",
     kind: "steps",
-    options: ["I handle edits", "Light content", "Most of the page", "Everything"],
+    options: ["I handle edits", "Specific content", "Most of the page", "Everything"],
   },
   {
     key: "motion",
     label: "Motion",
-    hint: "How alive the thing feels.",
+    hint: "Physics and movement on the site.",
     kind: "steps",
     options: ["Still", "Subtle", "Animated", "Interactive", "Showroom grade"],
   },

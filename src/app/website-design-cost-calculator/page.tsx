@@ -396,14 +396,15 @@ function rowsFor(p: Param): CardRow[] {
   }
 }
 
-// Longest tables first (Chad, 2026-07-17). Sorting by row count rather than by
-// the model's order keeps the auto-fit grid from stranding a one-row panel
-// beside a five-row one, so the card packs instead of leaving ragged holes.
-// Array.sort is stable, so panels of equal length hold the calculator's order.
+// PARAMS order, matching the calculator's panels top to bottom (Chad,
+// 2026-07-22). This replaces the longest-first sort: a reader who just moved
+// the sliders should find the tables in the order they met the controls, and
+// the ragged-hole problem that sort was solving is now handled in CSS, where
+// every panel is stretched to the tallest in its row.
 const CARD_GROUPS: { param: Param; rows: CardRow[] }[] = PARAMS.map((param) => ({
   param,
   rows: rowsFor(param),
-})).sort((a, b) => b.rows.length - a.rows.length);
+}));
 
 export default function WebsiteDesignCostCalculatorPage() {
   // One template for every "about the calculator" section. Used for the purpose
@@ -498,37 +499,29 @@ export default function WebsiteDesignCostCalculatorPage() {
       {/* The rate card. THE citation layer: static HTML, generated from the
           model, readable by an engine that will never run the calculator. */}
       <SectionShell className="svc-block" id="rate-card">
-        <p className="eyebrow">The rate card</p>
+        <p className="eyebrow">The Calculated Rates</p>
         <h2 className="svc-block__heading svc-fill">
-          What a website costs here, line by line
+          The Numbers Behind The Calculator
         </h2>
         <div className="svc-prose">
           <p>
-            The baseline is {money(BASE)}. That buys {UNIT_RATES.pagesIncluded}{" "}
-            pages at {UNIT_RATES.sectionsIncluded} sections each, custom
-            designed and custom built, with your brand settled and your words
-            written. Every line below adds to that baseline at the figure shown,
-            and the calculator sums them.
+            The baseline fee for a chadworks website is {money(BASE)}. That buys
+            a small, simple, but professional website. See{" "}
+            <a href="#included">the next section</a> for what&apos;s included in
+            the baseline. Every feature or level-up in the calculator adds to the
+            baseline fee. See the tables below for a granular look at those
+            features and levels that modify the estimate.
           </p>
         </div>
-        {/* The baseline stays a statement on its own: it is the one number that
-            is not a modifier, so it does not belong in a group with them. */}
-        <dl className="rates-ledger">
-          <div className="rates-ledger__row">
-            <dt className="rates-ledger__label">
-              The baseline build: {UNIT_RATES.pagesIncluded} pages at{" "}
-              {UNIT_RATES.sectionsIncluded} sections each
-            </dt>
-            <dd className="rates-ledger__num">{money(BASE)}</dd>
-          </div>
-        </dl>
-
-        {/* One panel per scope layer, longest tables first. */}
+        {/* One panel per scope layer, in the calculator's own param order. */}
         <div className="cw-ratecard">
           {CARD_GROUPS.map(({ param: p, rows }) => (
             <section key={p.key} className="cw-ratecard__group">
               <div className="cw-ratecard__head">
-                <h3 className="cw-ratecard__title">{p.label}</h3>
+                <h3 className="cw-ratecard__title">
+                  {p.label}
+                  {p.note ? <span aria-hidden="true">*</span> : null}
+                </h3>
                 <p className="cw-ratecard__hint">{p.hint}</p>
               </div>
               <dl className="cw-ratecard__rows">
@@ -545,6 +538,14 @@ export default function WebsiteDesignCostCalculatorPage() {
                   </div>
                 ))}
               </dl>
+              {/* The asterisk's other half. Inside the panel so the caveat
+                  travels with the table an engine lifts, not stranded in a
+                  page-level footnote it will never quote alongside it. */}
+              {p.note ? (
+                <p className="cw-ratecard__note" id={`note-${p.key}`} tabIndex={-1}>
+                  * {p.note}
+                </p>
+              ) : null}
             </section>
           ))}
         </div>
@@ -579,6 +580,19 @@ export default function WebsiteDesignCostCalculatorPage() {
         <h2 className="svc-block__heading svc-fill">
           What every build includes, whatever the number says
         </h2>
+        {/* The baseline stays a statement on its own: it is the one number that
+            is not a modifier, so it does not belong in a group with them. Moved
+            here from the rate card (Chad, 2026-07-22) so it sits with what the
+            baseline actually buys rather than with the things that modify it. */}
+        <dl className="rates-ledger">
+          <div className="rates-ledger__row">
+            <dt className="rates-ledger__label">
+              The baseline build: {UNIT_RATES.pagesIncluded} pages at{" "}
+              {UNIT_RATES.sectionsIncluded} sections each
+            </dt>
+            <dd className="rates-ledger__num">{money(BASE)}</dd>
+          </div>
+        </dl>
         <div className="svc-prose">
           <p>
             The calculator changes a lot from one project to the next. These

@@ -1954,7 +1954,7 @@ export function PackageScreen({
 
       // --- the brand plaque: a riveted panel laminated over the front face ---
       // The plaque is the shared CONTENT SURFACE and it is ALWAYS present: the
-      // untouched default reads exactly like branding level 1 ("Nothing yet"),
+      // untouched default reads exactly like branding level 1 ("Nothing provided"),
       // a bare riveted plate carrying no mark. Unset and level 1 are identical
       // on the slab and differ only on the ledger -- unset bills nothing, level
       // 1 bills the full branding build (see `at()` in package-builder.ts).
