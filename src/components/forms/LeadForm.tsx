@@ -7,7 +7,7 @@
 // contact-form.js), adapted to React: refs + DOM classes, uncontrolled
 // inputs, the same has-error behavior, the same JSON POST shape.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { FormField, LeadFormConfig } from "@/lib/forms";
 
 // The centralized LEIT contact-form endpoint (leit-dashboard on le-projects-01):
@@ -85,11 +85,28 @@ function groupFields(fields: FormField[]) {
   return groups;
 }
 
-export function LeadForm({ config }: { config: LeadFormConfig }) {
+export function LeadForm({
+  config,
+  getExtraData,
+  beforeSubmit,
+}: {
+  config: LeadFormConfig;
+  // Extra payload merged in at SUBMIT time (read live, not at render), so a
+  // caller can attach state that changes after mount -- e.g. the calculator's
+  // current scope -- without prefilling any field. Overrides collected fields
+  // on key collision.
+  getExtraData?: () => Record<string, string>;
+  // Optional node rendered just before the submit button (e.g. a sign-off).
+  beforeSubmit?: ReactNode;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const tsRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [mailtoHref, setMailtoHref] = useState<string>("");
+  // Whether every required field is filled (and any email is valid). Gates the
+  // optional beforeSubmit node, so a sign-off only appears once the form is
+  // ready to send.
+  const [complete, setComplete] = useState(false);
   const idBase = `cwf-${config.source.replace(/[^a-z0-9]+/gi, "-")}`;
 
   // LEIT anti-spam timestamp: base64(now) set on mount and after each reset,
@@ -98,13 +115,27 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
     if (tsRef.current) tsRef.current.value = btoa(String(Math.floor(Date.now() / 1000)));
   }, [status]);
 
-  // Clear field error when the user starts typing again (source behavior).
+  // Are all required fields filled (and any email well-formed)? Read live off
+  // the DOM, since the inputs are uncontrolled.
+  function isComplete(form: HTMLFormElement) {
+    let ok = true;
+    form.querySelectorAll<HTMLInputElement>("[required]").forEach((field) => {
+      const v = (field.value || "").trim();
+      if (!v) ok = false;
+      else if (field.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) ok = false;
+    });
+    return ok;
+  }
+
+  // Clear field error when the user starts typing again (source behavior), and
+  // re-evaluate whether the form is complete so the sign-off can appear.
   function onInput(e: React.FormEvent) {
     const group = (e.target as HTMLElement).closest(".cw-form-field");
     if (group && group.classList.contains("has-error")) {
       const v = (e.target as HTMLInputElement).value || "";
       if (v.trim()) group.classList.remove("has-error");
     }
+    if (formRef.current) setComplete(isComplete(formRef.current));
   }
 
   function validateForm(form: HTMLFormElement) {
@@ -153,6 +184,8 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
     // Report the actual page the form was sent from (like chadlewine's
     // source_page). config._source is the semantic slot; this is the real URL.
     data.source_page = window.location.pathname;
+    // Merge caller-supplied data (read now, so it reflects current state).
+    if (getExtraData) Object.assign(data, getExtraData());
 
     fetch(FORM_ENDPOINT, {
       method: "POST",
@@ -229,6 +262,10 @@ export function LeadForm({ config }: { config: LeadFormConfig }) {
         if (g.span === "third") return <div key={gi} className="cw-form-grid cw-form-grid--3">{inner}</div>;
         return <div key={gi}>{inner}</div>;
       })}
+
+      {/* Only once every required field is filled, so a sign-off pops in when
+          the form is actually ready to send. */}
+      {complete ? beforeSubmit : null}
 
       <button type="submit" className="svc-btn cw-form__submit" disabled={status === "sending"}>
         <span className="svc-btn__label">

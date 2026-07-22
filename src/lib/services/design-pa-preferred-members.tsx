@@ -17,7 +17,7 @@ export const paPreferredMembers: Service = {
     "chadworks builds websites for PA Preferred members, the Pennsylvania-grown and made farms, food producers, and makers, with local-PA credibility, farm-stand and market hours up front, and buy-local trust signals that turn neighbors into regulars.",
 
   answer:
-    "If you carry the PA Preferred mark, your website should make a shopper trust you the way the program intends: Pennsylvania-grown, Pennsylvania-made, and worth a drive. I build exactly that. I'm Chad, I am based in Pennsylvania, and I have been shipping sites since the MySpace days. Your site leads with your farm-stand or market hours and location, puts the PA Preferred and any organic or local credentials up top, shows real photos of your land and your products, and reads like a neighbor you can trust rather than a faceless brand. It loads fast on a phone so a shopper at the market can find you. Custom builds run $5,200 to $8,200 depending on scope, quoted up front.",
+    "If you carry the PA Preferred mark, your website should make a shopper trust you the way the program intends: Pennsylvania-grown, Pennsylvania-made, and worth a drive. I build exactly that. I'm Chad, I am based in Pennsylvania, and I have been shipping sites since the MySpace days. Your site leads with your farm-stand or market hours and location, puts the PA Preferred and any organic or local credentials up top, shows real photos of your land and your products, and reads like a neighbor you can trust rather than a faceless brand. It loads fast on a phone so a shopper at the market can find you. Custom builds run $5,000 to $10,000 depending on scope, quoted up front.",
 
   keyFactsHeading: "PA Preferred web design, at a glance",
   keyFacts: [
@@ -107,7 +107,7 @@ export const paPreferredMembers: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,200 - $8,200",
+    figure: "$5,000 - $10,000",
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing is based on scope, not hours. A focused site with your hours, location, story, and product list lands near the low end of the range. Add a real photo gallery, a market and events calendar, or online ordering and the number moves up. You see the full quote before we start, and that is the number on the final invoice. When the season changes, you email me and I bill the update.",
@@ -163,6 +163,6 @@ export const paPreferredMembers: Service = {
   meta: {
     title: "Web Design for PA Preferred Members | chadworks",
     description:
-      "Websites for PA Preferred members: Pennsylvania-grown and made farms, food producers, and makers. Farm-stand and market hours up front, the PA Preferred mark and local credentials as trust signals, real photos, and fast on a phone. Custom builds run $5,200 to $8,200, quoted up front.",
+      "Websites for PA Preferred members: Pennsylvania-grown and made farms, food producers, and makers. Farm-stand and market hours up front, the PA Preferred mark and local credentials as trust signals, real photos, and fast on a phone. Custom builds run $5,000 to $10,000, quoted up front.",
   },
 };

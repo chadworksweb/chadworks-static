@@ -16,7 +16,7 @@ export const musicIndustry: Service = {
     "chadworks designs specialized websites for labels, studios, managers, and producers: roster and discography pages, studio booking, and the credibility that gets artists and clients to say yes.",
 
   answer:
-    "This is specialized web design for the business behind the music: labels, recording studios, artist managers, and producers. Not consulting, the build itself. I'm Chad, I design and code every site myself, I make music too, and I have been shipping sites since the MySpace days, so I speak both sides. A label gets a roster and discography that signals real catalog. A studio gets a booking flow and a gear-and-room showcase that fills the calendar. A manager or producer gets a credits page that closes deals. Every build is fast, server-rendered, and readable by Google and the AI assistants. Custom builds run $5,200 to $8,200 depending on scope, quoted up front.",
+    "This is specialized web design for the business behind the music: labels, recording studios, artist managers, and producers. Not consulting, the build itself. I'm Chad, I design and code every site myself, I make music too, and I have been shipping sites since the MySpace days, so I speak both sides. A label gets a roster and discography that signals real catalog. A studio gets a booking flow and a gear-and-room showcase that fills the calendar. A manager or producer gets a credits page that closes deals. Every build is fast, server-rendered, and readable by Google and the AI assistants. Custom builds run $5,000 to $10,000 depending on scope, quoted up front.",
 
   keyFactsHeading: "Music-industry web design, at a glance",
   keyFacts: [
@@ -106,7 +106,7 @@ export const musicIndustry: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,200 - $8,200",
+    figure: "$5,000 - $10,000",
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing is based on scope, not hours. A focused credibility site, a producer credits page or a studio one-pager, lands near the low end of the range. Add a full label roster and discography, a studio booking flow, or a deep gear-and-rooms showcase and the number moves up. You see the full quote before we start, and that is the number on the final invoice. When you sign a new artist or add a room, you email me and I bill the update.",
@@ -162,6 +162,6 @@ export const musicIndustry: Service = {
   meta: {
     title: "Web Design for the Music Industry | chadworks",
     description:
-      "Specialized website design for labels, studios, managers, and producers: roster and discography pages, studio booking flows, and credits that close deals. Built by a developer who makes music. Custom builds run $5,200 to $8,200, quoted up front.",
+      "Specialized website design for labels, studios, managers, and producers: roster and discography pages, studio booking flows, and credits that close deals. Built by a developer who makes music. Custom builds run $5,000 to $10,000, quoted up front.",
   },
 };

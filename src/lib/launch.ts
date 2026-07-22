@@ -54,6 +54,9 @@ const LAUNCHED = new Set<string>([
               // LIVE ON PROD 2026-07-18 with the first essay ("Is Your Agency
               // Ripping You Off?"). This also flips <GoingToBat /> from the
               // inline email thread to the teaser capsule everywhere it runs.
+  "/website-design-cost-calculator/", // launched 2026-07-20 -- the scope calculator (tool intent)
+  "/how-much-does-a-website-cost/", // launched 2026-07-20 -- the cost guide (informational intent).
+                                    // Launch WITH the calculator so their cross-links resolve.
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant

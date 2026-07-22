@@ -637,6 +637,30 @@ p, li, dd, figcaption { text-wrap: pretty; }
   color: transparent;
 }
 
+/* ---------------------------------------------------------------------------
+   SITE-WIDE DESCENDER FIX for gradient (background-clip: text) headings.
+
+   `background-clip: text` paints the gradient only inside the element's
+   background box (the padding box). With the tight display line-heights we use,
+   that box ends just below the baseline, so glyph tails -- the g, y, p, q, j --
+   fall past it and render transparent (they look "cut off"). See ss1: the g in
+   "Design". padding-bottom grows the paint box downward to cover the tails,
+   with no effect on the letters themselves.
+
+   Applies to every gradient carrier that renders WORDS. Number-only gradient
+   text (prices, stat figures, indexes) has no descenders and is intentionally
+   left out. Any NEW background-clip:text element carrying words should be added
+   here. --------------------------------------------------------------------- */
+.text-gradient,
+.svc-fill,
+.home-hero__word,
+.chroma-letter,
+.dr-a__h1 em,
+.cw-art-hero__h1 em,
+.cw-art-copysample__h1 em {
+  padding-bottom: 0.15em;
+}
+
 /* Dark band: indigo full-width section with inverted text */
 .band-dark {
   background: var(--dark-bg);
@@ -1196,6 +1220,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-size: var(--text-sm);
   border-radius: 999px;                       /* pill */
   border: 1px solid transparent;
+  /* Native <button> defaults to the arrow cursor; force the pointer so a real
+     button reads as clickable like the <a> variants of this class. */
+  cursor: pointer;
   transition: color 0.35s cubic-bezier(0.21, 0.6, 0.35, 1);
 }
 /* bg_slide_right (mirrors the chadworks.co Avada button): the hover gradient
@@ -1772,6 +1799,419 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .svc-prose { color: var(--dark-muted); }
 .svc-dark .svc-prose h3,
 .svc-faq-section--dark .svc-prose h3 { color: var(--dark-text, #fff); }
+
+/* --- Prose hierarchy ------------------------------------------------------
+   .svc-prose renders at the LEAD size (--text-lg). One opening line at that
+   size reads as a lead; a whole section built from it reads as wall-to-wall
+   lede. `--lead` keeps the first paragraph at lead size and drops the rest to
+   plain body copy; `--plain` sets the whole block to body size. */
+.svc-prose--lead > p + p { font-size: var(--text-base); }
+.svc-prose--plain > * { font-size: var(--text-base); }
+
+/* --- Section kicker: the mono .eyebrow used as a per-section label. The reset
+   zeroes margins, and the shell grid has no row-gap, so add the gap here. On
+   dark bands the purple accent goes low-contrast, so lift it to lavender. */
+.svc-block > .eyebrow,
+.svc-faq__intro > .eyebrow { display: block; margin-bottom: var(--space-2xs); }
+.svc-dark .eyebrow,
+.svc-faq-section--dark .eyebrow { color: #c9b3ec; }
+
+/* --- Cost-calculator intro: prose beside a static "at a glance" panel. The
+   panel is server-rendered HTML (not the WebGL readout at the top of the page),
+   so a crawler that never runs the calculator still reads the baseline, the
+   scope breadth and the turnaround as plain text. */
+.cw-calc-intro {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: clamp(var(--space-md), 4vw, var(--space-xl));
+  align-items: start;
+  margin-top: var(--space-md);
+}
+@media (max-width: 820px) { .cw-calc-intro { grid-template-columns: 1fr; } }
+/* Two paragraph rhythms on the calculator page (Chad): "lede tight" and "p".
+   Every LEAD-SIZE opening paragraph takes the snug lede rhythm -- that is a
+   bare .svc-prose block (all of whose paragraphs render at lead size) plus the
+   first paragraph of a .svc-prose--lead block. Body copy stays at --leading-body:
+   .svc-prose--plain blocks and the 2nd+ paragraphs of a --lead block. .svc-lede
+   is already --leading-snug globally. `main:has(.cw-calc-hero)` scopes all of
+   this to the calculator page alone (that hero class is unique to it), so no
+   other page's prose is touched. */
+main:has(.cw-calc-hero) .svc-prose:not(.svc-prose--lead):not(.svc-prose--plain) > p,
+main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
+  line-height: var(--leading-snug);
+}
+.cw-calc-glance { padding: clamp(1.4rem, 3vw, 2rem); }
+.cw-calc-glance__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+.cw-calc-glance dl { margin: 0; display: grid; }
+.cw-calc-glance__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.cw-calc-glance__row:first-of-type { border-top: none; padding-top: 0; }
+.cw-calc-glance__k { margin: 0; color: var(--text-secondary); font-size: var(--text-base); }
+.cw-calc-glance__v {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* --- Cost-calculator TOC: the in-page nav that replaced the "at a glance" panel.
+   Sits in the intro's right column; numbered anchor links, one per section, in
+   page order. Same panel shell + mono/lavender accents as the old glance box. */
+.cw-calc-toc { padding: clamp(1.4rem, 3vw, 2rem); }
+.cw-calc-toc__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-xs);
+}
+.cw-calc-toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: cw-toc;
+  display: grid;
+}
+.cw-calc-toc__list li {
+  counter-increment: cw-toc;
+  border-top: 1px solid var(--border-subtle);
+}
+.cw-calc-toc__list li:first-child { border-top: none; }
+.cw-calc-toc__list a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding: 0.6rem 0;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--text-base);
+  transition: color 0.15s ease;
+}
+.cw-calc-toc__list a::before {
+  content: counter(cw-toc, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent);
+  opacity: 0.7;
+}
+.cw-calc-toc__list a:hover { color: var(--text-primary); }
+.cw-calc-toc__list a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* --- Custom-calculator kinds: the "what else I can build" list as a grid of
+   category modules (geographic / business / financial / fun), three examples
+   each. Panels reuse the shared .panel shell. */
+.cw-calc-kinds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+.cw-calc-kinds__module { padding: clamp(1.2rem, 2.4vw, 1.6rem); }
+.cw-calc-kinds__cat {
+  font-family: var(--font-mono);
+  font-size: calc(var(--text-xs) * 1.25);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 var(--space-sm);
+}
+.cw-calc-kinds__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+.cw-calc-kinds__list li {
+  position: relative;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+.cw-calc-kinds__list li::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+/* The rate card follows the purpose section directly, so it drops its top
+   padding to sit tight under it. */
+#rate-card { padding-top: 0; }
+
+/* --- Purpose section: prose beside the package-assemble object. */
+.cw-purpose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(var(--space-lg), 4vw, var(--space-2xl));
+  align-items: start; /* both columns top-align; the object sizes itself */
+  margin-top: var(--space-md);
+}
+@media (max-width: 760px) {
+  .cw-purpose-grid { grid-template-columns: 1fr; }
+}
+.cw-purpose-aside { display: flex; min-width: 0; }
+.cw-purpose-text .svc-prose { margin-top: var(--space-sm); }
+/* Top-align the left column: its first element (the lede) drops its default
+   top margin so it starts level with the object's title in the right column. */
+.cw-purpose-text > :first-child { margin-top: 0; }
+
+/* The deconstruct/reassemble object: the WebGL canvas fills the whole right
+   column (matching the prose height) and is itself the click target. The prose
+   drives the row height; the canvas flex-grows into it. */
+.cw-assemble {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+/* The column title: a proper h3 in the default heading style, centered. Only
+   spacing + alignment are set here; the type + colour come from the global
+   heading rule (do NOT inherit the secondary grey the object canvas doesn't
+   need). */
+.cw-assemble__plan {
+  flex: 0 0 auto;
+  margin: 0 0 var(--space-sm);
+  text-align: center;
+  color: var(--text-primary);
+}
+/* The object itself is the click target (build / take apart); it carries no
+   button chrome. `position: relative` anchors the hover tooltip. The stage sizes
+   to the canvas, which owns its own aspect box (so the object is no longer
+   height-tied to the prose column). */
+.cw-assemble__stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.cw-assemble__canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  height: auto;
+  /* 15% brightness lift on hover, so pointing at it reads as "this is a control". */
+  transition: filter 180ms ease;
+}
+/* Brightness lifts only when the cursor is over an actual rendered piece
+   (`.is-over` is toggled by the canvas alpha hit-test), not the empty canvas. */
+.cw-assemble__stage.is-over .cw-assemble__canvas,
+.cw-assemble__stage:focus-visible .cw-assemble__canvas {
+  filter: brightness(1.15);
+}
+.cw-assemble__stage:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+/* The hint is the site's "coming soon" tooltip (the svc-lane dark bubble). It
+   TRACKS THE CURSOR: JS sets left/top to the pointer position within the stage,
+   and the transform floats the bubble just above the pointer. */
+.cw-assemble__tip {
+  position: absolute;
+  left: 50%; /* default before the first pointer move / on keyboard focus */
+  top: 50%;
+  transform: translate(-50%, calc(-100% - 14px));
+  z-index: 3;
+  white-space: nowrap;
+  padding: 0.32rem 0.6rem;
+  border-radius: 7px;
+  background: var(--dark-bg);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s var(--ease-smooth);
+}
+.cw-assemble__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.cw-assemble__stage.is-over .cw-assemble__tip,
+.cw-assemble__stage:focus-visible .cw-assemble__tip {
+  opacity: 1;
+}
+/* While a build/deconstruct is animating (`is-building`, set by the draw loop),
+   the hint stays hidden even under hover or focus -- it returns only once the
+   object settles fully built or fully apart. Higher specificity than the show
+   rules above so it wins without !important. */
+.cw-assemble__stage.is-building.is-over .cw-assemble__tip,
+.cw-assemble__stage.is-building:focus-visible .cw-assemble__tip {
+  opacity: 0;
+}
+
+/* --- Glow-square bullets, lifted from the showroom interior module
+   (.bursts li::before): an 8px rounded square, lavender-to-purple gradient with a
+   soft purple glow. Overrides the default svc-prose disc markers. */
+.svc-prose ul.cw-glow-list {
+  list-style: none;
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.svc-prose ul.cw-glow-list li {
+  position: relative;
+  margin: 0;
+  padding-left: 1.4rem;
+}
+.svc-prose ul.cw-glow-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, #aeb9ea, #6629bc);
+  box-shadow: 0 0 10px rgba(102, 41, 188, 0.6);
+}
+
+/* --- Cost-calculator hero backdrop: the shared manifesto cloud (the pale-indigo
+   fbm field, <ManifestoAmbient />) passed as the SectionShell `bg`, so it renders
+   full-bleed in .cw-shell__bg at z-index 0 behind the intro. Masked to fade to
+   nothing across the bottom half, so it dissolves into the rate card below with
+   no hard band edge. Fade is BOTTOM-only (opaque at the top). */
+.cw-calc-hero > .cw-shell__bg {
+  /* Full-bleed: this hero is a content-width section, so break the cloud out to
+     the full viewport width. The page already clips overflow-x, so no h-scroll. */
+  left: 50%;
+  right: auto;
+  width: 100vw;
+  transform: translateX(-50%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+}
+
+/* --- Worked-example builds (the dark "examples of website cost" band). Each
+   build is its own block: an h3 that STATES the cost, the scope detail as plain
+   body, and the turnaround. A divider + padding give the builds real separation
+   so a label never runs into its description. */
+.cw-builds { display: grid; margin-top: var(--space-lg); }
+.cw-build {
+  padding: var(--space-md) 0;
+  border-top: 1px solid rgba(229, 210, 244, 0.16);
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: clamp(var(--space-sm), 3vw, var(--space-xl));
+  align-items: center;
+  overflow: visible;
+}
+.cw-build:first-child { border-top: none; padding-top: 0; }
+.cw-build__body { position: relative; z-index: 2; }
+/* Every shape image is the same width with the slab in the same place, so the
+   slab reads at an identical size on every row (filling the right third). The
+   image is drawn WIDER than its column: the transparent left margin, and any
+   motion trail, bleed leftward UNDER the copy. It sits behind the text and
+   ignores the pointer. */
+.cw-build__shape {
+  width: 155%;
+  height: auto;
+  justify-self: end;
+  display: block;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+@media (max-width: 680px) {
+  .cw-build { grid-template-columns: 1fr; gap: var(--space-sm); }
+  .cw-build__shape { width: 86%; justify-self: start; margin-top: var(--space-xs); }
+}
+.cw-build__title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  color: #e5d2f4;
+}
+.cw-build__price {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--dark-muted), #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cw-build__detail {
+  margin-top: var(--space-xs);
+  color: var(--dark-muted);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  max-width: 68ch;
+}
+.cw-build__meta {
+  margin-top: var(--space-2xs);
+  color: rgba(229, 210, 244, 0.74);
+  font-size: var(--text-sm);
+}
+/* The exact scope behind the build, ticked off under the timeline. Wraps into a
+   tidy multi-column list; each item carries a CSS-drawn check (no glyph, so it
+   stays ASCII-clean). */
+.cw-build__scope {
+  list-style: none;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.15rem;
+}
+.cw-build__scope-item {
+  position: relative;
+  padding-left: 1.4em;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: rgba(229, 210, 244, 0.82);
+}
+.cw-build__scope-item::before {
+  content: "";
+  position: absolute;
+  left: 0.16em;
+  top: 0.26em;
+  width: 0.34em;
+  height: 0.62em;
+  border: solid var(--accent-teal);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 
 /* RATE CARD -- the model's ladders, published as grouped static tables.
    One panel per scope layer (13, matching the calculator's params exactly) so
@@ -4832,6 +5272,51 @@ p, li, dd, figcaption { text-wrap: pretty; }
   -webkit-text-fill-color: transparent;
   letter-spacing: -0.01em;
 }
+/* ---- /web-design/ per-instance spacing (Chad, 2026-07-19) ----------------
+   Both classes are passed from src/app/web-design/page.tsx and exist nowhere
+   else, so the shared capsules keep the standard rhythm on every other page.
+   Two classes beat the base `.section` single-class rule on specificity. */
+
+/* The testimonials band sits under the dark FAQ now, and the full section pad
+   on top read as a hole between them. */
+.section.cw-wd-testimonials {
+  padding-top: calc(var(--section-pad-y) * 0.5);
+}
+
+/* Closes the gap between the portfolio showcase and the About Chad block. */
+.section.cw-wd-made {
+  padding-top: calc(var(--section-pad-y) * 0.35);
+}
+
+/* Inclusions list on the cost calculator. Full width, two columns once there
+   is room, so seven items read as one block rather than a long thin scroll.
+   Borrows the "+" marker from .svc-qual__col--fit without inheriting that
+   component's two-column shell. */
+.cw-included {
+  margin: var(--space-lg) 0 var(--space-md);
+  display: grid;
+  gap: var(--space-xs) var(--space-lg);
+  list-style: none;
+  padding: 0;
+}
+@media (min-width: 760px) {
+  .cw-included { grid-template-columns: 1fr 1fr; }
+}
+.cw-included li {
+  position: relative;
+  padding-left: var(--space-md);
+  color: var(--text-secondary);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+.cw-included li::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  color: var(--accent-teal);
+  font-weight: 700;
+}
+
 .rates-ledger__note {
   grid-column: 1 / -1;
   margin: 0.5rem 0 0;
@@ -4912,6 +5397,17 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .svc-faq-section--dark .rates-ledger__row { border-top-color: rgba(229, 210, 244, 0.16); }
 /* Task name lavender, duration white (the reverse of the light-band ledger). */
 .svc-faq-section--dark .rates-ledger__label { color: #e5d2f4; }
+/* The figure runs a text-clip gradient whose dark stop disappears on the
+   inverted band (same failure the .svc-statement--ondark rule fixes). Shift the
+   ramp lighter, and lift the sub-note off the light-band grey onto the dark
+   palette so both read against the dark ground. */
+.svc-faq-section--dark .rates-ledger__num {
+  background: linear-gradient(135deg, var(--dark-muted), #ffffff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.svc-faq-section--dark .rates-ledger__note { color: rgba(229, 210, 244, 0.74); }
 .cw-rate-explainer .rates-ledger__num {
   font-size: clamp(1rem, 0.82rem + 0.7vw, 1.3rem);
   background: none;

@@ -1,5 +1,5 @@
 // Route: /rates/ -- standalone page. Value-based pricing with the math
-// showing. Real numbers only ($5.25/min, $3,200 floor, $6,200 typical, $550
+// showing. Real numbers only ($5.25/min, $3,200 baseline, $5,000-$10,000 typical, $550
 // every 6 months for WordPress care). Signature moment (CWS-CREATIVE-ARSENAL):
 // the glass price panel + scanning border + a show-the-math ledger. Copy in
 // Chad's public voice, big-ticket posture (never apologize for the number).
@@ -11,6 +11,8 @@ import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { BASE, money } from "@/lib/package-builder";
+import { MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
 
 // The minutely-rate explainer: real task -> real time, shown in the page's
 // existing show-the-math ledger (label + mono figure per row).
@@ -31,7 +33,7 @@ const PAGE_PATH = "/rates/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
-  "Work bills at $5.25 a minute. The smallest engagement is $3,200, and most websites land near $6,200. WordPress care runs $550 every 6 months. The real numbers, on the table before you decide, with the math showing.";
+  `Work bills at ${money(MINUTELY)} a minute. The smallest engagement is ${money(BASE)}, and most websites land between $5,000 and $10,000. WordPress care runs ${money(WORDPRESS_CARE)} every 6 months. The real numbers, on the table before you decide, with the math showing.`;
 
 export const metadata: Metadata = {
   title: TITLE,

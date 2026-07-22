@@ -16,12 +16,14 @@ import {
   MainContactCapsule,
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
+import { BASE, money } from "@/lib/package-builder";
+import { MINUTELY } from "@/lib/pricing";
 
 const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
 const DESCRIPTION =
-  "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,200 floor, most near $6,200), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
+  "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,200 baseline, most between $5,000 and $10,000), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -117,17 +119,18 @@ const GROUPS: FaqGroup[] = [
         a: (
           <FaqParas
             items={[
-              "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000.",
+              `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000.`,
               <>
                 If your website needs work, not a redesign, I charge by the minute
-                at $5.25/min, which adds up to $315/hour. Read more about my fees
-                on my <LaunchLink href="/rates/">rates page</LaunchLink>.
+                at {money(MINUTELY)}/min, which adds up to {money(MINUTELY * 60)}/hour.
+                Read more about my fees on my{" "}
+                <LaunchLink href="/rates/">rates page</LaunchLink>.
               </>,
             ]}
           />
         ),
         aText:
-          "My baseline fee for full builds, including redesigns, is $3,250. Most projects end up between $5,000 and $6,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at $5.25/min, which adds up to $315/hour. Read more about my fees on my rates page.",
+          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${money(MINUTELY * 60)}/hour. Read more about my fees on my rates page.`,
       },
       {
         q: "Do you have a lower rate for special cases?",
@@ -202,9 +205,15 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Do you handle privacy policy, cookies, and GDPR?",
-        a: "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need.\n\nDisclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+        a: "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Those consent controls actually gate the tracking rather than just announcing it, so nothing measures a visitor until they agree to it, and there are no advertising or marketing pixels on your site at all. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need.\n\nDisclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
         aText:
-          "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need. Disclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+          "Yes, data privacy assets like Privacy Policy, Terms of Service and cookie consent controls are built into every new chadworks website. Those consent controls actually gate the tracking rather than just announcing it, so nothing measures a visitor until they agree to it, and there are no advertising or marketing pixels on your site at all. Some sites may require more complex controls, which may require an additional fee. Your site will be covered for relevant US-based laws like CCPA and GDPR and can be tweaked to cover specifics you may need. Disclaimer: I am not a lawyer and my proposal-agreement waives my liability for such exposure your site may face, so a business with serious compliance exposure should have counsel review the language, but you won't launch missing the standard protections.",
+      },
+      {
+        q: "Can people with disabilities use my site?",
+        a: "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy.\n\nA share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening.",
+        aText:
+          "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy. A share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening.",
       },
       {
         q: "Can you set up a newsletter or mailing list?",

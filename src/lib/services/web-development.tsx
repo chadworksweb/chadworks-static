@@ -162,7 +162,7 @@ export const webDevelopment: Service = {
   price: {
     heading: "What it costs, plainly",
     body:
-      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 floor. Most builds settle near $6,200, depending on scope and which route you take. I'm honest that this puts me above the cheapest option you'll find, and that is deliberate, because the cheap option is usually the one you pay to rebuild in two years. If a strict fixed budget matters to you more than the result, I'll tell you straight that we probably aren't a match, and I would rather say so now than after you've spent the money.",
+      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 baseline. Most builds settle between $5,000 and $10,000, depending on scope and which route you take. I'm honest that this puts me above the cheapest option you'll find, and that is deliberate, because the cheap option is usually the one you pay to rebuild in two years. If a strict fixed budget matters to you more than the result, I'll tell you straight that we probably aren't a match, and I would rather say so now than after you've spent the money.",
   },
 
   faqs: [
@@ -247,6 +247,8 @@ export const webDevelopment: Service = {
     items: [
       "You own the code and the hosting outright -- nothing of yours is ever locked inside my account.",
       "Every build includes two weeks of free bug fixes after launch.",
+      "It works with a keyboard and a screen reader, because some of your visitors need it to.",
+      "Nothing measures a visitor until they agree to it, and there are no ad pixels.",
       "I give you a straight answer on fit before either of us commits to anything.",
       "You get the working files handed over, no lock-in, nothing held hostage.",
     ],

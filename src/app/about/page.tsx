@@ -15,6 +15,7 @@ import {
   EraTimelineCapsule,
   ProofCapsule,
   AboutChadCapsule,
+  TenetsCapsule,
   FitCapsule,
   MainContactCapsule,
 } from "@/components/capsules";
@@ -172,8 +173,14 @@ export default function AboutPage() {
       {/* PROOF -- concrete, linked, anonymized per the permission flags. */}
       <ProofCapsule proof={{ heading: "Notable Achievements", items: PROOF }} variant="achievements" />
 
-      {/* WHO I WORK WITH -- the canonical fit block, shared with the homepage
-          and service pages. */}
+      {/* THE TENETS -- moved here from /web-design/ (Chad, 2026-07-17): they
+          describe how chadworks operates, not how a website gets designed.
+          Placed immediately before the fit block on purpose: what I promise
+          you, then who I promise it to. */}
+      <TenetsCapsule />
+
+      {/* ARE WE A GOOD FIT? -- the canonical fit block, shared with the
+          homepage and service pages. Teases /are-we-a-good-fit/. */}
       <FitCapsule />
 
       {/* THE HUMAN -- the canonical "the Chad behind chadworks" block, shared

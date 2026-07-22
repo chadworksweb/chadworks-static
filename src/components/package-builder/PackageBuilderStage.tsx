@@ -17,31 +17,48 @@
 // (lib/package-builder), never two implementations of it.
 // =====================================================================
 
-import { useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
 import PackageScreen from "@/components/package-builder/PackageScreen";
 import {
-  FLOOR,
+  BASELINE,
   PARAMS,
   channels,
+  integrationCount,
   money,
   price,
+  weeksLabel,
   type Param,
   type Scope,
 } from "@/lib/package-builder";
 import s from "./package-builder.module.css";
 
 // Params that would run too long as a chip row keep a slim slider instead.
-const AS_COUNT = new Set<keyof Scope>(["pages", "sections", "integrations", "locales"]);
+// Integrations left this set on 2026-07-19: it is a named checklist now, so it
+// asks which systems rather than making the reader count them first.
+const AS_COUNT = new Set<keyof Scope>(["pages", "sections", "locales"]);
 
 function valueLabel(p: Param, v: number): string {
-  if (p.kind === "steps") return p.options?.[v] ?? String(v);
+  // v < 0 is the UNSET state (no chip picked): show no value, just the label.
+  if (p.kind === "steps") return v < 0 ? "" : p.options?.[v] ?? String(v);
+  // A bitmask, so the head summarises with a count rather than a value.
+  if (p.kind === "checks") {
+    const n = integrationCount(v);
+    return n === 0 ? "" : n === 1 ? "1 system" : `${n} systems`;
+  }
   if (p.key === "locales") return v === 1 ? "1 language" : `${v} languages`;
-  if (p.key === "integrations") return v === 1 ? "1 system" : `${v} systems`;
   return String(v);
 }
 
-export function PackageBuilderStage() {
-  const [scope, setScope] = useState<Scope>(FLOOR);
+// Scope is CONTROLLED by the parent (ScopeCalculator) so the send-to-Chad form
+// can read the same state the calculator writes. Only the open-panel set is
+// local -- it is pure UI and nothing else needs it.
+export function PackageBuilderStage({
+  scope,
+  setScope,
+}: {
+  scope: Scope;
+  setScope: Dispatch<SetStateAction<Scope>>;
+}) {
   // Not an accordion: any number of panels can be open, so two layers can be
   // compared without one closing the other.
   const [open, setOpen] = useState<ReadonlySet<keyof Scope>>(new Set(["pages"]));
@@ -57,13 +74,13 @@ export function PackageBuilderStage() {
 
   const ch = useMemo(() => channels(scope), [scope]);
   const total = price(scope);
-  const dirty = JSON.stringify(scope) !== JSON.stringify(FLOOR);
+  const dirty = JSON.stringify(scope) !== JSON.stringify(BASELINE);
 
   return (
     // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
     // content back on the site width.
     <div className={`full ${s.wrap}`}>
-      {/* the object */}
+      {/* the object -- the slab AND the mathDev plug both live in here now */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />
       </div>
@@ -73,6 +90,14 @@ export function PackageBuilderStage() {
         <div className={s.readout}>
           <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
           <p className={s.figure}>{money(total)}</p>
+          {/* The window is the half of the answer the tool used to withhold: it
+              charged for a squeezed timeline without ever naming the normal one. */}
+          <p className={s.window}>{weeksLabel(scope)}</p>
+          {dirty ? (
+            <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
+              Reset
+            </button>
+          ) : null}
         </div>
 
         {/* the scope */}
@@ -112,26 +137,71 @@ export function PackageBuilderStage() {
                           step={1}
                           value={v}
                           aria-label={p.label}
-                          onChange={(e) => set(p.key, Number(e.target.value))}
+                          onChange={(e) => {
+                            const nv = Number(e.target.value);
+                            // Reaching for languages before copy has been
+                            // picked implies copy exists to translate: the xN
+                            // badge sits on the copy column, so promote unset
+                            // copy to level 1 in the same move rather than
+                            // stamping it over an empty column.
+                            if (p.key === "locales") {
+                              setScope((prev) => ({
+                                ...prev,
+                                locales: nv,
+                                content: prev.content < 0 ? 0 : prev.content,
+                              }));
+                            } else {
+                              set(p.key, nv);
+                            }
+                          }}
                         />
                         <span className={s.countValue}>{v}</span>
                       </div>
+                    ) : p.kind === "checks" ? (
+                      // Same chip row as the step selectors, but every chip is
+                      // an independent toggle over one bit of the mask, so any
+                      // number can be on at once. The numeral slot carries a
+                      // check instead of a rung number: these are not an order.
+                      <ol className={s.opts} role="group" aria-label={p.label}>
+                        {p.options?.map((opt, i) => {
+                          const on = (v & (1 << i)) !== 0;
+                          return (
+                            <li key={opt} className={s.optItem}>
+                              <button
+                                type="button"
+                                className={`${s.opt}${on ? ` ${s.optOn}` : ""}`}
+                                aria-pressed={on}
+                                aria-label={`${p.label}: ${opt}`}
+                                onClick={() => set(p.key, v ^ (1 << i))}
+                              >
+                                <span className={s.optNum} aria-hidden="true">
+                                  {on ? "x" : ""}
+                                </span>
+                                <span className={s.optText}>{opt}</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ol>
                     ) : (
-                      <div className={s.chips} role="group" aria-label={p.label}>
+                      <ol className={s.opts} role="group" aria-label={p.label}>
                         {p.options?.map((opt, i) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            className={`${s.chip}${i === v ? ` ${s.chipOn}` : ""}`}
-                            aria-pressed={i === v}
-                            aria-label={`${p.label}: ${opt}`}
-                            title={opt}
-                            onClick={() => set(p.key, i)}
-                          >
-                            {i + 1}
-                          </button>
+                          <li key={opt} className={s.optItem}>
+                            <button
+                              type="button"
+                              className={`${s.opt}${i === v ? ` ${s.optOn}` : ""}`}
+                              aria-pressed={i === v}
+                              aria-label={`${p.label}: ${opt}`}
+                              onClick={() => set(p.key, i)}
+                            >
+                              <span className={s.optNum} aria-hidden="true">
+                                {i + 1}
+                              </span>
+                              <span className={s.optText}>{opt}</span>
+                            </button>
+                          </li>
                         ))}
-                      </div>
+                      </ol>
                     )}
                   </div>
                 </div>
@@ -140,17 +210,31 @@ export function PackageBuilderStage() {
           })}
         </div>
 
-        {/* the finish line */}
+        {/* the finish line: a native anchor to the send form right below the
+            stage. No JS, no DOM reach-across -- the browser scrolls to the form,
+            which already carries the live scope. */}
         <div className={s.finish}>
-          <a className={s.finishLink} href="/contact/">
+          <a className={s.finishLink} href="#your-scope">
             Send this scope to Chad
           </a>
-          {dirty ? (
-            <button type="button" className={s.reset} onClick={() => setScope(FLOOR)}>
-              Reset
-            </button>
-          ) : null}
         </div>
+      </div>
+
+      {/* The tool needs a real landscape screen -- the rail, the object and the
+          price sit in a row. Mobile stays DARK either way: a portrait device gets
+          the rotate prompt, and a phone in landscape (too short to run it) still
+          darks out and points at the desktop. Only a landscape screen with tablet
+          or desktop height shows the tool. Always in the DOM, toggled by CSS, so
+          there is no hydration flash and the static export needs no client gate. */}
+      <div className={s.mobileGate}>
+        <p className={s.gateKicker}>chadworks</p>
+        {/* The page title still lands even though the tool is dark, so the fold
+            says what this page is rather than only that it is unavailable. */}
+        <p className={s.gateTitle}>Website Design Cost Calculator</p>
+        <p className={s.gateHeading}>
+          <span className={s.gateMsgRotate}>Rotate your device to landscape</span>
+          <span className={s.gateMsgDesktop}>Please view on desktop</span>
+        </p>
       </div>
     </div>
   );

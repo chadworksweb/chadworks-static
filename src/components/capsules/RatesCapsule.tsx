@@ -6,6 +6,8 @@
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { isLaunched } from "@/lib/launch";
+import { BASE, money } from "@/lib/package-builder";
+import { MINUTELY } from "@/lib/pricing";
 
 // `standalone` = the /rates/ page use: the heading renders as the page's H1 in
 // the standard hero-title styling (the removed rates hero), and the redundant
@@ -33,7 +35,7 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
       <div className="cw-pricing__grid">
         <div className="cw-price-card panel">
           <p className="cw-price-card__label">Per minute</p>
-          <p className="cw-price-card__figure">$5.25<span className="cw-price-card__unit"> / min</span></p>
+          <p className="cw-price-card__figure">{money(MINUTELY)}<span className="cw-price-card__unit"> / min</span></p>
           <p className="cw-price-card__note">
             I have always worked and delivered at a blistering pace, and with the
             onset of AI tools, charging by the hour is no longer an appropriate
@@ -42,7 +44,7 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
         </div>
         <div className="cw-price-card panel">
           <p className="cw-price-card__label">Flat-rate builds</p>
-          <p className="cw-price-card__figure">From $3,200</p>
+          <p className="cw-price-card__figure">From {money(BASE)}</p>
           <p className="cw-price-card__note">
             Most sites land between $5,000 and $10,000. For more information
             about flat rate projects, <Link href="/websites/">click here</Link>.

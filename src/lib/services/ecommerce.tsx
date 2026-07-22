@@ -163,10 +163,10 @@ export const ecommerce: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$3,200 - $6,200+",
+    figure: "$3,200 - $10,000+",
     figureSub: "Value-based -- platform costs stated before you choose",
     body:
-      "Store builds are priced on what they win for your business, from the $3,200 floor with most landing near $6,200. Catalog size and custom flows move the number, and you'll see it in writing before anything starts. The platform's own monthly costs get laid out at the same time, because a store bill you didn't see coming is the oldest trick in this industry.",
+      "Store builds are priced on what they win for your business, from the $3,200 baseline with most landing between $5,000 and $10,000. Catalog size and custom flows move the number, and you'll see it in writing before anything starts. The platform's own monthly costs get laid out at the same time, because a store bill you didn't see coming is the oldest trick in this industry.",
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if your product photos are weak,
@@ -261,6 +261,8 @@ export const ecommerce: Service = {
     items: [
       "The store, product data, and customer list live in your accounts.",
       "Every build includes two weeks of free fixes after launch.",
+      "It works with a keyboard and a screen reader, because some of your visitors need it to.",
+      "Nothing measures a visitor until they agree to it, and there are no ad pixels.",
       "Platform monthly costs are on the table before you choose one.",
       "You get a real operations handover, not a goodbye email.",
     ],

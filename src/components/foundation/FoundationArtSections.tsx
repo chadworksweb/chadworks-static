@@ -63,8 +63,8 @@ export function FoundationBuild() {
             number a homeowner with water in the basement can find in two seconds,
             proof that you are licensed and engineer-backed with a transferable
             warranty, and a page Google will actually rank locally. Most foundation
-            repair sites are missing at least one. Custom builds run $5,200 to
-            $8,200 and are built in days, not months.
+            repair sites are missing at least one. Custom builds run $5,000 to
+            $10,000 and are built in days, not months.
           </div>
         </div>
 

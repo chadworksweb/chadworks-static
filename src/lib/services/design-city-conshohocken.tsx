@@ -16,13 +16,13 @@ export const conshohocken: Service = {
     "chadworks designs and builds custom websites for Conshohocken, PA businesses, the Schuylkill riverfront borough where corporate offices and a dense restaurant scene share the same few blocks.",
 
   answer:
-    "If you run a business in Conshohocken, PA, here is what you get: a custom website built to a professional standard that holds up next to the corporate crowd downtown, fast on a phone and tuned so Google and the AI answer engines find you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,200 to $8,200 depending on scope, quoted up front before work starts. Conshy is an unusual mix: office towers full of professionals on the riverfront, stacked right on top of a packed restaurant and bar scene. Your customers here judge a business by how put-together it looks, and the website is the first thing they judge.",
+    "If you run a business in Conshohocken, PA, here is what you get: a custom website built to a professional standard that holds up next to the corporate crowd downtown, fast on a phone and tuned so Google and the AI answer engines find you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Conshy is an unusual mix: office towers full of professionals on the riverfront, stacked right on top of a packed restaurant and bar scene. Your customers here judge a business by how put-together it looks, and the website is the first thing they judge.",
 
   keyFactsHeading: "Conshohocken web design, at a glance",
   keyFacts: [
     "Custom websites for Conshohocken businesses, built for a Schuylkill riverfront borough where corporate office workers and a dense dining-and-bar scene share the same blocks.",
     "Designed to a professional bar that reads as credible to a discerning Conshy crowd, and fast on a phone so the after-work decision goes your way.",
-    "Value-based pricing: $5,200 to $8,200, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
     "Local or remote both work: I am based in Greater Philadelphia, minutes from Conshohocken, and I run plenty of projects fully remote.",
   ],
 
@@ -85,10 +85,10 @@ export const conshohocken: Service = {
 
   price: {
     heading: "What a Conshohocken site costs",
-    figure: "$5,200 to $8,200",
+    figure: "$5,000 to $10,000",
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Conshohocken business runs $5,200 to $8,200, depending on page count and how much custom design the project needs. You get the exact figure before any work starts. This is a value-based build for a site that reads as professional to a sharp local crowd and that you fully own, not a template you rent by the month.",
+      "A custom site for a Conshohocken business runs $5,000 to $10,000, depending on page count and how much custom design the project needs. You get the exact figure before any work starts. This is a value-based build for a site that reads as professional to a sharp local crowd and that you fully own, not a template you rent by the month.",
   },
 
   qualification: {
@@ -114,7 +114,7 @@ export const conshohocken: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,200 to $8,200, depending on scope. I quote the exact number up front before any work begins. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work begins. It is value-based pricing for a site you own, not a recurring template fee.",
     },
     {
       q: "Why does the look of my site matter so much here?",
@@ -141,6 +141,6 @@ export const conshohocken: Service = {
   meta: {
     title: "Website Design in Conshohocken, PA | chadworks",
     description:
-      "Custom website design for Conshohocken, PA businesses on the Schuylkill riverfront, from corporate-adjacent services to the Conshy dining scene. Fast, polished, built for local search. $5,200 to $8,200, quoted up front.",
+      "Custom website design for Conshohocken, PA businesses on the Schuylkill riverfront, from corporate-adjacent services to the Conshy dining scene. Fast, polished, built for local search. $5,000 to $10,000, quoted up front.",
   },
 };
