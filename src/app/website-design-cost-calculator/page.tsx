@@ -232,37 +232,52 @@ const META_SECTIONS: {
     eyebrow: "Who it's for",
     heading: "Who would use a website cost calculator?",
     body: (
-      <>
+      // Lede and list sit side by side, half the row each: the paragraph ends on
+      // "for:" and the list answers it, so they belong on one line rather than
+      // stacked with the answer pushed down the section. The list rides in a
+      // frosted card, which has real backdrop to work with here because the
+      // hero's manifesto cloud runs behind this part of the page.
+      <div className="cw-split">
         <p>
-          I built this website cost calculator for the client that has been
-          shafted in the past. The web design world can be misleading and scammy.
-          It often runs on the charm-offensive. I created this website calculator
-          for clients that aren&apos;t that familiar with website design and
-          development. I built this website cost calculator for:
+          <strong>
+            I built this website cost calculator for the client that has been
+            shafted in the past.
+          </strong>
+          <br />
+          The web design world can be misleading and scammy. It often runs on the
+          charm-offensive.
+          <br />I created this website calculator for clients that aren&apos;t
+          that familiar with website design and development.
         </p>
-        <ul className="cw-glow-list">
-          <li>
-            Clients that want to build their own package and have a better idea of
-            what costs are involved.
-          </li>
-          <li>
-            Clients that aren&apos;t ready to have a direct call or face to face
-            meeting, but still want to be informed.
-          </li>
-          <li>
-            Clients that want a visualization rather than a list of features they
-            have no context of.
-          </li>
-          <li>
-            Clients that want to know what they&apos;re getting for their
-            investment.
-          </li>
-          <li>
-            Clients that want an easy way to spec and budget their website or web
-            development projects.
-          </li>
-        </ul>
-      </>
+        <div className="cw-split__frost">
+          {/* The line the list answers, moved out of the lede and into the card
+              with it (Chad, 2026-07-22). It picks up .svc-prose h3 styling from
+              the enclosing prose block. */}
+          <h3>I built this website cost calculator for:</h3>
+          <ul className="cw-glow-list">
+            <li>
+              Clients that want to build their own package and have a better idea
+              of what costs are involved.
+            </li>
+            <li>
+              Clients that aren&apos;t ready to have a direct call or face to face
+              meeting, but still want to be informed.
+            </li>
+            <li>
+              Clients that want a visualization rather than a list of features
+              they have no context of.
+            </li>
+            <li>
+              Clients that want to know what they&apos;re getting for their
+              investment.
+            </li>
+            <li>
+              Clients that want an easy way to spec and budget their website or
+              web development projects.
+            </li>
+          </ul>
+        </div>
+      </div>
     ),
   },
   {
@@ -562,9 +577,9 @@ export default function WebsiteDesignCostCalculatorPage() {
           way. The same two baselines are stated on /faqs/ and the service
           pages; they should move together. */}
       <SectionShell className="svc-block" id="included">
-        <p className="eyebrow">Always included</p>
+        <p className="eyebrow">BASELINE TECHNICAL SPECS AND FEATURES</p>
         <h2 className="svc-block__heading svc-fill">
-          What every build includes, whatever the number says
+          Here&apos;s what&apos;s included in the Baseline website cost
         </h2>
         {/* The baseline stays a statement on its own: it is the one number that
             is not a modifier, so it does not belong in a group with them. Moved
@@ -581,10 +596,10 @@ export default function WebsiteDesignCostCalculatorPage() {
         </dl>
         <div className="svc-prose">
           <p>
-            The calculator changes a lot from one project to the next. These
-            parts stay the same on every build, at the baseline and at the top of
-            the ladder alike. They are what a website has to do before I put my
-            name on it.
+            The website calculator&apos;s estimate changes a lot depending on the
+            features and levels you select, but what doesn&apos;t change is the
+            foundation beneath it. Here&apos;s a list of everything that&apos;s
+            already included in every chadworks website:
           </p>
         </div>
         <ul className="cw-included">
