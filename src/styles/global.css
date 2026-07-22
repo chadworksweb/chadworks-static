@@ -194,6 +194,7 @@ ul, ol { list-style: none; padding: 0; }
 p a,
 .cw-fit-list a,
 .rates-ledger__label a,
+.cw-inline-more__btn,
 .essay-prose a {
   color: var(--accent);
   text-decoration: none;
@@ -212,6 +213,8 @@ p a:focus-visible,
 .rates-ledger__label a:focus-visible,
 .cw-fit-list a:hover,
 .cw-fit-list a:focus-visible,
+.cw-inline-more__btn:hover,
+.cw-inline-more__btn:focus-visible,
 .essay-prose a:hover,
 .essay-prose a:focus-visible {
   background-size: 100% 1px, 100% 1px;
@@ -221,6 +224,7 @@ p a:focus-visible,
   html:not(.cw-force-motion) {
     p a,
     .rates-ledger__label a,
+    .cw-inline-more__btn,
     .cw-fit-list a { transition: none; }
   }
 }
@@ -1844,6 +1848,9 @@ p, li, dd, figcaption { text-wrap: pretty; }
    zeroes margins, and the shell grid has no row-gap, so add the gap here. On
    dark bands the purple accent goes low-contrast, so lift it to lavender. */
 .svc-block > .eyebrow,
+/* headInBody sections carry the kicker inside a column of their own layout, so
+   it is no longer a direct child of the shell and the selector above misses it. */
+.svc-block--head-in-body .cw-split__col > .eyebrow,
 .svc-faq__intro > .eyebrow { display: block; margin-bottom: var(--space-2xs); }
 .svc-dark .eyebrow,
 .svc-faq-section--dark .eyebrow { color: #c9b3ec; }
@@ -1996,6 +2003,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 #rate-card { padding-top: 0; }
 #who { padding-top: 0; }
 #why { padding-top: 0; }
+#other-calculators { padding-top: 0; }
 
 /* The heading already carries margin-bottom: var(--space-md) and .svc-lede adds
    its own margin-top on top of that, so a lede sitting directly under a heading
@@ -5769,6 +5777,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    wipe is swapped: --accent-teal is #4a6b6e, dark and muted, which is invisible
    against a navy gradient, so the wipe comes in white instead. */
 .svc-faq-section--dark .rates-ledger__label a,
+.svc-faq-section--dark .cw-inline-more__btn,
 .svc-faq-section--dark .svc-prose p a {
   color: #e5d2f4;
   background-image:
@@ -9989,4 +9998,50 @@ html.cw-motion-paused *::after {
   /* Phone: a step down from the desktop 3xl, but bigger than the plain 2xl --
      the essay title is the page's whole first impression. */
   .essay-head__title { font-size: clamp(2.25rem, 1.7rem + 2.4vw, 2.75rem); }
+}
+
+/* --- Inline disclosure (InlineMore) -------------------------------------
+   The bullet-scale sibling of .svc-more. Used in the calculator's baseline
+   list, where a bullet states the promise plainly and the qualifying detail
+   sits one tap away instead of doubling the bullet's length. The panel keeps
+   its copy in the static HTML at all times (see InlineMore.tsx) -- this only
+   collapses it visually. */
+/* The trigger is a <button> for the semantics (it toggles, it is not a
+   destination) but it has to READ as a link, so it joins the shared link rule
+   up top -- the same animated underline wipe the agency names in the ledger
+   use, including the dark-band variant where the wipe comes in white. Only the
+   UA button chrome is reset here.
+   Deliberately NOT set: `color`, `text-decoration` and any `padding-bottom`.
+   Colour and the wipe belong to the shared rule; a `text-decoration: underline`
+   here would double the bar (see the RULE noted on that rule), and a blanket
+   `padding: 0` or `background: none` would flatten the 0.1em the underline
+   needs to sit in and wipe out the gradient that draws it. */
+.cw-inline-more__btn {
+  appearance: none;
+  background-color: transparent;
+  border: 0;
+  padding-top: 0;
+  padding-left: 0;
+  padding-right: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.svc-faq-section--dark .cw-inline-more__inner { color: rgba(229, 210, 244, 0.88); }
+.cw-inline-more {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease-swoop);
+}
+.cw-inline-more[data-open] { grid-template-rows: 1fr; }
+.cw-inline-more__inner { overflow: hidden; min-width: 0; }
+/* The gap belongs INSIDE the clip, or it shows as a permanent blank strip
+   under the bullet while the panel is shut. */
+.cw-inline-more__inner > :first-child { padding-top: var(--space-2xs); }
+@media (prefers-reduced-motion: reduce) {
+  /* The panel only. The trigger's transition is already switched off with the
+     other links, up in the shared reduced-motion rule. */
+  html:not(.cw-force-motion) {
+    .cw-inline-more { transition: none; }
+  }
 }

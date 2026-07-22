@@ -50,6 +50,7 @@ import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/cap
 import { SectionShell } from "@/components/capsules/SectionShell";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
 import { LaunchLink } from "@/components/LaunchLink";
+import { InlineMore } from "@/components/InlineMore";
 import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
 import { PackageAssemble } from "@/components/package-builder/PackageAssemble";
 import {
@@ -188,6 +189,12 @@ const META_SECTIONS: {
   modules?: { label: string; items: string[] }[];
   aside?: ReactNode;
   lede?: ReactNode;
+  // Render the eyebrow and H2 INSIDE the body instead of full-width above it
+  // (Chad, 2026-07-22). Only "who" wants this: its body is a two-column split,
+  // and the heading belongs at the top of the left column with the prose it
+  // introduces, not spanning both columns. The section owns the markup in that
+  // case, so it can place them in the right grid cell.
+  headInBody?: boolean;
 }[] = [
   {
     id: "how-built",
@@ -255,6 +262,7 @@ const META_SECTIONS: {
     id: "who",
     eyebrow: "Who it's for",
     heading: "Who would use a website cost calculator?",
+    headInBody: true,
     body: (
       // Lede and list sit side by side, half the row each: the paragraph ends on
       // "for:" and the list answers it, so they belong on one line rather than
@@ -266,6 +274,11 @@ const META_SECTIONS: {
             .cw-split is a two-column grid, so a bare second <p> would become a
             THIRD grid item and land in the wrong column. */}
         <div className="cw-split__col">
+          {/* Heading lives in the column, not above the split (headInBody). */}
+          <p className="eyebrow">Who it&apos;s for</p>
+          <h2 className="svc-block__heading svc-fill">
+            Who would use a website cost calculator?
+          </h2>
           <p>
             <strong>
               I built this website cost calculator for the client that has been
@@ -468,9 +481,17 @@ export default function WebsiteDesignCostCalculatorPage() {
   // One template for every "about the calculator" section. Used for the purpose
   // section (hoisted up under the hero) and the rest (rendered in place below).
   const renderMetaSection = (s: (typeof META_SECTIONS)[number]) => (
-    <SectionShell key={s.id} className="svc-block" id={s.id}>
-      <p className="eyebrow">{s.eyebrow}</p>
-      <h2 className="svc-block__heading svc-fill">{s.heading}</h2>
+    <SectionShell
+      key={s.id}
+      className={`svc-block${s.headInBody ? " svc-block--head-in-body" : ""}`}
+      id={s.id}
+    >
+      {s.headInBody ? null : (
+        <>
+          <p className="eyebrow">{s.eyebrow}</p>
+          <h2 className="svc-block__heading svc-fill">{s.heading}</h2>
+        </>
+      )}
       {s.aside ? (
         <div className="cw-purpose-grid">
           <div className="cw-purpose-text">
@@ -565,14 +586,18 @@ export default function WebsiteDesignCostCalculatorPage() {
       <SectionShell className="svc-block" id="rate-card">
         <p className="eyebrow">The Calculated Rates</p>
         <h2 className="svc-block__heading svc-fill">
-          The Numbers Behind The Calculator
+          The prices behind the calculator
         </h2>
         <div className="svc-prose">
           <p>
             The baseline fee for a chadworks website is {money(BASE)}. That buys
             a small, simple, but professional website. See{" "}
-            <a href="#included">the next section</a> for what&apos;s included in
-            the baseline. Every feature or level-up in the calculator adds to the
+            {/* Explicit {" "} on BOTH sides of the link. This <p> has
+                expression children ({money(BASE)}), so the compiler drops the
+                leading space of the text node after </a> and it rendered as
+                "sectionfor". Same trap the Visible bullet documents below. */}
+            <a href="#included">the next section</a>{" "}
+            for what&apos;s included in the baseline. Every feature or level-up in the calculator adds to the
             baseline fee. See the tables below for a granular look at those
             features and levels that modify the estimate.
           </p>
@@ -728,12 +753,35 @@ export default function WebsiteDesignCostCalculatorPage() {
             and fee.
           </li>
           <li>
-            <strong>Accessible.</strong> Every site works with a keyboard for
-            the people who cannot use a mouse, labels its buttons and images so
-            a screen reader can say what they are out loud, keeps enough
-            contrast between text and background to stay readable, and honors
-            the setting a visitor switched on to stop things from moving.
-            Further compliance available as needed.
+            <strong>Accessible.</strong>{" "}
+            {/* Chad's line was "meet baseline ADA and ARIA requirements". Same
+                promise, corrected on two counts (2026-07-22): the ADA is a
+                statute with no technical spec for private-sector sites, so the
+                standard anyone actually measures against is WCAG; and ARIA is
+                an authoring spec for describing custom controls, not a bar a
+                site can "meet". Naming WCAG and keeping the ADA as the reason
+                it matters holds the claim up without losing the term buyers
+                search for. The practices and the paid tier sit behind the
+                disclosure, which ships its copy in the static HTML, so an
+                engine still reads every word of it. */}
+            All chadworks websites are built to WCAG, the accessibility standard
+            the ADA is enforced against.{" "}
+            <InlineMore trigger="Click here for more details">
+              <p>
+                That means every site works with a keyboard for the people who
+                cannot use a mouse, labels its buttons and images so a screen
+                reader can say what they are out loud, keeps enough contrast
+                between text and background to stay readable, and honors the
+                setting a visitor switched on to stop things from moving. ARIA
+                gets used where plain HTML cannot describe a control on its own,
+                and not where it can.
+              </p>
+              <p>
+                What costs extra is the proof. Formal WCAG 2.2 AA conformance
+                takes an audit and hands-on testing with the assistive tech
+                itself, so it is quoted as its own scope and fee.
+              </p>
+            </InlineMore>
           </li>
           <li>
             <strong>Analytics.</strong> Google Analytics and PostHog are both

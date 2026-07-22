@@ -17,7 +17,7 @@ import {
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
 import { BASE, money } from "@/lib/package-builder";
-import { MINUTELY } from "@/lib/pricing";
+import { MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
 
 const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
@@ -146,9 +146,13 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "How much does website maintenance cost?",
-        a: "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
-        aText:
-          "Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my Baseline Maintenance Plan at $675 every six months. The BMP covers routine WordPress core, plugin and theme updates, as well as daily backups.",
+        // The figure was hand-typed as $675 and contradicted the hub's 550,
+        // which is what /rates/ and the cost guide have been rendering. $550 is
+        // correct (Chad, 2026-07-22). Reads WORDPRESS_CARE now, so the two can
+        // never disagree again -- this answer also feeds the FAQPage JSON-LD,
+        // so the wrong number was the one an assistant would quote back.
+        a: `Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my WordPress care plan at ${money(WORDPRESS_CARE)} every six months. The care plan covers routine WordPress core, plugin and theme updates, as well as daily backups.`,
+        aText: `Most new sites I build are custom coded and static, which don't require maintenance. However, WordPress sites do require ongoing maintenance, which is covered by my WordPress care plan at ${money(WORDPRESS_CARE)} every six months. The care plan covers routine WordPress core, plugin and theme updates, as well as daily backups.`,
       },
     ],
   },
@@ -211,9 +215,9 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Can people with disabilities use my site?",
-        a: "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy.\n\nA share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening.",
+        a: "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy.\n\nA share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening. Formal WCAG 2.2 AA conformance, the kind with an audit and a written statement behind it, is a separate piece of work I quote on its own.",
         aText:
-          "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy. A share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening.",
+          "Yes, and it is part of the build rather than an upgrade I sell you later. Every site works with a keyboard for the people who cannot use a mouse, labels its buttons and images so a screen reader can say what they are out loud, keeps enough contrast between text and background to stay readable, and honors the setting a visitor switched on to stop things from moving when animation makes them queasy. A share of the people landing on your site browse this way and will never once mention it to you. They just leave when a site fights them, which means the cost of getting this wrong is invisible and you would never know it was happening. Formal WCAG 2.2 AA conformance, the kind with an audit and a written statement behind it, is a separate piece of work I quote on its own.",
       },
       {
         q: "Can you set up a newsletter or mailing list?",

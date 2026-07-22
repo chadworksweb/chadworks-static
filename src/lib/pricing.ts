@@ -31,6 +31,25 @@ export const MINUTELY = 5.25; // $/min for work after launch. Also on /rates/.
 export const WORDPRESS_CARE = 550; // $ per six months, the WordPress care plan.
 
 // ---------------------------------------------------------------------
+// STANDALONE SERVICES -- sold on their own, not as part of a build.
+//
+// Added to the hub 2026-07-22 (Chad). Both currently sit hand-typed in the
+// pages that sell them, which is the drift the hub exists to stop:
+//   AUDIT       -> /faqs/ and /ai-visibility-audit/
+//   ADS_MONTHLY -> components/chatgpt/AdvertisingArtSections.tsx (4 places,
+//                  including the big pricing panel) and /faqs/
+// Rewiring those pages to read from here belongs to the hand-typed-prices
+// pass; defining them is the first half and has to land first.
+//
+// The three-way $675 collision is intentional on Chad's side (one number, three
+// products) but it makes the constants easy to mix up, so each names its own
+// unit: the audit is charged ONCE, the ads figure is PER MONTH.
+// ---------------------------------------------------------------------
+export const AUDIT = 675; // $ flat, one-time. The AI visibility audit, no commitment attached.
+export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. Ad spend is the client's, billed by OpenAI.
+export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own floor (as of June 2026), NOT chadworks revenue.
+
+// ---------------------------------------------------------------------
 // WORKED-EXAMPLE USE CASES -- real scopes, priced by the model at render.
 //
 // Every figure is computed by price(ex.scope), never typed, so an example is
