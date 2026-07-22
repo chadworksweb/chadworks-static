@@ -325,11 +325,13 @@ export function PackageBuilderStage({
       </div>
 
       {/* The tool needs a real landscape screen -- the rail, the object and the
-          price sit in a row. Mobile stays DARK either way: a portrait device gets
-          the rotate prompt, and a phone in landscape (too short to run it) still
-          darks out and points at the desktop. Only a landscape screen with tablet
-          or desktop height shows the tool. Always in the DOM, toggled by CSS, so
-          there is no hydration flash and the static export needs no client gate. */}
+          price sit in a row. A PHONE stays dark in both orientations and is sent
+          to the desktop, because turning it does not buy enough room either way.
+          A TABLET upright is the one gated case where turning it really does run
+          the tool, so it is the only one that says "rotate". Which line shows is
+          pure CSS (see .gateMsgRotate / .gateMsgDesktop); both are always in the
+          DOM, so there is no hydration flash and the static export needs no
+          client gate. */}
       <div className={s.mobileGate}>
         <p className={s.gateKicker}>chadworks</p>
         {/* The page title still lands even though the tool is dark, so the fold
@@ -338,6 +340,12 @@ export function PackageBuilderStage({
         <p className={s.gateHeading}>
           <span className={s.gateMsgRotate}>Rotate your device to landscape</span>
           <span className={s.gateMsgDesktop}>Please view on desktop</span>
+        </p>
+        {/* Phone-only footnote. Hidden wherever the rotate prompt shows, since a
+            tablet is being asked to turn, not to leave. */}
+        <p className={s.gateNote}>
+          I am working on a mobile friendly version of this. To see the fully
+          loaded calculator, visit this page on a tablet or computer.
         </p>
       </div>
     </div>

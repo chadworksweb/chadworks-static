@@ -570,23 +570,37 @@
   margin: 0.35rem 0 0;
 }
 
-/* Two messages share the one heading line. Portrait shows "rotate"; a phone in
-   landscape (already turned, still too small) shows "view on desktop" instead. */
-.gateMsgDesktop {
+/* The footnote under "please view on desktop". Sits with the phone message, so
+   it is hidden in the tablet block below alongside the desktop line. */
+.gateNote {
+  max-width: 32ch;
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: rgba(237, 231, 246, 0.7);
+}
+
+/* Two messages share the one heading line. "View on desktop" is the DEFAULT
+   (Chad, 2026-07-22): rotating a phone does not buy enough room either way, so
+   a phone is told the true answer in both orientations. "Rotate" is the tablet
+   message alone, because on a tablet turning it really does run the tool. */
+.gateMsgRotate {
   display: none;
 }
 
-/* SHOW THE GATE. Two conditions, OR'd:
-   1. A NARROW portrait screen (<= 600px wide) -- a phone upright. The tool
-      renders its row down to 600px (see the tablet rule above), so the portrait
-      gate carries the same 600px floor: above it there is real width to run the
-      tool, and a wide-but-portrait window (a tall desktop window, a portrait
-      monitor, a large tablet upright) is NOT gated just for its aspect ratio.
+/* SHOW THE GATE. Three conditions, OR'd:
+   1. A NARROW portrait screen (<= 600px wide) -- a phone upright.
    2. A landscape screen small enough to be a phone (short AND narrow) -- turning
       a phone sideways still is not enough room, so mobile stays dark. The
-      max-width guard keeps a wide-but-short desktop window out of the gate. */
+      max-width guard keeps a wide-but-short desktop window out of the gate.
+   3. A TABLET upright: portrait, wider than the phone floor, and `pointer:
+      coarse` so a tall narrow DESKTOP window is not caught by aspect ratio
+      alone -- which is the trap the original two-condition rule was written to
+      avoid. A tablet has the width to run the tool once it is turned, so this
+      one gets the rotate prompt rather than being sent to a desktop. */
 @media (orientation: portrait) and (max-width: 600px),
-  (orientation: landscape) and (max-width: 950px) and (max-height: 600px) {
+  (orientation: landscape) and (max-width: 950px) and (max-height: 600px),
+  (orientation: portrait) and (min-width: 601px) and (max-width: 1100px) and (pointer: coarse) {
   /* The tool and its chrome both go; the gate is all that renders. */
   .canvasLayer,
   .inner {
@@ -605,14 +619,16 @@
   }
 }
 
-/* Phone in landscape: swap the rotate prompt for the desktop one, since it is
-   already turned as far as it goes. */
-@media (orientation: landscape) and (max-width: 950px) and (max-height: 600px) {
+/* Tablet upright is the ONE case where turning the device actually helps, so it
+   is the one case that asks for it. Every other gated screen keeps the default
+   "view on desktop". */
+@media (orientation: portrait) and (min-width: 601px) and (max-width: 1100px) and (pointer: coarse) {
   .gateMsgRotate {
-    display: none;
+    display: inline;
   }
 
-  .gateMsgDesktop {
-    display: inline;
+  .gateMsgDesktop,
+  .gateNote {
+    display: none;
   }
 }

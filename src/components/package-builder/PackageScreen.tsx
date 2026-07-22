@@ -94,6 +94,11 @@ export function PackageScreen({
   captureRef.current = capture;
   const assemblyRef = useRef(!!assembly);
   assemblyRef.current = !!assembly;
+  // Whether this device has a real pointer. Read inside the pointer handler, so
+  // it must not be evaluated during render (there is no window on the server).
+  // Defaults to true: on a mouse machine the very first move then behaves
+  // normally, and a touch device corrects it before the handler can fire.
+  const canHoverRef = useRef(true);
   // Assembly build target: 0 scattered, 1 built. A ref so the click never
   // re-runs the setup effect; the loop eases toward it.
   const builtTargetRef = useRef(0);
@@ -1286,8 +1291,35 @@ export function PackageScreen({
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-      const proj = Mat.persp((SCREEN.fov * Math.PI) / 180, w / Math.max(1, h), 0.1, 100);
-      const view = Mat.trans(0, 0, SCREEN.camZ);
+      const aspect = w / Math.max(1, h);
+      // ASSEMBLY-ONLY FRAMING (Chad, 2026-07-22). The composite object is not
+      // symmetric about the origin: the mathDev plug hangs off the left edge and
+      // the page leaves stack behind, so the painted result lands ~14% above and
+      // ~10% left of its box centre. Measured off the canvas pixels at 390, 768
+      // and 1440 wide; the figure held at all three. On a phone-height canvas
+      // that pushed the object clean off the top edge with 105px of dead space
+      // under it, which is what read as "it does not collect into the centre".
+      //
+      // The vertical error is a CONSTANT ~47 CSS px, not a constant fraction:
+      // sampled at six canvas sizes from 227px to 381px tall, the displacement
+      // held at -47px +/- 1.5 while the percentage swung from -21% to -12%.
+      // That is why it read as a mobile bug -- the same fixed offset eats a far
+      // bigger share of a short canvas. So the shift is specified in pixels and
+      // converted to world units per frame. clientHeight is CSS pixels, so this
+      // is device-pixel-ratio independent; the drawing buffer is not.
+      //
+      // The horizontal error IS proportional (a steady -10% at every size), so
+      // it stays a fraction of the visible width.
+      //
+      // Scoped to assembly mode: the live calculator's object is framed by the
+      // stage layout around it, not by this box, and must not move.
+      const halfH = Math.abs(SCREEN.camZ) * Math.tan((SCREEN.fov * Math.PI) / 360);
+      const cssH = Math.max(1, canvas.clientHeight);
+      const shiftY = assemblyRef.current ? -(47 / cssH) * (halfH * 2) : 0;
+      const shiftX = assemblyRef.current ? 0.102 * (halfH * 2 * aspect) : 0;
+
+      const proj = Mat.persp((SCREEN.fov * Math.PI) / 180, aspect, 0.1, 100);
+      const view = Mat.trans(shiftX, shiftY, SCREEN.camZ);
       // FLOAT ONLY, no spin. The object is suspended, so it has to DRIFT, not
       // just tilt: translation is what sells weightlessness, and a lone bob on
       // one axis reads as a loop. Four sines on deliberately unrelated periods
@@ -2657,7 +2689,13 @@ export function PackageScreen({
       if (!tipEl) tipEl = host.querySelector(".cw-assemble__tip");
       const rect = canvas.getBoundingClientRect();
       const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
-      if (tipEl) { tipEl.style.left = `${cx}px`; tipEl.style.top = `${cy}px`; }
+      // Only a real pointer drags the hint around. A tap fires pointermove too,
+      // and writing inline left/top here would beat the CSS that pins the hint
+      // to the foot of the stage on touch (see the `hover: none` block).
+      if (tipEl && canHoverRef.current) {
+        tipEl.style.left = `${cx}px`;
+        tipEl.style.top = `${cy}px`;
+      }
       if (!rect.width || !rect.height) return;
       // Device pixels; WebGL's origin is bottom-left, so y is flipped.
       const dx = Math.max(0, Math.min(canvas.width - 1, Math.round((cx / rect.width) * canvas.width)));
@@ -2669,6 +2707,7 @@ export function PackageScreen({
     };
     const asmLeave = () => { stageEl?.classList.remove("is-over"); canvas.style.cursor = ""; };
     if (asm) {
+      canHoverRef.current = window.matchMedia("(hover: hover)").matches;
       canvas.addEventListener("pointermove", asmMove);
       canvas.addEventListener("pointerleave", asmLeave);
     }
@@ -2717,8 +2756,13 @@ export function PackageScreen({
           }}
         >
           <canvas className="cw-assemble__canvas" ref={canvasRef} aria-hidden="true" />
+          {/* The verb follows the INPUT, not the viewport: a touch screen taps.
+              Both words are in the DOM and swapped in CSS, so the static export
+              needs no client branch and there is no hydration flash. */}
           <span className="cw-assemble__tip" role="tooltip">
-            {built ? "click to take it apart" : "click to build"}
+            <span className="cw-assemble__verb--hover">click</span>
+            <span className="cw-assemble__verb--touch">tap</span>
+            {built ? " to take it apart" : " to build"}
           </span>
         </button>
       </div>
