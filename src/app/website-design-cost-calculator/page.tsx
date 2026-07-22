@@ -193,14 +193,37 @@ const META_SECTIONS: {
     id: "how-built",
     eyebrow: "Under the hood",
     heading: "How did you build the website cost calculator?",
+    // Chad's copy, verbatim (2026-07-22). The closing line links to the VSR
+    // service; /vision-strategy-roadmap/ is not launched yet, so LaunchLink
+    // renders it as the sealed "coming soon" affordance and turns into a real
+    // link on its own the moment that route lands in launch.ts.
+    lede: (
+      <>
+        <p>
+          I asked Claude Code to build me a calculator and with one detailed
+          prompt it built this. SIKE. I spent nearly an entire week on just
+          this. I had the vision in my head of visualizing something that has
+          never been visualized. Mockups aren&apos;t a visualization. This is a
+          true visualization of an abstract concept (scope) turned into a
+          tangible, interactive tool.
+        </p>
+        <p>
+          The reality is, that I built this with my words, explaining what I
+          wanted to Claude Code and guiding the AI until it came out to my
+          liking. It&apos;s a prime example of the kind of assets chadworks can
+          build, seemingly out of thin air. All it takes is a clear vision.{" "}
+          <LaunchLink href="/vision-strategy-roadmap/">
+            Let me help you pull that vision out.
+          </LaunchLink>
+        </p>
+      </>
+    ),
     body: (
       <p>
-        It runs on a small pricing model I wrote, the same one I use to quote in
-        real life: a {money(BASE)}{" "}baseline plus a published figure for each
-        thing that moves the number, pages and development and branding and
-        commerce and the rest. Nothing is a lookup of somebody&apos;s averages.
-        Every figure on the rate card above is generated straight from that model,
-        so the tool and the table can never say two different numbers.
+        The pricing is wired to a master price list within the site&apos;s
+        codebase. When I change a price there, it changes anywhere else that
+        specific feature or packaged scope is displayed, including the
+        calculator. Fancy, huh?
       </p>
     ),
   },
@@ -210,11 +233,11 @@ const META_SECTIONS: {
     heading: "What is the purpose of a website cost calculator?",
     aside: <PackageAssemble />,
     lede: (
-      <>
+      <p>
         This calculator turns a vague idea or question into a visual entity with a
         number attached. Its purpose is to make scoping your website project and
         budgeting for it easier and clearer than ever.
-      </>
+      </p>
     ),
     body: (
       <p>
@@ -239,17 +262,25 @@ const META_SECTIONS: {
       // frosted card, which has real backdrop to work with here because the
       // hero's manifesto cloud runs behind this part of the page.
       <div className="cw-split">
-        <p>
-          <strong>
-            I built this website cost calculator for the client that has been
-            shafted in the past.
-          </strong>
-          <br />
-          The web design world can be misleading and scammy. It often runs on the
-          charm-offensive.
-          <br />I created this website calculator for clients that aren&apos;t
-          that familiar with website design and development.
-        </p>
+        {/* The two paragraphs are wrapped, not siblings of the frost card:
+            .cw-split is a two-column grid, so a bare second <p> would become a
+            THIRD grid item and land in the wrong column. */}
+        <div className="cw-split__col">
+          <p>
+            <strong>
+              I built this website cost calculator for the client that has been
+              shafted in the past.
+            </strong>
+          </p>
+          <p>
+            The web design world can be misleading and scammy. It often runs on
+            the charm-offensive.
+          </p>
+          <p>
+            I created this website calculator for clients that aren&apos;t that
+            familiar with website design and development.
+          </p>
+        </div>
         <div className="cw-split__frost">
           {/* The line the list answers, moved out of the lede and into the card
               with it (Chad, 2026-07-22). It picks up .svc-prose h3 styling from
@@ -335,18 +366,31 @@ const META_SECTIONS: {
     body: (
       <>
         <p>
-          Because every other website cost calculator I found either hid the
-          number behind a form or made one up. I already price this way in person,
-          off a rate card I am happy to publish, so putting that same card behind a
-          tool cost me nothing and saved you a sales call. I would rather you read
-          the total, decide I am too expensive, and never email me, than gate the
-          answer to farm your contact details.
+          I built this because every website cost calculator I could find was
+          boring or technical. Some were a literal web form, some a bunch of
+          toggles, and one was entirely slider based. It made my eyes hurt. Few
+          were treated as a product itself, and absolutely
+          none had a visualization paired with the calculator. I like to build
+          things <em>all the way</em>, so I built this <em>all the way</em>, as
+          an example of just how far <em>all the way</em> is.
         </p>
         <p>
-          Because your budget is yours. You get the number here, and you email me
-          only if you want to. Read the total, decide I am too expensive, and we
-          both just saved a phone call. Nothing you do with this calculator reaches
-          me until you send it.
+          I also built this to cut right to the money conversation, or avoid it
+          entirely. This calculator puts the actual numbers in the
+          client&apos;s head before they even contact me, saving both parties
+          time.
+        </p>
+        <p>
+          I also made it free and un-gated because I am not interested in
+          farming contact info of strangers in an attempt to sell them
+          something down the line. I&apos;m interested in people that want what
+          they want and know when they want it, whether now or in the future.
+          This calculator was designed to kick the tire kickers and attract the
+          real partner clients that I want to work with.
+        </p>
+        <p>
+          If you are that client partner,{" "}
+          <Link href="/contact/">contact me here</Link>.
         </p>
       </>
     ),
@@ -430,13 +474,19 @@ export default function WebsiteDesignCostCalculatorPage() {
       {s.aside ? (
         <div className="cw-purpose-grid">
           <div className="cw-purpose-text">
-            {s.lede ? <p className="svc-lede">{s.lede}</p> : null}
+            {s.lede ? <div className="svc-lede">{s.lede}</div> : null}
             <div className="svc-prose svc-prose--plain">{s.body}</div>
           </div>
           <div className="cw-purpose-aside">{s.aside}</div>
         </div>
       ) : (
-        <div className="svc-prose">{s.body}</div>
+        // A lede renders here too, not just in the aside branch. It used to be
+        // reachable only when a section had an aside, so `lede` on a plain
+        // section silently rendered nothing.
+        <>
+          {s.lede ? <div className="svc-lede">{s.lede}</div> : null}
+          <div className="svc-prose">{s.body}</div>
+        </>
       )}
       {s.modules && (
         <div className="cw-calc-kinds">
@@ -581,25 +631,42 @@ export default function WebsiteDesignCostCalculatorPage() {
           COMPLIANT and ANALYTICS bullets, which promise specific artifacts (a
           privacy policy, a terms page, cookie controls) rather than a practice.
           Every build has to actually ship them. */}
-      <SectionShell className="svc-block" id="included">
-        <p className="eyebrow">BASELINE TECHNICAL SPECS AND FEATURES</p>
-        <h2 className="svc-block__heading svc-fill">
-          What&apos;s included in the website calculator&apos;s Baseline?
-        </h2>
+      {/* THE INVERTED BAND (Chad, 2026-07-22). This borrows the FAQ section's
+          shape wholesale: `full` breakout, the dark plum->navy gradient with its
+          lavender washes, svc-faq__layout's 2fr 3fr grid, the sticky intro
+          column left and a frosted card right. It reuses those exact classes
+          rather than cloning them, so a change to the FAQ band moves this one
+          too. The only new CSS is what turns .cw-included from a bare list into
+          the glass card the accordion is on the other bands.
+
+          NOT the accordion itself: .svc-acc is a button/disclosure structure and
+          this is a static list an engine can lift in one piece. Same surface, no
+          behavior. */}
+      <SectionShell
+        full
+        className="svc-block svc-faq-section"
+        trailingClassName="svc-faq-section--dark"
+        id="included"
+      >
         {/* No baseline ledger line here. It was moved in from the rate card on
             2026-07-22 and back out the same day (Chad): the heading already
             names the baseline, and the section's job is what the baseline BUYS,
             not restating what it costs. The figure lives on the rate card and
             in the hero lede. */}
-        <div className="svc-prose">
-          <p>
-            The website calculator&apos;s estimate changes a lot depending on the
-            features and levels you select, but what doesn&apos;t change is the
-            foundation beneath it. Here&apos;s a list of everything that&apos;s
-            already included in every chadworks website:
-          </p>
-        </div>
-        <ul className="cw-included">
+        <div className="svc-faq__layout">
+          <div className="svc-faq__intro">
+            <p className="eyebrow">BASELINE TECHNICAL SPECS AND FEATURES</p>
+            <h2 className="svc-block__heading svc-fill">
+              What&apos;s included in the website calculator&apos;s Baseline?
+            </h2>
+            <p className="svc-faq__lead">
+              The website calculator&apos;s estimate changes a lot depending on
+              the features and levels you select, but what doesn&apos;t change is
+              the foundation beneath it. Here&apos;s a list of everything
+              that&apos;s already included in every chadworks website:
+            </p>
+          </div>
+          <ul className="cw-included">
           <li>
             <strong>Standard pages.</strong> Home, Services, About, Contact
             (swap any for your specific needs).
@@ -657,8 +724,9 @@ export default function WebsiteDesignCostCalculatorPage() {
             <strong>Analytics.</strong> Google Analytics and PostHog are both
             available for integration into your website or project. Leveraging
             the data collected, however, is a separate service.
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </SectionShell>
 
       {/* The "about the calculator" cluster: Chad's questions, each its own headed
@@ -680,113 +748,137 @@ export default function WebsiteDesignCostCalculatorPage() {
         trailingClassName="svc-faq-section--dark"
         id="difference"
       >
-        <p className="eyebrow">The difference</p>
+        <p className="eyebrow">The calculated difference</p>
         <h2 className="svc-block__heading svc-fill">
-          What makes this different from other website cost calculators
+          What makes this different from other website cost calculators?
         </h2>
         <div className="svc-prose svc-prose--lead">
+          <p>It visualizes the product.</p>
           <p>
-            Every other website cost calculator I tried does one of two things.
-            It hides the number behind a form, so you answer a page of questions
-            and then wait for a salesperson to email you a range. Or it makes the
-            number up, averaging industry data into a figure no actual studio
-            charges for an actual website. Either way you leave without the one
-            thing you came for.
-          </p>
-          <p>
-            This one publishes a real rate card and prices your exact scope off
-            it, in the open, with no email gate. Here is what the others hand you
-            instead.
+            Despite their interfaces leaving much to be desired, all the other
+            calculators get you some sort of number &mdash; that isn&apos;t what
+            makes this different. What makes this website cost calculator different is
+            its interactivity and its visual depiction of your custom scope, in
+            real time.
           </p>
         </div>
         <dl className="rates-ledger">
           {CALCULATORS.map((row) => (
             <div key={row.who} className="rates-ledger__row">
+              {/* The mark is painted BEHIND the label as an oversized,
+                  low-alpha watermark. aria-hidden, so a screen reader and an
+                  engine both get the name and note and never a stray glyph.
+                  `data-mark` lets CSS size a thin glyph up to match the ink of
+                  a heavy one without special-casing the markup. */}
               <dt className="rates-ledger__label">
                 <a href={row.href} rel="nofollow noopener" target="_blank">
                   {row.who}
                 </a>
-                . {row.note}
+                . <span className="rates-ledger__label-note">{row.note}</span>
               </dt>
-              <dd className="rates-ledger__num">{row.tag}</dd>
+              <dd className="rates-ledger__num">
+                <span
+                  className="rates-ledger__mark"
+                  data-mark={row.mark}
+                  aria-hidden="true"
+                >
+                  {row.mark}
+                </span>
+                <span className="rates-ledger__tag">{row.tag}</span>
+              </dd>
             </div>
           ))}
         </dl>
-        <div className="svc-prose svc-prose--plain">
+        <div className="svc-prose svc-prose--plain cw-calc-closer">
           <p>
-            Mine is the one that just shows you the card. Every figure it adds up
-            is published above, computed by the same model I quote from, so you
-            can check the arithmetic and walk away without ever telling me your
-            name. I would rather you read the total, decide I am too expensive,
-            and never email me, than gate the answer to farm your contact
-            details.
+            The chadworks website cost calculator gives you everything, for
+            free, up front, in granular detail and with an easy to understand
+            visualization. Every figure it adds up is published above, computed
+            by the same model I quote from, so you can check the arithmetic and
+            walk away without ever telling me your name. (If you find an error,
+            please <Link href="/contact/">let me know</Link>.) I would rather you
+            read the total, decide whether or not it&apos;s in your budget, and
+            proceed accordingly. Whether that&apos;s walking away or making an
+            inquiry, it&apos;s the right move.
           </p>
           <p>
-            It is accurate about my rates and honest about your project. Every
-            number it adds up is published in the table above, so you can check the
-            arithmetic yourself. What it cannot know is that your booking system has
-            to talk to a twelve year old scheduling database, and that kind of thing
-            is exactly where estimates die. Treat the number as a real starting point
-            for a real conversation. It becomes a quote once we have talked through
-            the parts a slider cannot see.
+            What it cannot know is that your booking system has to talk to a
+            twelve year old scheduling database, and that kind of thing is
+            exactly why this is an estimate generator, not a proposal generator.
+            Treat the number as a real starting point for a real conversation.
+            It becomes a quote once we have talked through the parts the
+            calculator can&apos;t take into consideration.
           </p>
         </div>
 
-        {/* A real client corroborating the no-upsell claim. Same markup as
-            TestimonialsCapsule so it inherits the styling and the headshot. */}
-        <figure className="svc-testimonial">
-          <blockquote className="svc-testimonial__quote">
-            Chad is very professional, talented and skilled. He does not try to
-            sell you on products or services that you don&apos;t need.
-          </blockquote>
-          <figcaption className="svc-testimonial__byline">
-            {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
-            <img
-              className="svc-testimonial__avatar"
-              src="/people/kimberly-dolan.webp"
-              alt=""
-              loading="lazy"
-            />
-            <p className="svc-testimonial__by">
-              Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)
-            </p>
-          </figcaption>
-        </figure>
+        {/* Real clients corroborating the two claims this section makes: no
+            upsell, and a finished product that lands. Both are verbatim from
+            live chadworks.co and both also run on /web-design/. Markup mirrors
+            TestimonialsCapsule (ul > li.svc-testimonial.panel) so it inherits
+            the card, the grid and the headshot rather than restating them --
+            the old single <figure> had no `panel` and no grid, which is why it
+            sat on this band as bare dark-on-dark text. */}
+        <ul className="svc-testimonials">
+          <li className="svc-testimonial panel">
+            <blockquote className="svc-testimonial__quote">
+              Chad is very professional, talented and skilled. He does not try
+              to sell you on products or services that you don&apos;t need.
+            </blockquote>
+            <div className="svc-testimonial__byline">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
+              <img
+                className="svc-testimonial__avatar"
+                src="/people/kimberly-dolan.webp"
+                alt=""
+                loading="lazy"
+              />
+              <p className="svc-testimonial__by">
+                Kimberly Dolan, K.I.M. Keep It Moving (Philadelphia)
+              </p>
+            </div>
+          </li>
+          <li className="svc-testimonial panel">
+            <blockquote className="svc-testimonial__quote">
+              Chad went above and beyond and exceeded our expectations with the
+              final product.
+            </blockquote>
+            <div className="svc-testimonial__byline">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
+              <img
+                className="svc-testimonial__avatar"
+                src="/people/mary-lynn-renner.webp"
+                alt=""
+                loading="lazy"
+              />
+              <p className="svc-testimonial__by">
+                Mary Lynn Renner, AAC Event Catering (Lansdale, PA)
+              </p>
+            </div>
+          </li>
+        </ul>
       </SectionShell>
 
+      {/* The /rates/ three-door exit, re-pointed: the two halves of what the
+          calculator prices, then the person doing it. Every one of the three is
+          launched, so none of them needs a sealed affordance. */}
       <PathsCapsule
         paths={{
-          heading: "Once you have a number:",
+          heading: "Explore chadworks™",
           items: [
             {
-              label: "How Much Does a Website Cost?",
-              detail:
-                "The full guide behind the number: what a site costs depending on who builds it, and what every piece of it is actually for.",
-              href: "/how-much-does-a-website-cost/",
-            },
-            {
-              label: "Web Design Packages",
-              detail:
-                "The same build sold as a defined scope at a defined number, written down before any money moves.",
-              href: "/web-design-packages/",
-            },
-            {
-              label: "Rates",
-              detail:
-                "The full economics, including how hourly works when a project is too open-ended to scope.",
-              href: "/rates/",
-            },
-            {
               label: "Web Design",
-              detail:
-                "What the money buys you visually, and why none of it starts from a theme.",
+              detail: "Learn more about my website design services.",
               href: "/web-design/",
             },
             {
               label: "Web Development",
-              detail:
-                "The code underneath, which is where the expensive half of that calculator lives.",
+              detail: "Learn more about my web development services.",
               href: "/web-development/",
+            },
+            {
+              label: "About",
+              detail: "Learn more about the Chad behind chadworks.",
+              href: "/about/",
             },
           ],
         }}

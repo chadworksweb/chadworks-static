@@ -193,6 +193,7 @@ ul, ol { list-style: none; padding: 0; }
    .svc-qual__more a does (background-image: none; padding-bottom: 0). */
 p a,
 .cw-fit-list a,
+.rates-ledger__label a,
 .essay-prose a {
   color: var(--accent);
   text-decoration: none;
@@ -207,6 +208,8 @@ p a,
 }
 p a:hover,
 p a:focus-visible,
+.rates-ledger__label a:hover,
+.rates-ledger__label a:focus-visible,
 .cw-fit-list a:hover,
 .cw-fit-list a:focus-visible,
 .essay-prose a:hover,
@@ -217,6 +220,7 @@ p a:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     p a,
+    .rates-ledger__label a,
     .cw-fit-list a { transition: none; }
   }
 }
@@ -748,7 +752,8 @@ p, li, dd, figcaption { text-wrap: pretty; }
     rgba(229, 210, 244, 0.38) 50.1%, rgba(229, 210, 244, 0.38) 100%);
 }
 /* cards / panels on dark -- glassmorphic on the aurora */
-.svc-dark .panel {
+.svc-dark .panel,
+.svc-faq-section--dark .panel {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
   border-color: var(--dark-border);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
@@ -769,8 +774,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* next-step bubble on dark */
 .svc-dark .svc-nextstep__num { background: rgba(255, 255, 255, 0.08); color: var(--dark-muted); }
 /* testimonials on dark */
-.svc-dark .svc-testimonial__quote { color: var(--dark-text); }
-.svc-dark .svc-testimonial__by { color: var(--dark-muted); }
+.svc-dark .svc-testimonial__quote,
+.svc-faq-section--dark .svc-testimonial__quote { color: var(--dark-text); }
+.svc-dark .svc-testimonial__by,
+.svc-faq-section--dark .svc-testimonial__by { color: var(--dark-muted); }
 
 /* =====================================================================
    APP CHROME (skeleton nav + footer)
@@ -1391,6 +1398,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
+/* A lede may hold more than one paragraph (the calculator's meta sections
+   render it as a container rather than a bare <p>). The global reset zeroes
+   margins, so the gap between stacked lede paragraphs is set here. */
+.svc-lede > p + p { margin-top: var(--space-sm); }
+
 .svc-hero__cta { margin-top: var(--space-lg); }
 
 /* Key facts band (lavender full-width) */
@@ -1734,16 +1746,32 @@ p, li, dd, figcaption { text-wrap: pretty; }
    renders non-clickable, dimmed with a dotted rule, and reveals a "coming soon"
    tooltip on hover/focus. Mirrors the svc-lane coming-soon bubble. */
 .cw-soon {
-  position: relative;
   cursor: default;
   color: inherit;
   border-bottom: 1px dotted currentColor;
   opacity: 0.7;
 }
+/* The bubble's anchor: zero-width, never wraps, so it is a stable point over
+   the start of the link. The link span itself must NOT be positioned -- when an
+   inline element wraps, its containing block grows to span every line fragment
+   and the bubble drifts off the text (see LaunchLink). */
+.cw-soon__anchor {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: baseline;
+}
 .cw-soon__tip {
   position: absolute;
-  bottom: calc(100% + 0.5rem);
-  left: 0;
+  bottom: calc(100% + 0.2rem);
+  /* Centred on the anchor rather than starting at it. Left-aligned, a link that
+     began in the right third pushed the bubble past the viewport edge, where the
+     band's `overflow: clip` cut the label in half (measured at 390px and
+     1024px). Centring halves the worst case in both directions. */
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  max-width: min(14rem, calc(100vw - 2rem));
   z-index: 5;
   white-space: nowrap;
   padding: 0.32rem 0.6rem;
@@ -1755,22 +1783,26 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-size: var(--text-xs);
   letter-spacing: 0.06em;
   opacity: 0;
-  transform: translateY(4px);
   pointer-events: none;
   transition: opacity 0.22s var(--ease-smooth), transform 0.22s var(--ease-smooth);
 }
+/* The arrow follows the bubble: centred, since the bubble is now centred on the
+   anchor rather than starting at it. */
 .cw-soon__tip::after {
   content: "";
   position: absolute;
   top: 100%;
-  left: 1rem;
+  left: 50%;
+  margin-left: -5px;
   border: 5px solid transparent;
   border-top-color: var(--dark-bg);
 }
+/* Both transforms have to carry the centring translate, or the hover state
+   snaps the bubble back to starting at the anchor. */
 .cw-soon:hover .cw-soon__tip,
 .cw-soon:focus-visible .cw-soon__tip {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
@@ -1957,11 +1989,30 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   font-family: var(--font-mono);
 }
 
-/* The purpose section is hoisted directly under the hero, and the rate card
-   follows it directly. Both drop their top padding so the three bands sit
-   tight against each other instead of stacking three full rhythms of air. */
+/* Sections that sit tight under the one above instead of opening a full
+   vertical rhythm of their own: purpose (hoisted under the hero), the rate card
+   (follows purpose), and who-it's-for (follows how-built). */
 #purpose { padding-top: 0; }
 #rate-card { padding-top: 0; }
+#who { padding-top: 0; }
+#why { padding-top: 0; }
+
+/* The heading already carries margin-bottom: var(--space-md) and .svc-lede adds
+   its own margin-top on top of that, so a lede sitting directly under a heading
+   opened a doubled gap. Drop the lede's half; the heading's own spacing stays. */
+#how-built .svc-lede { margin-top: 0; }
+
+/* THIS PAGE ONLY. .cw-soon dims the sealed link with `opacity`, and opacity
+   applies to the whole SUBTREE, so the "coming soon" bubble inherited the same
+   0.7 and the page showed through it. Dim the text with a translucent colour
+   instead and leave the element itself fully opaque, so the bubble reads solid.
+   Scoped to the two sections that carry a LaunchLink rather than changed on
+   .cw-soon, which every other page's sealed links also use. */
+#how-built .cw-soon,
+#included .cw-soon {
+  opacity: 1;
+  color: color-mix(in srgb, currentColor 72%, transparent);
+}
 
 /* --- Purpose section: prose beside the package-assemble object. */
 .cw-purpose-grid {
@@ -2098,6 +2149,11 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    to outrank the `.svc-prose ul.cw-glow-list` margin below, which would
    otherwise win the tie on source order and push this column out of line. */
 .svc-prose .cw-split > ul.cw-glow-list { margin-top: 0; }
+
+/* A plain (unfrosted) split column that holds more than one block. The global
+   reset zeroes margins and .svc-prose's `> * + *` rhythm only reaches DIRECT
+   children, so stacked paragraphs inside a column get their gap here. */
+.cw-split__col > * + * { margin-top: var(--space-sm); }
 
 /* Frosted card around a split column. Same glass as .cw-gempanel__card (the
    established frosted surface on this site) rather than a second recipe for
@@ -5387,12 +5443,69 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
+/* The sentence after the linked name drops below the label's weight, so the
+   name stays the thing you scan and its note reads as the explanation. */
+.rates-ledger__label-note { font-weight: 300; }
+
+/* THE WATERMARK behind a tag: the failure mode drawn as one oversized glyph,
+   sat low enough in alpha to read as texture rather than a second label.
+   `-webkit-text-fill-color` has to be restated: the parent paints its text
+   through a clipped gradient with the fill set transparent, and the mark would
+   inherit that and disappear. The tag is lifted a layer so the glyph stays
+   behind it, since a positioned element otherwise paints over in-flow text. */
+.rates-ledger__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -52%);
+  z-index: 0;
+  font-size: 2.6em;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  -webkit-text-fill-color: currentColor;
+  opacity: 0.3;
+  pointer-events: none;
+  user-select: none;
+}
+/* A tilde is a fraction of the ink an X or a bracket pair carries, so at a
+   shared size it reads as nothing. Doubled to match their presence. */
+.rates-ledger__mark[data-mark="~"] { font-size: 5.2em; }
+/* The tag rides above the watermark. z-index alone was not enough: the parent
+   fills its glyphs with `background-clip: text`, and an element's background
+   paints BELOW every descendant, so the letters were being filled from a layer
+   under the absolutely positioned mark and the glyph read as see-through.
+   Carrying the same clipped gradient on the span itself puts the fill inside
+   the span's own layer, above the mark, fully opaque. `inherit` picks up
+   whichever gradient the band set, so the light and dark variants both hold. */
+.rates-ledger__tag {
+  position: relative;
+  z-index: 1;
+  background: inherit;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+/* The shared ledger baselines its two columns, which pins the tag to the FIRST
+   line of a label that runs several lines, leaving it and its watermark riding
+   high in the row. Here the tag is a standalone mark rather than a figure
+   answering a line of text, so it centers instead. Scoped: every other ledger
+   on the site still wants the baseline. */
+#difference .rates-ledger__row { align-items: center; }
+
 .rates-ledger__num {
   margin: 0;
   font-family: var(--font-mono);
   font-size: clamp(1.25rem, 0.9rem + 1.4vw, 1.85rem);
   font-weight: 600;
   line-height: 1;
+  position: relative; /* anchors .rates-ledger__mark */
+  /* background-clip: text clips glyphs to the paint box, and line-height: 1
+     makes that box exactly font-size tall, so a descender (the g in "Averaged")
+     renders cut. Extend the paint box downward and pull the same amount back
+     off the layout box, so the fix costs no vertical space. */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
   white-space: nowrap;
   background: linear-gradient(120deg, var(--text-primary), var(--accent));
   -webkit-background-clip: text;
@@ -5420,26 +5533,40 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    is room, so seven items read as one block rather than a long thin scroll.
    Borrows the "+" marker from .svc-qual__col--fit without inheriting that
    component's two-column shell. */
-.cw-included {
-  margin: var(--space-lg) 0 var(--space-md);
-  display: grid;
-  gap: 0.6rem var(--space-lg);
-  list-style: none;
-  padding: 0;
-}
-/* ONE COLUMN (Chad, 2026-07-22). It was two on desktop, which meant the reading
+/* The inclusions list is the RIGHT column of the inverted FAQ-shaped band on
+   the calculator page, so it carries the same frosted card the accordion has
+   (.svc-acc). The surface is restated here rather than shared, because .svc-acc
+   is a disclosure structure (buttons, open/closed rows) and this is a static
+   list. Keep the two in step if the accordion's glass is retuned.
+
+   ONE COLUMN (Chad, 2026-07-22). It was two on desktop, which meant the reading
    order ran across the row rather than down the list, so the sequence the copy
    is actually written in was not the sequence anyone read. */
+.cw-included {
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+  list-style: none;
+  padding: clamp(1.2rem, 2.4vw, 1.75rem);
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
 .cw-included li {
   position: relative;
   margin: 0;
-  padding-left: 1.4rem;
+  padding-left: 1.6rem;
   color: var(--text-secondary);
-  /* Body size, not the lead size the list used to carry: seven items at lead
-     size read as seven headlines rather than a list under the paragraph. */
-  font-size: var(--text-base);
-  line-height: var(--leading-body);
+  /* The accordion question size, so a row here reads at the same weight as a
+     row on the FAQ bands rather than dropping to body copy inside the card. */
+  font-size: clamp(0.98rem, 1.5vw, 1.15rem);
+  line-height: 1.5;
 }
+/* The bold lead-in label carries the primary colour; the sentence after it
+   stays secondary, so each row reads label-then-detail. */
+.cw-included li strong { color: var(--text-primary); }
 /* The glow marker from .cw-glow-list, restated rather than shared: that rule is
    scoped to lists inside .svc-prose and this list is a sibling of the prose
    block, not a child of it. Same 8px gradient chip, so the two lists on this
@@ -5454,6 +5581,21 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   border-radius: 2px;
   background: linear-gradient(135deg, #aeb9ea, #6629bc);
   box-shadow: 0 0 10px rgba(102, 41, 188, 0.6);
+}
+
+/* ON THE DARK BAND. Same overrides the accordion takes (.svc-acc), so the card
+   sits on the plum->navy gradient as glass rather than as a white slab. The
+   marker's deep-violet end goes invisible against that background, so the chip
+   is re-aimed at the lavender the band already uses. */
+.svc-faq-section--dark .cw-included {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 210, 244, 0.16);
+}
+.svc-faq-section--dark .cw-included li { color: rgba(229, 210, 244, 0.88); }
+.svc-faq-section--dark .cw-included li strong { color: #fff; }
+.svc-faq-section--dark .cw-included li::before {
+  background: linear-gradient(135deg, #ffffff, #b39ddb);
+  box-shadow: 0 0 10px rgba(229, 210, 244, 0.55);
 }
 
 .rates-ledger__note {
@@ -5530,6 +5672,17 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding-top: var(--section-pad-y);
 }
 
+/* The calculator's lane funnel has the same problem for the same reason: it
+   follows the dark difference band, and the 15% top rule crowds it against
+   that band's edge. Full rhythm back, heading centered, matching the treatment
+   above. The ID beats the four-class rule it has to override. */
+#difference ~ .section.svc-block.reveal:has(.svc-lanes) {
+  padding-top: var(--section-pad-y);
+}
+#difference ~ .svc-block:has(.svc-lanes) .svc-block__heading {
+  text-align: center;
+}
+
 /* Ledger on the dark band: labels/figures/rules flip to the inverted palette,
    matching the FAQ accordion's dark overrides. In this section the figures run
    a touch smaller so the task labels stay the emphasis. */
@@ -5547,6 +5700,28 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   -webkit-text-fill-color: transparent;
 }
 .svc-faq-section--dark .rates-ledger__note { color: rgba(229, 210, 244, 0.74); }
+/* Closes the competitor table. The ledger rules BETWEEN its rows and leaves the
+   last one open, so the closing paragraph ran on as if it were another row.
+   Same hairline, same value as the row rule on this band.
+
+   NO margin-top: the last row already ends on its own 1.4rem bottom padding,
+   which is exactly the gap every other row leaves above its rule. Adding a
+   margin on top of that made the final row read taller than the rest. */
+.cw-calc-closer {
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(229, 210, 244, 0.16);
+}
+/* On this band the link text goes lavender, or the standard purple disappears
+   into it. The RESTING rule stays the standard faint purple. Only the hover
+   wipe is swapped: --accent-teal is #4a6b6e, dark and muted, which is invisible
+   against a navy gradient, so the wipe comes in white instead. */
+.svc-faq-section--dark .rates-ledger__label a,
+.svc-faq-section--dark .svc-prose p a {
+  color: #e5d2f4;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(rgba(128, 84, 188, 0.4), rgba(128, 84, 188, 0.4));
+}
 .cw-rate-explainer .rates-ledger__num {
   font-size: clamp(1rem, 0.82rem + 0.7vw, 1.3rem);
   background: none;

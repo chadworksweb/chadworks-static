@@ -287,30 +287,44 @@ export const AFTER_LAUNCH: AfterLaunchTask[] = [
 // first-party price to check; it is named for its behavior (industry averages),
 // not a figure.
 // ---------------------------------------------------------------------
-export type CalculatorRow = { who: string; tag: string; note: string; href: string };
+// `mark` is the oversized glyph the page paints BEHIND the tag as a watermark:
+// a drawn shorthand for the failure mode (X blocked, ~ approximate, [ ] a gap
+// where the answer should be). Decoration only -- it is aria-hidden at render,
+// so the tag is what any reader or engine actually gets.
+export type CalculatorRow = {
+  who: string;
+  tag: string;
+  mark: string;
+  note: string;
+  href: string;
+};
 
 export const CALCULATORS: CalculatorRow[] = [
   {
     who: "WebFX",
     tag: "Gated",
+    mark: "X",
     note: "Puts the estimate behind a lead form. You answer their questions, then wait for an email with a range in it.",
     href: "https://www.webfx.com/web-design/learn/website-design-cost-calculator/",
   },
   {
     who: "Outliant",
     tag: "Gated",
+    mark: "X",
     note: "Gates the number behind your contact details, built to open a sales conversation rather than answer you on the spot.",
     href: "https://www.outliant.com/website-cost-calculator",
   },
   {
     who: "websitecostcalculator.app",
     tag: "Averaged",
-    note: "Returns an industry average, which is a number no actual studio charges for an actual website.",
+    mark: "~",
+    note: "Returns an industry average (from 2018), which is a number no actual studio charges for an actual website.",
     href: "https://websitecostcalculator.app/",
   },
   {
     who: "Pronto",
     tag: "Too wide",
+    mark: "[ ]",
     note: "Quotes a range so wide, $2,000 to $10,000 on a brochure site, that it defers the real answer to a phone call.",
     href: "https://www.prontomarketing.com/website-cost-calculator/",
   },

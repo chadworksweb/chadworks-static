@@ -26,6 +26,12 @@ export function LaunchLink({
       </Link>
     );
   }
+  // The tip hangs off a ZERO-WIDTH inline-block anchor at the START of the
+  // link, not off the link span itself. A relatively-positioned INLINE element
+  // that wraps across lines gives its absolute children a containing block
+  // spanning the first and last line fragments, which is the full paragraph
+  // width -- so the bubble landed at the paragraph's left edge instead of over
+  // the words. The anchor never wraps, so the bubble sits on the link.
   return (
     <span
       className={`cw-soon${className ? ` ${className}` : ""}`}
@@ -33,10 +39,12 @@ export function LaunchLink({
       role="link"
       aria-disabled="true"
     >
-      {children}
-      <span className="cw-soon__tip" role="tooltip">
-        {soonLabel}
+      <span className="cw-soon__anchor">
+        <span className="cw-soon__tip" role="tooltip">
+          {soonLabel}
+        </span>
       </span>
+      {children}
     </span>
   );
 }
