@@ -2774,14 +2774,16 @@ export function PackageScreen({
           <span className="cw-assemble__tip" role="tooltip">
             {settledBuilt ? "click to take it apart" : "click to build"}
           </span>
+          {/* The TOUCH hint sits dead centre of the canvas and INSIDE the stage
+              button, because people tap the words -- outside the button that tap
+              did nothing. It is `pointer-events: none` as well, so it can never
+              swallow a tap meant for the object beneath it. Only one of the two
+              hints is ever displayed, so exactly one reaches the accessibility
+              tree per device. */}
+          <span className="cw-assemble__taphint">
+            {settledBuilt ? "tap to take it apart" : "tap to build"}
+          </span>
         </button>
-        {/* The TOUCH hint is its own element OUTSIDE the stage button, so it can
-            never sit over the canvas the way an absolutely positioned overlay
-            does. Only one of the two is ever displayed (see the `hover: none`
-            block), so exactly one reaches the accessibility tree per device. */}
-        <p className="cw-assemble__taphint">
-          {settledBuilt ? "tap to take it apart" : "tap to build"}
-        </p>
       </div>
     );
   }

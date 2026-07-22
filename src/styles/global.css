@@ -2139,10 +2139,11 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    no pointer can never set, so on touch it never appeared and the object read
    as decoration rather than something you can operate. Here it rests visible
    and says "tap" (Chad, 2026-07-22).
-   It is a SEPARATE element that lives outside the stage button entirely, so it
-   is never layered over the canvas (Chad, 2026-07-22). Reusing the overlay and
-   merely un-absoluting it still left it inside the object's own box; this one
-   is a sibling, below it, in normal flow. */
+   It is its own element, separate from the cursor bubble, sitting DEAD CENTRE
+   of the canvas and inside the stage button (Chad, 2026-07-22). It briefly
+   lived below the canvas instead; that put it outside the button, and since
+   people tap the words rather than the object, tapping it did nothing.
+   `pointer-events: none` means it can never swallow a tap either way. */
 .cw-assemble__taphint { display: none; }
 @media (hover: none) {
   /* The cursor bubble is meaningless without a cursor. */
@@ -2150,8 +2151,12 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 
   .cw-assemble__taphint {
     display: block;
-    width: fit-content;
-    margin: 0.9rem auto 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    pointer-events: none;
     padding: 0.32rem 0.6rem;
     border-radius: 7px;
     background: var(--dark-bg);
@@ -2165,9 +2170,8 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 
   /* Gone for the whole build, and its label does not change until the object
      settles, so it leaves saying what it said and returns already correct --
-     no flash of the new wording on the way out. Sibling combinator rather than
-     :has(), since the hint sits right after the stage. */
-  .cw-assemble__stage.is-building ~ .cw-assemble__taphint { opacity: 0; }
+     no flash of the new wording on the way out. */
+  .cw-assemble__stage.is-building .cw-assemble__taphint { opacity: 0; }
 }
 
 /* --- Glow-square bullets, lifted from the showroom interior module
