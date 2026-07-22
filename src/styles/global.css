@@ -2139,27 +2139,35 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    no pointer can never set, so on touch it never appeared and the object read
    as decoration rather than something you can operate. Here it rests visible
    and says "tap" (Chad, 2026-07-22).
-   It is pinned to the foot of the stage rather than tracking a pointer that
-   does not exist -- the cursor-tracking JS is guarded to hover devices, so
-   nothing writes inline left/top over this. The arrow goes with it, since at
-   rest it is not pointing at anything. */
-.cw-assemble__verb--touch { display: none; }
+   It is a SEPARATE element that lives outside the stage button entirely, so it
+   is never layered over the canvas (Chad, 2026-07-22). Reusing the overlay and
+   merely un-absoluting it still left it inside the object's own box; this one
+   is a sibling, below it, in normal flow. */
+.cw-assemble__taphint { display: none; }
 @media (hover: none) {
-  .cw-assemble__verb--hover { display: none; }
-  .cw-assemble__verb--touch { display: inline; }
+  /* The cursor bubble is meaningless without a cursor. */
+  .cw-assemble__tip { display: none; }
 
-  .cw-assemble__tip {
-    opacity: 1;
-    left: 50%;
-    top: auto;
-    bottom: 6px;
-    transform: translateX(-50%);
+  .cw-assemble__taphint {
+    display: block;
+    width: fit-content;
+    margin: 0.9rem auto 0;
+    padding: 0.32rem 0.6rem;
+    border-radius: 7px;
+    background: var(--dark-bg);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: opacity 0.18s var(--ease-smooth);
   }
-  .cw-assemble__tip::after { display: none; }
 
-  /* Still hidden mid-transition, same as the hover case -- but keyed on
-     `is-building` alone, because `is-over` never lands here. */
-  .cw-assemble__stage.is-building .cw-assemble__tip { opacity: 0; }
+  /* Gone for the whole build, and its label does not change until the object
+     settles, so it leaves saying what it said and returns already correct --
+     no flash of the new wording on the way out. Sibling combinator rather than
+     :has(), since the hint sits right after the stage. */
+  .cw-assemble__stage.is-building ~ .cw-assemble__taphint { opacity: 0; }
 }
 
 /* --- Glow-square bullets, lifted from the showroom interior module

@@ -104,6 +104,14 @@ export function PackageScreen({
   const builtTargetRef = useRef(0);
   // Mirror of the target for the caption only (the loop reads the ref).
   const [built, setBuilt] = useState(false);
+  // The HINT's label lags `built` on purpose. Flipping it on click meant the
+  // bubble showed the new wording for a frame or two before `is-building` faded
+  // it out, which read as a flash. This updates only when the object has
+  // finished moving, so the hint leaves saying what it said and comes back
+  // already correct. The draw loop calls onSettle when the build snaps home.
+  const [settledBuilt, setSettledBuilt] = useState(false);
+  const onSettleRef = useRef<(v: boolean) => void>(() => {});
+  onSettleRef.current = setSettledBuilt;
   // The live target. Written every render, read by the loop. Never a dep.
   const target = useRef<Channels>(channels);
   target.current = channels;
@@ -1231,6 +1239,8 @@ export function PackageScreen({
     // pointer events alone would strand the tooltip visible through the whole
     // transition. `is-building` (toggled below) hides the hint in CSS.
     let asmStageEl: HTMLElement | null = null;
+    // Previous frame's in-flight flag, so the settle handler fires on the edge.
+    let wasBuilding = false;
 
     const draw = (now: number) => {
       if (!t0) { t0 = now; prevTs = now; }
@@ -1353,7 +1363,12 @@ export function PackageScreen({
         // Settled == built01 has snapped exactly onto its target; anything else
         // is a transition in flight, so flag it and CSS hides the hint tooltip.
         if (!asmStageEl) asmStageEl = host.querySelector(".cw-assemble__stage");
-        asmStageEl?.classList.toggle("is-building", built01 !== tgt);
+        const building = built01 !== tgt;
+        asmStageEl?.classList.toggle("is-building", building);
+        // The moment it stops moving, hand the settled state to the hint label.
+        // Only on the falling edge, so this is not a per-frame setState.
+        if (wasBuilding && !building) onSettleRef.current(tgt >= 0.5);
+        wasBuilding = building;
       }
       const eBuilt = built01 <= 0 ? 0 : built01 >= 1 ? 1 : built01 * built01 * (3 - 2 * built01);
       const visH = Math.tan(((SCREEN.fov * Math.PI) / 180) / 2) * Math.abs(SCREEN.camZ);
@@ -2756,15 +2771,17 @@ export function PackageScreen({
           }}
         >
           <canvas className="cw-assemble__canvas" ref={canvasRef} aria-hidden="true" />
-          {/* The verb follows the INPUT, not the viewport: a touch screen taps.
-              Both words are in the DOM and swapped in CSS, so the static export
-              needs no client branch and there is no hydration flash. */}
           <span className="cw-assemble__tip" role="tooltip">
-            <span className="cw-assemble__verb--hover">click</span>
-            <span className="cw-assemble__verb--touch">tap</span>
-            {built ? " to take it apart" : " to build"}
+            {settledBuilt ? "click to take it apart" : "click to build"}
           </span>
         </button>
+        {/* The TOUCH hint is its own element OUTSIDE the stage button, so it can
+            never sit over the canvas the way an absolutely positioned overlay
+            does. Only one of the two is ever displayed (see the `hover: none`
+            block), so exactly one reaches the accessibility tree per device. */}
+        <p className="cw-assemble__taphint">
+          {settledBuilt ? "tap to take it apart" : "tap to build"}
+        </p>
       </div>
     );
   }
