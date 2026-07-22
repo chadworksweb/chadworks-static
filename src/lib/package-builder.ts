@@ -16,7 +16,7 @@
 // ---------------------------------------------------------------------
 // "Baseline", never "floor" (Chad, 2026-07-17). The readout already says
 // "Baseline price" at rest, so the copy and the tool now use one word.
-export const BASE = 3200; // the baseline build: 3 pages, clean and correct
+export const BASE = 3250; // the baseline build: 3 pages, clean and correct
 
 const PER_PAGE = 260; // each page past the 3 the base covers
 const PAGES_INCLUDED = 3;

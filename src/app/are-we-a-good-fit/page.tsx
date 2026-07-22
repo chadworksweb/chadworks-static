@@ -134,7 +134,7 @@ export default function GoodFitPage() {
               still renders a real em-dash. */}
           The decision to build your own sovereign property off-social media, off
           YouTube&mdash;off any centralized platform carries weight, and financial
-          requirements. The starting price for any chadworks project is $3,200 but
+          requirements. The starting price for any chadworks project is $3,250 but
           easily cracks $5,000 and $10,000. See my{" "}
           {/* LaunchLink, not Link: the calculator lives on the claude/chadworks-work
               branch and is not merged, so /build-your-website-package/ does not

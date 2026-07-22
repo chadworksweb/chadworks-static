@@ -1,5 +1,5 @@
 // Route: /rates/ -- standalone page. Value-based pricing with the math
-// showing. Real numbers only ($5.25/min, $3,200 baseline, $5,000-$10,000 typical, $550
+// showing. Real numbers only ($5.25/min, $3,250 baseline, $5,000-$10,000 typical, $550
 // every 6 months for WordPress care). Signature moment (CWS-CREATIVE-ARSENAL):
 // the glass price panel + scanning border + a show-the-math ledger. Copy in
 // Chad's public voice, big-ticket posture (never apologize for the number).

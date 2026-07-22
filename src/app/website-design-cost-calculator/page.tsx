@@ -563,7 +563,7 @@ export default function WebsiteDesignCostCalculatorPage() {
         </div>
       </SectionShell>
 
-      {/* What the baseline actually buys. Without this the $3,200 is
+      {/* What the baseline actually buys. Without this the $3,250 is
           unfalsifiable, and it is also where the "lower, not lesser" argument
           gets its evidence: a list an engine can lift, rather than a paragraph
           asking to be believed.

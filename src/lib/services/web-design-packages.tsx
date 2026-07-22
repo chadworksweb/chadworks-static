@@ -1,6 +1,6 @@
 // Service: Web Design Packages (Websites lane) -- the scoped route: a
 // defined build at a defined number. No invented tiers: the three postures
-// use the REAL locked economics ($3,200 baseline / $5,000-$10,000 typical / beyond).
+// use the REAL locked economics ($3,250 baseline / $5,000-$10,000 typical / beyond).
 // Copy in Chad's public voice.
 
 import type { ReactNode, CSSProperties } from "react";
@@ -58,7 +58,7 @@ export const webDesignPackages: Service = {
   keyFactsHeading: "Packages, at a glance",
   keyFacts: [
     "Every package is the same craft. The number scales with scope, never with how much polish you deserve.",
-    "Projects start at a $3,200 baseline and most land between $5,000 and $10,000 with design and development included.",
+    "Projects start at a $3,250 baseline and most land between $5,000 and $10,000 with design and development included.",
     "The quote you approve is the invoice you get. Add nothing, and the number never moves.",
     "Packages still get custom design. A defined scope means a defined size, not a template.",
   ],
@@ -160,7 +160,7 @@ export const webDesignPackages: Service = {
 
   price: {
     heading: "The three postures",
-    figure: "$3,200 / $5,000 to $10,000 / beyond",
+    figure: "$3,250 / $5,000 to $10,000 / beyond",
     figureSub: "The baseline build / the typical build / the big vision",
     body:
       "The baseline gets a focused site that does one job well. The typical build is where most businesses land: full design, development, and the launch handled. Past that, the number tracks the vision, and we scope it together. Hourly work bills at $315 when a defined package isn't the right shape.",
@@ -221,7 +221,7 @@ export const webDesignPackages: Service = {
         label: "Which posture sounds like you?",
         span: "half",
         options: [
-          { value: "baseline", label: "The baseline build ($3,200)" },
+          { value: "baseline", label: "The baseline build ($3,250)" },
           { value: "typical", label: "The typical build ($5,000 to $10,000)" },
           { value: "beyond", label: "The big vision" },
           { value: "unsure", label: "Scope it for me" },
@@ -277,6 +277,6 @@ export const webDesignPackages: Service = {
   meta: {
     title: "Web Design Packages -- A Defined Build at a Defined Number | chadworks",
     description:
-      "A web design package is a scoped website build at a number you know before work starts: a $3,200 baseline, a $5,000 to $10,000 typical build, and custom beyond. The quote you approve is the invoice you get.",
+      "A web design package is a scoped website build at a number you know before work starts: a $3,250 baseline, a $5,000 to $10,000 typical build, and custom beyond. The quote you approve is the invoice you get.",
   },
 };

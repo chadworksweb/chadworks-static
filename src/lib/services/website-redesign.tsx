@@ -201,7 +201,7 @@ export const websiteRedesign: Service = {
   price: {
     heading: "What a redesign costs, plainly",
     body:
-      "I price a redesign on the value of the new site, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,200 floor. Most redesigns settle near $6,200, depending on how much of the old site carries over and how deep the rebuild goes. A redesign can actually come in lighter than a build from zero when your brand and content are already strong, or heavier when the old site is so tangled that untangling it is most of the work. Either way, I'll tell you which case you are before you commit. This puts me above the cheapest option out there, and that is on purpose, because the cheap redesign is usually the one you pay to redo again in two years.",
+      "I price a redesign on the value of the new site, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,250 floor. Most redesigns settle near $6,200, depending on how much of the old site carries over and how deep the rebuild goes. A redesign can actually come in lighter than a build from zero when your brand and content are already strong, or heavier when the old site is so tangled that untangling it is most of the work. Either way, I'll tell you which case you are before you commit. This puts me above the cheapest option out there, and that is on purpose, because the cheap redesign is usually the one you pay to redo again in two years.",
   },
 
   faqLead:

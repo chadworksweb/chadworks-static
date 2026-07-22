@@ -23,7 +23,7 @@ const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
 const DESCRIPTION =
-  "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,200 baseline, most between $5,000 and $10,000), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
+  "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,250 baseline, most between $5,000 and $10,000), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
 
 export const metadata: Metadata = {
   title: TITLE,

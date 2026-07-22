@@ -275,7 +275,7 @@ const FAQS = [
     q: "What does a website cost?",
     a: (
       <>
-        A website from chadworks starts at $3,200 but typically crosses the
+        A website from chadworks starts at $3,250 but typically crosses the
         $5,000 mark. A web app or more involved build beyond a brochure website
         will easily break $10,000. Visit my{" "}
         <LaunchLink href="/rates/">rates page</LaunchLink> for more info.
