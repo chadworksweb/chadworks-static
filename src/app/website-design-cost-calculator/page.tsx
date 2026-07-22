@@ -571,13 +571,16 @@ export default function WebsiteDesignCostCalculatorPage() {
           gets its evidence: a list an engine can lift, rather than a paragraph
           asking to be believed.
 
-          Nothing here was invented to fill the list out. The accessibility and
-          privacy lines are Chad's call. The privacy line is still stated as
-          PRACTICE rather than as a named standard. The accessibility line is
-          NOT any more: on 2026-07-22 Chad named ADA and ARIA outright, which is
-          a conformance claim and is deliberate. /faqs/ and the service pages
-          still carry the old practice-stated wording, so the two no longer
-          match; they should move together. */}
+          Nothing here was invented to fill the list out; the whole list is
+          Chad's copy (2026-07-22). Two claims in it are load-bearing. The
+          ACCESSIBILITY line names ADA and ARIA outright, which is a conformance
+          claim the old practice-stated wording ("works with a keyboard and a
+          screen reader") deliberately avoided. /faqs/ and the service pages
+          still carry that old wording, so the two no longer match and should
+          move together. The old privacy line is gone, replaced by the DATA
+          COMPLIANT and ANALYTICS bullets, which promise specific artifacts (a
+          privacy policy, a terms page, cookie controls) rather than a practice.
+          Every build has to actually ship them. */}
       <SectionShell className="svc-block" id="included">
         <p className="eyebrow">BASELINE TECHNICAL SPECS AND FEATURES</p>
         <h2 className="svc-block__heading svc-fill">
@@ -651,18 +654,11 @@ export default function WebsiteDesignCostCalculatorPage() {
             ADA and ARIA requirements. Further compliance available as needed.
           </li>
           <li>
-            Nothing measures your visitors until they agree to it, and there are
-            no advertising or marketing pixels on it anywhere.
+            <strong>Analytics.</strong> Google Analytics and PostHog are both
+            available for integration into your website or project. Leveraging
+            the data collected, however, is a separate service.
           </li>
         </ul>
-        <div className="svc-prose svc-prose--plain">
-          <p>
-            The first one is worth reading twice. The code, the domain, and the
-            hosting are in your name from the day it launches, including the parts
-            that make it easy to walk to another builder. You own the whole
-            website the moment it goes live, keys and all.
-          </p>
-        </div>
       </SectionShell>
 
       {/* The "about the calculator" cluster: Chad's questions, each its own headed
