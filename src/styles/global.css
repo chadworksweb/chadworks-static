@@ -2152,9 +2152,14 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   .cw-assemble__taphint {
     display: block;
     position: absolute;
+    /* Foot of the canvas, not its centre: centred it sat straight on top of the
+       assembled slab. The object occupies roughly the middle 57% of the box, so
+       the bottom strip is the one place inside the tap target that is clear of
+       it in both states (Chad, 2026-07-22). */
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: auto;
+    bottom: 6px;
+    transform: translateX(-50%);
     z-index: 3;
     pointer-events: none;
     padding: 0.32rem 0.6rem;
