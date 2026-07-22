@@ -53,13 +53,11 @@ import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
 import { PackageAssemble } from "@/components/package-builder/PackageAssemble";
 import {
   BASE,
-  BASELINE,
   PARAMS,
   PER_PAGE_LADDER_KEYS,
   UNIT_RATES,
   ladderFor,
   money,
-  weeksLabel,
   type Param,
 } from "@/lib/package-builder";
 import { CALCULATORS } from "@/lib/pricing";
@@ -387,7 +385,7 @@ function rowsFor(p: Param): CardRow[] {
         const mult = UNIT_RATES.timelineMult[i];
         return {
           opt,
-          amt: mult === 1 ? "no change" : `+${Math.round((mult - 1) * 100)}% of the build`,
+          amt: mult === 1 ? "no change" : `+${Math.round((mult - 1) * 100)}% of the subtotal`,
           zero: mult === 1,
         };
       });
@@ -550,18 +548,6 @@ export default function WebsiteDesignCostCalculatorPage() {
           ))}
         </div>
 
-        <div className="svc-prose svc-prose--plain">
-          <p>
-            Rush is a percentage of the whole build, because urgency taxes every
-            hour of a project at once. It is the one line that buys you something
-            other than more website: the baseline build takes {weeksLabel(BASELINE)},
-            and the rush premium pushes your project to the front of the queue, so
-            the weeks drop as the price climbs. Branding works in reverse. The
-            more you bring in hand, the less I build, so a full system in hand
-            costs nothing and a blank start costs{" "}
-            {money(ladderFor("brandingDone")?.[0] ?? 0)}.
-          </p>
-        </div>
       </SectionShell>
 
       {/* What the baseline actually buys. Without this the $3,250 is

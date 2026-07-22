@@ -291,7 +291,7 @@ export const PARAMS: Param[] = [
     label: "Ecommerce",
     hint: "What the site sells and how.",
     kind: "steps",
-    options: ["Nothing", "A few products", "A real store", "A catalog", "A platform"],
+    options: ["None", "A few products", "A real store", "A catalog", "A platform"],
   },
   {
     key: "integrations",
@@ -299,6 +299,7 @@ export const PARAMS: Param[] = [
     hint: "What the site has to talk to. Check every one that applies.",
     kind: "checks",
     options: [...INTEGRATION_OPTIONS],
+    note: "Effort to bring an integration to production level will vary greatly per situation. This is a rough estimate, not a promise. Integrations will be discussed thoroughly during the consultation process.",
   },
   {
     key: "timeline",
@@ -310,7 +311,7 @@ export const PARAMS: Param[] = [
   {
     key: "locales",
     label: "Languages",
-    hint: "Each one is another site to keep true.",
+    hint: "Number of languages the site needs to be translated into.",
     kind: "range",
     min: 1,
     max: 6,
