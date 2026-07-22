@@ -167,7 +167,7 @@ const breadcrumbJsonLd = {
 // under the hero), then the rate card and the rest.
 const TOC: { href: string; label: string }[] = [
   { href: "#purpose", label: "What it's for" },
-  { href: "#rate-card", label: "The rate card" },
+  { href: "#rate-card", label: "The numbers behind it" },
   { href: "#included", label: "What every build includes" },
   { href: "#how-built", label: "How I built it" },
   { href: "#who", label: "Who it's for" },
