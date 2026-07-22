@@ -49,6 +49,7 @@ import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
+import { LaunchLink } from "@/components/LaunchLink";
 import { ScopeCalculator } from "@/components/package-builder/ScopeCalculator";
 import { PackageAssemble } from "@/components/package-builder/PackageAssemble";
 import {
@@ -571,29 +572,22 @@ export default function WebsiteDesignCostCalculatorPage() {
           asking to be believed.
 
           Nothing here was invented to fill the list out. The accessibility and
-          privacy lines are Chad's call (2026-07-19): both are baselines on
-          every build, and both are stated as PRACTICE rather than as a named
-          standard, so there is no conformance claim to defend. Keep it that
-          way. The same two baselines are stated on /faqs/ and the service
-          pages; they should move together. */}
+          privacy lines are Chad's call. The privacy line is still stated as
+          PRACTICE rather than as a named standard. The accessibility line is
+          NOT any more: on 2026-07-22 Chad named ADA and ARIA outright, which is
+          a conformance claim and is deliberate. /faqs/ and the service pages
+          still carry the old practice-stated wording, so the two no longer
+          match; they should move together. */}
       <SectionShell className="svc-block" id="included">
         <p className="eyebrow">BASELINE TECHNICAL SPECS AND FEATURES</p>
         <h2 className="svc-block__heading svc-fill">
-          Here&apos;s what&apos;s included in the Baseline website cost
+          What&apos;s included in the website calculator&apos;s Baseline?
         </h2>
-        {/* The baseline stays a statement on its own: it is the one number that
-            is not a modifier, so it does not belong in a group with them. Moved
-            here from the rate card (Chad, 2026-07-22) so it sits with what the
-            baseline actually buys rather than with the things that modify it. */}
-        <dl className="rates-ledger">
-          <div className="rates-ledger__row">
-            <dt className="rates-ledger__label">
-              The baseline build: {UNIT_RATES.pagesIncluded} pages at{" "}
-              {UNIT_RATES.sectionsIncluded} sections each
-            </dt>
-            <dd className="rates-ledger__num">{money(BASE)}</dd>
-          </div>
-        </dl>
+        {/* No baseline ledger line here. It was moved in from the rate card on
+            2026-07-22 and back out the same day (Chad): the heading already
+            names the baseline, and the section's job is what the baseline BUYS,
+            not restating what it costs. The figure lives on the rate card and
+            in the hero lede. */}
         <div className="svc-prose">
           <p>
             The website calculator&apos;s estimate changes a lot depending on the
@@ -604,37 +598,57 @@ export default function WebsiteDesignCostCalculatorPage() {
         </div>
         <ul className="cw-included">
           <li>
-            The code, the domain, and the hosting all end up in your name, on
-            day one.
+            <strong>Standard pages.</strong> Home, Services, About, Contact
+            (swap any for your specific needs).
           </li>
           <li>
-            It is designed and built for your business alone, a layout no other
-            company is running.
+            <strong>Page sections.</strong> Header, hero, intro, expansion,
+            CTA, footer.
+          </li>
+          {/* The space after the label is an explicit {" "} here, NOT the plain
+              source space every other bullet uses. This <li> has expression
+              children ({" "} + the LaunchLink), and in that case the compiler
+              drops the leading space of the text node that follows </strong>,
+              so the label ran straight into "Basic". Keep the explicit form on
+              any bullet that mixes text with expressions. */}
+          <li>
+            <strong>Visible.</strong>{" "}
+            Basic, yet comprehensive SEO and GEO (AI search visibility) is
+            included in all builds. Your site will show for your business,
+            project or person&apos;s name. Ranking and competing for terms
+            beyond that is not guaranteed, but is available via{" "}
+            {/* /visibility/ is not in launch.ts LAUNCHED, so LaunchLink renders
+                this as the site's standard sealed affordance: dimmed, not
+                clickable, "coming soon" on hover/focus. It becomes a real link
+                the moment that route is launched, with no edit here. */}
+            <LaunchLink href="/visibility/">Visibility services</LaunchLink>.
           </li>
           <li>
-            It loads fast, because the pages are finished and waiting before
-            anyone asks for them.
+            <strong>Responsive.</strong> All chadworks websites and digital
+            productions are mobile friendly, and where required, mobile first.
           </li>
           <li>
-            There is no database sitting behind it for somebody to break into,
-            which is most of what people mean when they say a site got hacked.
+            <strong>Novel design.</strong> It is designed and built for your
+            business alone, a layout no other company is running.
           </li>
           <li>
-            Hosting a site built this way costs close to nothing, and the bill
-            goes straight to you.
+            <strong>Speed.</strong> All chadworks sites are tuned for maximum
+            performance that the technology stack will allow.
           </li>
           <li>
-            It works on a phone, checked on real ones and not just by shrinking
-            a browser window.
+            <strong>Security.</strong> All sites are either inherently secure
+            with SSL and static infrastructure, or hardened with commercial
+            grade tools to protect exposure like logins or databases.
           </li>
           <li>
-            Google is handed a map of your pages and the technical groundwork it
-            needs to actually list you, and that same groundwork is what lets
-            ChatGPT and the other engines read you and quote you correctly.
+            <strong>Data compliant.</strong> Privacy policy, terms of service
+            pages and cookie controls are included in all sites. Additional
+            protection is available as needed for an additional, custom scope
+            and fee.
           </li>
           <li>
-            It works with a keyboard and a screen reader, no mouse required, and
-            it respects the setting a visitor turned on to stop things moving.
+            <strong>Accessible.</strong> All chadworks websites meet baseline
+            ADA and ARIA requirements. Further compliance available as needed.
           </li>
           <li>
             Nothing measures your visitors until they agree to it, and there are

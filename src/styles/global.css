@@ -1957,8 +1957,10 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   font-family: var(--font-mono);
 }
 
-/* The rate card follows the purpose section directly, so it drops its top
-   padding to sit tight under it. */
+/* The purpose section is hoisted directly under the hero, and the rate card
+   follows it directly. Both drop their top padding so the three bands sit
+   tight against each other instead of stacking three full rhythms of air. */
+#purpose { padding-top: 0; }
 #rate-card { padding-top: 0; }
 
 /* --- Purpose section: prose beside the package-assemble object. */
@@ -5425,9 +5427,9 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   list-style: none;
   padding: 0;
 }
-@media (min-width: 760px) {
-  .cw-included { grid-template-columns: 1fr 1fr; }
-}
+/* ONE COLUMN (Chad, 2026-07-22). It was two on desktop, which meant the reading
+   order ran across the row rather than down the list, so the sequence the copy
+   is actually written in was not the sequence anyone read. */
 .cw-included li {
   position: relative;
   margin: 0;
@@ -5441,7 +5443,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 /* The glow marker from .cw-glow-list, restated rather than shared: that rule is
    scoped to lists inside .svc-prose and this list is a sibling of the prose
    block, not a child of it. Same 8px gradient chip, so the two lists on this
-   page read as one family while this one keeps its two columns. */
+   page read as one family. */
 .cw-included li::before {
   content: "";
   position: absolute;
