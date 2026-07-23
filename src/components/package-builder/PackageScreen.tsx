@@ -1329,6 +1329,20 @@ export function PackageScreen({
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
       const aspect = w / Math.max(1, h);
+      // MOBILE ZOOM (2026-07-23). The projection is fov-BASED on the vertical,
+      // so the object always paints at the same FRACTION of the canvas height
+      // (~30%) no matter how big the canvas is. On the desktop stage that is
+      // ~230px of an 828px column and reads as an object. In the stacked mobile
+      // layout the band is a third of that height, so the same 30% is ~90px --
+      // a thumbnail floating in dead space.
+      //
+      // Fixing it by growing the band would come straight out of the parameter
+      // list, which is the half of the screen that has to stay usable. So the
+      // CAMERA moves in instead: same object, same framing, closer. The test is
+      // the band's own shape (short, and no wider than a tablet), not a device
+      // sniff, so a narrow desktop window in the stacked layout gets it too.
+      const short = canvas.clientWidth <= 900 && canvas.clientHeight < 460;
+      const camZ = short ? SCREEN.camZ / 1.3 : SCREEN.camZ;
       // ASSEMBLY-ONLY FRAMING (Chad, 2026-07-22). The composite object is not
       // symmetric about the origin: the mathDev plug hangs off the left edge and
       // the page leaves stack behind, so the painted result lands ~14% above and
@@ -1350,13 +1364,13 @@ export function PackageScreen({
       //
       // Scoped to assembly mode: the live calculator's object is framed by the
       // stage layout around it, not by this box, and must not move.
-      const halfH = Math.abs(SCREEN.camZ) * Math.tan((SCREEN.fov * Math.PI) / 360);
+      const halfH = Math.abs(camZ) * Math.tan((SCREEN.fov * Math.PI) / 360);
       const cssH = Math.max(1, canvas.clientHeight);
       const shiftY = assemblyRef.current ? -(47 / cssH) * (halfH * 2) : 0;
       const shiftX = assemblyRef.current ? 0.102 * (halfH * 2 * aspect) : 0;
 
       const proj = Mat.persp((SCREEN.fov * Math.PI) / 180, aspect, 0.1, 100);
-      const view = Mat.trans(shiftX, shiftY, SCREEN.camZ);
+      const view = Mat.trans(shiftX, shiftY, camZ);
       // FLOAT ONLY, no spin. The object is suspended, so it has to DRIFT, not
       // just tilt: translation is what sells weightlessness, and a lone bob on
       // one axis reads as a loop. Four sines on deliberately unrelated periods
@@ -1398,7 +1412,7 @@ export function PackageScreen({
         wasBuilding = building;
       }
       const eBuilt = built01 <= 0 ? 0 : built01 >= 1 ? 1 : built01 * built01 * (3 - 2 * built01);
-      const visH = Math.tan(((SCREEN.fov * Math.PI) / 180) / 2) * Math.abs(SCREEN.camZ);
+      const visH = Math.tan(((SCREEN.fov * Math.PI) / 180) / 2) * Math.abs(camZ);
       const visW = visH * (w / Math.max(1, h));
       // The built package is nudged UP by 50 CSS px (75 up, then 25 back down --
       // Chad). Converted to world units (a full canvas height spans 2*visH), and
@@ -1446,7 +1460,7 @@ export function PackageScreen({
         // had supposedly been subtracted.
         const oz = gp.nz * 1.0 + Math.sin(time * gp.frq[2] + gp.phs[2]) * gp.amp[2];
         const mag =
-          Math.abs(SCREEN.camZ) / Math.max(0.1, Math.abs(SCREEN.camZ) - (az + oz * s));
+          Math.abs(camZ) / Math.max(0.1, Math.abs(camZ) - (az + oz * s));
         // `ext` is a SWEPT RADIUS about the pivot, not a half-width. The part
         // spins freely while it is apart, so the only bound that holds at every
         // angle is a sphere -- splitting it per axis would let a wide slab clip
@@ -1632,7 +1646,7 @@ export function PackageScreen({
             gl.uniform1f(ut.breath, 1);
             gl.uniform1f(ut.ripple, 0);
             const zS = -1.15; // just in front of the grain, still behind the slab
-            const vz = zS + SCREEN.camZ;
+            const vz = zS + camZ;
             for (let i = 0; i < SHAPES.length; i++) {
               const sp = SHAPES[i];
               const bob = Math.sin(time * 0.28 + sp.drift) * 0.04;
@@ -2028,7 +2042,7 @@ export function PackageScreen({
 
         // Project the body centre to canvas px so the click handler can hit-test
         // the plug. model[12..14] is the box centre in world space.
-        const vz = bodyModel[14] + SCREEN.camZ;
+        const vz = bodyModel[14] + camZ;
         if (vz < -0.001) {
           const ndcx = (proj[0] * bodyModel[12]) / -vz;
           const ndcy = (proj[5] * bodyModel[13]) / -vz;
@@ -2215,7 +2229,7 @@ export function PackageScreen({
         // two eye distances ABOUT THE EYE'S OWN xy, not about the local origin.
         // That offset is the whole asymmetry. It is derived from S each frame,
         // so it stays right through the zoom, the scatter and the sway.
-        const camLocal = Mat.pt(Mat.invAffine(S), -shiftX, -shiftY, -SCREEN.camZ);
+        const camLocal = Mat.pt(Mat.invAffine(S), -shiftX, -shiftY, -camZ);
         const liftScale = (z: number) => (z - camLocal[2]) / (faceZ - camLocal[2]);
         const ovShrink = liftScale(faceZ + (OV_HD + PLAQUE_GAP) * appear);
         // A panel laminated on the front cap can never be WIDER than the cap.

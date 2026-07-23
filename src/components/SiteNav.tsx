@@ -70,21 +70,87 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
-  // Escape closes the open panel.
+  // The hamburger, so closing can hand focus back to the thing that opened it.
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  // Escape closes the open panel. Focus goes back to the toggle first: the
+  // panel takes `inert` the moment it shuts, so a Escape pressed while focus
+  // was on a menu link would otherwise drop focus onto nothing.
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key !== "Escape") return;
+      toggleRef.current?.focus();
+      setOpen(false);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  // ---------------------------------------------------------------------
+  // SCROLL LOCK while the panel is open.
+  //
+  // Without it the page scrolls away underneath an open menu: you drag on what
+  // looks like a modal and the site slides behind it, so closing the menu drops
+  // you somewhere you never chose to be.
+  //
+  // `overflow: hidden` on the body is the usual answer and it is not enough --
+  // iOS Safari scrolls the page anyway. Pinning the body with `position: fixed`
+  // at a negative top is the one technique that holds everywhere; the offset is
+  // what stops the page snapping to the top the instant it is pinned, and the
+  // cleanup scrolls back to it. Instant, because :root carries `scroll-behavior:
+  // smooth` and a restore must not be a visible ride.
+  //
+  // Pinning the body also removes the scrollbar, which shifts the layout on any
+  // window narrow enough to show the toggle but wide enough to have one. The
+  // padding gives that exact width back.
+  //
+  // The panel itself scrolls internally (see .site-nav--open .site-nav__panel-
+  // inner), so locking the page never strands a menu taller than the screen.
+  // ---------------------------------------------------------------------
+  useEffect(() => {
+    if (!open) return;
+    const body = document.body;
+    const y = window.scrollY;
+    const bar = window.innerWidth - document.documentElement.clientWidth;
+    const prev = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      paddingRight: body.style.paddingRight,
+    };
+
+    body.style.position = "fixed";
+    body.style.top = `-${y}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    if (bar > 0) body.style.paddingRight = `${bar}px`;
+
+    return () => {
+      Object.assign(body.style, prev);
+      window.scrollTo({ top: y, behavior: "instant" });
+    };
   }, [open]);
 
   // The full nav renders sitewide. A link whose route isn't launched yet renders
   // greyed and non-clickable (a "coming soon" placeholder) instead of pointing
   // at a sealed page. Launch state is driven entirely by launch.ts.
   return (
-    <nav className={`site-nav${hidden ? " site-nav--hidden" : ""}${open ? " site-nav--open" : ""}`}>
+    <nav
+      className={`site-nav${hidden ? " site-nav--hidden" : ""}${open ? " site-nav--open" : ""}`}
+      // TABBING OUT CLOSES IT. The open panel locks the page scroll, so focus
+      // leaving the header would otherwise land on page content that cannot be
+      // scrolled to. Closing on the way out releases the lock and keeps the tab
+      // order honest. Guarded on relatedTarget: a touch on the panel's own
+      // padding blurs to nothing, and that must not count as leaving.
+      onBlur={(e) => {
+        const next = e.relatedTarget as Node | null;
+        if (next && !e.currentTarget.contains(next)) setOpen(false);
+      }}
+    >
       <div className="site-nav__inner">
         <Link
           href="/"
@@ -137,6 +203,7 @@ export default function SiteNav() {
         {/* Mobile-only (<=900) hamburger; the inline links hide at that tier. */}
         <button
           type="button"
+          ref={toggleRef}
           className="site-nav__toggle"
           aria-expanded={open}
           aria-controls="site-nav-panel"

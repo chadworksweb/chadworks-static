@@ -116,9 +116,13 @@
   pointer-events: none;
 }
 
+/* Opacity is a CONTRAST budget here, not a taste setting. At 0.55 this line
+   measured 3.05:1 on the stage, under the 4.5:1 that body-size text owes.
+   0.72 lands it at 4.61 and still reads a clear step below the figure. Same
+   correction on .window, which shares the treatment. */
 .readoutLabel {
   composes: micro;
-  opacity: 0.55;
+  opacity: 0.72;
   margin: 0 0 0.5rem;
 }
 
@@ -135,7 +139,9 @@
    weeks are one answer, so they share the readout rather than competing. */
 .window {
   composes: micro;
-  opacity: 0.55;
+  /* 3.05:1 at 0.55, and this is half the answer, not a footnote. See
+     .readoutLabel above. */
+  opacity: 0.72;
   margin: 0.65rem 0 0;
   font-variant-numeric: tabular-nums;
   /* 50% up from the .micro 0.62rem it composes (Chad, 2026-07-19). The window
@@ -339,7 +345,9 @@
 .hint {
   font-size: 0.75rem;
   line-height: 1.5;
-  opacity: 0.66;
+  /* 3.64:1 at 0.66. 0.75 clears 4.5:1 and keeps the hint under the option rows
+     it introduces. */
+  opacity: 0.75;
   margin: 0;
 }
 
@@ -400,13 +408,17 @@
   background: rgba(128, 84, 188, 0.08);
 }
 
-/* The rank marker: quiet by default so the words lead. */
+/* The rank marker: quiet by default so the words lead. It is aria-hidden (the
+   option text carries the meaning, and vertical order carries the rank), so it
+   is a decorative label and formally exempt from contrast. Cleared anyway: at
+   0.5 alpha it read 4.05:1 on white and less over the open panel's violet tint.
+   Solid indigo puts it past 4.5:1 in both, and the words still lead. */
 .optNum {
   flex: none;
   min-width: 0.85rem;
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 0.6rem;
-  color: rgba(36, 57, 137, 0.5);
+  color: #5a6ba0;
 }
 
 .optText {
@@ -420,8 +432,11 @@
   font-weight: 600;
 }
 
+/* The chosen row's numeral sits on the violet-tinted chip, where the brand
+   violet only reaches 4.05:1. Same one-shade-down violet the slider's number
+   uses, for the same reason. */
 .optOn .optNum {
-  color: #8054bc;
+  color: #6f45a4;
 }
 
 /* count rows: a slim slider where a chip row would run too long */
@@ -443,11 +458,15 @@
   min-width: 0;
 }
 
+/* The slider's number is the value itself, so it cannot ride at the brand
+   violet's 4.33:1 over the open panel's tint. One shade down (#6f45a4) reads as
+   the same violet and measures 5.1:1. The head's value keeps #8054bc, which
+   clears on its own white plate. */
 .countValue {
   composes: micro;
   min-width: 2rem;
   text-align: right;
-  color: #8054bc;
+  color: #6f45a4;
 }
 
 /* ---- bottom: the reference's "Finish your piece" ---- */
@@ -522,10 +541,238 @@
   }
 }
 
-/* ---- the gate: the tool needs a real landscape screen. ----
-   Mobile stays DARK either way. Hidden by default; the show conditions below
-   flip it on. The visual dark lives here so both conditions share it and only
-   have to toggle `display`. */
+/* =====================================================================
+   MOBILE: the stage becomes a STACK. (Spike, 2026-07-23)
+
+   Desktop is one fixed 100dvh stage with three absolutely positioned sectors
+   in a row. A phone gets the same three sectors in a column, with the object
+   and the price WELDED TO THE TOP so they never leave the screen while you
+   tap through the parameters:
+
+     [ nav                    ]
+     [ object      (sticky)   ]
+     [ $18,400  7-9 wks  RESET]  (sticky, directly under the object)
+     [ PAGES              6 + ]  <- page scroll from here down
+     [ SECTIONS PER PAGE  4 + ]
+     [ ...12 params...        ]
+     [ Send this scope to Chad]
+
+   Three things make it work:
+   1. The rail stops being its own scroll box. A nested scroller inside a page
+      scroller is the one thing that always feels broken on touch, so PAGE
+      scroll owns the params and the rail is a plain full-width list.
+   2. The object band is sticky and OPAQUE, and outranks the rail (z 5 vs 1),
+      so the params scroll behind it rather than through it.
+   3. NO HEADER over the stage. The band reserved a nav-height of padding at
+      first so the object cleared the sticky bar, and that padding is exactly
+      what threw the object off centre -- it was centred in the band minus the
+      nav, which is not the band. The header stands down instead (see the
+      cw-nav-off effect in PackageBuilderStage), so the band is the whole frame
+      and the object centres in what you actually see.
+
+   The negative margin-top stays, so the band's flow box starts at the very top
+   of the viewport -- the same place its sticky rule pins it to. Flow and stuck
+   positions coincide, which is why no compensating margin is needed underneath.
+   ===================================================================== */
+@media (orientation: portrait) and (max-width: 900px) {
+  .wrap {
+    /* The stage: two fifths of the screen (Chad, 2026-07-23). One token,
+       because the sticky price strip has to park at exactly the band's bottom
+       edge -- the two cannot drift apart. Now that the header stands down over
+       the stage, this is the object's WHOLE frame, with nothing taken out of
+       the top of it. */
+    --obj-h: 40dvh;
+
+    height: auto;
+    /* Sticky needs a scrolling ancestor it can travel in: `overflow: hidden`
+       here would pin the band to the top of the box and never move it. */
+    overflow: visible;
+    padding-bottom: 2.5rem;
+  }
+
+  .canvasLayer {
+    position: sticky;
+    inset: auto;
+    top: 0;
+    z-index: 5;
+    height: var(--obj-h);
+    /* Opaque: the rail runs UNDER this band. Same wash as the stage, so the
+       seam between the band and the page below it does not read as an edge. */
+    background:
+      radial-gradient(88% 74% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 64%),
+      #ede7f6;
+  }
+
+  /* No longer a positioned layer: it is just the flow below the band. Dropping
+     the z-index matters as much as dropping the position -- as a stacking
+     context it would drag the rail up over the object band with it. */
+  .inner {
+    position: static;
+    z-index: auto;
+    width: auto;
+    pointer-events: auto;
+  }
+
+  /* ---- the price strip: the readout, laid on its side ----
+     Desktop stacks it in the top-right corner. Here it is one horizontal plate
+     welded under the object, because the number has to stay in view while you
+     are tapping the thing that changes it.
+       [ BASELINE PRICE           ]
+       [ $18,400     7-9 weeks    ]  [RESET] */
+  .readout {
+    position: sticky;
+    top: var(--obj-h);
+    right: auto;
+    z-index: 6;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    column-gap: 0.7rem;
+    row-gap: 0.1rem;
+    padding: 0.55rem 0.85rem 0.6rem;
+    text-align: left;
+    /* OPAQUE, not a frosted plate. The rail scrolls under this strip, and at
+       92% white the param row passing behind it ghosted straight through the
+       price. A number people are reading off cannot have another number
+       showing through it. */
+    background: #fff;
+    border-block: 1px solid rgba(36, 57, 137, 0.14);
+    pointer-events: auto;
+  }
+
+  .readoutLabel {
+    grid-area: 1 / 1 / 2 / 3;
+    margin: 0;
+  }
+
+  .figure {
+    grid-area: 2 / 1 / 3 / 2;
+    font-size: 1.65rem;
+  }
+
+  .window {
+    grid-area: 2 / 2 / 3 / 3;
+    margin: 0;
+    font-size: 0.8rem;
+  }
+
+  .reset {
+    grid-area: 1 / 3 / 3 / 4;
+    align-self: center;
+    margin: 0;
+    /* A real tap target, not a 10px word. The vertical padding buys a 44px hit
+       height inside the strip without moving the ink, so the small word still
+       reads small while the target clears the touch floor. */
+    padding: 0.85rem 0.35rem 0.85rem 0.85rem;
+    opacity: 0.72;
+  }
+
+  /* ---- the rail: full width, page-scrolled ---- */
+  .rail {
+    position: static;
+    width: auto;
+    padding: 0;
+    overflow: visible;
+    scrollbar-gutter: auto;
+    gap: 0;
+    border-radius: 0;
+    border-inline: none;
+    border-top: none;
+  }
+
+  /* KEYBOARD: nothing may be focused underneath the sticky chrome. Tabbing to a
+     control scrolls it into view, and without a scroll margin that landed the
+     focused row at y=398 with the price strip's bottom edge at y=403 -- focused,
+     and behind the furniture. The margin is the band plus the strip plus air. */
+  .head,
+  .opt,
+  .range,
+  .finishLink {
+    scroll-margin-top: calc(var(--obj-h) + 5.5rem);
+  }
+
+  /* Touch sizing. Every head clears 44px and every option row clears 40px;
+     the micro-type comes up a step with them so the rail does not read as
+     desktop chrome that happens to be wide. */
+  .head {
+    min-height: 44px;
+    padding: 0.75rem 0.7rem 0.75rem 0.9rem;
+  }
+
+  .paramOpen .head {
+    padding: calc(0.75rem - 1px) calc(0.7rem - 1px) calc(0.75rem - 1px) calc(0.9rem - 1px);
+  }
+
+  .headLabel {
+    font-size: 0.8rem;
+  }
+
+  .headValue {
+    font-size: 0.68rem;
+  }
+
+  .caret {
+    font-size: 0.9rem;
+    opacity: 0.55;
+  }
+
+  .bodyInner {
+    padding-inline: 0.9rem;
+    gap: 0.7rem;
+  }
+
+  .hint {
+    font-size: 0.85rem;
+  }
+
+  .opts {
+    gap: 0.3rem;
+  }
+
+  .opt {
+    padding: 0.6rem 0.65rem;
+    font-size: 0.88rem;
+    min-height: 40px;
+    align-items: center;
+  }
+
+  .optNum {
+    font-size: 0.68rem;
+  }
+
+  /* Fat thumb, fat track: the count sliders are the only drag targets here. */
+  .count {
+    gap: 0.9rem;
+    padding-right: 0.2rem;
+  }
+
+  .range {
+    height: 2.25rem;
+  }
+
+  .countValue {
+    font-size: 0.85rem;
+    min-width: 2.4rem;
+  }
+
+  /* The finish line stops floating: it is the last thing in the column. */
+  .finish {
+    position: static;
+    margin-top: 1.4rem;
+    padding-inline: 0.9rem;
+  }
+
+  .finishLink {
+    font-size: 0.7rem;
+    padding-block: 0.5rem 0.35rem;
+  }
+}
+
+/* ---- the gate: one case left. ----
+   A phone TURNED SIDEWAYS has ~390px of height, which the sticky band alone
+   would eat. Everything else -- phone upright, tablet either way, desktop --
+   now runs the real tool, so the gate exists only to ask for the device back
+   in portrait. Hidden by default; the show condition below flips it on. */
 .mobileGate {
   display: none;
   flex-direction: column;
@@ -570,37 +817,10 @@
   margin: 0.35rem 0 0;
 }
 
-/* The footnote under "please view on desktop". Sits with the phone message, so
-   it is hidden in the tablet block below alongside the desktop line. */
-.gateNote {
-  max-width: 32ch;
-  margin: 0.15rem 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: rgba(237, 231, 246, 0.7);
-}
-
-/* Two messages share the one heading line. "View on desktop" is the DEFAULT
-   (Chad, 2026-07-22): rotating a phone does not buy enough room either way, so
-   a phone is told the true answer in both orientations. "Rotate" is the tablet
-   message alone, because on a tablet turning it really does run the tool. */
-.gateMsgRotate {
-  display: none;
-}
-
-/* SHOW THE GATE. Three conditions, OR'd:
-   1. A NARROW portrait screen (<= 600px wide) -- a phone upright.
-   2. A landscape screen small enough to be a phone (short AND narrow) -- turning
-      a phone sideways still is not enough room, so mobile stays dark. The
-      max-width guard keeps a wide-but-short desktop window out of the gate.
-   3. A TABLET upright: portrait, wider than the phone floor, and `pointer:
-      coarse` so a tall narrow DESKTOP window is not caught by aspect ratio
-      alone -- which is the trap the original two-condition rule was written to
-      avoid. A tablet has the width to run the tool once it is turned, so this
-      one gets the rotate prompt rather than being sent to a desktop. */
-@media (orientation: portrait) and (max-width: 600px),
-  (orientation: landscape) and (max-width: 950px) and (max-height: 600px),
-  (orientation: portrait) and (min-width: 601px) and (max-width: 1100px) and (pointer: coarse) {
+/* SHOW THE GATE. One condition: a touch device held sideways with no height to
+   give -- a phone in landscape. The `pointer: coarse` guard keeps a short
+   desktop window out of it, since a desktop can just run the row. */
+@media (orientation: landscape) and (max-width: 950px) and (max-height: 600px) and (pointer: coarse) {
   /* The tool and its chrome both go; the gate is all that renders. */
   .canvasLayer,
   .inner {
@@ -609,6 +829,7 @@
 
   .wrap {
     height: auto;
+    margin-top: 0;
     padding-bottom: 0;
     /* The gate carries its own dark; drop the lavender wash under it. */
     background: none;
@@ -616,19 +837,6 @@
 
   .mobileGate {
     display: flex;
-  }
-}
-
-/* Tablet upright is the ONE case where turning the device actually helps, so it
-   is the one case that asks for it. Every other gated screen keeps the default
-   "view on desktop". */
-@media (orientation: portrait) and (min-width: 601px) and (max-width: 1100px) and (pointer: coarse) {
-  .gateMsgRotate {
-    display: inline;
-  }
-
-  .gateMsgDesktop,
-  .gateNote {
-    display: none;
+    min-height: 100dvh;
   }
 }

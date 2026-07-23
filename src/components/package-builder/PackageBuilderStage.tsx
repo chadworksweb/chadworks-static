@@ -17,7 +17,7 @@
 // (lib/package-builder), never two implementations of it.
 // =====================================================================
 
-import { type Dispatch, type SetStateAction, useMemo, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import PackageScreen from "@/components/package-builder/PackageScreen";
 import {
   BASELINE,
@@ -116,6 +116,54 @@ function scrollToNote(el: HTMLElement) {
   window.setTimeout(finish, TRAVEL_MS + 400);
 }
 
+// ---------------------------------------------------------------------
+// MOBILE: PARK AN OPENED PANEL UNDER THE STICKY BAND.
+//
+// On a phone the object and the price strip are welded to the top of the
+// screen, so roughly half the viewport is already spoken for. Open a panel
+// down near the twelfth parameter and its body unfolds below the fold: the
+// reader taps a row and, as far as they can tell, nothing happens.
+//
+// So the head is carried up to sit just under the price strip, which puts the
+// panel it opened in the space that is actually free. The strip's own rect is
+// the measurement -- it IS the bottom edge of the occluded zone, so there is
+// no offset to keep in sync with the CSS.
+//
+// Opening a panel never moves its own head (only the rows below it shift), so
+// this can measure immediately rather than waiting out the expand animation.
+// ---------------------------------------------------------------------
+const MOBILE_Q = "(orientation: portrait) and (max-width: 900px)";
+const PARK_GAP = 10;
+const PARK_MS = 420;
+
+function parkHead(head: HTMLElement, strip: HTMLElement | null) {
+  if (!strip) return;
+  const delta = head.getBoundingClientRect().top - strip.getBoundingClientRect().bottom - PARK_GAP;
+  if (Math.abs(delta) < 6) return;
+
+  // Same discipline as scrollToNote: global.css sets `scroll-behavior: smooth`
+  // on the root, so every write here is "instant" or each frame would start its
+  // own competing smooth scroll.
+  const startY = window.scrollY;
+  const maxY = document.documentElement.scrollHeight - window.innerHeight;
+  const endY = Math.max(0, Math.min(maxY, startY + delta));
+  const jump = (y: number) => window.scrollTo({ top: y, behavior: "instant" });
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    jump(endY);
+    return;
+  }
+
+  const t0 = performance.now();
+  const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+  const step = (now: number) => {
+    const prog = Math.min(1, (now - t0) / PARK_MS);
+    jump(startY + (endY - startY) * ease(prog));
+    if (prog < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 // Params that would run too long as a chip row keep a slim slider instead.
 // Integrations left this set on 2026-07-19: it is a named checklist now, so it
 // asks which systems rather than making the reader count them first.
@@ -146,6 +194,9 @@ export function PackageBuilderStage({
   // Not an accordion: any number of panels can be open, so two layers can be
   // compared without one closing the other.
   const [open, setOpen] = useState<ReadonlySet<keyof Scope>>(new Set(["pages"]));
+  // The price strip. Read only on mobile, where it is sticky and its bottom
+  // edge is the line an opened panel gets parked under.
+  const readoutRef = useRef<HTMLDivElement>(null);
 
   const set = (k: keyof Scope, v: number) => setScope((prev) => ({ ...prev, [k]: v }));
 
@@ -156,6 +207,89 @@ export function PackageBuilderStage({
       return next;
     });
 
+  // ---------------------------------------------------------------------
+  // THE HEADER STANDS DOWN WHILE THE STAGE HOLDS THE TOP OF THE SCREEN.
+  //
+  // Stacked mobile welds the object band to the viewport top, and a sticky
+  // header over it forced the band to reserve a nav-height of padding just to
+  // keep the object clear of the bar. That padding is what threw the object off
+  // centre: it was centred in the band minus the nav, which is not the band.
+  //
+  // With the header gone over the stage the band is the whole frame again, so
+  // the object centres in what you actually see. The header keeps its normal
+  // scroll-up behaviour everywhere below the stage, and hides again the moment
+  // you scroll back up into it.
+  //
+  // THE INTRO (Chad, 2026-07-23): the header is NOT hidden from the first frame.
+  // It loads present, holds for a beat so the page reads as chadworks, then
+  // tucks up on its own -- the CSS transform transition animates the tuck --
+  // revealing the stage with the object already in its centre. Any scroll during
+  // the beat hands control straight to the scroll logic, so a reader who moves
+  // first never waits on the timer.
+  //
+  // Mobile only: the desktop stage starts BELOW the nav rather than under it,
+  // so it has nothing to reclaim.
+  // ---------------------------------------------------------------------
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const NAV_OFF = "cw-nav-off";
+    const mq = window.matchMedia(MOBILE_Q);
+    // The header holds this long before it tucks on load. Long enough to register
+    // as present, short enough that "it slid up on its own" is the read.
+    const INTRO_HOLD_MS = 650;
+    let raf = 0;
+    // Until the intro beat passes (or the reader scrolls), the header is left
+    // alone so it stays visible on load.
+    let revealed = false;
+
+    const apply = () => {
+      raf = 0;
+      const el = wrapRef.current;
+      // The stage covers the top strip when it starts at or above the top edge
+      // and has not yet been scrolled clean past it.
+      const r = el?.getBoundingClientRect();
+      const covering = !!r && mq.matches && r.top < 1 && r.bottom > 0;
+      document.body.classList.toggle(NAV_OFF, revealed && covering);
+    };
+
+    // rAF-coalesced: the scroll handler must not measure once per scroll event.
+    const onChange = () => {
+      if (raf) return;
+      // A reader who scrolls has engaged; drop the intro hold and let the normal
+      // logic run from here.
+      if (window.scrollY > 2) revealed = true;
+      raf = requestAnimationFrame(apply);
+    };
+
+    const reveal = () => {
+      revealed = true;
+      apply();
+    };
+    const introTimer = window.setTimeout(reveal, INTRO_HOLD_MS);
+
+    apply(); // revealed is false, so the header is untouched on the first frame
+    window.addEventListener("scroll", onChange, { passive: true });
+    window.addEventListener("resize", onChange);
+    mq.addEventListener("change", onChange);
+    return () => {
+      window.clearTimeout(introTimer);
+      window.removeEventListener("scroll", onChange);
+      window.removeEventListener("resize", onChange);
+      mq.removeEventListener("change", onChange);
+      if (raf) cancelAnimationFrame(raf);
+      // Never leave the site without a header because this page unmounted.
+      document.body.classList.remove(NAV_OFF);
+    };
+  }, []);
+
+  const onHeadClick = (k: keyof Scope, head: HTMLElement) => {
+    const opening = !open.has(k);
+    toggle(k);
+    if (!opening || !window.matchMedia(MOBILE_Q).matches) return;
+    requestAnimationFrame(() => parkHead(head, readoutRef.current));
+  };
+
   const ch = useMemo(() => channels(scope), [scope]);
   const total = price(scope);
   const dirty = JSON.stringify(scope) !== JSON.stringify(BASELINE);
@@ -163,7 +297,7 @@ export function PackageBuilderStage({
   return (
     // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
     // content back on the site width.
-    <div className={`full ${s.wrap}`}>
+    <div className={`full ${s.wrap}`} ref={wrapRef}>
       {/* the object -- the slab AND the mathDev plug both live in here now */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />
@@ -171,12 +305,22 @@ export function PackageBuilderStage({
 
       <div className={s.inner}>
         {/* the number */}
-        <div className={s.readout}>
+        <div className={s.readout} ref={readoutRef}>
           <p className={s.readoutLabel}>{dirty ? "Estimate as scoped" : "Baseline price"}</p>
-          <p className={s.figure}>{money(total)}</p>
+          {/* Both halves of the answer announce themselves. Every control here
+              changes a number somewhere else on the screen, which a screen
+              reader would otherwise never mention -- you would tap through
+              twelve parameters and never learn the price moved. Two small live
+              regions rather than one around the whole readout, so the Reset
+              button appearing does not get read out as part of the estimate. */}
+          <p className={s.figure} aria-live="polite" aria-atomic="true">
+            {money(total)}
+          </p>
           {/* The window is the half of the answer the tool used to withhold: it
               charged for a squeezed timeline without ever naming the normal one. */}
-          <p className={s.window}>{weeksLabel(scope)}</p>
+          <p className={s.window} aria-live="polite" aria-atomic="true">
+            {weeksLabel(scope)}
+          </p>
           {dirty ? (
             <button type="button" className={s.reset} onClick={() => setScope(BASELINE)}>
               Reset
@@ -197,7 +341,7 @@ export function PackageBuilderStage({
                   className={s.head}
                   aria-expanded={isOpen}
                   aria-controls={panelId}
-                  onClick={() => toggle(p.key)}
+                  onClick={(e) => onHeadClick(p.key, e.currentTarget)}
                 >
                   <span className={s.headLabel}>{p.label}</span>
                   <span className={s.headValue}>{valueLabel(p, v)}</span>
@@ -324,29 +468,17 @@ export function PackageBuilderStage({
         </div>
       </div>
 
-      {/* The tool needs a real landscape screen -- the rail, the object and the
-          price sit in a row. A PHONE stays dark in both orientations and is sent
-          to the desktop, because turning it does not buy enough room either way.
-          A TABLET upright is the one gated case where turning it really does run
-          the tool, so it is the only one that says "rotate". Which line shows is
-          pure CSS (see .gateMsgRotate / .gateMsgDesktop); both are always in the
-          DOM, so there is no hydration flash and the static export needs no
-          client gate. */}
+      {/* One gated case is left: a phone held sideways. Upright it runs the
+          stacked layout, and every larger screen runs the row, so the gate no
+          longer sends anyone away -- it asks for the device back in portrait.
+          Pure CSS (see the media query on .mobileGate), so there is no
+          hydration flash and the static export needs no client gate. */}
       <div className={s.mobileGate}>
         <p className={s.gateKicker}>chadworks</p>
         {/* The page title still lands even though the tool is dark, so the fold
             says what this page is rather than only that it is unavailable. */}
         <p className={s.gateTitle}>Website Design Cost Calculator</p>
-        <p className={s.gateHeading}>
-          <span className={s.gateMsgRotate}>Rotate your device to landscape</span>
-          <span className={s.gateMsgDesktop}>Please view on desktop</span>
-        </p>
-        {/* Phone-only footnote. Hidden wherever the rotate prompt shows, since a
-            tablet is being asked to turn, not to leave. */}
-        <p className={s.gateNote}>
-          I am working on a mobile friendly version of this. To see the fully
-          loaded calculator, visit this page on a tablet or computer.
-        </p>
+        <p className={s.gateHeading}>Rotate your device to portrait</p>
       </div>
     </div>
   );

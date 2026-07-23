@@ -843,6 +843,26 @@ p, li, dd, figcaption { text-wrap: pretty; }
 }
 /* Scroll-up-only: tuck the header up out of view when scrolling down. */
 .site-nav--hidden { transform: translateY(-100%); }
+
+/* NAV OFF OVER A STAGE (Chad, 2026-07-23). Set by a stage that owns the top of
+   the screen -- currently the stacked mobile calculator, where the object is
+   centred in a band welded to the viewport top. A sticky header over that band
+   is not chrome, it is a bite out of the frame: the object has to be pushed
+   down by a nav-height to clear it, and then it is no longer centred in the
+   thing it is centred in.
+   So the header stays gone for as long as the stage covers the top strip, and
+   comes back the moment you are into the sections below it -- on the scroll-up
+   it already answers to. An OPEN mobile menu is exempt, or the panel would
+   slide away with the bar still holding it. */
+body.cw-nav-off .site-nav:not(.site-nav--open) { transform: translateY(-100%); }
+
+/* A TUCKED HEADER IS STILL TABBABLE. Both hidden states translate the bar off
+   the top of the screen while leaving 22 links in the tab order, so a keyboard
+   user tabs through a header they cannot see -- focus lands nowhere visible.
+   Focus brings it back. Pointer users never trigger this, so the tucking they
+   asked for is unchanged. */
+.site-nav--hidden:focus-within,
+body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .site-nav__inner {
   grid-column: content;
   display: flex;
@@ -1102,6 +1122,16 @@ p, li, dd, figcaption { text-wrap: pretty; }
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+/* The open panel carries its own scroll. The page behind it is locked while it
+   is open (see SiteNav), so a menu taller than the screen -- a short phone with
+   both dropdowns expanded -- has to be able to reach its own last item. Only
+   when open: the closed state must keep `overflow: hidden`, which is what makes
+   the 0fr row collapse read as shut instead of squashed. */
+.site-nav--open .site-nav__panel-inner {
+  max-height: calc(100dvh - var(--nav-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .site-nav__panel-inner a {
   font-family: var(--font-display);
@@ -8181,6 +8211,10 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    (the .svc-hero__art-toggle base hides at <=900px; override for this one). */
 @media (max-width: 900px) {
   .cw-motion-toggle { display: inline-flex; }
+  /* ...except where a page opts out on mobile (the stacked calculator). The
+     compound selector outranks the show rule just above at the same breakpoint;
+     the object parks itself off-screen, so nothing goes uncontrolled. */
+  .cw-motion-toggle.cw-motion-toggle--hide-mobile { display: none; }
 }
 /* Pocket variant: same pill, parked bottom-right (the chat-button corner) on
    every page whose header doesn't already carry the toggle. */

@@ -30,6 +30,14 @@ const ISOLATED_HEADER_ROUTES = new Set<string>();
 // entirely (nothing for it to control). Matched with the trailing slash trimmed.
 const MOTIONLESS_ROUTES = new Set<string>(["/faqs"]);
 
+// Routes where the pocket toggle is hidden ON MOBILE ONLY (Chad, 2026-07-23).
+// The stacked calculator already owns the bottom of a small screen with its
+// price strip and send link; a floating pause button on top of that is clutter,
+// and the object parks itself when off-screen anyway. Desktop keeps it. The hide
+// is a CSS class + media query, not a JS width check, so the static export never
+// flashes the button in before hydration decides.
+const HIDE_ON_MOBILE_ROUTES = new Set<string>(["/website-design-cost-calculator"]);
+
 export function MotionTogglePocket() {
   const pathname = usePathname();
   const [paused, setPaused] = useState(false);
@@ -78,10 +86,12 @@ export function MotionTogglePocket() {
   // The start-motion invite is never stowed -- under reduced motion the hero
   // art (and its toggle) are hidden, so there is no second button to clash with.
   const stowed = !offerStart && heroInView;
+  const hideOnMobile = HIDE_ON_MOBILE_ROUTES.has(pathname.replace(/\/$/, "") || "/");
   const className =
     "svc-hero__art-toggle cw-motion-toggle cw-motion-toggle--pocket" +
     (measured ? "" : " is-premeasure") +
-    (stowed ? " is-stowed" : "");
+    (stowed ? " is-stowed" : "") +
+    (hideOnMobile ? " cw-motion-toggle--hide-mobile" : "");
 
   if (offerStart) {
     return (
