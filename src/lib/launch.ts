@@ -46,6 +46,10 @@ const LAUNCHED = new Set<string>([
   "/website-design-for-septic-services/",
   "/website-design-for-foundation-repair/",
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
+  "/terms-of-service/", // launched 2026-07-23 -- rewritten as SITE terms (visitor
+                        // rules, scraping/AI-training limits, disclaimers, PA
+                        // disputes) on the anchored legal-doc layout. The old
+                        // draft was a client services agreement and never shipped.
   "/faqs/", // launched 2026-07-17 -- FAQ page (FAQPage JSON-LD, four themed groups)
   "/essays/", // launched 2026-07-17 -- the essays surface (CWS-EXPANSION-PLAN-01
               // item N: authority is published, not case-studied). This lights the

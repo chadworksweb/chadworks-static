@@ -10084,3 +10084,180 @@ html.cw-motion-paused *::after {
     .cw-inline-more { transition: none; }
   }
 }
+
+/* =====================================================================
+   LEGAL DOC -- anchored two-column layout (see LegalToc.tsx + the terms
+   page). A sticky rail lists every section beside the copy, and its dot
+   fills in as that section takes the reading line. The body headings carry
+   a number, not a dot: a permanently lit marker beside every h2 competed
+   with the rail's moving one for the same job (Chad, 2026-07-23).
+
+   Width note: this is a two-COLUMN reading layout, not a page-shell
+   narrowing. The grid sits at the standard site width; only the copy
+   column carries a measure, and it earns one because it is prose.
+   ===================================================================== */
+.cw-legal {
+  margin-top: var(--space-xl);
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  /* start (not stretch) or the rail cell fills the section height and the
+     sticky child has nothing left to travel through. */
+  align-items: start;
+}
+
+/* ---- the rail ---------------------------------------------------- */
+.cw-legal__rail {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--space-md));
+  /* A 20-section rail is taller than a laptop viewport, so it scrolls inside
+     itself rather than clipping. LegalToc keeps the lit item centered. */
+  max-height: calc(100dvh - var(--nav-height) - var(--space-lg));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* overflow-y makes this a scrollport on BOTH axes, so the active dot -- which
+     scales up and sits flush against x=0 -- got its left edge sliced flat.
+     Pad the scrollport and pull the box back by the same amount: the dot gets
+     room to grow into and the column stays where it was. */
+  padding-inline-start: 3px;
+  margin-inline-start: -3px;
+  /* The bar itself is hidden: an overlay scrollbar draws a hairline down the
+     rail's right edge that reads as a stray divider between the two columns,
+     and the rail already re-centers itself on the lit item. */
+  scrollbar-width: none;
+}
+.cw-legal__rail::-webkit-scrollbar { width: 0; height: 0; }
+.cw-legal__rail-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-xs);
+}
+.cw-legal__rail-list {
+  list-style: none;
+  display: grid;
+  /* No gap: the padding inside each link is the hit area, and a gap would
+     open dead strips between rows that look like the rail is skipping. */
+}
+.cw-legal__rail-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.5rem 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition:
+    color var(--duration-base) var(--ease-smooth);
+}
+.cw-legal__rail-link:hover { color: var(--accent); }
+.cw-legal__rail-link[data-active] {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* The shared marker. Hollow by default, filled once its section is the one
+   being read -- the whole tell of the layout, so it gets a real transition. */
+.cw-legal__dot {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  /* centers the dot on the first line of the label (label leading is
+     --leading-snug, so half of that minus half the dot) */
+  margin-top: 0.33em;
+  border-radius: 50%;
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  transition:
+    background-color var(--duration-base) var(--ease-smooth),
+    border-color var(--duration-base) var(--ease-smooth),
+    transform var(--duration-base) var(--ease-anticipate);
+}
+.cw-legal__rail-link:hover .cw-legal__dot { border-color: var(--accent); }
+.cw-legal__rail-link[data-active] .cw-legal__dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.2);
+}
+
+/* ---- the copy ---------------------------------------------------- */
+.cw-legal__body { max-width: var(--measure-prose); }
+
+.cw-legal__section {
+  /* The header is sticky, so a jump without this lands with the heading
+     hidden underneath it. */
+  scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+}
+/* The rule between sections belongs to the SECTION, not to the h2, so it spans
+   the full copy column instead of stopping at the end of the heading text.
+   .legal-prose puts its own border + top padding on h2; both are cleared here. */
+.cw-legal__section + .cw-legal__section {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}
+/* Two levels: the h2 is a PART (nine of them, and the only thing the rail
+   lists), the h3 is a clause inside it. The part heading is the heavier of the
+   two by size and by the rule above it; the clause heading carries the weight
+   so it still reads as a heading at body size. */
+.cw-legal__body h2 {
+  margin: 0 0 var(--space-md);
+  padding-top: 0;
+  border-top: 0;
+  font-size: var(--text-2xl);
+}
+.cw-legal__body h3 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+}
+.cw-legal__clause + .cw-legal__clause { margin-top: var(--space-lg); }
+.cw-legal__clause {
+  scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+}
+/* The number is a child of its heading (valid: phrasing content inside a
+   heading), so it stays part of the heading text for document outlines and for
+   anyone citing a clause by number. Styled down to a mono tag. */
+.cw-legal__num {
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  font-size: 0.72em;
+  margin-right: 0.4em;
+}
+.cw-legal__section > * + *,
+.cw-legal__clause > * + * { margin-top: var(--space-sm); }
+/* Each heading carries its own margin-bottom; the flow rule must not add to it. */
+.cw-legal__section > h2 + *,
+.cw-legal__clause > h3 + * { margin-top: 0; }
+
+/* ---- stacked ----------------------------------------------------- */
+@media (max-width: 900px) {
+  .cw-legal { grid-template-columns: minmax(0, 1fr); }
+  /* Stacked, the rail sits ABOVE the copy, and 20-odd items at full height
+     would push the first paragraph most of a screen down the page. Capped
+     into a scrolling index card instead: the cut-off edge is the affordance,
+     and it needs no JS to work. */
+  .cw-legal__rail {
+    position: static;
+    max-height: 45vh;
+    /* The card's own padding gives the scaled dot all the room it needs, so
+       drop the desktop scrollport nudge or the card sits 3px off the edge. */
+    padding: var(--space-md);
+    margin-inline-start: 0;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--bg-surface) 40%, var(--bg-base));
+  }
+  .cw-legal__rail-link { padding: 0.38rem 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .cw-legal__dot { transition: none; }
+    .cw-legal__rail-link[data-active] .cw-legal__dot { transform: none; }
+  }
+}
