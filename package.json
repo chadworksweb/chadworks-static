@@ -9,6 +9,7 @@
     "sync:llms": "node scripts/sync-llms-essays.mjs && node scripts/sync-llms-prices.mjs",
     "audit:prices": "node scripts/price-audit.mjs",
     "audit:index": "node scripts/index-audit.mjs",
+    "audit:portfolio": "node scripts/portfolio-audit.mjs",
     "render:save": "node scripts/render-diff.mjs save",
     "render:check": "node scripts/render-diff.mjs check",
     "start": "next start -p 8890",

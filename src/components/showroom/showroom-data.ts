@@ -3,7 +3,9 @@
 // the service pages render), plus Rising Compass, which that capsule holds separately
 // as its flagship instead of in the grid. Those two lists have to be kept in step by
 // hand: add a project to one and it silently goes missing from the other, which is
-// how rslgo dropped out of the showroom for a while. Captures live at
+// how rslgo dropped out of the showroom for a while. `scripts/portfolio-audit.mjs`
+// (a deploy gate since 2026-07-23) is what now catches that, so the sync is still
+// manual but no longer silent. Captures live at
 // /public/portfolio/<slug>-*.jpg. Order is the reel order (top to bottom): Rising
 // Compass leads, AAC Event Catering sits at the bottom.
 

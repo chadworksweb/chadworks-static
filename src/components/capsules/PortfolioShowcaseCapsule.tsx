@@ -40,6 +40,10 @@ const HELD_BACK = [
 
 // Exported so any other surface renders the exact same list. Note this is the
 // FULL archive; consumers get the curated selection via the capsule itself.
+// Kept in step with SHOWROOM_ITEMS (showroom/showroom-data.ts) by
+// `scripts/portfolio-audit.mjs`, a deploy gate: every key here must appear
+// there, every HELD_BACK entry must name a key here, and every capture must be
+// on disk. Add a project to one list only and the deploy stops.
 export const ARCHIVE: ArchiveItem[] = [
   {
     key: "scinet",

@@ -100,6 +100,17 @@ node scripts/stack-query-audit.mjs || {
   exit 1
 }
 
+# Portfolio safety net. The work shows up on three surfaces driven by three
+# hand-synced lists with nothing connecting them, which has already dropped a
+# project off the showroom and left a dead portfolio block rendering nowhere.
+# Blocks a deploy where the lists disagree, a holdback names nothing, or a
+# capture a list points at is not on disk.
+echo "Auditing the portfolio surfaces ..."
+node scripts/portfolio-audit.mjs || {
+  echo "Deploy aborted: the portfolio lists have drifted apart."
+  exit 1
+}
+
 echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # Additive tar-sync (like the libra-engine-site deploy): extracts/overwrites but
 # does NOT prune. Next hashes its build assets, so stale /_next/static files just
