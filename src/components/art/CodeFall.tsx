@@ -70,18 +70,52 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 // and the glyph set physically cannot drift. If the layout maths in layout()
 // changes, change it here too; a mismatch shows up as the art visibly jumping
 // the moment hydration lands.
-const SEED_SCRIPT = `(function(){function s(){try{
+const SEED_SCRIPT = `(function(){
+var C=null,X=null,S=null,last=0,raf=0;
+var G=${JSON.stringify(GLYPHS)},A=${JSON.stringify(HEAD)},N=${JSON.stringify(TRAIL_NEAR)},F=${JSON.stringify(TRAIL_FAR)};
+function P(){return G[(Math.random()*G.length)|0]}
+// Mirrors newColumn(). Same ranges, same per-row glyph buffer, so the objects
+// handed to the component are indistinguishable from ones it made itself.
+function nc(above,rows){var len=Math.round(10+Math.random()*16);var ch=[];
+for(var q=0;q<len+rows+2;q++)ch.push(P());
+return{head:above?(-rows*1.1+Math.random()*(rows*1.8)):(-len+Math.random()*(len-1)),
+speed:5.5+Math.random()*7.5,len:len,dim:0.4+Math.random()*0.6,chars:ch,lastRow:-9999}}
+function dc(col,x){var hr=Math.floor(col.head);
+for(var k=0;k<col.len;k++){var row=hr-k;if(row<0||row>S.rows)continue;
+var g=col.chars[row]||P(),t=k/col.len;
+if(k===0){X.shadowColor='rgba('+A[0]+','+A[1]+','+A[2]+',0.55)';X.shadowBlur=7;
+X.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*col.dim)+')';X.fillText(g,x,row*S.rowH);X.shadowBlur=0}
+else{var ct=Math.min(1,t*1.3);
+X.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*col.dim)+')';
+X.fillText(g,x,row*S.rowH)}}}
+function paint(){X.clearRect(0,0,S.w,S.h);for(var i=0;i<S.columns.length;i++)dc(S.columns[i],i*S.colW)}
+// The same integration the component's frame() runs: 30fps throttle, dt capped
+// at 0.066, heads advance by speed*dt, a new glyph at each newly entered row
+// plus the upstream flicker, and columns respawn above once they fall out.
+function loop(now){
+if(!window.__CW_CODEFALL_SEED){raf=0;return}
+raf=requestAnimationFrame(loop);
+if(last&&now-last<33.34)return;
+var dt=last?Math.min((now-last)/1000,0.066):0;last=now;
+for(var i=0;i<S.columns.length;i++){var col=S.columns[i];col.head+=col.speed*dt;
+var hr=Math.floor(col.head);
+if(hr!==col.lastRow){col.lastRow=hr;
+if(hr>=0&&hr<col.chars.length)col.chars[hr]=P();
+if(Math.random()<0.5)col.chars[(Math.random()*col.chars.length)|0]=P()}
+if(hr-col.len>S.rows)S.columns[i]=nc(false,S.rows)}
+paint()}
+function boot(){try{
 var w=document.querySelector('.home-hero__codefall');if(!w)return false;
 var c=w.querySelector('canvas');if(!c)return false;
 // NOT c.width. A canvas with no width attribute reports the HTML default of
 // 300x150, so that test read "already painted" every time and this whole
-// script silently did nothing. Flag the element explicitly instead.
+// script silently did nothing.
 if(c.getAttribute('data-cw-seed'))return true;
 var x=c.getContext('2d');if(!x)return true;
 // Every "not ready yet" path must return FALSE so the DOMContentLoaded retry
-// still fires. This script sits at the top of the hero and the hero has no
-// resolved height until the markup below it parses, so the first attempt
-// always reads clientHeight 0 and has to come back later.
+// still fires. This sits at the top of the hero and the hero has no resolved
+// height until the markup below it parses, so the first attempt always reads
+// clientHeight 0 and has to come back later.
 var W=w.clientWidth,H=w.clientHeight;if(!W||!H)return false;
 var d=Math.min(window.devicePixelRatio||1,2);
 var m=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||'monospace';
@@ -90,32 +124,17 @@ c.width=Math.round(W*d);c.height=Math.round(H*d);
 x.setTransform(d,0,0,d,0,0);x.font=f+'px '+m;x.textBaseline='top';
 var cw=Math.max(8,Math.ceil(x.measureText('0').width)+1);
 var rh=Math.round(f*1.18),rows=Math.ceil(H/rh)+2,cols=Math.ceil(W/cw);
-var G=${JSON.stringify(GLYPHS)},A=${JSON.stringify(HEAD)},N=${JSON.stringify(TRAIL_NEAR)},F=${JSON.stringify(TRAIL_FAR)};
-var P=function(){return G[(Math.random()*G.length)|0]};
-// Build the SAME Column objects newColumn(true) builds, with the same start
-// distribution. Getting this wrong is what caused the jitter: a dense frame
-// handed over to a sparse one reads as the art collapsing and refilling.
-var cl=[];
-for(var i=0;i<cols;i++){
-var len=Math.round(10+Math.random()*16);
-var ch=[];for(var q=0;q<len+rows+2;q++)ch.push(P());
-cl.push({head:-rows*1.1+Math.random()*(rows*1.8),speed:5.5+Math.random()*7.5,len:len,dim:0.4+Math.random()*0.6,chars:ch,lastRow:-9999});}
-for(var i=0;i<cols;i++){var col=cl[i],hr=Math.floor(col.head);
-for(var k=0;k<col.len;k++){var row=hr-k;if(row<0||row>rows)continue;
-var g=col.chars[row],t=k/col.len;
-if(k===0){x.shadowColor='rgba('+A[0]+','+A[1]+','+A[2]+',0.55)';x.shadowBlur=7;
-x.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*col.dim)+')';x.fillText(g,i*cw,row*rh);x.shadowBlur=0;}
-else{var ct=Math.min(1,t*1.3);
-x.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*col.dim)+')';
-x.fillText(g,i*cw,row*rh);}}}
-// Hand the exact state to the component. Without this the effect generates a
-// fresh random set and the whole pattern visibly reshuffles at hydration.
-window.__CW_CODEFALL_SEED={w:W,h:H,colW:cw,rowH:rh,rows:rows,cols:cols,columns:cl};
+C=c;X=x;S={w:W,h:H,colW:cw,rowH:rh,rows:rows,cols:cols,columns:[]};
+for(var i=0;i<cols;i++)S.columns.push(nc(true,rows));
+window.__CW_CODEFALL_SEED=S;
 c.setAttribute('data-cw-seed','1');
-return true;}catch(e){return true;}}
+paint();
+var red=window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.documentElement.classList.contains('cw-force-motion');
+if(!red)raf=requestAnimationFrame(loop);
+return true}catch(e){return true}}
 // React can HOIST an inline script above the markup it was written next to
 // (seen on this codebase 2026-07-23), so if the canvas is not parsed yet, wait.
-if(!s()){document.addEventListener('DOMContentLoaded',s);}})();`;
+if(!boot()){document.addEventListener('DOMContentLoaded',boot)}})();`;
 
 export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -219,10 +238,13 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
         seed.rows === rows && seed.cols === cols
       ) {
         columns = seed.columns;
-        (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null }).__CW_CODEFALL_SEED = null;
       } else {
         columns = Array.from({ length: cols }, () => newColumn(true));
       }
+      // Clear the handle on BOTH branches. It is what tells the inline seed
+      // loop to stop, so leaving it set after a geometry mismatch would run two
+      // animation loops over one canvas, each drawing a different state.
+      (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null }).__CW_CODEFALL_SEED = null;
       const b = canvas.getBoundingClientRect();
       rectL = b.left;
       rectT = b.top;
