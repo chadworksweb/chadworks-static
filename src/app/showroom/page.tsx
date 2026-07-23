@@ -64,7 +64,8 @@ const collectionJsonLd = {
       item: {
         "@type": "WebSite",
         name: w.label,
-        url: w.href,
+        // Only a piece with a live public link carries a url in the schema.
+        ...(w.href ? { url: w.href } : {}),
         image: `${SITE_URL}${captureSrc(w.slug)}`,
       },
     })),

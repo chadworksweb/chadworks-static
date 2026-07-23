@@ -12,7 +12,7 @@ export type ShowroomItem = {
   slug: string; // resolves /portfolio/<slug>-desktop.jpg
   label: string;
   url: string; // chrome-bar display host
-  href: string; // live site
+  href?: string; // live site; omit for a piece with no public link
   alt: string;
   blurb: string;
   platform?: string; // meta row: "Platform: <value>"
@@ -135,7 +135,8 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     slug: "thorobird",
     label: "Thorobird",
     url: "thorobird.com",
-    href: "https://thorobird.com",
+    // No live-site link: the client has not kept the site in good shape, so the
+    // piece stays in the showroom but does not point at it (2026-07-23).
     alt: "Thorobird website, designed and developed by chadworks",
     blurb: "A brand site with a distinct point of view, custom built.",
     platform: "WordPress",

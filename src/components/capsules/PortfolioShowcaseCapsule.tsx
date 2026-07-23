@@ -33,6 +33,9 @@ const FEATURED: FeaturedItem = {
 const HELD_BACK = [
   "edenscapes", "massagepros", "adsautomation", "salpattica", "ttww", "therapistexample",
   "videofeed", "abracadabragems", "videoplayer", "jeremyhayes", "rozariolaw",
+  // Held back from the curated grid 2026-07-23 (Chad); both still live in the
+  // full /showroom/. thorobird also lost its live-site link (unmaintained).
+  "aac", "thorobird",
 ];
 
 // Exported so any other surface renders the exact same list. Note this is the
@@ -134,7 +137,8 @@ export const ARCHIVE: ArchiveItem[] = [
     alt: "Thorobird website, designed and developed by chadworks",
     url: "thorobird.com",
     label: "Thorobird",
-    href: "https://thorobird.com",
+    // No live-site link: the client has not kept the site in good shape, so the
+    // piece stays in the portfolio but does not point at it (2026-07-23).
     blurb:
       "WordPress website for NYC real estate brokerage firm with custom designed homepage.",
   },

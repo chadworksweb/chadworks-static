@@ -450,7 +450,8 @@ export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "stati
                   <span className={styles.featureMeta}>
                     <span>Platform: {items[index]?.platform ?? "TBD"}</span>
                     <span>Year: {items[index]?.year ?? "TBD"}</span>
-                    <span>Live: {items[index]?.url}</span>
+                    {/* No "Live:" line for a piece with no public link. */}
+                    {items[index]?.href && <span>Live: {items[index]?.url}</span>}
                   </span>
                 </button>
                 {/* The card gives no sign it is a control until you happen to hover it.
@@ -734,15 +735,18 @@ function SelectedFrame({
                 <li key={i}>{b}</li>
               ))}
             </ul>
-            <a
-              className={styles.visit}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              Visit live site <span aria-hidden="true">&#8599;</span>
-            </a>
+            {/* Omitted for a piece with no public link (see showroom-data). */}
+            {item.href && (
+              <a
+                className={styles.visit}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Visit live site <span aria-hidden="true">&#8599;</span>
+              </a>
+            )}
           </div>
         </div>
 
