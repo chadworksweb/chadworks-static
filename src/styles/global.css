@@ -8211,9 +8211,14 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    (the .svc-hero__art-toggle base hides at <=900px; override for this one). */
 @media (max-width: 900px) {
   .cw-motion-toggle { display: inline-flex; }
-  /* ...except where a page opts out on mobile (the stacked calculator). The
-     compound selector outranks the show rule just above at the same breakpoint;
-     the object parks itself off-screen, so nothing goes uncontrolled. */
+}
+/* ...except where a page opts out for its whole stacked layout (the calculator).
+   This tracks the STACK condition, not 900px, so it also hides on a tablet where
+   the stack now runs wide. The compound selector outranks the show rule above by
+   specificity, so order across the two blocks does not matter; the object parks
+   itself off-screen, so nothing goes uncontrolled.
+   Keep this query identical to the calculator's stack @media. */
+@media (pointer: coarse), (max-width: 900px) {
   .cw-motion-toggle.cw-motion-toggle--hide-mobile { display: none; }
 }
 /* Pocket variant: same pill, parked bottom-right (the chat-button corner) on

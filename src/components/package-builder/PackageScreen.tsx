@@ -1120,8 +1120,20 @@ export function PackageScreen({
     });
 
     // --- sizing -------------------------------------------------------
+    // Whether the tool is in its STACKED layout (phone/tablet), where the object
+    // sits in a short band and the camera moves in to fill it. Mirrors the CSS
+    // stack @media exactly; cached here and refreshed on resize so the draw loop
+    // reads a boolean, not a per-frame matchMedia. Height alone cannot decide it:
+    // a short DESKTOP window is also short but must keep the row's framing, so
+    // the zoom is gated on this being the stacked layout in the first place.
+    const stackMq =
+      typeof window !== "undefined"
+        ? window.matchMedia("(pointer: coarse), (max-width: 900px)")
+        : null;
+    let stacked = !!stackMq?.matches;
     let DPR = 1;
     const resize = () => {
+      stacked = !!stackMq?.matches;
       DPR = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.round(canvas.clientWidth * DPR);
       const h = Math.round(canvas.clientHeight * DPR);
@@ -1329,19 +1341,21 @@ export function PackageScreen({
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
       const aspect = w / Math.max(1, h);
-      // MOBILE ZOOM (2026-07-23). The projection is fov-BASED on the vertical,
-      // so the object always paints at the same FRACTION of the canvas height
-      // (~30%) no matter how big the canvas is. On the desktop stage that is
-      // ~230px of an 828px column and reads as an object. In the stacked mobile
-      // layout the band is a third of that height, so the same 30% is ~90px --
-      // a thumbnail floating in dead space.
+      // STACKED-BAND ZOOM (2026-07-23). The projection is fov-BASED on the
+      // vertical, so the object always paints at the same FRACTION of the canvas
+      // height (~30%) no matter how big the canvas is. On the desktop stage that
+      // is ~230px of an 828px column and reads as an object. In the stacked
+      // layout the band is a fraction of that height, so the same 30% is a
+      // thumbnail floating in dead space.
       //
-      // Fixing it by growing the band would come straight out of the parameter
-      // list, which is the half of the screen that has to stay usable. So the
-      // CAMERA moves in instead: same object, same framing, closer. The test is
-      // the band's own shape (short, and no wider than a tablet), not a device
-      // sniff, so a narrow desktop window in the stacked layout gets it too.
-      const short = canvas.clientWidth <= 900 && canvas.clientHeight < 460;
+      // Growing the band would come straight out of the parameter list, so the
+      // CAMERA moves in instead: same object, same framing, closer. Gated on the
+      // STACKED layout (see `stacked` above), not on height -- a tablet's band is
+      // 1024+ wide but short and must zoom, while a short DESKTOP window is also
+      // short but must keep the row's framing. The height check then only keeps
+      // the zoom off a tall stacked band (a big portrait tablet) where the
+      // object already reads at size.
+      const short = stacked && canvas.clientHeight < 620;
       const camZ = short ? SCREEN.camZ / 1.3 : SCREEN.camZ;
       // ASSEMBLY-ONLY FRAMING (Chad, 2026-07-22). The composite object is not
       // symmetric about the origin: the mathDev plug hangs off the left edge and

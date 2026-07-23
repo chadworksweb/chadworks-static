@@ -132,7 +132,12 @@ function scrollToNote(el: HTMLElement) {
 // Opening a panel never moves its own head (only the rows below it shift), so
 // this can measure immediately rather than waiting out the expand animation.
 // ---------------------------------------------------------------------
-const MOBILE_Q = "(orientation: portrait) and (max-width: 900px)";
+// The stacked-layout condition, mirrored from the CSS `@media` that switches the
+// tool to the stacked column. It drives the header tuck (cw-nav-off) and the
+// open-panel park -- both are meaningless in the desktop row and must run for
+// every phone AND tablet, either orientation, that gets the stack.
+// NOTE: keep this string IDENTICAL to that CSS media query.
+const MOBILE_Q = "(pointer: coarse), (max-width: 900px)";
 const PARK_GAP = 10;
 const PARK_MS = 420;
 

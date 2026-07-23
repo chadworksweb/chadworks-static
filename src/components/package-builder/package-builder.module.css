@@ -516,33 +516,8 @@
   opacity: 1;
 }
 
-/* ---- tablet: KEEP the row. rail | object | number stays a row down to the
-   gate, instead of collapsing to a vertical stack. Everything at or below 600px
-   is the mobile gate, so there is no narrow single-column state left to serve;
-   the three sectors read as a row at every width the tool actually renders.
-   The rail token narrows on its own (min(19rem, 22vw) + 50px), so the object
-   just gets the space left over. ---- */
-@media (max-width: 900px) {
-  /* The desktop rail token (min(19rem, 22vw) + 50px) collapses to ~180px at the
-     narrow end, which clips the head values ("Straightforward", "I handle edits").
-     Give the rail a floor so the row holds its content at every tablet width;
-     the object just takes whatever space is left over. */
-  .wrap {
-    --rail-w: clamp(14.5rem, 34vw, 20rem);
-  }
-
-  /* Tighter inner padding buys the label a little more room before it wraps. */
-  .rail {
-    padding: 0.4rem;
-  }
-
-  .head {
-    padding-left: 0.6rem;
-  }
-}
-
 /* =====================================================================
-   MOBILE: the stage becomes a STACK. (Spike, 2026-07-23)
+   MOBILE + TABLET: the stage becomes a STACK. (Spike, 2026-07-23; tablet 07-23)
 
    Desktop is one fixed 100dvh stage with three absolutely positioned sectors
    in a row. A phone gets the same three sectors in a column, with the object
@@ -573,8 +548,16 @@
    The negative margin-top stays, so the band's flow box starts at the very top
    of the viewport -- the same place its sticky rule pins it to. Flow and stuck
    positions coincide, which is why no compensating margin is needed underneath.
+
+   WHO GETS THE STACK: every touch device (`pointer: coarse` -- phones AND
+   tablets, either orientation), plus any narrow window under 900px. A desktop
+   with a real mouse keeps the row at every width above that. The centred
+   --stack-col cap is what lets a wide tablet run the stack without the object
+   floating in a letterbox or the rows stretching edge to edge.
+   Keep this query in sync with MOBILE_Q in PackageBuilderStage and the
+   .cw-motion-toggle--hide-mobile query in global.css.
    ===================================================================== */
-@media (orientation: portrait) and (max-width: 900px) {
+@media (pointer: coarse), (max-width: 900px) {
   .wrap {
     /* The stage: two fifths of the screen (Chad, 2026-07-23). One token,
        because the sticky price strip has to park at exactly the band's bottom
@@ -582,6 +565,13 @@
        the stage, this is the object's WHOLE frame, with nothing taken out of
        the top of it. */
     --obj-h: 40dvh;
+    /* Stacked = ONE centred column. On a phone the viewport is narrower than the
+       cap, so it is full width; on a tablet the cap stops the object floating in
+       a letterbox and the rows stretching label-to-far-edge across the screen.
+       The band WASH still bleeds full width (it is on .canvasLayer); only the
+       drawn canvas and the rows are bounded, so the tablet reads as a focused
+       calculator column on the site's wash rather than a stretched phone. */
+    --stack-col: min(100%, 41rem);
 
     height: auto;
     /* Sticky needs a scrolling ancestor it can travel in: `overflow: hidden`
@@ -601,6 +591,14 @@
     background:
       radial-gradient(88% 74% at 50% 46%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 64%),
       #ede7f6;
+  }
+
+  /* The object draws into the centred column, not the full bleed. A 1024-wide
+     canvas framed the slab as a small thing lost in a wide letterbox; bounding
+     the canvas gives it a near-square stage it can fill. */
+  .canvasLayer :global(.cw-pkgscreen) {
+    max-width: var(--stack-col);
+    margin-inline: auto;
   }
 
   /* No longer a positioned layer: it is just the flow below the band. Dropping
@@ -624,6 +622,10 @@
     top: var(--obj-h);
     right: auto;
     z-index: 6;
+    /* Same centred column as the rail, so the price sits directly over the rows
+       it belongs to and nothing on the sides shows past it as the rail scrolls. */
+    max-width: var(--stack-col);
+    margin-inline: auto;
     display: grid;
     grid-template-columns: auto 1fr auto;
     align-items: baseline;
@@ -667,10 +669,14 @@
     opacity: 0.72;
   }
 
-  /* ---- the rail: full width, page-scrolled ---- */
+  /* ---- the rail: the centred column, page-scrolled ---- */
   .rail {
     position: static;
     width: auto;
+    /* Same cap as the strip above it: on a tablet the rows are a centred column,
+       not label-hard-left / value-hard-right across 1024px of dead space. */
+    max-width: var(--stack-col);
+    margin-inline: auto;
     padding: 0;
     overflow: visible;
     scrollbar-gutter: auto;
@@ -755,10 +761,12 @@
     min-width: 2.4rem;
   }
 
-  /* The finish line stops floating: it is the last thing in the column. */
+  /* The finish line stops floating: it is the last thing in the column, centred
+     under the rows on the same cap. */
   .finish {
     position: static;
-    margin-top: 1.4rem;
+    max-width: var(--stack-col);
+    margin: 1.4rem auto 0;
     padding-inline: 0.9rem;
   }
 
