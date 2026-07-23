@@ -54,30 +54,13 @@ export function GoogleAnalytics() {
 
   if (!loadScript) return null;
 
-  // `lazyOnload`, not `afterInteractive`. gtag is the single heaviest script on
-  // any page here: 522 KB decoded, 176 KiB on the wire, larger than any chunk
-  // this site builds. On `afterInteractive` it loads while the page is still
-  // hydrating and fights the main thread through the whole LCP window. Measured
-  // on the homepage (3 runs, median, mobile): blocking it outright is worth
-  // 8 points, and takes total blocking time from 1.53 s to 0.87 s.
-  //
-  // `lazyOnload` keeps GA and moves it after the load event instead, so it costs
-  // nothing that a visitor experiences. THE TRADE, stated plainly: a visitor who
-  // leaves before the load event fires is no longer counted. On a slow phone
-  // that is a real, if small, hole in the numbers, and it is the fast-bouncing
-  // visitor it loses. Reverting is one word if that data matters more than the
-  // speed does.
-  //
-  // Not gated on an interaction, deliberately. Loading analytics only on scroll
-  // or click would score better still, because Lighthouse never interacts, and
-  // that is exactly why it would be dishonest.
   return (
     <>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-        strategy="lazyOnload"
+        strategy="afterInteractive"
       />
-      <Script id="ga-init" strategy="lazyOnload">
+      <Script id="ga-init" strategy="afterInteractive">
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
