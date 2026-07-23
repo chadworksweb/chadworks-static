@@ -17,8 +17,17 @@
 // (lib/package-builder), never two implementations of it.
 // =====================================================================
 
-import { type Dispatch, type SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import PackageScreen from "@/components/package-builder/PackageScreen";
+import { prefersReducedMotion } from "@/lib/motion";
 import {
   BASELINE,
   PARAMS,
@@ -53,7 +62,8 @@ const TRAVEL_MS = 750;
 const PULSE_MS = 2500;
 
 function scrollToNote(el: HTMLElement) {
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // prefersReducedMotion(), not matchMedia: it honours the forced-motion opt-in.
+  const reduced = prefersReducedMotion();
 
   el.classList.remove(PULSE);
   el.classList.add(HELD);
@@ -138,6 +148,41 @@ function scrollToNote(el: HTMLElement) {
 // every phone AND tablet, either orientation, that gets the stack.
 // NOTE: keep this string IDENTICAL to that CSS media query.
 const MOBILE_Q = "(pointer: coarse), (max-width: 900px)";
+
+// Panel open/close. The MOTION is a CSS transition on max-height (see the .body
+// rule); all this does is write the exact pixel target, because a transition
+// needs two real numbers to ease between and only the DOM knows how tall a
+// panel's content is. Measuring is also what keeps the ease honest: transitions
+// to a guessed ceiling reach the content early and read as a snap.
+//
+// Why not CSS alone: `grid-template-rows: 0fr -> 1fr` is the tidy way to animate
+// to a content's own height, but WebKit (iOS Safari AND iOS Chrome) does not
+// interpolate an `fr` track, so it jumped there. A WAAPI height animation was no
+// better on that engine. A px-to-px transition is the one thing that animates
+// everywhere.
+//
+// useLayoutEffect on the server logs a warning and does nothing; fall back to
+// useEffect there. `typeof window` is constant per environment, so this is not
+// a conditionally-called hook.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+// Write a panel's max-height. `animate` false commits the value with the
+// transition suppressed -- used for the very first paint and for a re-measure
+// after a resize, neither of which should look like the reader opened anything.
+function setPanelHeight(el: HTMLElement, open: boolean, animate: boolean) {
+  // scrollHeight is the full content height whether the panel is currently
+  // clipped shut or standing open, so the same read works in both directions.
+  const target = open ? `${el.scrollHeight}px` : "0px";
+  if (animate) {
+    el.style.maxHeight = target;
+    return;
+  }
+  const prev = el.style.transition;
+  el.style.transition = "none";
+  el.style.maxHeight = target;
+  void el.offsetHeight; // force the value to commit before motion is restored
+  el.style.transition = prev;
+}
 const PARK_GAP = 10;
 const PARK_MS = 420;
 
@@ -154,7 +199,8 @@ function parkHead(head: HTMLElement, strip: HTMLElement | null) {
   const endY = Math.max(0, Math.min(maxY, startY + delta));
   const jump = (y: number) => window.scrollTo({ top: y, behavior: "instant" });
 
-  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  // Same gate as scrollToNote: respects a visitor who opted into full motion.
+  if (prefersReducedMotion()) {
     jump(endY);
     return;
   }
@@ -287,6 +333,47 @@ export function PackageBuilderStage({
       document.body.classList.remove(NAV_OFF);
     };
   }, []);
+
+  // Give every panel its measured max-height so the CSS transition has a real
+  // number to ease to. On the first pass the value is committed WITHOUT motion
+  // (the panel that starts open must simply be open, not unfold on arrival);
+  // after that, only panels whose open-state actually flipped are rewritten, so
+  // an unrelated scope edit re-renders without disturbing anything.
+  const prevOpenRef = useRef<ReadonlySet<keyof Scope> | null>(null);
+  useIsoLayoutEffect(() => {
+    const prev = prevOpenRef.current;
+    const first = prev === null;
+    prevOpenRef.current = open;
+    for (const p of PARAMS) {
+      const now = open.has(p.key);
+      if (!first && now === prev!.has(p.key)) continue;
+      const el = document.getElementById(`pkg-panel-${p.key}`);
+      if (el) setPanelHeight(el, now, !first);
+    }
+  }, [open]);
+
+  // Re-measure the open panels when the viewport changes. Their content rewraps
+  // (a rotation is the obvious case), and a stale pixel cap would either clip
+  // the panel or leave a gap under it. Silent: no transition on a re-measure.
+  useEffect(() => {
+    const onResize = () => {
+      for (const p of PARAMS) {
+        if (!open.has(p.key)) continue;
+        const el = document.getElementById(`pkg-panel-${p.key}`);
+        if (!el) continue;
+        // Drop the cap first so scrollHeight reports the content's true height
+        // rather than the height the old cap is holding it to.
+        el.style.transition = "none";
+        el.style.maxHeight = "none";
+        const h = el.scrollHeight;
+        el.style.maxHeight = `${h}px`;
+        void el.offsetHeight;
+        el.style.transition = "";
+      }
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [open]);
 
   const onHeadClick = (k: keyof Scope, head: HTMLElement) => {
     const opening = !open.has(k);

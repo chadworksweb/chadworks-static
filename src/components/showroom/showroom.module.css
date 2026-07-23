@@ -1195,17 +1195,23 @@ html:has(.route) { scrollbar-gutter: stable; }
   to { opacity: 0; transform: translateY(18px); }
 }
 
+/* Gated on the forced-motion override, like every other reduced-motion block on
+   the site (see lib/motion.ts). Without the gate a visitor whose OS asks for
+   reduced motion gets the static showroom even after opting INTO full motion
+   from the first-visit invite, and the opt-in reads as broken. */
 @media (prefers-reduced-motion: reduce) {
-  .selected { animation: none; }
-  .frame { animation: none; }
-  .stageFrame { animation: none; }
-  .escBtn { animation: none; }
-  .enter { animation: none; }
-  .featureTitle { animation: none; }
-  /* Lands lit instead of striking: a blink sequence is the one thing this setting is
-     most for, and the hint still has to be readable. */
-  .featureHint { animation: none; }
-  .rail { transition: none; }
-  .railItem { transition: none; }
-  .railScrollArrow { animation: none; }
+  :global(html:not(.cw-force-motion)) {
+    .selected { animation: none; }
+    .frame { animation: none; }
+    .stageFrame { animation: none; }
+    .escBtn { animation: none; }
+    .enter { animation: none; }
+    .featureTitle { animation: none; }
+    /* Lands lit instead of striking: a blink sequence is the one thing this setting is
+       most for, and the hint still has to be readable. */
+    .featureHint { animation: none; }
+    .rail { transition: none; }
+    .railItem { transition: none; }
+    .railScrollArrow { animation: none; }
+  }
 }

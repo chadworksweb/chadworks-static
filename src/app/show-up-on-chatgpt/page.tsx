@@ -141,11 +141,14 @@ export default function ShowUpOnChatgptPage() {
       />
 
       {/* Six-step visibility timeline (bold timeline). */}
+      {/* schemeAuto: the CTA below is a fixed dark band, so this one yields to
+          rule 9 and renders light rather than stacking two darks. */}
       <ProcessCapsule
         heading={service.approach.heading}
         steps={service.approach.steps}
         stepLabel={(i) => `Step ${String(i + 1).padStart(2, "0")}`}
         scheme="inverted"
+        schemeAuto
       />
 
       <CtaCapsule cta={service.cta} form={service.form} scheme="inverted" />

@@ -2576,7 +2576,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 /* Motion off: hold the highlight steady for the same two seconds instead of
    breathing it. The reader still gets told where they landed. */
 @media (prefers-reduced-motion: reduce) {
-  .cw-ratecard__note--pulse {
+  html:not(.cw-force-motion) .cw-ratecard__note--pulse {
     animation: none;
     background: rgba(250, 204, 21, 0.85);
     color: #1a1a1a;

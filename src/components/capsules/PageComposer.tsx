@@ -70,8 +70,20 @@ export function PageComposer({ jsonLd = [], children }: PageComposerProps) {
       !prefs[i].schemeAuto &&
       !prefs[i - 1].schemeAuto
     ) {
+      // Name the offending pair. Without this the warning says a rule is broken
+      // somewhere on some page and nothing else, which is how it survives.
+      const nameOf = (n: number) => {
+        const k = kids[n];
+        if (!isValidElement(k)) return `child ${n}`;
+        const t = k.type as { displayName?: string; name?: string } | string;
+        const nm = typeof t === "string" ? t : t.displayName || t.name || "Unknown";
+        const id = (k.props as { id?: string }).id;
+        return id ? `${nm}#${id} (index ${n})` : `${nm} (index ${n})`;
+      };
       console.warn(
-        "[PageComposer] rule 9: two inverted sections are consecutive; insert a light section between them."
+        `[PageComposer] rule 9: two inverted sections are consecutive -- ` +
+          `${nameOf(i - 1)} then ${nameOf(i)}. Insert a light section between them, ` +
+          `or give one of them schemeAuto so it demotes itself.`
       );
     }
   }

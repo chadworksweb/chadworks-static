@@ -288,56 +288,61 @@
   flex: none;
 }
 
-/* Sleek open/close. `grid-template-rows: 0fr -> 1fr` animates to the content's
-   OWN height, which max-height guessing never does: no magic number, no clip at
-   tall panels, no dead easing on short ones. Needs the body always mounted, so
-   the panel toggles a class instead of unmounting. */
+/* Open/close is a plain CSS transition on a MEASURED max-height.
+   Two earlier attempts failed on WebKit (iOS Safari AND iOS Chrome, which is
+   WebKit too):
+     1. `grid-template-rows: 0fr -> 1fr` -- WebKit does not interpolate an `fr`
+        grid track, so it jumped while Chrome desktop eased.
+     2. Web Animations API on `height` -- also unreliable there.
+   A transition between two explicit PIXEL values is the one thing every engine
+   animates, so that is what this is now. The exact px comes from the script
+   (PackageBuilderStage measures scrollHeight and writes an inline max-height),
+   which is what keeps the ease landing exactly on the content instead of racing
+   to a guessed ceiling and reading as a snap.
+   Always mounted so it can animate, and so the closed body stays out of the tab
+   order via `inert`. */
 .body {
-  display: grid;
-  grid-template-rows: 0fr;
+  overflow: hidden;
+  max-height: 0;
   opacity: 0;
   transition:
-    grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.22s ease;
 }
 
 .bodyOpen {
-  grid-template-rows: 1fr;
   opacity: 1;
+  /* Fallback only, for the instant before the script writes the measured value
+     (and if JS never runs at all): generous enough not to clip the tallest
+     panel. The script replaces it with the panel's real height inline. */
+  max-height: 60rem;
 }
 
-/* The row that actually collapses. Overflow hidden is what makes 0fr read as
-   closed rather than as squashed content. */
+/* Padding is CONSTANT now, not open-only. With the body clipped to height 0 when
+   closed, overflow hides the padding too, so there is no sliver to avoid -- which
+   is what forced the old open-only padding. Constant padding also means the
+   measured height is the same whether the panel is open or shut at measure time,
+   which is what lets the collapse tween start from a correct height. */
 .bodyInner {
-  overflow: hidden;
   display: grid;
   gap: 0.55rem;
-  padding: 0 0.4rem;
-}
-
-/* Top padding sits HERE, not as a margin under the head: the head carries a
-   background now, and a margin would cut a pale stripe between it and the body
-   tint. Padding also has to live on the open state only -- the collapse animates
-   the row to 0fr, and a constant padding would leave a sliver behind when shut.
-   Same treatment as padding-bottom, so both ends breathe and both animate. */
-.bodyOpen .bodyInner {
-  padding-top: 0.6rem;
-  padding-bottom: 0.75rem;
-  transition: padding-top 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    padding-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0.6rem 0.4rem 0.75rem;
 }
 
 .caret {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
 }
 
+/* Reduced motion, GATED ON THE FORCED-MOTION OVERRIDE. `html:not(.cw-force-motion)`
+   is the site-wide contract (see lib/motion.ts): a visitor whose OS asks for
+   reduced motion can opt into the full experience from the first-visit invite,
+   and every other animation on the site honours that opt-in because it is gated
+   this way. This block was NOT, so on a device with reduced motion enabled these
+   panels snapped even after the visitor chose full motion -- which read as the
+   panels being broken rather than as a setting being respected. */
 @media (prefers-reduced-motion: reduce) {
-  .body,
-  .bodyInner,
-  /* .bodyOpen .bodyInner sets the padding transition and outranks a bare
-     .bodyInner selector, so it has to be named here or it keeps animating. */
-  .bodyOpen .bodyInner,
-  .caret {
+  :global(html:not(.cw-force-motion)) .body,
+  :global(html:not(.cw-force-motion)) .caret {
     transition: none;
   }
 }
