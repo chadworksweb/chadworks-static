@@ -38,6 +38,69 @@ const rand = (min: number, max: number) => min + Math.random() * (max - min);
 const pick = () => GLYPHS[(Math.random() * GLYPHS.length) | 0];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+// ---------------------------------------------------------------------------
+// SEED FRAME -- the falling code, painted before React exists.
+//
+// The <canvas> ships in the static HTML but is EMPTY until this component
+// hydrates and its effect runs. On a throttled phone that is over a second of
+// blank space where the hero art belongs.
+//
+// It was invisible until 2026-07-23 only because the 237 KB render-blocking
+// stylesheet held first paint back to ~3.2 s, by which point hydration had
+// already happened. Turning gzip on took first paint to ~1.2 s and uncovered
+// the gap. gzip did not cause this; it stopped hiding it.
+//
+// So this runs as a plain inline script, in the HTML, with no dependencies and
+// nothing to download. It paints ONE frozen frame of exactly what the loop
+// would draw, and the effect then takes over on the same canvas.
+//
+// DUPLICATION, ACKNOWLEDGED. This repeats layout() and the still parts of
+// drawColumn() in hand-written ES5. It cannot import them: the whole point is
+// to run before any bundle arrives. What it does NOT repeat is every part that
+// only matters once things move (the cursor orb, the head bloom, respawning),
+// because a single frame has no use for them.
+//
+// The constants below are INTERPOLATED from the module's own, so the palette
+// and the glyph set physically cannot drift. If the layout maths in layout()
+// changes, change it here too; a mismatch shows up as the art visibly jumping
+// the moment hydration lands.
+const SEED_SCRIPT = `(function(){function s(){try{
+// Return TRUE only when the frame is actually on the canvas. Every "not ready
+// yet" case must return false so the DOMContentLoaded retry still fires. The
+// height case is the one that matters: this script sits at the top of the hero,
+// and the hero's height is not resolved until the markup below it is parsed, so
+// the first attempt reads clientHeight 0 and has to come back later.
+var w=document.querySelector('.home-hero__codefall');if(!w)return false;
+var c=w.querySelector('canvas');if(!c)return false;
+// NOT \`c.width\`. A canvas with no width attribute still reports 300 (and 150
+// high), the HTML default, so that test read "already painted" every time and
+// this whole script silently did nothing. Flag the element explicitly instead.
+if(c.getAttribute('data-cw-seed'))return true;
+var x=c.getContext('2d');if(!x)return true;
+var W=w.clientWidth,H=w.clientHeight;if(!W||!H)return false;
+var d=Math.min(window.devicePixelRatio||1,2);
+var m=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||'monospace';
+var f=Math.max(13,Math.min(17,Math.round(W/30)));
+c.width=Math.round(W*d);c.height=Math.round(H*d);
+x.setTransform(d,0,0,d,0,0);x.font=f+'px '+m;x.textBaseline='top';
+var cw=Math.max(8,Math.ceil(x.measureText('0').width)+1);
+var rh=Math.round(f*1.18),rows=Math.ceil(H/rh)+2,cols=Math.ceil(W/cw);
+var G=${JSON.stringify(GLYPHS)},A=${JSON.stringify(HEAD)},N=${JSON.stringify(TRAIL_NEAR)},F=${JSON.stringify(TRAIL_FAR)};
+for(var i=0;i<cols;i++){
+var len=Math.round(10+Math.random()*16),dim=0.4+Math.random()*0.6;
+var head=Math.floor(rows*0.3+Math.random()*rows*0.6);
+for(var k=0;k<len;k++){var row=head-k;if(row<0||row>rows)continue;
+var ch=G[(Math.random()*G.length)|0],t=k/len;
+if(k===0){x.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*dim)+')';}
+else{var ct=Math.min(1,t*1.3);
+x.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*dim)+')';}
+x.fillText(ch,i*cw,row*rh);}}
+c.setAttribute('data-cw-seed','1');
+return true;}catch(e){return true;}}
+// React can HOIST an inline script above the markup it was written next to
+// (seen on this codebase 2026-07-23), so if the canvas is not parsed yet, wait.
+if(!s()){document.addEventListener('DOMContentLoaded',s);}})();`;
+
 export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -281,9 +344,26 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       raf = 0;
     };
 
+    // Paint the columns exactly as they stand, once, synchronously. This is the
+    // same frame the loop would draw on its first tick; it does NOT move a
+    // single head, so it changes nothing about the motion.
+    //
+    // Why it has to exist: layout() assigns canvas.width, and assigning canvas
+    // width CLEARS the canvas. Without an immediate repaint the canvas sits
+    // blank from that assignment until the IntersectionObserver fires and the
+    // first requestAnimationFrame lands. That is one frame at best and much
+    // longer if the observer is late, and the requirement is that the falling
+    // code is never absent for even a moment.
+    const paintOnce = () => {
+      ctx.clearRect(0, 0, cssW, cssH);
+      for (let i = 0; i < columns.length; i++) drawColumn(columns[i], i * colW);
+    };
+
     layout();
     if (reduce) {
       renderStatic();
+    } else {
+      paintOnce();
     }
 
     const ro = new ResizeObserver(() => {
@@ -291,7 +371,10 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       stop();
       layout();
       if (reduce) renderStatic();
-      else if (wasRunning) start();
+      else {
+        paintOnce(); // same reason: layout() just cleared it
+        if (wasRunning) start();
+      }
     });
     ro.observe(wrap);
 
@@ -346,6 +429,8 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       <div className="home-hero__codefall" ref={wrapRef} aria-hidden="true">
         <canvas ref={canvasRef} />
       </div>
+      {/* Paints the first frame before the bundle lands. See SEED_SCRIPT. */}
+      <script dangerouslySetInnerHTML={{ __html: SEED_SCRIPT }} />
       {!hideToggle && (
       <button
         type="button"
