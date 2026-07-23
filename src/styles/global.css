@@ -5717,19 +5717,38 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    column carries the numbered "correspondence" steps; the right column holds
    the task -> time ledger under its own heading. */
 
-/* The numbered steps that break out of the "why 10 min minimum" sentence. */
+/* The numbered steps that break out of the "why 10 min minimum" sentence.
+   COUNTER + ::before, not a list marker. With `list-style-position: outside`
+   the browser draws the marker to the LEFT of the ol's padding box, and these
+   numerals are mono at --text-lg, so they came out wider than the padding and
+   hung ~17px past the column's left edge -- breaking the line the heading and
+   the lead paragraph share. Numbering it here puts the digit exactly on that
+   edge and still gives a wrapped line its hanging indent, which
+   `list-style-position: inside` would have thrown away. */
 .cw-rate-explainer__steps {
   margin: var(--space-sm) 0;
-  padding-left: 1.4em;
-  list-style: decimal;
+  padding-left: 0;
+  list-style: none;
+  counter-reset: cw-step;
   color: rgba(229, 210, 244, 0.9);
 }
 .cw-rate-explainer__steps li {
+  counter-increment: cw-step;
+  position: relative;
+  /* Room for the digit + its gap. The mono numeral measures ~28px at this size,
+     so this clears it by a hair under half a space and lands the text close to
+     where the old list-marker version had it. Wrapped lines align here, not to
+     the numeral, which is the whole reason the indent stays on the li. */
+  padding-left: 1.6em;
   margin: 0.3rem 0;
   font-size: var(--text-lg);
   line-height: var(--leading-body);
 }
-.cw-rate-explainer__steps li::marker {
+.cw-rate-explainer__steps li::before {
+  content: counter(cw-step) ".";
+  position: absolute;
+  left: 0;
+  top: 0;
   color: #c9b3ec;
   font-family: var(--font-mono);
 }
