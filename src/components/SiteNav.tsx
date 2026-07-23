@@ -70,86 +70,6 @@ export default function SiteNav() {
   const openRef = useRef(open);
   openRef.current = open;
 
-  // ---- LET THE COLOURWAVE FINISH ITS CYCLE (Chad, 2026-07-23) --------------
-  // The wave is bound to :hover, so moving the pointer to the next item killed
-  // it mid-stride and the letters snapped back to rest. Skimming the menu read
-  // as a series of interruptions.
-  //
-  // The rule: leaving a link for somewhere else INSIDE the menu lets the wave
-  // play out its current cycle; leaving the menu entirely kills it on the spot,
-  // same as the dropdown closing.
-  //
-  // Per LETTER, not per link, because the letters are staggered by --i. Waiting
-  // on the last letter alone would leave the earlier ones part-way into a fresh
-  // cycle when the class came off. Each letter instead ends on its OWN
-  // animationiteration, which is by definition the 100% keyframe (rest colour),
-  // so the wave drains off the end of the word instead of being cut.
-  const linksRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const root = linksRef.current;
-    if (!root) return;
-    const FINISHING = "is-finishing";
-
-    // Drop a link out of the finishing state and undo the per-letter freezes.
-    const cancel = (link: HTMLElement) => {
-      link.classList.remove(FINISHING);
-      link.querySelectorAll<HTMLElement>(".nav-wave__letter").forEach((l) => {
-        l.style.animation = "";
-      });
-    };
-
-    const onMouseOut = (e: MouseEvent) => {
-      const target = e.target as Element | null;
-      const link = target?.closest?.(".site-nav__links a") as HTMLElement | null;
-      if (!link) return;
-      const to = e.relatedTarget as Node | null;
-      if (to && link.contains(to)) return; // still within the same link
-
-      // Left the menu altogether: kill it now, do not let it drain.
-      if (!to || !root.contains(to)) {
-        cancel(link);
-        return;
-      }
-
-      const letters = [...link.querySelectorAll<HTMLElement>(".nav-wave__letter")];
-      if (!letters.length) return;
-      // Adding the class in the same tick that :hover drops keeps the computed
-      // animation-name identical, so the running animation carries on rather
-      // than restarting from 0%.
-      link.classList.add(FINISHING);
-      let pending = letters.length;
-      for (const letter of letters) {
-        const done = () => {
-          letter.removeEventListener("animationiteration", done);
-          // Freeze THIS letter now: it has just crossed 100%, which is rest.
-          letter.style.animation = "none";
-          if (--pending === 0) cancel(link);
-        };
-        letter.addEventListener("animationiteration", done);
-      }
-    };
-
-    // Coming back to a draining link hands it straight back to :hover.
-    const onMouseOver = (e: MouseEvent) => {
-      const target = e.target as Element | null;
-      const link = target?.closest?.(".site-nav__links a") as HTMLElement | null;
-      if (link?.classList.contains(FINISHING)) cancel(link);
-    };
-
-    const onLeave = () => {
-      root.querySelectorAll<HTMLElement>(`.${FINISHING}`).forEach(cancel);
-    };
-
-    root.addEventListener("mouseout", onMouseOut);
-    root.addEventListener("mouseover", onMouseOver);
-    root.addEventListener("mouseleave", onLeave);
-    return () => {
-      root.removeEventListener("mouseout", onMouseOut);
-      root.removeEventListener("mouseover", onMouseOver);
-      root.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
   // Escape closes the open panel.
   useEffect(() => {
     if (!open) return;
@@ -174,7 +94,7 @@ export default function SiteNav() {
         >
           chadworks&trade;
         </Link>
-        <div className="site-nav__links" ref={linksRef}>
+        <div className="site-nav__links">
           {LINKS.map((l) => {
             const top = isLaunched(l.href) ? (
               <Link href={l.href}>
