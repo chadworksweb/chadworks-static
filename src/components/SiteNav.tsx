@@ -21,7 +21,18 @@ type NavLink = {
 // intended state, not an oversight: Chad, 2026-07-16, "yes, consulting greyed
 // out for now".
 const LINKS: NavLink[] = [
-  { href: "/websites/", label: "Websites" },
+  {
+    href: "/websites/",
+    label: "Websites",
+    // Chad, 2026-07-23. Labels are lifted from SiteFooter rather than written
+    // fresh, so the same route is never called two things depending on where a
+    // reader met it.
+    children: [
+      { href: "/web-design/", label: "Web Design" },
+      { href: "/web-development/", label: "Web Development" },
+      { href: "/website-design-cost-calculator/", label: "Website Cost Calculator" },
+    ],
+  },
   { href: "/visibility/", label: "Visibility" },
   { href: "/consulting/", label: "Consulting" },
   { href: "/essays/", label: "Essays" },
