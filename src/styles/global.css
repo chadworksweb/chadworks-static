@@ -919,7 +919,14 @@ p, li, dd, figcaption { text-wrap: pretty; }
   white-space: pre;
   transition: color var(--duration-base) var(--ease-smooth);
 }
+/* `.is-finishing` carries the SAME animation as :hover, on purpose. SiteNav
+   adds it in the tick that :hover drops, and because the computed
+   animation-name is unchanged the running wave carries on instead of
+   restarting at 0%. Each letter then freezes itself on its own
+   animationiteration, so the wave drains off the end of the word rather than
+   being cut mid-stride when the pointer moves to the next item. */
 .site-nav__links a:hover .nav-wave__letter,
+.site-nav__links a.is-finishing .nav-wave__letter,
 .cw-lane-sub__link:hover .nav-wave__letter {
   animation: nav-letter-colorwave 0.7s var(--ease-smooth) infinite;
   animation-delay: calc(var(--i) * 0.05s);
@@ -941,6 +948,7 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     .site-nav__links a:hover .nav-wave__letter,
+    .site-nav__links a.is-finishing .nav-wave__letter,
     .cw-lane-sub__link:hover .nav-wave__letter { animation: none; color: var(--nav-link-pulse); }
   }
 }
@@ -1008,6 +1016,22 @@ p, li, dd, figcaption { text-wrap: pretty; }
   font-size: 1rem;
   padding: 0.45rem var(--space-sm);
   white-space: nowrap;
+}
+/* Cell tint on hover (Chad, 2026-07-23). Very light on purpose: the colourwave
+   is the thing announcing the hover, and a strong fill would compete with it.
+   This just tells you which row the pointer is on.
+   The row is full-bleed to the panel edges -- no inline margin -- so it reads
+   as a cell rather than a floating chip, and the padding above is what keeps
+   the label off the edge. Not applied to .site-nav__soon: an unlaunched item is
+   not clickable, so lighting it up would promise something it cannot do. */
+.site-nav__dropdown a {
+  transition: background-color var(--duration-base) var(--ease-smooth);
+}
+.site-nav__dropdown a:hover {
+  background-color: rgba(102, 41, 188, 0.06); /* --nav-link-pulse, barely there */
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .site-nav__dropdown a { transition: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
