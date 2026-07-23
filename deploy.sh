@@ -80,6 +80,17 @@ node scripts/index-audit.mjs || {
   exit 1
 }
 
+# Pricing-hub safety net, same shape as the one above. Refuses to ship a build
+# carrying a hand-typed price, because that is how a figure goes stale: it moves
+# in the hub, the page keeps quoting the old one, and nothing notices until a
+# client does. Blocks the deploy rather than the build, so `npm run dev` and a
+# local `npm run build` stay fast.
+echo "Auditing prices against the hub ..."
+node scripts/price-audit.mjs || {
+  echo "Deploy aborted: a price is hand-typed instead of read from src/lib/pricing.ts."
+  exit 1
+}
+
 echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # Additive tar-sync (like the libra-engine-site deploy): extracts/overwrites but
 # does NOT prune. Next hashes its build assets, so stale /_next/static files just

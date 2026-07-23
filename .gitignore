@@ -28,3 +28,6 @@ next-env.d.ts
 # 95d4802), but untracked from here on so they never ride along in a diff, a
 # deploy, or a status listing. Nothing in here is imported or rendered.
 /parked/
+
+# Rendered-text snapshots (scripts/render-diff.mjs) -- build output, tree-specific.
+.render-snapshots/

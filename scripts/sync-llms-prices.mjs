@@ -141,6 +141,38 @@ if (unmatched.length) {
   process.exit(1);
 }
 
+// --- coverage: the question the rules alone cannot ask -----------------
+// Every rule matching is only half the guarantee. It says the figures we KNOW
+// about are current; it says nothing about a figure nobody wrote a rule for.
+// Add a line to llms.txt quoting a price and, without this, it would sit there
+// unmanaged forever while the script cheerfully reported "up to date".
+//
+// So: every line carrying a dollar figure must be claimed by some rule. The
+// essay entries are the deliberate exception -- they are generated from essay
+// frontmatter by sync-llms-essays.mjs, and the money in them is somebody
+// else's (the $1,000-a-month agency retainer), not a chadworks price.
+const claimed = RULES.map(([shape]) =>
+  new RegExp(
+    shape.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").split("#").join(PRICE).split("@").join(COUNT),
+  ),
+);
+const isEssayEntry = (l) => /^-\s*\[.*\]\(\S*\/essays\/[^)]+\/\)/.test(l.trim());
+const unclaimed = next
+  .split(/\r?\n/)
+  .filter((l) => /\$[0-9]/.test(l) && !isEssayEntry(l))
+  .filter((l) => !claimed.some((re) => re.test(l)));
+
+if (unclaimed.length) {
+  console.error("sync-llms-prices: these lines in public/llms.txt quote a price no rule owns:");
+  for (const l of unclaimed) console.error(`  ${l.slice(0, 140)}`);
+  console.error(
+    "\nA figure here is invisible to the pricing hub: llms.txt is a static asset,",
+    "\nso it cannot import. Add a rule in this file anchored on the words around",
+    "\nthe number, or remove the figure from the line.",
+  );
+  process.exit(1);
+}
+
 if (next === source) {
   if (!CHECK_ONLY) console.log("sync-llms-prices: up to date.");
   process.exit(0);
