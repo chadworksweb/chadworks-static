@@ -13,6 +13,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { isMotionPaused, setMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
+import { CODEFALL_WORKER_SOURCE } from "./codefall-source";
 
 // Code-flavored glyphs (drawn in the brand mono face). No CJK -- the mono font
 // has no katakana, which would render as tofu boxes.
@@ -25,11 +26,8 @@ const TRAIL_NEAR: [number, number, number] = [36, 57, 137]; // #243989 deep indi
 const TRAIL_FAR: [number, number, number] = [174, 185, 234]; // #aeb9ea periwinkle (dissolving tail)
 
 
-// The handover payload the inline SEED_SCRIPT leaves on window for layout().
-type SeedState = {
-  w: number; h: number; colW: number; rowH: number;
-  rows: number; cols: number; columns: Column[];
-};
+// What the inline boot script leaves on window once the worker owns the canvas.
+type WorkerHandle = { worker: Worker; url: string; dpr: number };
 
 type Column = {
   head: number; // fractional row index of the leading glyph
@@ -45,92 +43,54 @@ const pick = () => GLYPHS[(Math.random() * GLYPHS.length) | 0];
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // ---------------------------------------------------------------------------
-// SEED FRAME -- the falling code, painted before React exists.
+// WORKER BOOT -- the falling code starts before the bundle, and off the main
+// thread so nothing the bundle does can interrupt it.
 //
-// The <canvas> ships in the static HTML but is EMPTY until this component
-// hydrates and its effect runs. On a throttled phone that is over a second of
-// blank space where the hero art belongs.
+// This inline script runs at HTML parse time. It hands the canvas to a worker
+// via transferControlToOffscreen() and starts it from a Blob URL, so there is
+// no module graph, no bundle and no extra request between the HTML arriving and
+// the first glyph appearing.
 //
-// It was invisible until 2026-07-23 only because the 237 KB render-blocking
-// stylesheet held first paint back to ~3.2 s, by which point hydration had
-// already happened. Turning gzip on took first paint to ~1.2 s and uncovered
-// the gap. gzip did not cause this; it stopped hiding it.
+// WHY OFF-THREAD. requestAnimationFrame and canvas 2D both run on the main
+// thread, and the main thread is blocked for ~434ms while the browser parses
+// this site's 1,148 KB of application JavaScript. Anything drawn from the page
+// freezes solid through that window no matter how early it starts, which is
+// exactly what happened when the art was first made to appear early: it showed
+// up, then stuttered. Measured in lab/codefall/, across four consecutive 450ms
+// blocks: page-driven longest gap 472ms, worker longest gap 35ms (one frame at
+// the 30fps throttle).
 //
-// So this runs as a plain inline script, in the HTML, with no dependencies and
-// nothing to download. It paints ONE frozen frame of exactly what the loop
-// would draw, and the effect then takes over on the same canvas.
+// AFTER TRANSFER THE PAGE CANNOT DRAW TO THIS CANVAS AT ALL, and
+// canvas.getContext("2d") THROWS on it. The component below therefore checks
+// for the handle before it touches the context, and every state change (resize,
+// pause, off-screen parking, pointer) becomes a message.
 //
-// DUPLICATION, ACKNOWLEDGED. This repeats layout() and the still parts of
-// drawColumn() in hand-written ES5. It cannot import them: the whole point is
-// to run before any bundle arrives. What it does NOT repeat is every part that
-// only matters once things move (the cursor orb, the head bloom, respawning),
-// because a single frame has no use for them.
-//
-// The constants below are INTERPOLATED from the module's own, so the palette
-// and the glyph set physically cannot drift. If the layout maths in layout()
-// changes, change it here too; a mismatch shows up as the art visibly jumping
-// the moment hydration lands.
-const SEED_SCRIPT = `(function(){
-var C=null,X=null,S=null,last=0,raf=0;
-var G=${JSON.stringify(GLYPHS)},A=${JSON.stringify(HEAD)},N=${JSON.stringify(TRAIL_NEAR)},F=${JSON.stringify(TRAIL_FAR)};
-function P(){return G[(Math.random()*G.length)|0]}
-// Mirrors newColumn(). Same ranges, same per-row glyph buffer, so the objects
-// handed to the component are indistinguishable from ones it made itself.
-function nc(above,rows){var len=Math.round(10+Math.random()*16);var ch=[];
-for(var q=0;q<len+rows+2;q++)ch.push(P());
-return{head:above?(-rows*1.1+Math.random()*(rows*1.8)):(-len+Math.random()*(len-1)),
-speed:5.5+Math.random()*7.5,len:len,dim:0.4+Math.random()*0.6,chars:ch,lastRow:-9999}}
-function dc(col,x){var hr=Math.floor(col.head);
-for(var k=0;k<col.len;k++){var row=hr-k;if(row<0||row>S.rows)continue;
-var g=col.chars[row]||P(),t=k/col.len;
-if(k===0){X.shadowColor='rgba('+A[0]+','+A[1]+','+A[2]+',0.55)';X.shadowBlur=7;
-X.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*col.dim)+')';X.fillText(g,x,row*S.rowH);X.shadowBlur=0}
-else{var ct=Math.min(1,t*1.3);
-X.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*col.dim)+')';
-X.fillText(g,x,row*S.rowH)}}}
-function paint(){X.clearRect(0,0,S.w,S.h);for(var i=0;i<S.columns.length;i++)dc(S.columns[i],i*S.colW)}
-// The same integration the component's frame() runs: 30fps throttle, dt capped
-// at 0.066, heads advance by speed*dt, a new glyph at each newly entered row
-// plus the upstream flicker, and columns respawn above once they fall out.
-function loop(now){
-if(!window.__CW_CODEFALL_SEED){raf=0;return}
-raf=requestAnimationFrame(loop);
-if(last&&now-last<33.34)return;
-var dt=last?Math.min((now-last)/1000,0.066):0;last=now;
-for(var i=0;i<S.columns.length;i++){var col=S.columns[i];col.head+=col.speed*dt;
-var hr=Math.floor(col.head);
-if(hr!==col.lastRow){col.lastRow=hr;
-if(hr>=0&&hr<col.chars.length)col.chars[hr]=P();
-if(Math.random()<0.5)col.chars[(Math.random()*col.chars.length)|0]=P()}
-if(hr-col.len>S.rows)S.columns[i]=nc(false,S.rows)}
-paint()}
-function boot(){try{
+// If OffscreenCanvas or Worker is missing, this bails WITHOUT setting the
+// handle and without transferring, and the component falls back to drawing on
+// the main thread exactly as it always did.
+const SEED_SCRIPT = `(function(){function boot(){try{
 var w=document.querySelector('.home-hero__codefall');if(!w)return false;
 var c=w.querySelector('canvas');if(!c)return false;
-// NOT c.width. A canvas with no width attribute reports the HTML default of
-// 300x150, so that test read "already painted" every time and this whole
-// script silently did nothing.
-if(c.getAttribute('data-cw-seed'))return true;
-var x=c.getContext('2d');if(!x)return true;
+if(c.getAttribute('data-cw-codefall'))return true;
+// No OffscreenCanvas or no Worker: stop, leave the handle unset, let the
+// component draw on the main thread. Returning true prevents a pointless retry.
+if(!c.transferControlToOffscreen||typeof Worker==='undefined')return true;
 // Every "not ready yet" path must return FALSE so the DOMContentLoaded retry
 // still fires. This sits at the top of the hero and the hero has no resolved
 // height until the markup below it parses, so the first attempt always reads
 // clientHeight 0 and has to come back later.
 var W=w.clientWidth,H=w.clientHeight;if(!W||!H)return false;
 var d=Math.min(window.devicePixelRatio||1,2);
+// The worker cannot read getComputedStyle, so the resolved font family has to
+// travel with the init message.
 var m=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||'monospace';
-var f=Math.max(13,Math.min(17,Math.round(W/30)));
-c.width=Math.round(W*d);c.height=Math.round(H*d);
-x.setTransform(d,0,0,d,0,0);x.font=f+'px '+m;x.textBaseline='top';
-var cw=Math.max(8,Math.ceil(x.measureText('0').width)+1);
-var rh=Math.round(f*1.18),rows=Math.ceil(H/rh)+2,cols=Math.ceil(W/cw);
-C=c;X=x;S={w:W,h:H,colW:cw,rowH:rh,rows:rows,cols:cols,columns:[]};
-for(var i=0;i<cols;i++)S.columns.push(nc(true,rows));
-window.__CW_CODEFALL_SEED=S;
-c.setAttribute('data-cw-seed','1');
-paint();
 var red=window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.documentElement.classList.contains('cw-force-motion');
-if(!red)raf=requestAnimationFrame(loop);
+var url=URL.createObjectURL(new Blob([${JSON.stringify(CODEFALL_WORKER_SOURCE)}],{type:'application/javascript'}));
+var wk=new Worker(url);
+var off=c.transferControlToOffscreen();
+wk.postMessage({type:'init',canvas:off,cssW:W,cssH:H,dpr:d,font:m,animate:!red},[off]);
+c.setAttribute('data-cw-codefall','1');
+window.__CW_CODEFALL={worker:wk,url:url,dpr:d};
 return true}catch(e){return true}}
 // React can HOIST an inline script above the markup it was written next to
 // (seen on this codebase 2026-07-23), so if the canvas is not parsed yet, wait.
@@ -156,6 +116,56 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
     const wrap = wrapRef.current;
     const canvas = canvasRef.current;
     if (!wrap || !canvas) return;
+
+    // ---- WORKER MODE -------------------------------------------------------
+    // The inline boot script already transferred this canvas and started the
+    // animation. React never draws here; it only relays state. This branch MUST
+    // come before getContext("2d"), which THROWS on a transferred canvas.
+    //
+    // The data attribute is checked as well as the handle: if React ever
+    // remounted and rebuilt the canvas element, the new one would not carry it,
+    // and falling through to the main-thread path is the correct recovery.
+    const handle = (window as unknown as { __CW_CODEFALL?: WorkerHandle })
+      .__CW_CODEFALL;
+    if (handle && canvas.getAttribute("data-cw-codefall")) {
+      const post = (m: Record<string, unknown>) => handle.worker.postMessage(m);
+
+      const ro = new ResizeObserver(() => {
+        post({ type: "resize", cssW: wrap.clientWidth, cssH: wrap.clientHeight, dpr: handle.dpr });
+      });
+      ro.observe(wrap);
+
+      // Park the loop unless the hero is near the viewport, the same thing the
+      // main-thread path does with its own IntersectionObserver.
+      const io = new IntersectionObserver(
+        (entries) => post({ type: "parked", value: !entries[0].isIntersecting }),
+        { rootMargin: "200px" },
+      );
+      io.observe(wrap);
+
+      post({ type: "paused", value: isMotionPaused() });
+      const unsub = subscribeMotion((v) => post({ type: "paused", value: v }));
+
+      // The worker cannot see the DOM, so the pointer travels as a message, in
+      // canvas-local CSS pixels.
+      const onMove = (e: MouseEvent) => {
+        const b = canvas.getBoundingClientRect();
+        post({ type: "pointer", x: e.clientX - b.left, y: e.clientY - b.top, inside: true });
+      };
+      const onLeave = () => post({ type: "pointer", x: -9999, y: -9999, inside: false });
+      document.addEventListener("mousemove", onMove, { passive: true });
+      document.addEventListener("mouseleave", onLeave);
+
+      return () => {
+        ro.disconnect();
+        io.disconnect();
+        unsub();
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseleave", onLeave);
+      };
+    }
+
+    // ---- FALLBACK: draw on the main thread (no OffscreenCanvas or no Worker) -
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -221,30 +231,7 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       rowH = Math.round(fontPx * 1.18);
       rows = Math.ceil(cssH / rowH) + 2;
       const cols = Math.ceil(cssW / colW);
-      // ADOPT the pre-hydration seed's columns rather than rolling new ones.
-      // The inline SEED_SCRIPT already painted a frame from its own random
-      // columns; generating a fresh set here would clear that frame and replace
-      // it with a different arrangement at a different density, which reads as
-      // the art collapsing and refilling about two seconds in. Measured before
-      // this: canvas ink fell 80% at hydration and climbed back over ~400ms.
-      // Only adopted when the geometry matches exactly, so a resize or a
-      // different DPR safely falls back to fresh columns. One-shot.
-      const seed = (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null })
-        .__CW_CODEFALL_SEED;
-      if (
-        seed &&
-        seed.w === cssW && seed.h === cssH &&
-        seed.colW === colW && seed.rowH === rowH &&
-        seed.rows === rows && seed.cols === cols
-      ) {
-        columns = seed.columns;
-      } else {
-        columns = Array.from({ length: cols }, () => newColumn(true));
-      }
-      // Clear the handle on BOTH branches. It is what tells the inline seed
-      // loop to stop, so leaving it set after a geometry mismatch would run two
-      // animation loops over one canvas, each drawing a different state.
-      (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null }).__CW_CODEFALL_SEED = null;
+      columns = Array.from({ length: cols }, () => newColumn(true));
       const b = canvas.getBoundingClientRect();
       rectL = b.left;
       rectT = b.top;
