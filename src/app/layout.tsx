@@ -108,8 +108,24 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildSiteGraph()) }}
         />
         <ConsentProvider>
+          {/* Skip link (WCAG 2.4.1 Bypass Blocks, Level A). FIRST focusable
+              thing on the page, deliberately ahead of SiteNav: without it a
+              keyboard user walks the whole header, dropdown children included,
+              before reaching a word of content, and does it again on every
+              page they open. Lives in the root layout so it covers the site
+              rather than a page at a time. */}
+          <a href="#main" className="skip-link">
+            Skip to content
+          </a>
           <SiteNav />
-          <main>{children}</main>
+          {/* tabIndex -1 makes this a programmatic focus target only -- it stays
+              out of the tab order, but focus actually LANDS here when the skip
+              link is followed. Without it Safari and older WebKit scroll to the
+              anchor and leave focus back at the top, so the next Tab returns
+              the user to the nav they just skipped. */}
+          <main id="main" tabIndex={-1}>
+            {children}
+          </main>
           <SiteFooter />
           <PageTransition />
           <MotionTogglePocket />
