@@ -24,23 +24,31 @@ case "$ENV" in
   staging|stage)
     DOCROOT="/srv/chadworks-staging"; BASE="https://staging.chadworks.co"; EXPECT="staging";;
   config)
-    # Push the nginx vhosts (prod + staging + shared security headers) from
-    # deploy/ to le-nginx's conf.d and reload. Content is NOT touched. Backs up
-    # each current file, tests the new config, and auto-restores if the test
-    # fails. All three go together: chadworks-staging.conf CONSUMES the
-    # $cw_redirect map that chadworks.conf declares, so pushing one without the
-    # other can leave conf.d referencing an undefined variable.
+    # Push the nginx vhosts (prod + staging + the shared snippets) from deploy/
+    # to le-nginx's conf.d and reload. Content is NOT touched. Backs up each
+    # current file, tests the new config, and auto-restores if the test fails.
+    # All four go together: chadworks-staging.conf CONSUMES the $cw_redirect map
+    # that chadworks.conf declares, and both vhosts `include` the two snippets,
+    # so pushing one without the others can leave conf.d referencing an
+    # undefined variable or a missing file.
+    #
+    # A snippet that is NEW on the server has no backup to restore, so the
+    # rollback path DELETES it instead. Without that, a failed nginx -t would
+    # leave a half-applied config: the vhosts restored to versions that do not
+    # include the snippet, and the snippet itself still sitting in conf.d.
     cd "$(dirname "$0")"
-    echo "Syncing deploy/chadworks.conf + chadworks-staging.conf + security-headers.conf -> ${SERVER}"
-    scp deploy/chadworks.conf deploy/chadworks-staging.conf deploy/security-headers.conf "$SERVER":/tmp/
+    echo "Syncing deploy/chadworks.conf + chadworks-staging.conf + security-headers.conf + compression.conf -> ${SERVER}"
+    scp deploy/chadworks.conf deploy/chadworks-staging.conf deploy/security-headers.conf deploy/compression.conf "$SERVER":/tmp/
     ssh "$SERVER" 'set -e
       TS=$(date +%Y%m%d%H%M%S); D=/root/proxy/nginx/conf.d
       sudo cp $D/chadworks.conf $D/chadworks.conf.bak-before-redirects-$TS
       [ -f $D/chadworks-staging.conf ] && sudo cp $D/chadworks-staging.conf $D/chadworks-staging.conf.bak-$TS || true
       [ -f $D/security-headers.conf ] && sudo cp $D/security-headers.conf $D/security-headers.conf.bak-$TS || true
+      [ -f $D/compression.conf ] && sudo cp $D/compression.conf $D/compression.conf.bak-$TS || true
       sudo cp /tmp/chadworks.conf $D/chadworks.conf
       sudo cp /tmp/chadworks-staging.conf $D/chadworks-staging.conf
       sudo cp /tmp/security-headers.conf $D/security-headers.conf
+      sudo cp /tmp/compression.conf $D/compression.conf
       if sudo docker exec le-nginx nginx -t; then
         sudo docker exec le-nginx nginx -s reload
         echo "nginx reloaded (rollback: chadworks.conf.bak-before-redirects-$TS)"
@@ -49,9 +57,11 @@ case "$ENV" in
         sudo cp $D/chadworks.conf.bak-before-redirects-$TS $D/chadworks.conf
         [ -f $D/chadworks-staging.conf.bak-$TS ] && sudo cp $D/chadworks-staging.conf.bak-$TS $D/chadworks-staging.conf || true
         [ -f $D/security-headers.conf.bak-$TS ] && sudo cp $D/security-headers.conf.bak-$TS $D/security-headers.conf || true
+        if [ -f $D/compression.conf.bak-$TS ]; then sudo cp $D/compression.conf.bak-$TS $D/compression.conf; else sudo rm -f $D/compression.conf; fi
         exit 1
       fi'
     echo "Done. Verify: curl -sI https://chadworks.co/blog"
+    echo "            curl -sI -H 'Accept-Encoding: gzip' https://chadworks.co/ | grep -i content-encoding"
     exit 0;;
   *)
     echo "usage: bash deploy.sh [prod|staging|config]"; exit 1;;
