@@ -31,3 +31,6 @@ next-env.d.ts
 
 # Rendered-text snapshots (scripts/render-diff.mjs) -- build output, tree-specific.
 .render-snapshots/
+
+# Lighthouse bench output (scripts/perf-measure.mjs). Local numbers, machine-specific.
+.perf/

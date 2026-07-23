@@ -13,7 +13,8 @@
     "render:save": "node scripts/render-diff.mjs save",
     "render:check": "node scripts/render-diff.mjs check",
     "start": "next start -p 8890",
-    "lint": "next lint"
+    "lint": "next lint",
+    "perf": "node scripts/perf-measure.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
