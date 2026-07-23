@@ -91,6 +91,15 @@ node scripts/price-audit.mjs || {
   exit 1
 }
 
+# Layout safety net. The calculator's stacked-layout breakpoint lives in three
+# files that must agree (CSS module, global CSS, and MOBILE_Q in JS) and cannot
+# be a shared constant. Blocks a deploy where they have drifted apart.
+echo "Auditing the stacked-layout breakpoint ..."
+node scripts/stack-query-audit.mjs || {
+  echo "Deploy aborted: the calculator's stacked-layout breakpoint is out of sync."
+  exit 1
+}
+
 echo "Syncing out/ -> ${SERVER}:${DOCROOT}"
 # Additive tar-sync (like the libra-engine-site deploy): extracts/overwrites but
 # does NOT prune. Next hashes its build assets, so stale /_next/static files just
