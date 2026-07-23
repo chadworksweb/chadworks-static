@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>CodeFall lab: main thread vs worker</title>
+<style>
+  :root {
+    --ink: #1a1930;
+    --muted: #6b6a85;
+    --line: #e3e1f0;
+    --violet: #6629bc;
+    --bad: #c0392b;
+    --good: #1d7a4c;
+  }
+  * { margin: 0; box-sizing: border-box; }
+  body {
+    font: 15px/1.5 ui-sans-serif, system-ui, sans-serif;
+    color: var(--ink);
+    padding: 24px;
+    background: #fff;
+  }
+  h1 { font-size: 20px; font-weight: 650; letter-spacing: -0.01em; }
+  p.lede { color: var(--muted); max-width: 76ch; margin-top: 6px; }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 18px 0; }
+  button {
+    font: inherit; font-weight: 600; padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--line); background: #fff; color: var(--ink); cursor: pointer;
+  }
+  button.primary { background: var(--violet); border-color: var(--violet); color: #fff; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .pane { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .pane h2 { font-size: 14px; font-weight: 650; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .stage { position: relative; height: 420px; background: #fcfcff; }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .meter { display: flex; gap: 18px; padding: 10px 14px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .meter b { font-weight: 650; }
+  .verdict { margin-top: 18px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; font-variant-numeric: tabular-nums; }
+  .good { color: var(--good); } .bad { color: var(--bad); }
+  code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>CodeFall lab: main thread vs worker</h1>
+<p class="lede">
+  Both panes run the identical animation from <code>core.js</code>. The left one
+  drives it from the page, the way the shipping component does. The right one
+  hands an <code>OffscreenCanvas</code> to a worker and never touches it again.
+  The button below blocks the main thread for 450ms, which is what parsing the
+  site's application JavaScript actually costs on load (measured 434ms,
+  2026-07-23). Watch which pane freezes.
+</p>
+
+<div class="controls">
+  <button class="primary" id="block">Block the main thread (450ms)</button>
+  <button id="block4">Block 4 times</button>
+  <button id="reset">Reset meters</button>
+  <label style="color:var(--muted)"><input type="checkbox" id="auto" checked /> auto-block once at 2s</label>
+</div>
+
+<div class="grid">
+  <div class="pane">
+    <h2>Main thread (what ships today)</h2>
+    <div class="stage"><canvas id="cvMain"></canvas></div>
+    <div class="meter">
+      <span>frames <b id="fMain">0</b></span>
+      <span>longest gap <b id="gMain">0</b>ms</span>
+    </div>
+  </div>
+  <div class="pane">
+    <h2>Worker + OffscreenCanvas</h2>
+    <div class="stage"><canvas id="cvWork"></canvas></div>
+    <div class="meter">
+      <span>frames <b id="fWork">0</b></span>
+      <span>longest gap <b id="gWork">0</b>ms</span>
+    </div>
+  </div>
+</div>
+
+<div class="verdict" id="verdict">Run a block to compare.</div>
+
+<script src="./core.js"></script>
+<script>
+(function () {
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var FONT = "ui-monospace, Menlo, Consolas, monospace";
+
+  // ---------------------------------------------------------------- main thread
+  var cvMain = document.getElementById("cvMain");
+  var mainFall = new CodeFallCore.CodeFall(cvMain.getContext("2d"), FONT);
+  var mainFrames = 0, mainMaxGap = 0, mainLastDraw = 0;
+
+  function sizeMain() {
+    var r = cvMain.parentElement.getBoundingClientRect();
+    mainFall.layout(cvMain, Math.round(r.width), Math.round(r.height), DPR);
+    mainFall.paint();
+  }
+  sizeMain();
+
+  function mainLoop(now) {
+    requestAnimationFrame(mainLoop);
+    if (mainFall.tick(now)) {
+      if (mainLastDraw) mainMaxGap = Math.max(mainMaxGap, now - mainLastDraw);
+      mainLastDraw = now;
+      mainFrames++;
+      document.getElementById("fMain").textContent = mainFrames;
+      document.getElementById("gMain").textContent = Math.round(mainMaxGap);
+    }
+  }
+  requestAnimationFrame(mainLoop);
+
+  cvMain.addEventListener("mousemove", function (e) {
+    var r = cvMain.getBoundingClientRect();
+    mainFall.setPointer(e.clientX - r.left, e.clientY - r.top, true);
+  });
+  cvMain.addEventListener("mouseleave", function () {
+    mainFall.setPointer(-9999, -9999, false);
+  });
+
+  // ---------------------------------------------------------------- worker
+  var cvWork = document.getElementById("cvWork");
+  var worker = null, workerOk = true;
+  try {
+    var off = cvWork.transferControlToOffscreen();
+    worker = new Worker("./worker.js");
+    var r0 = cvWork.parentElement.getBoundingClientRect();
+    worker.postMessage(
+      { type: "init", canvas: off, cssW: Math.round(r0.width), cssH: Math.round(r0.height), dpr: DPR, font: FONT },
+      [off]
+    );
+    worker.onmessage = function (e) {
+      if (e.data.type === "stats") {
+        document.getElementById("fWork").textContent = e.data.frames;
+        document.getElementById("gWork").textContent = e.data.maxGap;
+      }
+    };
+    // The pointer has to travel as a message: the worker cannot see the DOM.
+    cvWork.addEventListener("mousemove", function (e) {
+      var r = cvWork.getBoundingClientRect();
+      worker.postMessage({ type: "pointer", x: e.clientX - r.left, y: e.clientY - r.top, inside: true });
+    });
+    cvWork.addEventListener("mouseleave", function () {
+      worker.postMessage({ type: "pointer", x: -9999, y: -9999, inside: false });
+    });
+  } catch (err) {
+    workerOk = false;
+    document.getElementById("verdict").textContent = "OffscreenCanvas unavailable: " + err.message;
+  }
+
+  window.addEventListener("resize", function () {
+    sizeMain();
+    if (worker) {
+      var r = cvWork.parentElement.getBoundingClientRect();
+      worker.postMessage({ type: "resize", cssW: Math.round(r.width), cssH: Math.round(r.height), dpr: DPR });
+    }
+  });
+
+  // ---------------------------------------------------------------- the blocker
+  // A busy loop, not a timer. setTimeout would yield; this is what real script
+  // evaluation does to the thread.
+  function blockMainThread(ms) {
+    var end = performance.now() + ms;
+    while (performance.now() < end) { /* deliberately spinning */ }
+  }
+
+  function report() {
+    var mg = Math.round(mainMaxGap);
+    var wg = parseInt(document.getElementById("gWork").textContent, 10) || 0;
+    var v = document.getElementById("verdict");
+    if (!workerOk) return;
+    v.innerHTML =
+      "Longest gap between drawn frames: main thread <b class='" + (mg > 100 ? "bad" : "good") + "'>" +
+      mg + "ms</b>, worker <b class='" + (wg > 100 ? "bad" : "good") + "'>" + wg + "ms</b>. " +
+      (wg > 0 && mg > wg * 2
+        ? "The worker kept animating through the block."
+        : "Block the thread to see the difference.");
+  }
+
+  document.getElementById("block").addEventListener("click", function () {
+    blockMainThread(450); setTimeout(report, 200);
+  });
+  document.getElementById("block4").addEventListener("click", function () {
+    var n = 0;
+    (function again() {
+      blockMainThread(450); n++;
+      if (n < 4) setTimeout(again, 300); else setTimeout(report, 200);
+    })();
+  });
+  document.getElementById("reset").addEventListener("click", function () {
+    mainFrames = 0; mainMaxGap = 0; mainLastDraw = 0;
+    document.getElementById("fMain").textContent = "0";
+    document.getElementById("gMain").textContent = "0";
+    if (worker) worker.postMessage({ type: "reset" });
+  });
+
+  if (document.getElementById("auto").checked) {
+    setTimeout(function () { blockMainThread(450); setTimeout(report, 200); }, 2000);
+  }
+})();
+</script>
+</body>
+</html>
