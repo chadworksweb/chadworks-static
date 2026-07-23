@@ -417,7 +417,11 @@ export const WP_HOST_SAVING = WP_HOST_TYPICAL - STATIC_HOSTING; // the monthly g
 //                              AGENCY_SMALL_BUSINESS_RANGE come straight off it.
 //   Offshore      $2,500-8,000 CONFIRMED exactly: three published packages at
 //                              $2,500 / $5,000 / $8,000, no form in the way.
-//   Freelancer    $500-$5,000  *** UNSOURCED. See the row's own note. ***
+//   Freelancer    $500-$15,000 RE-SOURCED. Forbes dropped the category, so the
+//                              row moved to a freelance-specific study whose
+//                              headline is "$500-$15,000 per website in 2026".
+//                              Smallest publisher in this table; re-check it
+//                              first. Full note sits on the row.
 // ---------------------------------------------------------------------
 export type MarketRow = { method: string; range: string; note: string; href: string };
 
@@ -429,21 +433,26 @@ export const MARKET: MarketRow[] = [
     href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
   },
   {
-    // CITATION IS BROKEN (checked 2026-07-23). Forbes rewrote this page as a
-    // "2026 Guide" and dropped the freelancer category entirely: the word
-    // "freelancer" no longer appears on it, and no figure on it exceeds
-    // $10,000 or matches $5,000. What it says now is "a professionally
-    // designed site generally starts around $1,500".
+    // RE-SOURCED 2026-07-23 (Chad picked the replacement). The old href was
+    // Forbes, which rewrote its guide as a "2026 Guide" and dropped the
+    // freelancer category outright: the word stopped appearing on the page and
+    // no figure on it matched $5,000 any more. It could not support this row.
     //
-    // So the href no longer supports the range OR the row's framing. Do not
-    // just move the number: this row needs a source that actually prices
-    // FREELANCE work (a marketplace rate study, say), and the range should
-    // follow whatever that source says. Left as Chad wrote it until he picks
-    // the replacement, because guessing a new number is worse than a stale one.
+    // The new source prices freelance work specifically and publishes its
+    // method (600+ scoped quotes across six markets, self-reported at +/-18%).
+    // Its headline is "$500-$15,000 per website in 2026", which is where this
+    // range now comes from. The top moved from $5,000 to $15,000 because that
+    // is what the source says, and the wider spread happens to make the row's
+    // own point harder rather than softer.
+    //
+    // Smaller publisher than the rest of this table, so it is the one to
+    // re-check first. Its tiers, for a sanity read next time: landing page
+    // $300-$1,500, brochure $800-$3,500, WordPress $1,200-$5,000, Shopify
+    // $2,500-$8,000, custom app $10,000-$30,000.
     method: "Hire a freelancer",
-    range: "$500 to $5,000",
+    range: "$500 to $15,000",
     note: "One person, one invoice, and a wide range because a freelancer might mean a student on a template or a twenty year veteran writing custom code. The word covers both.",
-    href: "https://www.forbes.com/advisor/business/software/how-much-does-a-website-cost/",
+    href: "https://projectcostestimator.com/freelance-website-cost",
   },
   {
     method: "Hire an agency",
