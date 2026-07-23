@@ -25,6 +25,12 @@ const TRAIL_NEAR: [number, number, number] = [36, 57, 137]; // #243989 deep indi
 const TRAIL_FAR: [number, number, number] = [174, 185, 234]; // #aeb9ea periwinkle (dissolving tail)
 
 
+// The handover payload the inline SEED_SCRIPT leaves on window for layout().
+type SeedState = {
+  w: number; h: number; colW: number; rowH: number;
+  rows: number; cols: number; columns: Column[];
+};
+
 type Column = {
   head: number; // fractional row index of the leading glyph
   speed: number; // rows per second
@@ -65,18 +71,17 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 // changes, change it here too; a mismatch shows up as the art visibly jumping
 // the moment hydration lands.
 const SEED_SCRIPT = `(function(){function s(){try{
-// Return TRUE only when the frame is actually on the canvas. Every "not ready
-// yet" case must return false so the DOMContentLoaded retry still fires. The
-// height case is the one that matters: this script sits at the top of the hero,
-// and the hero's height is not resolved until the markup below it is parsed, so
-// the first attempt reads clientHeight 0 and has to come back later.
 var w=document.querySelector('.home-hero__codefall');if(!w)return false;
 var c=w.querySelector('canvas');if(!c)return false;
-// NOT \`c.width\`. A canvas with no width attribute still reports 300 (and 150
-// high), the HTML default, so that test read "already painted" every time and
-// this whole script silently did nothing. Flag the element explicitly instead.
+// NOT c.width. A canvas with no width attribute reports the HTML default of
+// 300x150, so that test read "already painted" every time and this whole
+// script silently did nothing. Flag the element explicitly instead.
 if(c.getAttribute('data-cw-seed'))return true;
 var x=c.getContext('2d');if(!x)return true;
+// Every "not ready yet" path must return FALSE so the DOMContentLoaded retry
+// still fires. This script sits at the top of the hero and the hero has no
+// resolved height until the markup below it parses, so the first attempt
+// always reads clientHeight 0 and has to come back later.
 var W=w.clientWidth,H=w.clientHeight;if(!W||!H)return false;
 var d=Math.min(window.devicePixelRatio||1,2);
 var m=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||'monospace';
@@ -86,15 +91,26 @@ x.setTransform(d,0,0,d,0,0);x.font=f+'px '+m;x.textBaseline='top';
 var cw=Math.max(8,Math.ceil(x.measureText('0').width)+1);
 var rh=Math.round(f*1.18),rows=Math.ceil(H/rh)+2,cols=Math.ceil(W/cw);
 var G=${JSON.stringify(GLYPHS)},A=${JSON.stringify(HEAD)},N=${JSON.stringify(TRAIL_NEAR)},F=${JSON.stringify(TRAIL_FAR)};
+var P=function(){return G[(Math.random()*G.length)|0]};
+// Build the SAME Column objects newColumn(true) builds, with the same start
+// distribution. Getting this wrong is what caused the jitter: a dense frame
+// handed over to a sparse one reads as the art collapsing and refilling.
+var cl=[];
 for(var i=0;i<cols;i++){
-var len=Math.round(10+Math.random()*16),dim=0.4+Math.random()*0.6;
-var head=Math.floor(rows*0.3+Math.random()*rows*0.6);
-for(var k=0;k<len;k++){var row=head-k;if(row<0||row>rows)continue;
-var ch=G[(Math.random()*G.length)|0],t=k/len;
-if(k===0){x.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*dim)+')';}
+var len=Math.round(10+Math.random()*16);
+var ch=[];for(var q=0;q<len+rows+2;q++)ch.push(P());
+cl.push({head:-rows*1.1+Math.random()*(rows*1.8),speed:5.5+Math.random()*7.5,len:len,dim:0.4+Math.random()*0.6,chars:ch,lastRow:-9999});}
+for(var i=0;i<cols;i++){var col=cl[i],hr=Math.floor(col.head);
+for(var k=0;k<col.len;k++){var row=hr-k;if(row<0||row>rows)continue;
+var g=col.chars[row],t=k/col.len;
+if(k===0){x.shadowColor='rgba('+A[0]+','+A[1]+','+A[2]+',0.55)';x.shadowBlur=7;
+x.fillStyle='rgba('+A[0]+','+A[1]+','+A[2]+','+(0.95*col.dim)+')';x.fillText(g,i*cw,row*rh);x.shadowBlur=0;}
 else{var ct=Math.min(1,t*1.3);
-x.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*dim)+')';}
-x.fillText(ch,i*cw,row*rh);}}
+x.fillStyle='rgba('+((N[0]+(F[0]-N[0])*ct)|0)+','+((N[1]+(F[1]-N[1])*ct)|0)+','+((N[2]+(F[2]-N[2])*ct)|0)+','+(Math.pow(1-t,1.5)*0.82*col.dim)+')';
+x.fillText(g,i*cw,row*rh);}}}
+// Hand the exact state to the component. Without this the effect generates a
+// fresh random set and the whole pattern visibly reshuffles at hydration.
+window.__CW_CODEFALL_SEED={w:W,h:H,colW:cw,rowH:rh,rows:rows,cols:cols,columns:cl};
 c.setAttribute('data-cw-seed','1');
 return true;}catch(e){return true;}}
 // React can HOIST an inline script above the markup it was written next to
@@ -186,7 +202,27 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
       rowH = Math.round(fontPx * 1.18);
       rows = Math.ceil(cssH / rowH) + 2;
       const cols = Math.ceil(cssW / colW);
-      columns = Array.from({ length: cols }, () => newColumn(true));
+      // ADOPT the pre-hydration seed's columns rather than rolling new ones.
+      // The inline SEED_SCRIPT already painted a frame from its own random
+      // columns; generating a fresh set here would clear that frame and replace
+      // it with a different arrangement at a different density, which reads as
+      // the art collapsing and refilling about two seconds in. Measured before
+      // this: canvas ink fell 80% at hydration and climbed back over ~400ms.
+      // Only adopted when the geometry matches exactly, so a resize or a
+      // different DPR safely falls back to fresh columns. One-shot.
+      const seed = (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null })
+        .__CW_CODEFALL_SEED;
+      if (
+        seed &&
+        seed.w === cssW && seed.h === cssH &&
+        seed.colW === colW && seed.rowH === rowH &&
+        seed.rows === rows && seed.cols === cols
+      ) {
+        columns = seed.columns;
+        (window as unknown as { __CW_CODEFALL_SEED?: SeedState | null }).__CW_CODEFALL_SEED = null;
+      } else {
+        columns = Array.from({ length: cols }, () => newColumn(true));
+      }
       const b = canvas.getBoundingClientRect();
       rectL = b.left;
       rectT = b.top;
