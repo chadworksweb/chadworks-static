@@ -60,7 +60,8 @@ const P = constants("pricing.ts", [
   "WP_HOST_TYPICAL",
   "WORKSPACE_SETUP",
   "WORKSPACE_EXTRA_MAILBOX",
-  "WORKSPACE_MONTHLY",
+  "WORKSPACE_MONTHLY_CEILING",
+  "MAILCHIMP_FREE_CONTACTS",
 ]);
 
 // Mirrors money() in package-builder.ts. Same locale, same grouping.
@@ -72,7 +73,13 @@ const WP_HOST_SAVING = P.WP_HOST_TYPICAL - P.STATIC_HOSTING;
 // --- the rules --------------------------------------------------------
 // `#` marks where a figure goes in the pattern; it expands to the PRICE shape
 // and the matching value is supplied positionally in `to`.
+//
+// `@` is the same idea for a BARE count, no dollar sign. Exactly one figure on
+// the site prices a service without being a price: Mailchimp's free-tier
+// contact limit. It moves like a price and is quoted like one, so it belongs on
+// the same leash.
 const PRICE = String.raw`\$[\d,]+(?:\.\d+)?`;
+const COUNT = String.raw`[\d,]+`;
 
 const RULES = [
   // Websites
@@ -90,7 +97,9 @@ const RULES = [
   ["Static hosting is # a month (about # less than a typical WordPress host), # for non-profits.",
     [money(P.STATIC_HOSTING), money(WP_HOST_SAVING), money(P.STATIC_HOSTING_NONPROFIT)]],
   ["Google Workspace runs under # a month per user; chadworks sets it up for a flat # (training and signature included), # per additional mailbox.",
-    [money(P.WORKSPACE_MONTHLY), money(P.WORKSPACE_SETUP), money(P.WORKSPACE_EXTRA_MAILBOX)]],
+    [money(P.WORKSPACE_MONTHLY_CEILING), money(P.WORKSPACE_SETUP), money(P.WORKSPACE_EXTRA_MAILBOX)]],
+  // Visibility, cont. -- the one bare-count rule.
+  ["Mailchimp is free up to @ contacts", [String(P.MAILCHIMP_FREE_CONTACTS)]],
   ["hosted for # a month (# non-profit)",
     [money(P.STATIC_HOSTING), money(P.STATIC_HOSTING_NONPROFIT)], "all"],
   ["hosting is # a month (# non-profit)",
@@ -106,11 +115,13 @@ let next = source;
 const unmatched = [];
 
 for (const [shape, values, mode] of RULES) {
-  // Escape the literal words, then expand each `#` into the price shape.
+  // Escape the literal words, then expand each placeholder into its shape.
   const pattern = shape
     .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
     .split("#")
-    .join(PRICE);
+    .join(PRICE)
+    .split("@")
+    .join(COUNT);
   const re = new RegExp(pattern, mode === "all" ? "g" : "");
   if (!re.test(next)) {
     unmatched.push(shape);
@@ -118,7 +129,7 @@ for (const [shape, values, mode] of RULES) {
   }
   re.lastIndex = 0;
   let i = 0;
-  const replacement = shape.split("#").reduce((acc, part, idx) =>
+  const replacement = shape.split(/[#@]/).reduce((acc, part, idx) =>
     idx === 0 ? part : acc + values[i++] + part);
   next = next.replace(re, () => replacement);
 }

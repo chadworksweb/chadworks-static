@@ -46,6 +46,8 @@ import {
 import {
   AFTER_LAUNCH,
   AGENCY_SMALL_BUSINESS_RANGE,
+  DOMAIN_YEARLY_HIGH,
+  DOMAIN_YEARLY_LOW,
   COMPONENTS,
   EXAMPLES,
   MARKET,
@@ -246,7 +248,7 @@ const FAQS: { q: string; a: ReactNode }[] = [
       <>
         If you build it yourself, $16 to $99 a month covers the builder and the
         hosting together. If someone builds you a custom site, the monthly cost
-        can be close to zero: you own a domain at about $12 to $20 a year, and a
+        can be close to zero: you own a domain at about {money(DOMAIN_YEARLY_LOW)} to {money(DOMAIN_YEARLY_HIGH)} a year, and a
         static site hosts for little or nothing. There is no monthly fee to me
         unless you put me on a WordPress care plan, currently {money(WORDPRESS_CARE)}{" "}
         every six months.
@@ -580,7 +582,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
             get surprised by. On a builder, the monthly fee never stops: $16 to
             $99 a month, every month, for as long as the site is up. On a custom
             site the ongoing cost can be almost nothing, because a domain runs
-            about $12 to $20 a year and a static site hosts for little or free.
+            about {money(DOMAIN_YEARLY_LOW)} to {money(DOMAIN_YEARLY_HIGH)} a year and a static site hosts for little or free.
           </p>
           <p>
             The variable is maintenance. A plain static site can sit untouched

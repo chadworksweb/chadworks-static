@@ -5,6 +5,7 @@
 
 import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
+import { SHOPIFY_APP_TYPICAL, SHOPIFY_BLOATED_BILL, SHOPIFY_PLAN } from "@/lib/pricing";
 import { BagChip, StoreChipDark, CartChip, TagChip } from "@/components/art/MoreChips";
 import { BAND_FROM_BASE, HIGH, LOW } from "@/lib/pricing";
 import { BASE, money } from "@/lib/package-builder";
@@ -78,8 +79,8 @@ export const shopify: Service = {
         </>,
         <>
           <strong>The apps</strong>{" "}get audited. Shopify&apos;s app store
-          solves everything for $10 a month each, and that&apos;s how a $39
-          plan becomes a $300 monthly bill. Every app has to earn its slot,
+          solves everything for {money(SHOPIFY_APP_TYPICAL)} a month each, and that&apos;s how a {money(SHOPIFY_PLAN)}{" "}
+          plan becomes a {money(SHOPIFY_BLOATED_BILL)}{" "}monthly bill. Every app has to earn its slot,
           and most don&apos;t.
         </>,
         <>

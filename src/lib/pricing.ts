@@ -32,19 +32,30 @@
 //      Wrong here means undercharging or a quote that does not match the site.
 //      Changing one is a business decision and takes effect the moment it lands.
 //
-//   2. WHAT OTHERS CHARGE FOR THE SAME WORK  -- the comparison set: agencies,
+//   2. THIRD-PARTY SERVICES  -- what the client pays a vendor DIRECTLY,
+//      alongside a chadworks engagement: Google Workspace, OpenAI's ad-spend
+//      floor, the Shopify plan, Mailchimp, the domain registrar. Not
+//      competitors; chadworks does not sell any of it and takes no margin on
+//      it. Quoted so a client can see the whole cost of what they are buying,
+//      and they move when the VENDOR says so, on no schedule of Chad's. Never
+//      present one as a chadworks price.
+//
+//   3. WHAT OTHERS CHARGE FOR THE SAME WORK  -- the comparison set: agencies,
 //      freelancers, DIY builders, offshore shops, WordPress hosts, rival cost
 //      calculators. These exist to argue chadworks' value against an
 //      alternative for the SAME job. They are somebody else's published prices,
 //      they go stale on somebody else's schedule, and a wrong one is chadworks'
 //      credibility, not theirs. RE-VERIFY ON A CADENCE, and cite a source.
 //
-//   3. THIRD-PARTY SERVICES  -- what the client pays a vendor DIRECTLY,
-//      alongside a chadworks engagement: Google's Workspace subscription,
-//      OpenAI's ad-spend floor. Not competitors; chadworks does not sell these
-//      and takes no margin on them. They are quoted so a client can see the
-//      whole cost of the thing they are buying, and they move when the vendor
-//      says so. Never present one as a chadworks price.
+// THE TEST that separates 2 from 3: could the client buy this INSTEAD of
+// chadworks? A WordPress host could replace chadworks hosting, so it is a
+// competitor (3). Google Workspace could not replace anything chadworks sells,
+// so it is a pass-through (2). Both are "somebody else's price"; only one of
+// them is an argument.
+//
+// FILE ORDER IS 1, 2, 3 AND THAT IS LOAD-BEARING: section 3's COMPONENTS table
+// renders the domain figures declared in section 2, and a const cannot be read
+// above its own declaration. Moving a section moves a build error with it.
 //
 // If a new figure does not clearly belong to one of the three, it does not
 // belong in the hub yet. Work out which it is first.
@@ -129,7 +140,7 @@ export const BAND_FROM_BASE = `${money(BASE)} - ${HIGH}+`; // "$3,250 - $10,000+
 // unit: the audit is charged ONCE, the other two are PER MONTH.
 //
 // The ad SPEND that sits beside ADS_MONTHLY is not here. It is OpenAI's floor,
-// billed to the client's own card, so it lives in section 3.
+// billed to the client's own card, so it lives in section 2.
 // ---------------------------------------------------------------------
 export const AUDIT = 675; // $ flat, one-time. The AI visibility audit, no commitment attached.
 export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. The management only.
@@ -148,14 +159,14 @@ export const REDESIGN_TYPICAL = 6200; // $ where most redesigns settle. A postur
 //
 // Quoted across five service files that all describe the same two numbers, so
 // a hosting change used to be a five-file edit. What a WordPress host charges
-// instead is a competitor figure and lives in section 2.
+// instead is a competitor figure and lives in section 3.
 // ---------------------------------------------------------------------
 export const STATIC_HOSTING = 20; // $/month, chadworks static hosting.
 export const STATIC_HOSTING_NONPROFIT = 10; // $/month, non-profits and tight-budget organizations.
 
 // Google Workspace setup. Both of these are what CHADWORKS charges to do the
 // migration; Google's own per-user subscription is a third-party service and
-// lives in section 3.
+// lives in section 2.
 export const WORKSPACE_SETUP = 300; // $ one-time to chadworks: setup, training, signature.
 export const WORKSPACE_EXTRA_MAILBOX = 25; // $ per additional mailbox set up at the same time.
 
@@ -312,12 +323,64 @@ export const EXAMPLES: Example[] = [
 ];
 
 // =====================================================================
-// SECTION 2 -- WHAT OTHERS CHARGE FOR THE SAME WORK
+// SECTION 2 -- THIRD-PARTY SERVICES
+//
+// What the client pays a vendor DIRECTLY, alongside a chadworks engagement.
+// Not competitors and not revenue: chadworks does not sell any of this and
+// takes no margin on it. Each one is quoted so a client can see the whole cost
+// of what they are buying, not just the chadworks half.
+//
+// THE RULE AT THE CALL SITE: never let one of these read as a chadworks price.
+// Every sentence that renders one already names the vendor and says the money
+// goes straight to them ("paid straight to OpenAI", "paid directly to Google").
+// Keep that clause if you touch the copy -- it is the only thing separating a
+// pass-through cost from a fee in the reader's mind.
+//
+// These move when the VENDOR says so, on no schedule of Chad's. Each carries
+// the date it was last true.
+// =====================================================================
+
+// --- Google Workspace ------------------------------------------------
+// Two readings of ONE vendor price, and both are published: /faqs/ quotes the
+// real band, the switch page rounds to a ceiling. The ceiling is stated rather
+// than derived, because "under $10" is a deliberately round promise and
+// Math.ceil() off the band would silently restate it every time Google moves.
+// If the band ever crosses the ceiling, the ceiling is the one that is wrong.
+export const WORKSPACE_MONTHLY_LOW = 7; // $/user/month, Business Starter. As of July 2026.
+export const WORKSPACE_MONTHLY_HIGH = 8; // $/user/month at the top of the entry tier.
+export const WORKSPACE_MONTHLY_CEILING = 10; // the "under $X a month" the switch page rounds to.
+
+// --- OpenAI ----------------------------------------------------------
+export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own ad-spend floor, billed to the client's card. As of June 2026.
+
+// --- Shopify ---------------------------------------------------------
+// The platform under a Shopify build. SHOPIFY_BLOATED_BILL is the end state
+// the /shopify/ page argues against (a lean plan buried under apps), not a
+// price Shopify publishes; it is the illustration, kept here so it cannot
+// contradict the two figures it is built from.
+export const SHOPIFY_PLAN = 39; // $/month, the plan a small store starts on. As of July 2026.
+export const SHOPIFY_APP_TYPICAL = 10; // $/month for one app that "solves everything".
+export const SHOPIFY_BLOATED_BILL = 300; // $/month once the apps stack up. The cautionary total.
+
+// --- Mailchimp -------------------------------------------------------
+// Chad's real go-to line is the free tier, so the contact count is the figure
+// that carries the argument. Not a dollar amount, but it prices the service.
+export const MAILCHIMP_FREE_CONTACTS = 500; // contacts included before Mailchimp charges anything.
+
+// --- Domain registration ---------------------------------------------
+// Paid to whichever registrar holds the name, in the client's own account.
+// Read by the cost guide's prose AND by the COMPONENTS table in section 3, so
+// the anatomy row and the argument cannot quote different years.
+export const DOMAIN_YEARLY_LOW = 12;
+export const DOMAIN_YEARLY_HIGH = 20;
+
+// =====================================================================
+// SECTION 3 -- WHAT OTHERS CHARGE FOR THE SAME WORK
 //
 // The comparison set. Every figure below is an alternative a client could buy
 // INSTEAD of chadworks for the same job: an agency, a freelancer, a DIY
 // builder, an offshore shop, a WordPress host, a rival cost calculator. That
-// is what separates this section from section 3, where the client pays a
+// is what separates this section from section 2, where the client pays a
 // vendor ALONGSIDE chadworks rather than instead of it.
 //
 // These are other people's published prices. They go stale on other people's
@@ -390,7 +453,7 @@ export type ComponentRow = { part: string; range: string; note: string };
 export const COMPONENTS: ComponentRow[] = [
   {
     part: "Domain name",
-    range: "$12 to $20 a year",
+    range: `${money(DOMAIN_YEARLY_LOW)} to ${money(DOMAIN_YEARLY_HIGH)} a year`,
     note: "The address itself, renewed yearly. On my builds it is registered in your name from day one, not held by me.",
   },
   {
@@ -466,24 +529,3 @@ export const CALCULATORS: CalculatorRow[] = [
     href: "https://www.prontomarketing.com/website-cost-calculator/",
   },
 ];
-
-// =====================================================================
-// SECTION 3 -- THIRD-PARTY SERVICES
-//
-// What the client pays a vendor DIRECTLY, alongside a chadworks engagement.
-// Not competitors and not revenue: chadworks does not sell any of this and
-// takes no margin on it. Each one is quoted so a client can see the whole cost
-// of what they are buying, not just the chadworks half.
-//
-// THE RULE AT THE CALL SITE: never let one of these read as a chadworks price.
-// Every sentence that renders one already names the vendor and says the money
-// goes straight to them ("paid straight to OpenAI", "paid directly to Google").
-// Keep that clause if you touch the copy -- it is the only thing separating a
-// pass-through cost from a fee in the reader's mind.
-//
-// These move when the VENDOR says so, on no schedule of Chad's. Each carries
-// the date it was last true.
-// =====================================================================
-
-export const WORKSPACE_MONTHLY = 10; // $/user/month for Google Workspace, paid to Google. Under-$10 as of July 2026.
-export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own ad-spend floor, billed to the client's card. As of June 2026.

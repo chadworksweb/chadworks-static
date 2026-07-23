@@ -25,6 +25,8 @@ import {
   LOW,
   MINUTELY,
   STATIC_HOSTING,
+  WORKSPACE_MONTHLY_HIGH,
+  WORKSPACE_MONTHLY_LOW,
   WORDPRESS_CARE,
 } from "@/lib/pricing";
 
@@ -106,9 +108,9 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Can you set up branded email accounts for me?",
-        a: "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will.\n\nMost clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account.\n\nIf your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+        a: `Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will.\n\nMost clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about ${money(WORKSPACE_MONTHLY_LOW)} to ${money(WORKSPACE_MONTHLY_HIGH)} a month per account.\n\nIf your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.`,
         aText:
-          "Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about $7 to $8 a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.",
+          `Yes, and I recommend it for anyone who wants to be taken seriously. A branded address at your own domain conveys a professionalism in a way that a free Gmail or Yahoo address never will. Most clients I set up on Google Workspace, which is Gmail with your domain plus Docs, Drive, and the rest, and runs about ${money(WORKSPACE_MONTHLY_LOW)} to ${money(WORKSPACE_MONTHLY_HIGH)} a month per account. If your work calls for Microsoft 365 instead, I can handle that too, though I only find it necessary for corporate or enterprise setups.`,
       },
       {
         q: "Do you use AI to build the sites?",

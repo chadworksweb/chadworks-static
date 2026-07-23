@@ -9,7 +9,7 @@ import type { Service } from "@/lib/service";
 import { MailChip } from "@/components/art/VisibilityHeroArt";
 import { TagChip, ShieldChipDark } from "@/components/art/MoreChips";
 import { ButtonChip } from "@/components/art/WebDesignHeroArt";
-import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { HOURLY, HOURLY_RATE, MAILCHIMP_FREE_CONTACTS } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
@@ -49,7 +49,7 @@ export const emailMarketing: Service = {
     <>
       Email is the one channel you own. The list is yours and no algorithm
       sits between you and the people on it. The platform can start free:
-      Mailchimp costs nothing up to 500 contacts. I&apos;m Chad, I&apos;ve
+      Mailchimp costs nothing up to {MAILCHIMP_FREE_CONTACTS}{" "}contacts. I&apos;m Chad, I&apos;ve
       built websites and their email for 20 years, and the work here is
       making the channel earn its place: a clean, segmented list and
       sends people open.
@@ -61,7 +61,7 @@ export const emailMarketing: Service = {
   keyFactsHeading: "Email marketing, at a glance",
   keyFacts: [
     "You own the list. Rankings and social reach are rented from an algorithm; the email list leaves with you, whatever platform it lives on.",
-    "It can start at $0. Mailchimp is free up to 500 contacts, and I'll tell you when free is all you need.",
+    `It can start at $0. Mailchimp is free up to ${MAILCHIMP_FREE_CONTACTS} contacts, and I'll tell you when free is all you need.`,
     "Segments beat blasts. Every client list I've set up across 20 years of website builds proves it: relevance is the open rate.",
     "Restraint is the strategy. Over-sending burns a list faster than anything else, so the calendar is part of the build.",
   ],
@@ -144,7 +144,7 @@ export const emailMarketing: Service = {
       {
         label: "The recommendation leads with the cost",
         detail:
-          "Mailchimp is my go-to, and the first fact I give every client is that it's free up to 500 contacts. The wallet comes first, every time.",
+          `Mailchimp is my go-to, and the first fact I give every client is that it's free up to ${MAILCHIMP_FREE_CONTACTS} contacts. The wallet comes first, every time.`,
       },
       {
         label: "The same advice, every time",
@@ -175,7 +175,7 @@ export const emailMarketing: Service = {
       `Email setup runs at ${money(HOURLY)} an hour as a scoped block: list cleanup, authentication, segments, templates, and the calendar, with the number in writing before we start. Ongoing sends can be scoped after, or your team can run the system themselves. It's documented for exactly that.`,
     disclaimer: (
       <>
-        <strong>Straight up:</strong>{" "}if your list is under 500 contacts,
+        <strong>Straight up:</strong>{" "}if your list is under {MAILCHIMP_FREE_CONTACTS}{" "}contacts,
         your platform is free and the spend here is setup only. I will
         never move you onto a paid plan you don&apos;t need.
       </>
@@ -187,7 +187,7 @@ export const emailMarketing: Service = {
   faqs: [
     {
       q: "Which platform should I use?",
-      a: "Mailchimp is my go-to, and it's free up to 500 contacts. Other platforms are fine too. The platform matters far less than the list hygiene and the segments, which is where the actual work is.",
+      a: `Mailchimp is my go-to, and it's free up to ${MAILCHIMP_FREE_CONTACTS} contacts. Other platforms are fine too. The platform matters far less than the list hygiene and the segments, which is where the actual work is.`,
     },
     {
       q: "How often should I send?",
@@ -285,6 +285,6 @@ export const emailMarketing: Service = {
   meta: {
     title: "Email Marketing: The Channel You Own, Built to Get Opened | chadworks",
     description:
-      `Email marketing built honestly: list cleanup, real segments, authenticated sending, and a calendar with discipline. Mailchimp free up to 500 contacts, and you'll hear when free is all you need. Setup at ${HOURLY_RATE}, scoped in writing. The list stays yours.`,
+      `Email marketing built honestly: list cleanup, real segments, authenticated sending, and a calendar with discipline. Mailchimp free up to ${MAILCHIMP_FREE_CONTACTS} contacts, and you'll hear when free is all you need. Setup at ${HOURLY_RATE}, scoped in writing. The list stays yours.`,
   },
 };
