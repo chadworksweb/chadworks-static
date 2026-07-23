@@ -19,6 +19,8 @@
 //   check advertising / trademark IP law first (Chad flagged this 2026-05-28).
 
 import { type Service } from "@/lib/service";
+import { STATIC_HOSTING, STATIC_HOSTING_NONPROFIT, WP_HOST_SAVING, WP_HOST_TYPICAL } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const leaveWordpress: Service = {
   slug: "switch/leave-wordpress",
@@ -36,7 +38,7 @@ export const leaveWordpress: Service = {
 
   keyFactsHeading: "Leaving WordPress, at a glance",
   keyFacts: [
-    "Static hosting from chadworks is $20 a month, where most WordPress hosts land around $30, so leaving puts about $10 back in your pocket every month for a site that also happens to be faster. Non-profits pay $10.",
+    `Static hosting from chadworks is ${money(STATIC_HOSTING)} a month, where most WordPress hosts land around ${money(WP_HOST_TYPICAL)}, so leaving puts about ${money(WP_HOST_SAVING)} back in your pocket every month for a site that also happens to be faster. Non-profits pay ${money(STATIC_HOSTING_NONPROFIT)}.`,
     "There is no admin to log into and no database sitting behind your site, so there is almost nothing left for someone to hack or for you to keep patched. Security comes built in.",
     "WordPress only earns its monthly cost if you are actually publishing on it. If your site mostly just sits there, that edit-it-yourself feature is quietly costing you somewhere between a hundred and a thousand-plus dollars a year that you never get back.",
   ],
@@ -72,7 +74,7 @@ export const leaveWordpress: Service = {
       {
         title: "I move your hosting and the savings start",
         body:
-          "I point your domain at static hosting and your old WordPress bill goes away. You drop to $20 a month, or $10 if you are a non-profit, with no update cycle to keep up with and security already handled.",
+          `I point your domain at static hosting and your old WordPress bill goes away. You drop to ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} if you are a non-profit, with no update cycle to keep up with and security already handled.`,
       },
       {
         title: "Need a change later? You just ask me",
@@ -122,7 +124,7 @@ export const leaveWordpress: Service = {
   price: {
     heading: "What hosting costs after you leave",
     body:
-      "Static hosting through chadworks is $20 a month. The typical WordPress host runs around $30, so leaving puts roughly $10 back in your pocket every month, for a site that also loads faster and has far less that can break. There is no update cycle to keep up with, and security comes built in because there is so little surface left to attack. Non-profits and tight-budget organizations pay $10 a month. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat stands: if you truly live inside your CMS and publish all the time, I'll tell you to keep it.",
+      `Static hosting through chadworks is ${money(STATIC_HOSTING)} a month. The typical WordPress host runs around ${money(WP_HOST_TYPICAL)}, so leaving puts roughly ${money(WP_HOST_SAVING)} back in your pocket every month, for a site that also loads faster and has far less that can break. There is no update cycle to keep up with, and security comes built in because there is so little surface left to attack. Non-profits and tight-budget organizations pay ${money(STATIC_HOSTING_NONPROFIT)} a month. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat stands: if you truly live inside your CMS and publish all the time, I'll tell you to keep it.`,
   },
 
   qualification: {
@@ -152,11 +154,11 @@ export const leaveWordpress: Service = {
     },
     {
       q: "How is static hosting cheaper and more secure?",
-      a: "A static site is just fast files with no database behind it and no admin to log into, so there is very little left to break or hack and very little to maintain. That is why it runs $20 a month instead of the $30 or so that is typical for WordPress.",
+      a: `A static site is just fast files with no database behind it and no admin to log into, so there is very little left to break or hack and very little to maintain. That is why it runs ${money(STATIC_HOSTING)} a month instead of the ${money(WP_HOST_TYPICAL)} or so that is typical for WordPress.`,
     },
     {
       q: "Do you offer a discount for non-profits?",
-      a: "Yes. Static hosting is $10 a month for non-profits and tight-budget organizations.",
+      a: `Yes. Static hosting is ${money(STATIC_HOSTING_NONPROFIT)} a month for non-profits and tight-budget organizations.`,
     },
     {
       q: "Do you only work with local businesses?",
@@ -175,6 +177,6 @@ export const leaveWordpress: Service = {
   meta: {
     title: "Leave WordPress: Switch to Faster, Cheaper Static Hosting | chadworks",
     description:
-      "Paying for a WordPress site that just sits there? I rebuild WordPress sites as fast, secure static sites and host them for $20 a month, where most WordPress hosts run around $30. Non-profits pay $10. Serving the Philadelphia area.",
+      `Paying for a WordPress site that just sits there? I rebuild WordPress sites as fast, secure static sites and host them for ${money(STATIC_HOSTING)} a month, where most WordPress hosts run around ${money(WP_HOST_TYPICAL)}. Non-profits pay ${money(STATIC_HOSTING_NONPROFIT)}. Serving the Philadelphia area.`,
   },
 };

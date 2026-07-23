@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8890",
-    "prebuild": "node scripts/sync-llms-essays.mjs",
+    "prebuild": "node scripts/sync-llms-essays.mjs && node scripts/sync-llms-prices.mjs",
     "build": "next build",
-    "sync:llms": "node scripts/sync-llms-essays.mjs",
+    "sync:llms": "node scripts/sync-llms-essays.mjs && node scripts/sync-llms-prices.mjs",
     "start": "next start -p 8890",
     "lint": "next lint"
   },

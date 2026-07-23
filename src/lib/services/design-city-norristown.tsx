@@ -4,6 +4,7 @@
 // core, and the Schuylkill riverfront. MVP breadth-first build (deepened later).
 
 import { type Service } from "@/lib/service";
+import { HIGH, LOW, TYPICAL_BAND } from "@/lib/pricing";
 
 export const norristown: Service = {
   slug: "website-design-for-norristown-pa",
@@ -16,13 +17,13 @@ export const norristown: Service = {
     "chadworks designs and builds custom websites for Norristown, PA businesses, from the Montgomery County courthouse district to the DeKalb Street small-business core.",
 
   answer:
-    "If you run a business in Norristown, PA, here is what you get: a custom website built around what your customers actually search for, designed to load fast and read clearly on a phone, and tuned so Google and the AI answer engines can find you. I am Chad, a solo builder in Greater Philadelphia, and I have been making websites since the MySpace days. Most projects land between $5,000 and $10,000 depending on scope, and you get the number up front before any work starts. Norristown is the Montgomery County seat, so a lot of the foot traffic here is people with a reason to be downtown: a courthouse appointment, a county office, a meal on Main or DeKalb. Your site should catch the ones already nearby and searching.",
+    `If you run a business in Norristown, PA, here is what you get: a custom website built around what your customers actually search for, designed to load fast and read clearly on a phone, and tuned so Google and the AI answer engines can find you. I am Chad, a solo builder in Greater Philadelphia, and I have been making websites since the MySpace days. Most projects land between ${LOW} and ${HIGH} depending on scope, and you get the number up front before any work starts. Norristown is the Montgomery County seat, so a lot of the foot traffic here is people with a reason to be downtown: a courthouse appointment, a county office, a meal on Main or DeKalb. Your site should catch the ones already nearby and searching.`,
 
   keyFactsHeading: "Norristown web design, at a glance",
   keyFacts: [
     "Custom websites for Norristown businesses, built for the Montgomery County seat where courthouse and county-office visitors mix with a working main-street economy along Main and DeKalb.",
     "Every build is designed mobile-first and tuned for local search, so a Norristown customer looking for what you offer finds you instead of a competitor a county over.",
-    "Pricing is value-based: $5,000 to $10,000, scope-dependent, quoted up front. No retainer surprises, no monthly platform rent on a template you do not own.",
+    `Pricing is value-based: ${TYPICAL_BAND}, scope-dependent, quoted up front. No retainer surprises, no monthly platform rent on a template you do not own.`,
     "I work both ways: in person around Greater Philadelphia or fully remote, so a Norristown project runs on whichever fits your week better.",
   ],
 
@@ -85,10 +86,10 @@ export const norristown: Service = {
 
   price: {
     heading: "What a Norristown site costs",
-    figure: "$5,000 to $10,000",
+    figure: TYPICAL_BAND,
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Norristown business runs $5,000 to $10,000, depending on how many pages you need and how much custom work the design calls for. You get the exact number before anything starts, so there is no creeping invoice. This is a value-based build, not a cheap template: you are paying for a site that actually brings in local customers and that you fully own when it ships.",
+      `A custom site for a Norristown business runs ${TYPICAL_BAND}, depending on how many pages you need and how much custom work the design calls for. You get the exact number before anything starts, so there is no creeping invoice. This is a value-based build, not a cheap template: you are paying for a site that actually brings in local customers and that you fully own when it ships.`,
   },
 
   qualification: {
@@ -114,7 +115,7 @@ export const norristown: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds land between $5,000 and $10,000, depending on scope. I quote the exact figure up front before any work begins, so you are never surprised by the invoice. It is a value-based price for a site you own, not a monthly template rental.",
+      a: `Most custom builds land between ${LOW} and ${HIGH}, depending on scope. I quote the exact figure up front before any work begins, so you are never surprised by the invoice. It is a value-based price for a site you own, not a monthly template rental.`,
     },
     {
       q: "Will my site show up when local people search?",
@@ -141,6 +142,6 @@ export const norristown: Service = {
   meta: {
     title: "Website Design in Norristown, PA | chadworks",
     description:
-      "Custom website design for Norristown, PA businesses near the Montgomery County courthouse and the DeKalb Street core. Fast, mobile-first, built for local search. $5,000 to $10,000, quoted up front.",
+      `Custom website design for Norristown, PA businesses near the Montgomery County courthouse and the DeKalb Street core. Fast, mobile-first, built for local search. ${TYPICAL_BAND}, quoted up front.`,
   },
 };

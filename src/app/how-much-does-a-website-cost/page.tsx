@@ -56,7 +56,7 @@ import {
 const PAGE_URL = `${SITE_URL}/how-much-does-a-website-cost/`;
 const TITLE = "How Much Does a Website Cost in 2026? A Real Price Breakdown | chadworks";
 const DESCRIPTION =
-  "A website costs from nothing to six figures, and the number comes down to who builds it. Here is the real breakdown: builder, freelancer, and agency prices; what domain, hosting, design, and maintenance each cost; and one working studio's actual figures, starting at $3,250.";
+  `A website costs from nothing to six figures, and the number comes down to who builds it. Here is the real breakdown: builder, freelancer, and agency prices; what domain, hosting, design, and maintenance each cost; and one working studio's actual figures, starting at ${money(BASE)}.`;
 
 export const metadata: Metadata = {
   title: TITLE,

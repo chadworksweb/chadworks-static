@@ -105,7 +105,7 @@ export default function VisionStrategyRoadmapPage() {
         portfolio: <DeliverableCapsule {...vsrDeliverable} />,
         testimonials: null,
         made: null,
-        // price: default PriceCapsule, carrying the real $3,250 figure.
+        // price: default PriceCapsule, carrying the real VSR_START figure.
         // qualification / faq: default.
         nextSteps: <PathsCapsule paths={service.paths!} />,
         // cta: default CtaCapsule, which mounts service.form in its right half.

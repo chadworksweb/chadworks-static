@@ -4,6 +4,7 @@
 // dining and boutique scene. MVP breadth-first build (deepened later).
 
 import { type Service } from "@/lib/service";
+import { TYPICAL_BAND } from "@/lib/pricing";
 
 export const ambler: Service = {
   slug: "website-design-for-ambler-pa",
@@ -16,13 +17,13 @@ export const ambler: Service = {
     "chadworks designs and builds custom websites for Ambler, PA businesses, the walkable Montgomery County borough whose restored downtown lives and dies on foot traffic.",
 
   answer:
-    "If you have a shop, studio, or restaurant in Ambler, PA, here is what you get: a custom website built to match how people actually find a walkable borough like this, designed to load fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder based in Greater Philadelphia, making websites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before any work starts. Ambler downtown runs on foot traffic, dinner-and-a-movie nights at the Ambler Theater, and a tight cluster of restaurants and boutiques. People decide where to eat or shop on their phone half a block away. Your site is what closes that decision in your favor.",
+    `If you have a shop, studio, or restaurant in Ambler, PA, here is what you get: a custom website built to match how people actually find a walkable borough like this, designed to load fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder based in Greater Philadelphia, making websites since the MySpace days. Most projects run ${TYPICAL_BAND} depending on scope, quoted up front before any work starts. Ambler downtown runs on foot traffic, dinner-and-a-movie nights at the Ambler Theater, and a tight cluster of restaurants and boutiques. People decide where to eat or shop on their phone half a block away. Your site is what closes that decision in your favor.`,
 
   keyFactsHeading: "Ambler web design, at a glance",
   keyFacts: [
     "Custom websites for Ambler businesses, built for a walkable Montgomery County borough where the restored downtown, the Ambler Theater, and a dense dining strip all run on foot traffic.",
     "Designed mobile-first, because in Ambler the customer deciding where to eat or browse is already on the sidewalk with a phone in hand.",
-    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    `Value-based pricing: ${TYPICAL_BAND}, scope-dependent, quoted up front. No template rent, no surprise invoices.`,
     "Local or remote both work: I am in Greater Philadelphia, an easy reach to Ambler, and I run plenty of projects fully remote too.",
   ],
 
@@ -85,10 +86,10 @@ export const ambler: Service = {
 
   price: {
     heading: "What an Ambler site costs",
-    figure: "$5,000 to $10,000",
+    figure: TYPICAL_BAND,
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for an Ambler business runs $5,000 to $10,000, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that actually pulls in nearby customers and that you own completely, not a monthly template rental dressed up as a deal.",
+      `A custom site for an Ambler business runs ${TYPICAL_BAND}, depending on page count and how much custom design the project needs. You get the exact figure before any work begins. This is a value-based build for a site that actually pulls in nearby customers and that you own completely, not a monthly template rental dressed up as a deal.`,
   },
 
   qualification: {
@@ -114,7 +115,7 @@ export const ambler: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Custom builds typically run $5,000 to $10,000, depending on scope. I quote the exact number up front before work starts. It is a value-based price for a site you own, not a recurring template fee.",
+      a: `Custom builds typically run ${TYPICAL_BAND}, depending on scope. I quote the exact number up front before work starts. It is a value-based price for a site you own, not a recurring template fee.`,
     },
     {
       q: "Can a website really bring in foot traffic?",
@@ -141,6 +142,6 @@ export const ambler: Service = {
   meta: {
     title: "Website Design in Ambler, PA | chadworks",
     description:
-      "Custom website design for Ambler, PA businesses in the walkable Montgomery County downtown near the Ambler Theater. Fast, mobile-first, built for local search. $5,000 to $10,000, quoted up front.",
+      `Custom website design for Ambler, PA businesses in the walkable Montgomery County downtown near the Ambler Theater. Fast, mobile-first, built for local search. ${TYPICAL_BAND}, quoted up front.`,
   },
 };

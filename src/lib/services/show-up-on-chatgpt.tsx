@@ -10,6 +10,8 @@
 import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
+import { AUDIT } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const showUpOnChatgpt: Service = {
   slug: "show-up-on-chatgpt",
@@ -20,7 +22,7 @@ export const showUpOnChatgpt: Service = {
   title: "Show Up on ChatGPT",
 
   intent:
-    "chadworks makes small-business sites readable and quotable to the AI crawlers behind ChatGPT, Claude, Gemini, and Perplexity, so your business gets named in the answer instead of your competitor. It starts with a $675 audit.",
+    `chadworks makes small-business sites readable and quotable to the AI crawlers behind ChatGPT, Claude, Gemini, and Perplexity, so your business gets named in the answer instead of your competitor. It starts with a ${money(AUDIT)} audit.`,
 
   answer: (
     <>
@@ -28,7 +30,7 @@ export const showUpOnChatgpt: Service = {
       That means letting bots like GPTBot and OAI-SearchBot in, adding structured
       data that names your business, and writing content that answers real
       questions. Most sites fail at least one of these, so they stay invisible. A
-      $675 audit tells you which ones are costing you. If you need to be visible
+      {money(AUDIT)} audit tells you which ones are costing you. If you need to be visible
       tomorrow instead, see{" "}
       <Link href="/advertising-on-chatgpt/">advertising on ChatGPT</Link>.
     </>
@@ -62,7 +64,7 @@ export const showUpOnChatgpt: Service = {
         { max: 6, tier: "max", text: "Six for six. You are built to be cited. The audit confirms it and finds the edge cases." },
       ]}
       ctaHref="/contact/"
-      ctaDefault="Get the $675 audit"
+      ctaDefault={`Get the ${money(AUDIT)} audit`}
       ctaMax="Audit me anyway"
     />
   ),
@@ -148,7 +150,7 @@ export const showUpOnChatgpt: Service = {
 
   price: {
     heading: "Start with the audit. Scale into the campaign.",
-    figure: "$675",
+    figure: money(AUDIT),
     figureSub: "AI Visibility Audit, one-time",
     body:
       "The baseline. I check whether AI crawlers can reach you, whether your structured data is doing its job, whether your content is quotable, and where you stand against the businesses already getting cited. You get a prioritized fix list and a straight answer about what is realistic in your space.",
@@ -218,6 +220,6 @@ export const showUpOnChatgpt: Service = {
   meta: {
     title: "Show Up on ChatGPT | chadworks",
     description:
-      "Get your business named in AI answers. I make your site readable and quotable to the crawlers behind ChatGPT, Claude, Gemini, and Perplexity: AI crawlers allowed, structured data that names you, and content that answers real questions. Starts with a $675 AI visibility audit.",
+      `Get your business named in AI answers. I make your site readable and quotable to the crawlers behind ChatGPT, Claude, Gemini, and Perplexity: AI crawlers allowed, structured data that names you, and content that answers real questions. Starts with a ${money(AUDIT)} AI visibility audit.`,
   },
 };

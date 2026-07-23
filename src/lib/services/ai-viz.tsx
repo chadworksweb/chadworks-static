@@ -9,6 +9,8 @@ import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { VisibilityHeroArt } from "@/components/art/VisibilityHeroArt";
 import { AiChatDemo } from "@/components/art/AiChatDemo";
+import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const aiViz: Service = {
   slug: "ai-viz",
@@ -181,10 +183,10 @@ export const aiViz: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$315/hr",
+    figure: HOURLY_RATE,
     figureSub: "Retained monthly, scoped in writing first",
     body:
-      "AI visibility runs as a monthly retainer built on my $315 hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.",
+      `AI visibility runs as a monthly retainer built on my ${money(HOURLY)} hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if the one-time audit is all your
@@ -297,6 +299,6 @@ export const aiViz: Service = {
   meta: {
     title: "AI Visibility: Get Recommended by ChatGPT and Google AI | chadworks",
     description:
-      "AI visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. $315/hr, scoped in writing.",
+      `AI visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. ${HOURLY_RATE}, scoped in writing.`,
   },
 };

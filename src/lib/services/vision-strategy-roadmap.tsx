@@ -53,6 +53,8 @@
 // rule would be the worse sin.
 
 import { type Service } from "@/lib/service";
+import { VSR_START } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 import type { RuleCapsuleProps } from "@/components/capsules/RuleCapsule";
 import type { SplitChecklistCapsuleProps } from "@/components/capsules/SplitChecklistCapsule";
 import type { VerbatimCapsuleProps } from "@/components/capsules/VerbatimCapsule";
@@ -74,12 +76,12 @@ export const visionStrategyRoadmap: Service = {
   // THE KEYSTONE IS THE SESSION, AND THE INTANGIBLE (Chad, 2026-07-16). An
   // earlier pass hung the whole page on "the sentence you say in the room". That
   // was wrong twice over: it reduces hours of skilled extraction to a
-  // quote-capture exercise, and it makes $3,250 look like the price of one
+  // quote-capture exercise, and it makes VSR_START look like the price of one
   // sentence. The click is a real moment and it stays a moment. What is being
   // sold is the session, and the material it works on is the intangible thing
   // the client is already carrying. Keep the weight there.
   answer:
-    "You have had the whole thing in your head for years, and every time you try to explain it, it comes out smaller than it is. That is what carrying something intangible feels like, and it does not improve by thinking about it harder. I'm Chad. This is a working session that gives the thing a shape, and then a document that holds the shape still. You leave with your Vision, Strategy, and Roadmap, yours to keep and build from with me or without me. It starts at $3,250. Every product I own went through this before a line of code was written.",
+    `You have had the whole thing in your head for years, and every time you try to explain it, it comes out smaller than it is. That is what carrying something intangible feels like, and it does not improve by thinking about it harder. I'm Chad. This is a working session that gives the thing a shape, and then a document that holds the shape still. You leave with your Vision, Strategy, and Roadmap, yours to keep and build from with me or without me. It starts at ${money(VSR_START)}. Every product I own went through this before a line of code was written.`,
 
   // FOUR bands, and the slots are Chad's (2026-07-16): 1 what the V/S/R is,
   // 2 who it is for, 3 why they need it, 4 the deliverable. A big-picture
@@ -208,13 +210,13 @@ export const visionStrategyRoadmap: Service = {
 
   price: {
     heading: "What a V/S/R costs",
-    figure: "$3,250",
+    figure: money(VSR_START),
     figureSub: "starting point, scoped to your world",
     body:
-      "$3,250 to start. Where it goes from there is decided by how tangled your world is rather than by how many hours I spend in it, so one founder with one product is a smaller number than an organization with four programs fused together. What you are paying for is the work, and the document is what you keep of it. For scale: a consulting firm would charge you six figures for this and hand you a deck with their name on the cover three weeks later. You get a couple of days in a room with me, and everything that comes out of it.",
+      `${money(VSR_START)} to start. Where it goes from there is decided by how tangled your world is rather than by how many hours I spend in it, so one founder with one product is a smaller number than an organization with four programs fused together. What you are paying for is the work, and the document is what you keep of it. For scale: a consulting firm would charge you six figures for this and hand you a deck with their name on the cover three weeks later. You get a couple of days in a room with me, and everything that comes out of it.`,
     disclaimer: (
       <>
-        $3,250 is the starting point, not a quote. Where a specific engagement
+        {money(VSR_START)} is the starting point, not a quote. Where a specific engagement
         lands is set in writing before any work begins, and it is decided by how
         much there is to untangle.
       </>
@@ -265,7 +267,7 @@ export const visionStrategyRoadmap: Service = {
     },
     {
       q: "What does it cost?",
-      a: "It starts at $3,250 and moves with the complexity of your world rather than with hours logged. What you are paying for is the document, and the number is set in writing before anything starts.",
+      a: `It starts at ${money(VSR_START)} and moves with the complexity of your world rather than with hours logged. What you are paying for is the document, and the number is set in writing before anything starts.`,
     },
   ],
 
@@ -349,7 +351,7 @@ export const visionStrategyRoadmap: Service = {
     title:
       "V/S/R: Vision, Strategy, Roadmap | Guided Vision Building | chadworks",
     description:
-      "You have the whole thing in your head and it comes out smaller every time you explain it. I run the session that gets it onto paper in your words, and hand you a Vision, Strategy, Roadmap document you own outright. From $3,250.",
+      `You have the whole thing in your head and it comes out smaller every time you explain it. I run the session that gets it onto paper in your words, and hand you a Vision, Strategy, Roadmap document you own outright. From ${money(VSR_START)}.`,
   },
 };
 

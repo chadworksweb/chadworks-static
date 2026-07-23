@@ -26,6 +26,8 @@ import {
   AdvertisingPricing,
 } from "@/components/chatgpt/AdvertisingArtSections";
 import { isLaunched } from "@/lib/launch";
+import { ADS_MIN_DAILY_SPEND } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const metadata: Metadata = {
   title: service.meta.title,
@@ -52,7 +54,7 @@ const COMPARE_ROWS: [string, string][] = [
   ["Sending the click to a slow homepage", "Sending it to a fast page that answers the prompt"],
   ["One ad for every kind of buyer", "Creative matched to the question being asked"],
   ["Setting a budget and walking away", "Watching the Ads Manager and cutting what fails"],
-  ["Guessing at the daily spend", "Starting at the $25 floor and scaling what converts"],
+  ["Guessing at the daily spend", `Starting at the ${money(ADS_MIN_DAILY_SPEND)} floor and scaling what converts`],
   ["Advertising a category OpenAI will reject", "Checking eligibility before a dollar is spent"],
 ];
 

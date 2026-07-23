@@ -1,6 +1,6 @@
 // Route: /rates/ -- standalone page. Value-based pricing with the math
-// showing. Real numbers only ($5.25/min, $3,250 baseline, $5,000-$10,000 typical, $550
-// every 6 months for WordPress care). Signature moment (CWS-CREATIVE-ARSENAL):
+// showing. Real numbers only, every one of them read from the pricing hub
+// (MINUTELY, BASE, the typical band, WORDPRESS_CARE). Signature moment (CWS-CREATIVE-ARSENAL):
 // the glass price panel + scanning border + a show-the-math ledger. Copy in
 // Chad's public voice, big-ticket posture (never apologize for the number).
 // JSON-LD: WebPage + FAQPage + BreadcrumbList.
@@ -12,7 +12,7 @@ import { isLaunched } from "@/lib/launch";
 import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { BASE, money } from "@/lib/package-builder";
-import { MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
+import { HIGH, HOURLY, LOW, MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
 
 // The minutely-rate explainer: real task -> real time, shown in the page's
 // existing show-the-math ledger (label + mono figure per row).
@@ -33,7 +33,7 @@ const PAGE_PATH = "/rates/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "Rates: What a chadworks Website Costs | chadworks";
 const DESCRIPTION =
-  `Work bills at ${money(MINUTELY)} a minute. The smallest engagement is ${money(BASE)}, and most websites land between $5,000 and $10,000. WordPress care runs ${money(WORDPRESS_CARE)} every 6 months. The real numbers, on the table before you decide, with the math showing.`;
+  `Work bills at ${money(MINUTELY)} a minute. The smallest engagement is ${money(BASE)}, and most websites land between ${LOW} and ${HIGH}. WordPress care runs ${money(WORDPRESS_CARE)} every 6 months. The real numbers, on the table before you decide, with the math showing.`;
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -73,7 +73,7 @@ const webPageJsonLd = {
       priceCurrency: "USD",
       priceSpecification: {
         "@type": "UnitPriceSpecification",
-        price: "315",
+        price: String(HOURLY),
         priceCurrency: "USD",
         unitText: "HUR",
       },

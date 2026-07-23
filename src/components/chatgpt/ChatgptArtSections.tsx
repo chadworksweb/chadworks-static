@@ -8,6 +8,8 @@
 
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { AI_VIZ_MONTHLY, AUDIT } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 import { ChatgptVisibility } from "@/components/chatgpt/ChatgptVisibility";
 
 export function ChatgptHero() {
@@ -39,11 +41,11 @@ export function ChatgptHero() {
           your business gets named, or someone else does. A lot of sites never get
           named because the AI crawlers cannot even read them. I find out why, fix
           it, and build the content that earns the citation, so you show up on
-          ChatGPT instead of your competitor. It starts with a $675 audit.
+          ChatGPT instead of your competitor. It starts with a {money(AUDIT)} audit.
         </p>
         <div className="cw-art-hero__actions">
           <Link href="/contact/" className="cw-art-btn cw-art-btn--primary">
-            Get visible for $675
+            Get visible for {money(AUDIT)}
           </Link>
           <Link href="#cw-art-score" className="cw-art-btn cw-art-btn--ghost">
             Am I invisible?
@@ -67,7 +69,7 @@ export function ChatgptWhyLanes() {
             crawlers. That means letting bots like GPTBot and OAI-SearchBot in,
             adding structured data that names your business, and writing content
             that answers real questions. Most sites fail at least one of these, so
-            they stay invisible. A $675 audit tells you which ones are costing you.
+            they stay invisible. A {money(AUDIT)} audit tells you which ones are costing you.
           </div>
           <p className="cw-art-why__lead">
             This is the organic side of AI search, sometimes called GEO, and it is
@@ -293,7 +295,7 @@ export function ChatgptPricingDuo() {
 
       <div className="cw-art-pricing-duo">
         <div className="cw-art-pricing-panel">
-          <div className="cw-art-pricing-panel__price">$675</div>
+          <div className="cw-art-pricing-panel__price">{money(AUDIT)}</div>
           <div className="cw-art-pricing-panel__sub">AI Visibility Audit, one-time</div>
           <p className="cw-art-pricing-panel__copy">
             The baseline. I check whether AI crawlers can reach you, whether your
@@ -303,13 +305,13 @@ export function ChatgptPricingDuo() {
             your space.
           </p>
           <Link href="/contact/" className="cw-art-btn cw-art-btn--primary cw-art-pricing-panel__cta">
-            Get visible for $675
+            Get visible for {money(AUDIT)}
           </Link>
         </div>
 
         <div className="cw-art-pricing-panel cw-art-pricing-panel--ongoing">
           <div className="cw-art-pricing-panel__price">
-            $675<span className="cw-art-pricing-panel__per"> / mo</span>
+            {money(AI_VIZ_MONTHLY)}<span className="cw-art-pricing-panel__per"> / mo</span>
           </div>
           <div className="cw-art-pricing-panel__sub">AI Visibility Campaign, ongoing</div>
           <p className="cw-art-pricing-panel__copy">

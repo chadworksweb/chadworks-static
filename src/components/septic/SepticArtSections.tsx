@@ -7,6 +7,7 @@
 
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { TYPICAL_BAND } from "@/lib/pricing";
 
 const DISPLAY = "Lexend, sans-serif";
 const MONO = "JetBrains Mono, monospace";
@@ -62,7 +63,7 @@ export function SepticBuild() {
             a phone number a panicked homeowner can find in two seconds, proof that
             you are licensed and insured, and a page Google will actually rank
             locally. Most septic services sites are missing at least one. Custom
-            builds run $5,000 to $10,000 and are built in days, not months.
+            builds run {TYPICAL_BAND} and are built in days, not months.
           </div>
         </div>
 

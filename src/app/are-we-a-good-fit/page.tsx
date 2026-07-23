@@ -26,6 +26,8 @@ import { PageComposer, MainContactCapsule } from "@/components/capsules";
 import { QualPanels } from "@/components/capsules/QualificationCapsule";
 import { FIT } from "@/components/capsules/FitCapsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { BASE, money } from "@/lib/package-builder";
+import { HIGH, LOW } from "@/lib/pricing";
 
 const ROUTE = "/are-we-a-good-fit/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
@@ -134,8 +136,8 @@ export default function GoodFitPage() {
               still renders a real em-dash. */}
           The decision to build your own sovereign property off-social media, off
           YouTube&mdash;off any centralized platform carries weight, and financial
-          requirements. The starting price for any chadworks project is $3,250 but
-          easily cracks $5,000 and $10,000. See my{" "}
+          requirements. The starting price for any chadworks project is {money(BASE)} but
+          easily cracks {LOW} and {HIGH}. See my{" "}
           {/* LaunchLink, not Link: the calculator lives on the claude/chadworks-work
               branch and is not merged, so /build-your-website-package/ does not
               exist here yet. This renders as plain TEXT until that route ships and

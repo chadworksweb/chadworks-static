@@ -22,24 +22,53 @@
 // pages import and render. A page never hand-types a figure the hub could own.
 // =====================================================================
 
-import { BASELINE, SMALL_BUSINESS, STORE, wire, type Scope } from "./package-builder";
+import { BASE, BASELINE, SMALL_BUSINESS, STORE, money, wire, type Scope } from "./package-builder";
 
 // ---------------------------------------------------------------------
 // AFTER-LAUNCH RATES -- one definition, imported everywhere.
 // ---------------------------------------------------------------------
 export const MINUTELY = 5.25; // $/min for work after launch. Also on /rates/.
+export const HOURLY = MINUTELY * 60; // the same rate said the other way, for the pages that quote an hour.
 export const WORDPRESS_CARE = 550; // $ per six months, the WordPress care plan.
+
+// ---------------------------------------------------------------------
+// THE TYPICAL BAND -- what most builds actually land at.
+//
+// Quoted on nearly every selling page ("most land between $5,000 and $10,000"),
+// which made it the single most-retyped figure on the site: 100+ hand-typed
+// occurrences before this pass. It is a POSTURE, not a computed figure -- the
+// calculator prices a scope, this says where scopes usually come out -- so it
+// is stated here rather than derived from a ladder.
+//
+// TYPICAL_HIGH doubles as the top of the "from the baseline to beyond" figures
+// on the service cards, which is why BAND_FROM_BASE lives here too: the cards
+// used to hand-type both ends of that range independently.
+// ---------------------------------------------------------------------
+export const TYPICAL_LOW = 5000;
+export const TYPICAL_HIGH = 10000;
+
+// The rendered forms.
+//
+// THE ENDS ARE EXPORTED SEPARATELY ON PURPOSE. Chad's copy joins them with
+// whichever word the sentence wants -- "between $5,000 and $10,000", "runs
+// $5,000 to $10,000", "$5,000 - $10,000" on a price card -- and swapping a
+// numeral must never swap his connector word too. A page that says "and"
+// interpolates the two ends; only a page that already said "to" or "-" uses a
+// prejoined band.
+export const LOW = money(TYPICAL_LOW); // "$5,000"
+export const HIGH = money(TYPICAL_HIGH); // "$10,000"
+export const HOURLY_RATE = `${money(HOURLY)}/hr`; // "$315/hr"
+export const HOURLY_LONG = `${money(HOURLY)}/hour`; // "$315/hour"
+export const TYPICAL_BAND = `${LOW} to ${HIGH}`; // "$5,000 to $10,000"
+export const TYPICAL_BAND_DASH = `${LOW} - ${HIGH}`; // "$5,000 - $10,000"
+export const BAND_FROM_BASE = `${money(BASE)} - ${HIGH}+`; // "$3,250 - $10,000+"
 
 // ---------------------------------------------------------------------
 // STANDALONE SERVICES -- sold on their own, not as part of a build.
 //
-// Added to the hub 2026-07-22 (Chad). Both currently sit hand-typed in the
-// pages that sell them, which is the drift the hub exists to stop:
-//   AUDIT       -> /faqs/ and /ai-visibility-audit/
-//   ADS_MONTHLY -> components/chatgpt/AdvertisingArtSections.tsx (4 places,
-//                  including the big pricing panel) and /faqs/
-// Rewiring those pages to read from here belongs to the hand-typed-prices
-// pass; defining them is the first half and has to land first.
+// Added to the hub 2026-07-22 (Chad); the pages that sell them were rewired to
+// read from here in the hand-typed-prices pass 2026-07-23, so the figures below
+// are now the only place these numbers are written down.
 //
 // The three-way $675 collision is intentional on Chad's side (one number, three
 // products) but it makes the constants easy to mix up, so each names its own
@@ -47,7 +76,36 @@ export const WORDPRESS_CARE = 550; // $ per six months, the WordPress care plan.
 // ---------------------------------------------------------------------
 export const AUDIT = 675; // $ flat, one-time. The AI visibility audit, no commitment attached.
 export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. Ad spend is the client's, billed by OpenAI.
+export const AI_VIZ_MONTHLY = 675; // $ per month, the ongoing AI visibility campaign. The third of the three.
 export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own floor (as of June 2026), NOT chadworks revenue.
+
+// Two products whose starting figure happens to equal BASE today. They are NOT
+// wired to BASE, on purpose: a build baseline and a strategy session are
+// separate products, and moving one must not silently move the other. Same
+// reasoning as the $675 collision above -- one number, three meanings, three
+// constants.
+export const VSR_START = 3250; // $ to start a Vision / Strategy / Roadmap engagement.
+export const REDESIGN_TYPICAL = 6200; // $ where most redesigns settle. A posture figure, like the band.
+
+// ---------------------------------------------------------------------
+// THE SWITCH LANE -- hosting and migration, sold off the /switch/ pages.
+//
+// Quoted across five service files that all describe the same two numbers, so
+// a hosting change used to be a five-file edit. WP_HOST_TYPICAL is somebody
+// else's price (what a typical WordPress host charges), kept here only so the
+// "puts $10 back in your pocket" line can be computed from the gap instead of
+// hand-typed as a third independent number that has to be kept in step.
+// ---------------------------------------------------------------------
+export const STATIC_HOSTING = 20; // $/month, chadworks static hosting.
+export const STATIC_HOSTING_NONPROFIT = 10; // $/month, non-profits and tight-budget organizations.
+export const WP_HOST_TYPICAL = 30; // $/month, roughly what a WordPress host runs. NOT chadworks revenue.
+export const WP_HOST_SAVING = WP_HOST_TYPICAL - STATIC_HOSTING; // the monthly gap, computed.
+
+// Google Workspace setup. WORKSPACE_MONTHLY is Google's own subscription, paid
+// straight to Google, and is here for the same reason WP_HOST_TYPICAL is.
+export const WORKSPACE_SETUP = 300; // $ one-time to chadworks: setup, training, signature.
+export const WORKSPACE_EXTRA_MAILBOX = 25; // $ per additional mailbox set up at the same time.
+export const WORKSPACE_MONTHLY = 10; // $/user/month, paid to Google. NOT chadworks revenue.
 
 // ---------------------------------------------------------------------
 // WORKED-EXAMPLE USE CASES -- real scopes, priced by the model at render.

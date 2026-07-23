@@ -10,6 +10,8 @@
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { AdvertisingChat } from "@/components/chatgpt/AdvertisingChat";
+import { ADS_MIN_DAILY_SPEND, ADS_MONTHLY } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export function AdvertisingHero() {
   return (
@@ -36,8 +38,8 @@ export function AdvertisingHero() {
           ChatGPT started running ads at the bottom of its answers in 2026, and the
           platform is now open to businesses of any size. I get you into that space
           and keep you there: I verify your advertiser account, build the campaign,
-          write the creative, and run it for a flat $675 a month. You fund the ad
-          spend directly to OpenAI, $25 a day minimum. Nothing about it routes
+          write the creative, and run it for a flat {money(ADS_MONTHLY)} a month. You fund the ad
+          spend directly to OpenAI, {money(ADS_MIN_DAILY_SPEND)} a day minimum. Nothing about it routes
           through me except the work.
         </p>
         <div className="cw-art-hero__actions">
@@ -65,7 +67,7 @@ export function AdvertisingWhyLanes() {
             Advertising on ChatGPT means paying to place your business in the
             sponsored slot at the bottom of a ChatGPT answer, shown to logged-in
             adults on the free and Go tiers. chadworks runs it as a managed service
-            for $675 a month. You fund the ad spend separately, $25 a day minimum,
+            for {money(ADS_MONTHLY)} a month. You fund the ad spend separately, {money(ADS_MIN_DAILY_SPEND)} a day minimum,
             paid straight to OpenAI.
           </div>
           <p className="cw-art-why__lead">
@@ -133,13 +135,13 @@ export function AdvertisingWhyLanes() {
             <p className="cw-art-lane__desc">
               OpenAI runs a self-serve Ads Manager with cost-per-click and
               cost-per-thousand bidding and no account minimum to get in the door.
-              The daily spend floor is $25. I set up the verified advertiser account,
+              The daily spend floor is {money(ADS_MIN_DAILY_SPEND)}. I set up the verified advertiser account,
               build the campaign in the Ads Manager, and manage the bids and creative
               from there.
             </p>
             <ul className="cw-art-lane__caps">
               <li>Self-serve Ads Manager, CPC or CPM bidding</li>
-              <li>$25 per day spend floor, billed by OpenAI to your card</li>
+              <li>{money(ADS_MIN_DAILY_SPEND)} per day spend floor, billed by OpenAI to your card</li>
               <li>Available to advertisers in the US, Canada, Australia, and New Zealand</li>
             </ul>
           </div>
@@ -241,7 +243,7 @@ export function AdvertisingPricing() {
       <div className="cw-art-pricing-solo">
         <div className="cw-art-pricing-panel cw-art-pricing-panel--ongoing">
           <div className="cw-art-pricing-panel__price">
-            $675<span className="cw-art-pricing-panel__per"> / mo</span>
+            {money(ADS_MONTHLY)}<span className="cw-art-pricing-panel__per"> / mo</span>
           </div>
           <div className="cw-art-pricing-panel__sub">Managed ChatGPT Ads</div>
           <p className="cw-art-pricing-panel__copy">
@@ -251,7 +253,7 @@ export function AdvertisingPricing() {
             in your name.
           </p>
           <p className="cw-art-pricing-panel__copy">
-            <strong>Your ad spend is separate.</strong> It starts at the $25 a day
+            <strong>Your ad spend is separate.</strong> It starts at the {money(ADS_MIN_DAILY_SPEND)} a day
             minimum and is billed by OpenAI straight to your card. It never passes
             through me, so there is no markup on your media and no question about
             where your money went.
@@ -271,7 +273,7 @@ export function AdvertisingPricing() {
           </ul>
 
           <p className="cw-art-pricing-panel__disclaimer">
-            <strong>Heads up:</strong> $675 covers the management. What you spend on
+            <strong>Heads up:</strong> {money(ADS_MONTHLY)} covers the management. What you spend on
             ads is your call and tracks the results we see. Eligibility depends on
             your category, and we confirm it before launch. Nothing here is a formal
             quote, real numbers come after a quick consult.

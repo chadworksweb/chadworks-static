@@ -12,6 +12,8 @@
 import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { WebDevHeroArt } from "@/components/art/WebDevHeroArt";
+import { HIGH, HOURLY, LOW } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 
 export const webDevelopment: Service = {
   slug: "web-development",
@@ -162,7 +164,7 @@ export const webDevelopment: Service = {
   price: {
     heading: "What it costs, plainly",
     body:
-      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,250 baseline. Most builds settle between $5,000 and $10,000, depending on scope and which route you take. I'm honest that this puts me above the cheapest option you'll find, and that is deliberate, because the cheap option is usually the one you pay to rebuild in two years. If a strict fixed budget matters to you more than the result, I'll tell you straight that we probably aren't a match, and I would rather say so now than after you've spent the money.",
+      `I price on the value of the work, not on how small a number I can promise you. Time bills at ${money(HOURLY)} an hour, and projects start at a ${money(BASE)} baseline. Most builds settle between ${LOW} and ${HIGH}, depending on scope and which route you take. I'm honest that this puts me above the cheapest option you'll find, and that is deliberate, because the cheap option is usually the one you pay to rebuild in two years. If a strict fixed budget matters to you more than the result, I'll tell you straight that we probably aren't a match, and I would rather say so now than after you've spent the money.`,
   },
 
   faqs: [

@@ -6,6 +6,8 @@
 import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
 import { BagChip, StoreChipDark, CartChip, TagChip } from "@/components/art/MoreChips";
+import { BAND_FROM_BASE, HIGH, LOW } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -157,10 +159,10 @@ export const shopify: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$3,250 - $10,000+",
+    figure: BAND_FROM_BASE,
     figureSub: "Value-based -- plus Shopify's own monthly plan",
     body:
-      "A Shopify build is priced on what it wins for your business, from the $3,250 baseline with most landing between $5,000 and $10,000. Shopify's own monthly plan sits on top, and I'll lay out that real number, including what the apps you actually need cost, before you ever commit to the platform.",
+      `A Shopify build is priced on what it wins for your business, from the ${money(BASE)} baseline with most landing between ${LOW} and ${HIGH}. Shopify's own monthly plan sits on top, and I'll lay out that real number, including what the apps you actually need cost, before you ever commit to the platform.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}Shopify&apos;s base plan is

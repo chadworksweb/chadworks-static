@@ -8,6 +8,8 @@ import type { Service } from "@/lib/service";
 import { CartChip, TagChip, CardChipDark, BagChip } from "@/components/art/MoreChips";
 import { BrowserChip } from "@/components/art/WebDevHeroArt";
 import { EcommerceViz } from "@/components/art/BuildPathViz";
+import { BAND_FROM_BASE, HIGH, LOW } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -163,10 +165,10 @@ export const ecommerce: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$3,250 - $10,000+",
+    figure: BAND_FROM_BASE,
     figureSub: "Value-based -- platform costs stated before you choose",
     body:
-      "Store builds are priced on what they win for your business, from the $3,250 baseline with most landing between $5,000 and $10,000. Catalog size and custom flows move the number, and you'll see it in writing before anything starts. The platform's own monthly costs get laid out at the same time, because a store bill you didn't see coming is the oldest trick in this industry.",
+      `Store builds are priced on what they win for your business, from the ${money(BASE)} baseline with most landing between ${LOW} and ${HIGH}. Catalog size and custom flows move the number, and you'll see it in writing before anything starts. The platform's own monthly costs get laid out at the same time, because a store bill you didn't see coming is the oldest trick in this industry.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if your product photos are weak,

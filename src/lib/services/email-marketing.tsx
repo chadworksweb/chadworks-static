@@ -9,6 +9,8 @@ import type { Service } from "@/lib/service";
 import { MailChip } from "@/components/art/VisibilityHeroArt";
 import { TagChip, ShieldChipDark } from "@/components/art/MoreChips";
 import { ButtonChip } from "@/components/art/WebDesignHeroArt";
+import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -167,10 +169,10 @@ export const emailMarketing: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$315/hr",
+    figure: HOURLY_RATE,
     figureSub: "Setup as a scoped block, in writing first",
     body:
-      "Email setup runs at $315 an hour as a scoped block: list cleanup, authentication, segments, templates, and the calendar, with the number in writing before we start. Ongoing sends can be scoped after, or your team can run the system themselves. It's documented for exactly that.",
+      `Email setup runs at ${money(HOURLY)} an hour as a scoped block: list cleanup, authentication, segments, templates, and the calendar, with the number in writing before we start. Ongoing sends can be scoped after, or your team can run the system themselves. It's documented for exactly that.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if your list is under 500 contacts,
@@ -283,6 +285,6 @@ export const emailMarketing: Service = {
   meta: {
     title: "Email Marketing: The Channel You Own, Built to Get Opened | chadworks",
     description:
-      "Email marketing built honestly: list cleanup, real segments, authenticated sending, and a calendar with discipline. Mailchimp free up to 500 contacts, and you'll hear when free is all you need. Setup at $315/hr, scoped in writing. The list stays yours.",
+      `Email marketing built honestly: list cleanup, real segments, authenticated sending, and a calendar with discipline. Mailchimp free up to 500 contacts, and you'll hear when free is all you need. Setup at ${HOURLY_RATE}, scoped in writing. The list stays yours.`,
   },
 };

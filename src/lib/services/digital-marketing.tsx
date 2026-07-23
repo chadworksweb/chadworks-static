@@ -8,6 +8,8 @@ import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
 import { ChartChip, MailChip, SearchChip } from "@/components/art/VisibilityHeroArt";
 import { PostChipDark, BoltChip } from "@/components/art/MoreChips";
+import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -179,10 +181,10 @@ export const digitalMarketing: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$315/hr",
+    figure: HOURLY_RATE,
     figureSub: "The triage is billable, and it's the point",
     body:
-      "The triage itself is billable time at $315 an hour, because it's the most valuable thing I do: it's the difference between funding the two channels that fit your buyers and funding six that don't. Ongoing channel work gets scoped in writing after it, and only for the channels that survived.",
+      `The triage itself is billable time at ${money(HOURLY)} an hour, because it's the most valuable thing I do: it's the difference between funding the two channels that fit your buyers and funding six that don't. Ongoing channel work gets scoped in writing after it, and only for the channels that survived.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}free marketing strategy is a sales
@@ -296,6 +298,6 @@ export const digitalMarketing: Service = {
   meta: {
     title: "Digital Marketing: Honest Channel Triage, Not the Full Menu | chadworks",
     description:
-      "Digital marketing sold as triage: a paid, straight answer on which channels your business actually needs, then proper work on the survivors. Search and AI visibility come first; follower-chasing never makes the list. Run by someone working inside OpenAI's ChatGPT advertising beta. $315/hr, every call in writing.",
+      `Digital marketing sold as triage: a paid, straight answer on which channels your business actually needs, then proper work on the survivors. Search and AI visibility come first; follower-chasing never makes the list. Run by someone working inside OpenAI's ChatGPT advertising beta. ${HOURLY_RATE}, every call in writing.`,
   },
 };

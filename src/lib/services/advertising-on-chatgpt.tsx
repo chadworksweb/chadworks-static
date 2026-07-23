@@ -9,6 +9,8 @@
 
 import Link from "next/link";
 import type { Service } from "@/lib/service";
+import { ADS_MIN_DAILY_SPEND, ADS_MONTHLY } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const advertisingOnChatgpt: Service = {
   slug: "advertising-on-chatgpt",
@@ -19,14 +21,14 @@ export const advertisingOnChatgpt: Service = {
   title: "Advertising on ChatGPT",
 
   intent:
-    "chadworks runs managed ChatGPT advertising for small businesses: I verify your advertiser account, build the campaign, write the creative, and manage it for a flat $675 a month, with your ad spend paid straight to OpenAI. It gets eligible businesses into the sponsored slot as soon as tomorrow.",
+    `chadworks runs managed ChatGPT advertising for small businesses: I verify your advertiser account, build the campaign, write the creative, and manage it for a flat ${money(ADS_MONTHLY)} a month, with your ad spend paid straight to OpenAI. It gets eligible businesses into the sponsored slot as soon as tomorrow.`,
 
   answer: (
     <>
       Advertising on ChatGPT means paying to place your business in the sponsored
       slot at the bottom of a ChatGPT answer, shown to logged-in adults on the free
-      and Go tiers. chadworks runs it as a managed service for $675 a month. You fund
-      the ad spend separately, $25 a day minimum, paid straight to OpenAI. If your
+      and Go tiers. chadworks runs it as a managed service for {money(ADS_MONTHLY)} a month. You fund
+      the ad spend separately, {money(ADS_MIN_DAILY_SPEND)} a day minimum, paid straight to OpenAI. If your
       category is blocked or you want durable presence instead of paid placement,
       see <Link href="/show-up-on-chatgpt/">showing up on ChatGPT</Link>.
     </>
@@ -36,7 +38,7 @@ export const advertisingOnChatgpt: Service = {
   keyFacts: [
     "ChatGPT places ads in a labeled, lightly tinted box at the bottom of its reply. There is no sidebar and no banner, so it reads as a suggestion attached to the thing the person was already asking about.",
     "There is no keyword auction the way Google works. Placement is matched to the topic of the live conversation, recent chat history, and how the person has engaged with ads before, so the creative has to fit the context.",
-    "OpenAI runs a self-serve Ads Manager with cost-per-click and cost-per-thousand bidding and a $25 a day spend floor billed straight to your card. It never routes through chadworks, so there is no markup on your media.",
+    `OpenAI runs a self-serve Ads Manager with cost-per-click and cost-per-thousand bidding and a ${money(ADS_MIN_DAILY_SPEND)} a day spend floor billed straight to your card. It never routes through chadworks, so there is no markup on your media.`,
     "Account verification takes a few business days, then a new ad usually clears review in about 24 hours. That speed is the real appeal of advertising over organic visibility: you can be in front of people tomorrow.",
   ],
 
@@ -74,7 +76,7 @@ export const advertisingOnChatgpt: Service = {
       {
         label: "Your spend stays yours",
         detail:
-          "The $25 a day minimum is billed by OpenAI straight to your card. It never passes through me, so there is no markup on your media and no question about where your money went.",
+          `The ${money(ADS_MIN_DAILY_SPEND)} a day minimum is billed by OpenAI straight to your card. It never passes through me, so there is no markup on your media and no question about where your money went.`,
       },
     ],
   },
@@ -108,10 +110,10 @@ export const advertisingOnChatgpt: Service = {
 
   price: {
     heading: "One flat monthly fee to run, monitor, and optimize your ads.",
-    figure: "$675",
+    figure: money(ADS_MONTHLY),
     figureSub: "Managed ChatGPT Ads, per month",
     body:
-      "The flat fee covers advertiser-account verification, the campaign build, the ad creative, ongoing optimization, and a monthly report you can actually read. I run it inside your own Ads Manager so the account stays in your name. Your ad spend is separate, starting at the $25 a day minimum, billed by OpenAI straight to your card.",
+      `The flat fee covers advertiser-account verification, the campaign build, the ad creative, ongoing optimization, and a monthly report you can actually read. I run it inside your own Ads Manager so the account stays in your name. Your ad spend is separate, starting at the ${money(ADS_MIN_DAILY_SPEND)} a day minimum, billed by OpenAI straight to your card.`,
   },
 
   faqLead:
@@ -119,7 +121,7 @@ export const advertisingOnChatgpt: Service = {
   faqs: [
     {
       q: "How much does it cost to advertise on ChatGPT?",
-      a: "Two numbers, kept separate on purpose. I manage your ChatGPT advertising for a flat $675 a month. Your ad spend is its own line, paid directly to OpenAI from your card, starting at the $25 a day minimum. The fee covers setup, verification, the campaign build, the creative, and monthly optimization. The spend is yours and you control it.",
+      a: `Two numbers, kept separate on purpose. I manage your ChatGPT advertising for a flat ${money(ADS_MONTHLY)} a month. Your ad spend is its own line, paid directly to OpenAI from your card, starting at the ${money(ADS_MIN_DAILY_SPEND)} a day minimum. The fee covers setup, verification, the campaign build, the creative, and monthly optimization. The spend is yours and you control it.`,
     },
     {
       q: "Can any business advertise on ChatGPT?",
@@ -139,7 +141,7 @@ export const advertisingOnChatgpt: Service = {
     },
     {
       q: "What is the minimum I can spend on ChatGPT advertising?",
-      a: "The daily floor is $25, billed by OpenAI directly to your card. That spend never routes through chadworks. You can start at the floor, watch what converts in the Ads Manager, and scale from there.",
+      a: `The daily floor is ${money(ADS_MIN_DAILY_SPEND)}, billed by OpenAI directly to your card. That spend never routes through chadworks. You can start at the floor, watch what converts in the Ads Manager, and scale from there.`,
     },
     {
       q: "What is the difference between advertising on ChatGPT and showing up organically?",
@@ -178,6 +180,6 @@ export const advertisingOnChatgpt: Service = {
   meta: {
     title: "Advertising on ChatGPT | chadworks",
     description:
-      "Managed ChatGPT advertising, done for you. I verify your advertiser account, build the campaign, write the creative, and run it for a flat $675 a month. Your ad spend is paid straight to OpenAI, $25 a day minimum. Eligible businesses can be live as soon as tomorrow.",
+      `Managed ChatGPT advertising, done for you. I verify your advertiser account, build the campaign, write the creative, and run it for a flat ${money(ADS_MONTHLY)} a month. Your ad spend is paid straight to OpenAI, ${money(ADS_MIN_DAILY_SPEND)} a day minimum. Eligible businesses can be live as soon as tomorrow.`,
   },
 };

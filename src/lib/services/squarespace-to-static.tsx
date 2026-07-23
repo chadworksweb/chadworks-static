@@ -2,12 +2,14 @@
 // A switch-lane acquisition surface that funnels into the Websites lane
 // (custom-coded / static). Same Service shape as the other switch pages; the
 // signature is the CompareTable (septic comparison-table lineage) in the
-// problemArt slot. Real numbers only: chadworks static hosting is $20/mo ($10
+// problemArt slot. Real numbers only: chadworks static hosting reads STATIC_HOSTING
 // non-profit); Squarespace's own pricing is kept qualitative (it changes and
 // is theirs to state), so the page leads with what chadworks actually charges.
 
 import { type Service } from "@/lib/service";
 import { CompareTable } from "@/components/art/CompareTable";
+import { STATIC_HOSTING, STATIC_HOSTING_NONPROFIT } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const squarespaceToStatic: Service = {
   slug: "switch/squarespace-to-static",
@@ -19,12 +21,12 @@ export const squarespaceToStatic: Service = {
     "chadworks rebuilds Squarespace sites as fast, custom-coded static sites the client owns outright, for businesses tired of renting a template on a monthly subscription.",
 
   answer:
-    "Squarespace is rented, not owned. You pay every month to keep your site live on a template thousands of other businesses also picked, and the day you stop paying, it's gone. A custom static site flips that. I rebuild what you have as fast, hand-built pages on your own domain, hosted for $20 a month, and the whole thing is yours to keep. Same content, a design built around your business instead of a theme, and nothing holding you hostage. You leave the monthly platform fee and the cookie-cutter look behind in a single move.",
+    `Squarespace is rented, not owned. You pay every month to keep your site live on a template thousands of other businesses also picked, and the day you stop paying, it's gone. A custom static site flips that. I rebuild what you have as fast, hand-built pages on your own domain, hosted for ${money(STATIC_HOSTING)} a month, and the whole thing is yours to keep. Same content, a design built around your business instead of a theme, and nothing holding you hostage. You leave the monthly platform fee and the cookie-cutter look behind in a single move.`,
 
   keyFactsHeading: "Squarespace to static, at a glance",
   keyFacts: [
     "A custom static site is yours outright. Everything sits in your name, from the code down to the hosting account, with nothing that vanishes the month you stop paying a platform.",
-    "Static hosting from chadworks is $20 a month, or $10 for a non-profit, with no platform subscription stacked on top of it and no plan tier waiting to upsell you.",
+    `Static hosting from chadworks is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no platform subscription stacked on top of it and no plan tier waiting to upsell you.`,
     "Squarespace hands everyone the same templates; a custom build is designed around your business and nobody else's, and it loads faster for both Google and the AI assistants.",
   ],
 
@@ -33,7 +35,7 @@ export const squarespaceToStatic: Service = {
       them="Squarespace"
       rows={[
         { feature: "Who owns it", them: "Squarespace owns the platform", us: "You own all of it" },
-        { feature: "What you pay", them: "A monthly platform plan", us: "$20/mo hosting, $10 non-profit" },
+        { feature: "What you pay", them: "A monthly platform plan", us: `${money(STATIC_HOSTING)}/mo hosting, ${money(STATIC_HOSTING_NONPROFIT)} non-profit` },
         { feature: "The design", them: "A shared template", us: "Built around your business" },
         { feature: "Speed and AI readiness", them: "Platform overhead", us: "Hand-built, fast, schema-ready" },
         { feature: "If you stop paying", them: "The site goes dark", us: "The files are still yours" },
@@ -72,7 +74,7 @@ export const squarespaceToStatic: Service = {
       {
         title: "I move it onto hosting you own",
         body:
-          "I point your domain at static hosting in your own name and the Squarespace plan goes away. You drop to $20 a month, or $10 as a non-profit, and the whole site is yours to keep for as long as you want it.",
+          `I point your domain at static hosting in your own name and the Squarespace plan goes away. You drop to ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} as a non-profit, and the whole site is yours to keep for as long as you want it.`,
       },
       {
         title: "Need a change later? You just ask me",
@@ -123,7 +125,7 @@ export const squarespaceToStatic: Service = {
   price: {
     heading: "What hosting costs after you leave",
     body:
-      "Static hosting through chadworks is $20 a month, and $10 for non-profits and tight-budget organizations. There is no platform subscription sitting on top of it, because there is no platform, just fast files on hosting you own. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if Squarespace is genuinely doing something your business depends on, I'll tell you to stay.",
+      `Static hosting through chadworks is ${money(STATIC_HOSTING)} a month, and ${money(STATIC_HOSTING_NONPROFIT)} for non-profits and tight-budget organizations. There is no platform subscription sitting on top of it, because there is no platform, just fast files on hosting you own. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if Squarespace is genuinely doing something your business depends on, I'll tell you to stay.`,
   },
 
   qualification: {
@@ -153,7 +155,7 @@ export const squarespaceToStatic: Service = {
     },
     {
       q: "How much does hosting cost once I switch?",
-      a: "Static hosting is $20 a month, or $10 for a non-profit, with no platform subscription on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.",
+      a: `Static hosting is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no platform subscription on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.`,
     },
     {
       q: "Why is a static site faster and easier to find than Squarespace?",
@@ -176,6 +178,6 @@ export const squarespaceToStatic: Service = {
   meta: {
     title: "Squarespace to Static: Own a Faster Custom Site | chadworks",
     description:
-      "On Squarespace and tired of renting a template? I rebuild Squarespace sites as fast, custom-coded static sites you own outright, hosted for $20 a month ($10 non-profit). A design built around your business, not a shared theme. Serving the Philadelphia area.",
+      `On Squarespace and tired of renting a template? I rebuild Squarespace sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). A design built around your business, not a shared theme. Serving the Philadelphia area.`,
   },
 };

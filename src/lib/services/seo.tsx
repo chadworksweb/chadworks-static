@@ -11,6 +11,8 @@ import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { VisibilitySpectrum } from "@/components/art/VisibilitySpectrum";
 import { SearchChip, RankChip, ChartChip, PinChipDark } from "@/components/art/VisibilityHeroArt";
+import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -194,10 +196,10 @@ export const seo: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$315/hr",
+    figure: HOURLY_RATE,
     figureSub: "Scoped blocks or retained, in writing first",
     body:
-      "SEO runs at $315 an hour, sold as scoped project blocks or a retainer, with the scope and number in writing before we start. It's priced on what owning your phrases is worth in your market, and in most markets that's a multiple of what the work costs. I'm not the cheapest, deliberately.",
+      `SEO runs at ${money(HOURLY)} an hour, sold as scoped project blocks or a retainer, with the scope and number in writing before we start. It's priced on what owning your phrases is worth in your market, and in most markets that's a multiple of what the work costs. I'm not the cheapest, deliberately.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}SEO compounds slowly. If you need the
@@ -314,6 +316,6 @@ export const seo: Service = {
   meta: {
     title: "SEO Services: Rank for the Phrases Buyers Actually Type | chadworks",
     description:
-      "Classic SEO, done honestly: structure-first pages that rank for real buying phrases and feed the AI answers engines now give. Proof: a Brooklyn psychologist on page one for his neighborhood's therapy phrase, now named in AI answers. $315/hr, scoped in writing, no guarantees nobody can keep.",
+      `Classic SEO, done honestly: structure-first pages that rank for real buying phrases and feed the AI answers engines now give. Proof: a Brooklyn psychologist on page one for his neighborhood's therapy phrase, now named in AI answers. ${HOURLY_RATE}, scoped in writing, no guarantees nobody can keep.`,
   },
 };

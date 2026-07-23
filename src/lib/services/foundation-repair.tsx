@@ -8,10 +8,11 @@
 // piering page). Copy preserves the source's angles -- the basement-flood call,
 // engineer signoff + transferable warranty, per-town local SEO, helical vs push
 // piers, AI-answer readability. Real facts; pricing is the site's value-based
-// posture (from $315/hr, quoted flat).
+// posture (from the hub's hourly rate, quoted flat).
 
 import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
+import { TYPICAL_BAND, TYPICAL_BAND_DASH } from "@/lib/pricing";
 
 export const foundationRepair: Service = {
   slug: "website-design-for-foundation-repair",
@@ -188,7 +189,7 @@ export const foundationRepair: Service = {
 
   price: {
     heading: "What I quote up front is what you pay.",
-    figure: "$5,000 - $10,000",
+    figure: TYPICAL_BAND_DASH,
     figureSub: "Custom build, scope-dependent",
     body:
       "Pricing tracks scope, not hours. A focused conversion site lands near the low end of the range. Add intake forms, a real photo gallery, or service-area pages and the number moves up. You see the full quote before we start, and that's the number on the final invoice, no retainer running in the background. When you need something later, you email me and I bill the work.",
@@ -240,7 +241,7 @@ export const foundationRepair: Service = {
     },
     {
       q: "Why do you show pricing when most foundation-repair-focused agencies don't?",
-      a: "Because you should know roughly what you're going to spend before we talk. Most agencies hide pricing so they can size the quote to what they think you'll pay. The range here is honest: $5,000 to $10,000 based on scope, quoted up front.",
+      a: `Because you should know roughly what you're going to spend before we talk. Most agencies hide pricing so they can size the quote to what they think you'll pay. The range here is honest: ${TYPICAL_BAND} based on scope, quoted up front.`,
     },
   ],
 
@@ -275,6 +276,6 @@ export const foundationRepair: Service = {
   meta: {
     title: "Website Design for Foundation Repair Contractors | chadworks",
     description:
-      "Foundation repair websites built to win the basement-flood call: fast on a phone, tap-to-call in the header, engineer signoff and transferable warranty up top, a dedicated ranking page for every method, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run $5,000 to $10,000, quoted up front.",
+      `Foundation repair websites built to win the basement-flood call: fast on a phone, tap-to-call in the header, engineer signoff and transferable warranty up top, a dedicated ranking page for every method, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run ${TYPICAL_BAND}, quoted up front.`,
   },
 };

@@ -57,6 +57,8 @@ import {
   PinChipDark,
 } from "@/components/art/VisibilityHeroArt";
 import { GoingToBat } from "@/components/GoingToBat";
+import { BASE, money } from "@/lib/package-builder";
+import { HIGH, LOW } from "@/lib/pricing";
 
 // The Websites + Visibility chip sets COMBINED into one stream (copied from the
 // /websites/ and /visibility/ hero art). They share a single sticky column on
@@ -275,9 +277,9 @@ const FAQS = [
     q: "What does a website cost?",
     a: (
       <>
-        A website from chadworks starts at $3,250 but typically crosses the
-        $5,000 mark. A web app or more involved build beyond a brochure website
-        will easily break $10,000. Visit my{" "}
+        A website from chadworks starts at {money(BASE)} but typically crosses
+        the {LOW} mark. A web app or more involved build beyond a brochure website
+        will easily break {HIGH}. Visit my{" "}
         <LaunchLink href="/rates/">rates page</LaunchLink> for more info.
       </>
     ),

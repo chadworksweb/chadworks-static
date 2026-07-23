@@ -9,6 +9,8 @@ import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
 import { SearchChip, RankChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
 import { ShieldChipDark, GearChip } from "@/components/art/MoreChips";
+import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -185,9 +187,9 @@ export const aiVisibilityAudit: Service = {
   price: {
     heading: "What it costs, plainly",
     figure: "One flat number",
-    figureSub: "Priced from $315/hr, in writing before you commit",
+    figureSub: `Priced from ${HOURLY_RATE}, in writing before you commit`,
     body:
-      "The audit is a fixed piece of work priced from my $315 hourly rate and quoted as one flat number before you commit. The number depends on the size of your site and your market, and it goes in writing first. No subscription hides inside it, and nothing renews.",
+      `The audit is a fixed piece of work priced from my ${money(HOURLY)} hourly rate and quoted as one flat number before you commit. The number depends on the size of your site and your market, and it goes in writing first. No subscription hides inside it, and nothing renews.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}the audit might tell you things are

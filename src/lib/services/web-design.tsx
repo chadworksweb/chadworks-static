@@ -15,6 +15,8 @@ import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { WebDesignHeroArt } from "@/components/art/WebDesignHeroArt";
 import { DesignReveal } from "@/components/art/DesignReveal";
+import { HIGH, HOURLY, LOW, TYPICAL_BAND } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 // No BuildPathViz icons on this page's platform lanes (Chad, 2026-07-17). The
 // icons are per-item DATA (`viz`), not part of PathsCapsule, so dropping them
 // here is scoped to /web-design/ and needs no fork: the capsule renders `viz`
@@ -161,7 +163,7 @@ export const webDesign: Service = {
   price: {
     heading: "What design costs, plainly",
     body:
-      "I price on the value of the work, not on how small a number I can promise you. Time bills at $315 an hour, and projects start at a $3,250 baseline. Most builds settle between $5,000 and $10,000, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.",
+      `I price on the value of the work, not on how small a number I can promise you. Time bills at ${money(HOURLY)} an hour, and projects start at a ${money(BASE)} baseline. Most builds settle between ${LOW} and ${HIGH}, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.`,
   },
 
   faqLead:
@@ -256,8 +258,8 @@ export const webDesign: Service = {
         label: "Budget Posture",
         span: "half",
         options: [
-          { value: "baseline", label: "Around the $3,250 baseline" },
-          { value: "typical", label: "The typical build ($5,000 to $10,000)" },
+          { value: "baseline", label: `Around the ${money(BASE)} baseline` },
+          { value: "typical", label: `The typical build (${TYPICAL_BAND})` },
           { value: "beyond", label: "Bigger vision, bigger number" },
           { value: "unsure", label: "Tell me what it takes" },
         ],

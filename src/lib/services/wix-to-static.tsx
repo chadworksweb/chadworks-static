@@ -1,12 +1,14 @@
 // Situation page: "Wix to Static" (/switch/wix-to-static/). Switch-lane
 // acquisition surface funneling into the Websites lane (custom-coded / static).
 // Signature: the CompareTable in the problemArt slot. Real numbers only:
-// chadworks static hosting $20/mo ($10 non-profit); Wix's own pricing stays
+// chadworks static hosting from the hub (STATIC_HOSTING / _NONPROFIT); Wix's own pricing stays
 // qualitative. The angle that separates Wix from Squarespace: the lock-in (Wix
 // gives you no real way to export your site).
 
 import { type Service } from "@/lib/service";
 import { CompareTable } from "@/components/art/CompareTable";
+import { STATIC_HOSTING, STATIC_HOSTING_NONPROFIT } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const wixToStatic: Service = {
   slug: "switch/wix-to-static",
@@ -18,12 +20,12 @@ export const wixToStatic: Service = {
     "chadworks rebuilds Wix sites as fast, custom-coded static sites the client owns and can actually take with them, for businesses stuck on a platform built to make leaving hard.",
 
   answer:
-    "Wix is built to keep you. There's no real way to export your site and take it elsewhere, so the monthly bill never quite ends and the longer you stay the more locked in you get. A custom static site is the opposite. I rebuild what you have as fast, hand-coded pages on your own domain, hosted for $20 a month, and every file is yours to keep and move whenever you like. Same content, a design made for your business, and no platform holding the exit shut. You get a faster site and your freedom back in one move.",
+    `Wix is built to keep you. There's no real way to export your site and take it elsewhere, so the monthly bill never quite ends and the longer you stay the more locked in you get. A custom static site is the opposite. I rebuild what you have as fast, hand-coded pages on your own domain, hosted for ${money(STATIC_HOSTING)} a month, and every file is yours to keep and move whenever you like. Same content, a design made for your business, and no platform holding the exit shut. You get a faster site and your freedom back in one move.`,
 
   keyFactsHeading: "Wix to static, at a glance",
   keyFacts: [
     "A custom static site is genuinely yours. The code and the hosting account sit in your name, so you can move it, hand it to someone else, or simply keep it, with no platform owning the door out.",
-    "Static hosting from chadworks is $20 a month, or $10 for a non-profit, with no platform plan layered on top of it and no upgrade nag waiting in the dashboard.",
+    `Static hosting from chadworks is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no platform plan layered on top of it and no upgrade nag waiting in the dashboard.`,
     "Wix sites carry a lot of weight just to make the editor work, and that weight slows the public page; a static rebuild is lean and fast and clean for Google and the AI assistants to read.",
   ],
 
@@ -33,7 +35,7 @@ export const wixToStatic: Service = {
       rows={[
         { feature: "Who owns it", them: "Wix owns the platform", us: "You own all of it" },
         { feature: "Taking it with you", them: "No real way to export", us: "Every file is yours to move" },
-        { feature: "What you pay", them: "A monthly Wix plan", us: "$20/mo hosting, $10 non-profit" },
+        { feature: "What you pay", them: "A monthly Wix plan", us: `${money(STATIC_HOSTING)}/mo hosting, ${money(STATIC_HOSTING_NONPROFIT)} non-profit` },
         { feature: "The design", them: "A Wix template", us: "Built around your business" },
         { feature: "Speed and AI readiness", them: "Heavy editor overhead", us: "Lean, fast, schema-ready" },
         { feature: "Making an edit", them: "Do it in Wix yourself", us: "Send it over, it's handled" },
@@ -71,7 +73,7 @@ export const wixToStatic: Service = {
       {
         title: "I move it onto hosting you own",
         body:
-          "I point your domain at static hosting in your own name and the Wix plan goes away. You drop to $20 a month, or $10 as a non-profit, and from that point on the entire site belongs to you, to keep or carry wherever you like.",
+          `I point your domain at static hosting in your own name and the Wix plan goes away. You drop to ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} as a non-profit, and from that point on the entire site belongs to you, to keep or carry wherever you like.`,
       },
       {
         title: "Need a change later? You just ask me",
@@ -122,7 +124,7 @@ export const wixToStatic: Service = {
   price: {
     heading: "What hosting costs after you leave",
     body:
-      "Static hosting through chadworks is $20 a month, and $10 for non-profits and tight-budget organizations. There is no platform plan sitting on top of it, because there is no platform, just fast files on hosting you control. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if Wix is genuinely doing something your business depends on, I'll tell you to stay.",
+      `Static hosting through chadworks is ${money(STATIC_HOSTING)} a month, and ${money(STATIC_HOSTING_NONPROFIT)} for non-profits and tight-budget organizations. There is no platform plan sitting on top of it, because there is no platform, just fast files on hosting you control. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if Wix is genuinely doing something your business depends on, I'll tell you to stay.`,
   },
 
   qualification: {
@@ -152,7 +154,7 @@ export const wixToStatic: Service = {
     },
     {
       q: "How much does hosting cost once I switch?",
-      a: "Static hosting is $20 a month, or $10 for a non-profit, with no platform plan on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.",
+      a: `Static hosting is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no platform plan on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.`,
     },
     {
       q: "Why would a static site be faster than my Wix site?",
@@ -175,6 +177,6 @@ export const wixToStatic: Service = {
   meta: {
     title: "Wix to Static: Own a Faster Site You Can Actually Take With You | chadworks",
     description:
-      "Stuck on Wix with no way to export your site? I rebuild Wix sites as fast, custom-coded static sites you own outright, hosted for $20 a month ($10 non-profit), on a design built around your business. Serving the Philadelphia area.",
+      `Stuck on Wix with no way to export your site? I rebuild Wix sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit), on a design built around your business. Serving the Philadelphia area.`,
   },
 };

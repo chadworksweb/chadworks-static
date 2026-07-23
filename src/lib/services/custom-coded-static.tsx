@@ -7,6 +7,8 @@ import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
 import { BoltChip, ShieldChipDark } from "@/components/art/MoreChips";
 import { CodeChip, TerminalChip, BracketsChip, BrowserChip } from "@/components/art/WebDevHeroArt";
+import { BAND_FROM_BASE, HIGH, HOURLY, LOW } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -168,10 +170,10 @@ export const customCodedStatic: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$3,250 - $10,000+",
+    figure: BAND_FROM_BASE,
     figureSub: "Value-based -- near-zero running costs after",
     body:
-      "Custom static is priced like every build here: on what it wins for your business, from the $3,250 baseline with most landing between $5,000 and $10,000. The difference is everything after launch. No platform maintenance, no plugin renewals, hosting that rounds to nothing. Content changes go through me and bill at $315 an hour, which for most marketing sites means a handful of small invoices a year instead of a monthly subscription.",
+      `Custom static is priced like every build here: on what it wins for your business, from the ${money(BASE)} baseline with most landing between ${LOW} and ${HIGH}. The difference is everything after launch. No platform maintenance, no plugin renewals, hosting that rounds to nothing. Content changes go through me and bill at ${money(HOURLY)} an hour, which for most marketing sites means a handful of small invoices a year instead of a monthly subscription.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if your content changes every week,

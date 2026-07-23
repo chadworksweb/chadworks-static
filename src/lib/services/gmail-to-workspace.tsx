@@ -14,6 +14,8 @@
 // traded during the session. Surfaced honestly in the approach and an FAQ.
 
 import { type Service } from "@/lib/service";
+import { WORKSPACE_EXTRA_MAILBOX, WORKSPACE_MONTHLY, WORKSPACE_SETUP } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const gmailToWorkspace: Service = {
   slug: "switch/gmail-to-workspace",
@@ -27,13 +29,13 @@ export const gmailToWorkspace: Service = {
   // Answer-first lede: names Gmail + Google Workspace and answers
   // what-you-get / what-it-costs in the first 100 words (GEO), Chad's voice.
   answer:
-    "Using a free Gmail for your business? It's a bad look, and a fixable one. Here's what most people don't realize: you can put your own domain on your email, you@yourdomain.com, inside the exact same Gmail you already use every day. That is all Google Workspace is. Same inbox, same app, same everything, with your real business name on the address instead of @gmail.com. It runs under ten dollars a month, paid to Google, and I set the whole thing up for you for a flat $300. Nothing new to learn, just a more credible name on every email you send.",
+    `Using a free Gmail for your business? It's a bad look, and a fixable one. Here's what most people don't realize: you can put your own domain on your email, you@yourdomain.com, inside the exact same Gmail you already use every day. That is all Google Workspace is. Same inbox, same app, same everything, with your real business name on the address instead of @gmail.com. It runs under ten dollars a month, paid to Google, and I set the whole thing up for you for a flat ${money(WORKSPACE_SETUP)}. Nothing new to learn, just a more credible name on every email you send.`,
 
   keyFactsHeading: "Gmail to Workspace, at a glance",
   keyFacts: [
     "Google Workspace is the exact same Gmail you already use, the same inbox and the same app, except your address becomes you@yourdomain.com instead of you@gmail.com. Nothing new to learn.",
-    "A branded address reads as far more established to a customer than a free @gmail.com, and Google Workspace runs under $10 a month per user, paid straight to Google.",
-    "chadworks sets the whole thing up for a one-time $300 fee, including a 30-minute training session and your email signature. Extra mailboxes are $25 each when set up at the same time.",
+    `A branded address reads as far more established to a customer than a free @gmail.com, and Google Workspace runs under ${money(WORKSPACE_MONTHLY)} a month per user, paid straight to Google.`,
+    `chadworks sets the whole thing up for a one-time ${money(WORKSPACE_SETUP)} fee, including a 30-minute training session and your email signature. Extra mailboxes are ${money(WORKSPACE_EXTRA_MAILBOX)} each when set up at the same time.`,
   ],
 
   problem: {
@@ -96,7 +98,7 @@ export const gmailToWorkspace: Service = {
   price: {
     heading: "What it costs, plainly",
     body:
-      "Setting up Google Workspace through chadworks is a one-time $300 fee. That covers creating your branded address, getting you switched over, a 30-minute training session, and your email signature. Need more than one mailbox? Additional accounts are $25 each when we set them up at the same time. Google Workspace itself is a separate subscription you pay straight to Google, and it runs under $10 a month per user.",
+      `Setting up Google Workspace through chadworks is a one-time ${money(WORKSPACE_SETUP)} fee. That covers creating your branded address, getting you switched over, a 30-minute training session, and your email signature. Need more than one mailbox? Additional accounts are ${money(WORKSPACE_EXTRA_MAILBOX)} each when we set them up at the same time. Google Workspace itself is a separate subscription you pay straight to Google, and it runs under ${money(WORKSPACE_MONTHLY)} a month per user.`,
   },
 
   qualification: {
@@ -122,7 +124,7 @@ export const gmailToWorkspace: Service = {
     },
     {
       q: "What does it cost?",
-      a: "A one-time $300 fee to chadworks for the full setup, which includes a 30-minute training session and your email signature. Additional mailboxes are $25 each when set up at the same time. Google Workspace itself is under $10 a month per user, paid directly to Google.",
+      a: `A one-time ${money(WORKSPACE_SETUP)} fee to chadworks for the full setup, which includes a 30-minute training session and your email signature. Additional mailboxes are ${money(WORKSPACE_EXTRA_MAILBOX)} each when set up at the same time. Google Workspace itself is under ${money(WORKSPACE_MONTHLY)} a month per user, paid directly to Google.`,
     },
     {
       q: "Will I lose my old emails and contacts?",
@@ -141,7 +143,7 @@ export const gmailToWorkspace: Service = {
   cta: {
     heading: "Put your real name on your email",
     body:
-      "Ready to put your real name on your email? Reach out and I'll get you switched over to a branded you@yourdomain.com address. It is the same Gmail you already use, a flat $300 for me to set up, and I handle the entire technical side so you don't have to. No pressure on the way in, just a more credible inbox waiting for you on the other end.",
+      `Ready to put your real name on your email? Reach out and I'll get you switched over to a branded you@yourdomain.com address. It is the same Gmail you already use, a flat ${money(WORKSPACE_SETUP)} for me to set up, and I handle the entire technical side so you don't have to. No pressure on the way in, just a more credible inbox waiting for you on the other end.`,
     buttonLabel: "Get a branded email",
     href: "/contact/",
   },
@@ -149,6 +151,6 @@ export const gmailToWorkspace: Service = {
   meta: {
     title: "Gmail to Google Workspace: Get a Branded you@yourdomain.com Email | chadworks",
     description:
-      "Using a free @gmail.com for your business? Get the exact same Gmail with your own domain: you@yourdomain.com, under $10 a month. chadworks sets up Google Workspace for a one-time $300, including training and your signature.",
+      `Using a free @gmail.com for your business? Get the exact same Gmail with your own domain: you@yourdomain.com, under ${money(WORKSPACE_MONTHLY)} a month. chadworks sets up Google Workspace for a one-time ${money(WORKSPACE_SETUP)}, including training and your signature.`,
   },
 };

@@ -1,12 +1,14 @@
 // Service: WordPress (Websites lane) -- the familiar CMS route, done right.
 // Real facts only: Chad hosts and maintains live WordPress client sites
-// today, and the $550/6mo maintenance plan is the real number. Copy in
+// today, and the WORDPRESS_CARE 6-month maintenance plan is the real number. Copy in
 // Chad's public voice.
 
 import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
 import { WChip, PostChipDark, GearChip } from "@/components/art/MoreChips";
 import { BrowserChip, ServerChip, DatabaseChip } from "@/components/art/WebDevHeroArt";
+import { BAND_FROM_BASE, HIGH, LOW, WORDPRESS_CARE } from "@/lib/pricing";
+import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
@@ -58,7 +60,7 @@ export const wordpress: Service = {
   keyFacts: [
     "WordPress earns its place when your team needs to edit content themselves. That's the honest reason to choose it, and it's a good one.",
     "I host and maintain live WordPress client sites today, so when something breaks, the person who built it is the person fixing it.",
-    "Maintenance is $550 every six months: routine technical updates and small content changes, with no meter running.",
+    `Maintenance is ${money(WORDPRESS_CARE)} every six months: routine technical updates and small content changes, with no meter running.`,
     "Custom design over the platform, not a purchased theme with your logo dropped in.",
   ],
 
@@ -151,7 +153,7 @@ export const wordpress: Service = {
       },
       {
         label: "The maintenance plan",
-        detail: "The $550-per-six-months number is real and published on the rates page, not quoted after you're locked in.",
+        detail: `The ${money(WORDPRESS_CARE)}-per-six-months number is real and published on the rates page, not quoted after you're locked in.`,
         href: "/rates/",
       },
     ],
@@ -159,10 +161,10 @@ export const wordpress: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "$3,250 - $10,000+",
-    figureSub: "Value-based -- maintenance $550 / 6 months",
+    figure: BAND_FROM_BASE,
+    figureSub: `Value-based -- maintenance ${money(WORDPRESS_CARE)} / 6 months`,
     body:
-      "A WordPress build is priced like every build here: on what it wins for your business, starting at the $3,250 baseline with most landing between $5,000 and $10,000. The difference from the static route is the ongoing side: WordPress needs maintenance, and mine is $550 every six months for updates and small content changes, stated here so it never surprises you.",
+      `A WordPress build is priced like every build here: on what it wins for your business, starting at the ${money(BASE)} baseline with most landing between ${LOW} and ${HIGH}. The difference from the static route is the ongoing side: WordPress needs maintenance, and mine is ${money(WORDPRESS_CARE)} every six months for updates and small content changes, stated here so it never surprises you.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if a WordPress site is sold to you
@@ -186,7 +188,7 @@ export const wordpress: Service = {
     },
     {
       q: "What does the maintenance plan actually cover?",
-      a: "Routine technical updates, backups, and miscellaneous small content changes as needed, for $550 every six months. Bigger additions are scoped and billed as real work, and I tell you the number before doing them.",
+      a: `Routine technical updates, backups, and miscellaneous small content changes as needed, for ${money(WORDPRESS_CARE)} every six months. Bigger additions are scoped and billed as real work, and I tell you the number before doing them.`,
     },
     {
       q: "Can you fix or redesign my existing WordPress site?",
@@ -277,6 +279,6 @@ export const wordpress: Service = {
   meta: {
     title: "WordPress -- The Familiar CMS, Done Right | chadworks",
     description:
-      "Custom-designed WordPress websites for teams that manage their own content: lean installs, real hosting, and maintenance by the person who built it ($550 every six months). Never a theme with your logo dropped in.",
+      `Custom-designed WordPress websites for teams that manage their own content: lean installs, real hosting, and maintenance by the person who built it (${money(WORDPRESS_CARE)} every six months). Never a theme with your logo dropped in.`,
   },
 };

@@ -4,6 +4,7 @@
 // street, and a refined, design-aware audience. MVP build (deepened later).
 
 import { type Service } from "@/lib/service";
+import { TYPICAL_BAND } from "@/lib/pricing";
 
 export const doylestown: Service = {
   slug: "website-design-for-doylestown-pa",
@@ -16,13 +17,13 @@ export const doylestown: Service = {
     "chadworks designs and builds custom websites for Doylestown, PA businesses, the Bucks County seat known for its arts, its Mercer museums, and a boutique main street with a design-aware crowd.",
 
   answer:
-    "If you run a business in Doylestown, PA, here is what you get: a custom website with real design behind it, the kind that holds up in a town that takes design seriously, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run $5,000 to $10,000 depending on scope, quoted up front before work starts. Doylestown is the Bucks County seat, a town shaped by Henry Mercer's tile-and-concrete museums and a boutique main street that draws people who notice craft. That audience can tell a thoughtful site from a cookie-cutter one, and so can your competition.",
+    `If you run a business in Doylestown, PA, here is what you get: a custom website with real design behind it, the kind that holds up in a town that takes design seriously, fast on a phone and tuned so Google and the AI answer engines surface you. I am Chad, a solo builder in Greater Philadelphia, building sites since the MySpace days. Most projects run ${TYPICAL_BAND} depending on scope, quoted up front before work starts. Doylestown is the Bucks County seat, a town shaped by Henry Mercer's tile-and-concrete museums and a boutique main street that draws people who notice craft. That audience can tell a thoughtful site from a cookie-cutter one, and so can your competition.`,
 
   keyFactsHeading: "Doylestown web design, at a glance",
   keyFacts: [
     "Custom websites for Doylestown businesses, built for the Bucks County seat where the Mercer museums, a strong arts scene, and a boutique main street draw a design-aware crowd.",
     "Real design behind the build, because a Doylestown audience can spot a generic template and the boutiques and galleries set a high visual bar.",
-    "Value-based pricing: $5,000 to $10,000, scope-dependent, quoted up front. No template rent, no surprise invoices.",
+    `Value-based pricing: ${TYPICAL_BAND}, scope-dependent, quoted up front. No template rent, no surprise invoices.`,
     "Local or remote both work: I am based in Greater Philadelphia, a straightforward reach to Bucks County, and I run plenty of projects fully remote.",
   ],
 
@@ -85,10 +86,10 @@ export const doylestown: Service = {
 
   price: {
     heading: "What a Doylestown site costs",
-    figure: "$5,000 to $10,000",
+    figure: TYPICAL_BAND,
     figureSub: "scope-dependent, quoted up front",
     body:
-      "A custom site for a Doylestown business runs $5,000 to $10,000, depending on page count and how much custom design the project calls for. You get the exact figure before any work begins. This is a value-based build for a genuinely designed site that fits the town's standard and that you fully own, not a template you rent month to month.",
+      `A custom site for a Doylestown business runs ${TYPICAL_BAND}, depending on page count and how much custom design the project calls for. You get the exact figure before any work begins. This is a value-based build for a genuinely designed site that fits the town's standard and that you fully own, not a template you rent month to month.`,
   },
 
   qualification: {
@@ -114,7 +115,7 @@ export const doylestown: Service = {
     },
     {
       q: "How much does a website cost?",
-      a: "Most custom builds run $5,000 to $10,000, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.",
+      a: `Most custom builds run ${TYPICAL_BAND}, depending on scope. I quote the exact number up front before any work starts. It is value-based pricing for a site you own, not a recurring template fee.`,
     },
     {
       q: "Why does real design matter for my Doylestown site?",
@@ -141,6 +142,6 @@ export const doylestown: Service = {
   meta: {
     title: "Website Design in Doylestown, PA | chadworks",
     description:
-      "Custom website design for Doylestown, PA businesses in the Bucks County seat, from boutiques to the arts scene near the Mercer museums. Genuinely designed, fast, built for local search. $5,000 to $10,000, quoted up front.",
+      `Custom website design for Doylestown, PA businesses in the Bucks County seat, from boutiques to the arts scene near the Mercer museums. Genuinely designed, fast, built for local search. ${TYPICAL_BAND}, quoted up front.`,
   },
 };

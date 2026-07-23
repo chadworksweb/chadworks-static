@@ -17,13 +17,22 @@ import {
 } from "@/components/capsules";
 import { FaqParas } from "@/components/FaqAccordion";
 import { BASE, money } from "@/lib/package-builder";
-import { MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
+import {
+  ADS_MIN_DAILY_SPEND,
+  AUDIT,
+  HIGH,
+  HOURLY_LONG,
+  LOW,
+  MINUTELY,
+  STATIC_HOSTING,
+  WORDPRESS_CARE,
+} from "@/lib/pricing";
 
 const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
 const DESCRIPTION =
-  "Straight answers about working with chadworks: who builds your site, what it costs ($315/hour, $3,250 baseline, most between $5,000 and $10,000), how the site gets built and owned, and how a business gets found in classic search and AI assistants.";
+  `Straight answers about working with chadworks: who builds your site, what it costs (${HOURLY_LONG}, ${money(BASE)} baseline, most between ${LOW} and ${HIGH}), how the site gets built and owned, and how a business gets found in classic search and AI assistants.`;
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -119,10 +128,10 @@ const GROUPS: FaqGroup[] = [
         a: (
           <FaqParas
             items={[
-              `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000.`,
+              `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}.`,
               <>
                 If your website needs work, not a redesign, I charge by the minute
-                at {money(MINUTELY)}/min, which adds up to {money(MINUTELY * 60)}/hour.
+                at {money(MINUTELY)}/min, which adds up to {HOURLY_LONG}.
                 Read more about my fees on my{" "}
                 <LaunchLink href="/rates/">rates page</LaunchLink>.
               </>,
@@ -130,7 +139,7 @@ const GROUPS: FaqGroup[] = [
           />
         ),
         aText:
-          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between $5,000 and $10,000, though it is not uncommon for ambitious projects to crack $10,000. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${money(MINUTELY * 60)}/hour. Read more about my fees on my rates page.`,
+          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${HOURLY_LONG}. Read more about my fees on my rates page.`,
       },
       {
         q: "Do you have a lower rate for special cases?",
@@ -140,14 +149,14 @@ const GROUPS: FaqGroup[] = [
       },
       {
         q: "Is there an ongoing cost after the site is built?",
-        a: "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc.\n\nIf you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
+        a: `Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at ${money(STATIC_HOSTING)}. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc.\n\nIf you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.`,
         aText:
-          "Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at $20. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc. If you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.",
+          `Every website has, at the very least, a monthly hosting fee and an annual domain name fee. My in-house hosting starts at ${money(STATIC_HOSTING)}. Domain fees are set and billed by your domain registrar directly, e.g. GoDaddy, NameCheap, etc. If you need to change or expand your site, that work is billed at my minutely rate, or a new flat rate is scoped and assessed to cover the limited update as its own new project.`,
       },
       {
         q: "How much does website maintenance cost?",
-        // The figure was hand-typed as $675 and contradicted the hub's 550,
-        // which is what /rates/ and the cost guide have been rendering. $550 is
+        // The figure was hand-typed and contradicted the hub's WORDPRESS_CARE,
+        // which is what /rates/ and the cost guide have been rendering. The hub is
         // correct (Chad, 2026-07-22). Reads WORDPRESS_CARE now, so the two can
         // never disagree again -- this answer also feeds the FAQPage JSON-LD,
         // so the wrong number was the one an assistant would quote back.
@@ -274,21 +283,21 @@ const GROUPS: FaqGroup[] = [
             A one-time, documented read on where a business stands in AI answers,
             classic search, structured data, and its profiles, scored so you can
             see exactly what is working and what is not. It's charged as a flat
-            rate of $675 with no strings attached, no commitment to hire me for
+            rate of {money(AUDIT)} with no strings attached, no commitment to hire me for
             anything further. Check out the{" "}
             <LaunchLink href="/ai-visibility-audit/">AI visibility audit page</LaunchLink> for
             more info.
           </>
         ),
         aText:
-          "A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of $675 with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.",
+          `A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of ${money(AUDIT)} with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.`,
       },
       {
         q: "Do you do advertising on ChatGPT?",
         a: (
           <>
             Yes, I have access to OpenAI's beta advertising platform. Their
-            minimum spend is $25/day (as of June 2026) and some industries are
+            minimum spend is {money(ADS_MIN_DAILY_SPEND)}/day (as of June 2026) and some industries are
             prohibited, like legal and financial services. Check out the{" "}
             <LaunchLink href="/advertising-on-chatgpt/">
               Advertising on ChatGPT page
@@ -297,7 +306,7 @@ const GROUPS: FaqGroup[] = [
           </>
         ),
         aText:
-          "Yes, I have access to OpenAI's beta advertising platform. Their minimum spend is $25/day (as of June 2026) and some industries are prohibited, like legal and financial services. Check out the Advertising on ChatGPT page for detailed information.",
+          `Yes, I have access to OpenAI's beta advertising platform. Their minimum spend is ${money(ADS_MIN_DAILY_SPEND)}/day (as of June 2026) and some industries are prohibited, like legal and financial services. Check out the Advertising on ChatGPT page for detailed information.`,
       },
       {
         q: "How long does SEO take to work?",

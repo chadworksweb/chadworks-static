@@ -1,12 +1,14 @@
 // Situation page: "GoDaddy to Static" (/switch/godaddy-to-static/). Switch-lane
 // acquisition surface funneling into the Websites lane (custom-coded / static).
 // Signature: the CompareTable in the problemArt slot. Real numbers only:
-// chadworks static hosting $20/mo ($10 non-profit); GoDaddy's own pricing stays
+// chadworks static hosting from the hub (STATIC_HOSTING / _NONPROFIT); GoDaddy's own pricing stays
 // qualitative. The angle: most GoDaddy sites began as a domain-purchase upsell
 // into the Website Builder, and the owner has outgrown the starter site.
 
 import { type Service } from "@/lib/service";
 import { CompareTable } from "@/components/art/CompareTable";
+import { STATIC_HOSTING, STATIC_HOSTING_NONPROFIT } from "@/lib/pricing";
+import { money } from "@/lib/package-builder";
 
 export const godaddyToStatic: Service = {
   slug: "switch/godaddy-to-static",
@@ -18,12 +20,12 @@ export const godaddyToStatic: Service = {
     "chadworks rebuilds GoDaddy Website Builder sites as fast, custom-coded static sites designed around the business, for owners who bought a domain, got upsold a builder, and outgrew it.",
 
   answer:
-    "Most GoDaddy sites started as an upsell. You bought a domain, got nudged into the website builder, and ended up with a tidy little template that does the job but never really looks like you mean business. A custom static site is the step up. I rebuild what you have as fast, hand-coded pages on the same domain you already own, hosted for $20 a month, with a design made for your business instead of a builder's default. You keep the domain, drop the monthly builder fee, and finally get a site that carries some weight.",
+    `Most GoDaddy sites started as an upsell. You bought a domain, got nudged into the website builder, and ended up with a tidy little template that does the job but never really looks like you mean business. A custom static site is the step up. I rebuild what you have as fast, hand-coded pages on the same domain you already own, hosted for ${money(STATIC_HOSTING)} a month, with a design made for your business instead of a builder's default. You keep the domain, drop the monthly builder fee, and finally get a site that carries some weight.`,
 
   keyFactsHeading: "GoDaddy to static, at a glance",
   keyFacts: [
     "A custom static site is designed around your business, not assembled from a builder's stock blocks, so it stops reading as a starter site and starts reading as a real one.",
-    "Static hosting from chadworks is $20 a month, or $10 for a non-profit, with no website-builder subscription on top. You keep the GoDaddy domain you already own; only the builder fee goes away.",
+    `Static hosting from chadworks is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no website-builder subscription on top. You keep the GoDaddy domain you already own; only the builder fee goes away.`,
     "Static pages are lean and quick, which your visitors and the AI assistants both notice, where a drag-and-drop builder tends to leave a site slower and thinner than it needs to be.",
   ],
 
@@ -32,7 +34,7 @@ export const godaddyToStatic: Service = {
       them="GoDaddy Builder"
       rows={[
         { feature: "Who designed it", them: "A stock builder template", us: "Built around your business" },
-        { feature: "What you pay", them: "A monthly builder plan", us: "$20/mo hosting, $10 non-profit" },
+        { feature: "What you pay", them: "A monthly builder plan", us: `${money(STATIC_HOSTING)}/mo hosting, ${money(STATIC_HOSTING_NONPROFIT)} non-profit` },
         { feature: "The ceiling", them: "What the builder allows", us: "Whatever your site needs" },
         { feature: "Speed and AI readiness", them: "Builder overhead", us: "Lean, fast, schema-ready" },
         { feature: "Your domain", them: "Stays at GoDaddy, fine", us: "Stays yours, points anywhere" },
@@ -71,7 +73,7 @@ export const godaddyToStatic: Service = {
       {
         title: "I move it onto hosting, your domain stays put",
         body:
-          "Your GoDaddy domain stays right where it is and stays yours. I point it at static hosting in your own name and the monthly builder fee simply drops off, landing you at $20 a month, or $10 if you run as a non-profit.",
+          `Your GoDaddy domain stays right where it is and stays yours. I point it at static hosting in your own name and the monthly builder fee simply drops off, landing you at ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} if you run as a non-profit.`,
       },
       {
         title: "Need a change later? You just ask me",
@@ -122,7 +124,7 @@ export const godaddyToStatic: Service = {
   price: {
     heading: "What hosting costs after you leave",
     body:
-      "Static hosting through chadworks is $20 a month, and $10 for non-profits and tight-budget organizations. There is no builder subscription sitting on top of it, just fast files on hosting you control, with your GoDaddy domain pointed at it. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if the builder is genuinely all your business needs, I'll tell you to keep it.",
+      `Static hosting through chadworks is ${money(STATIC_HOSTING)} a month, and ${money(STATIC_HOSTING_NONPROFIT)} for non-profits and tight-budget organizations. There is no builder subscription sitting on top of it, just fast files on hosting you control, with your GoDaddy domain pointed at it. The one-time rebuild is a separate, scoped number you'll find on the rates page. And the honest caveat holds: if the builder is genuinely all your business needs, I'll tell you to keep it.`,
   },
 
   qualification: {
@@ -152,7 +154,7 @@ export const godaddyToStatic: Service = {
     },
     {
       q: "How much does hosting cost once I switch?",
-      a: "Static hosting is $20 a month, or $10 for a non-profit, with no builder subscription on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.",
+      a: `Static hosting is ${money(STATIC_HOSTING)} a month, or ${money(STATIC_HOSTING_NONPROFIT)} for a non-profit, with no builder subscription on top. The one-time rebuild is quoted separately based on your site, and the real numbers for that live on the rates page.`,
     },
     {
       q: "Why would a static site be faster than the GoDaddy builder?",
@@ -175,6 +177,6 @@ export const godaddyToStatic: Service = {
   meta: {
     title: "GoDaddy to Static: Trade the Builder for a Real Custom Site | chadworks",
     description:
-      "Outgrown the GoDaddy website builder? I rebuild GoDaddy Builder sites as fast, custom-coded static sites designed around your business, hosted for $20 a month ($10 non-profit). Keep your domain, drop the builder fee. Serving the Philadelphia area.",
+      `Outgrown the GoDaddy website builder? I rebuild GoDaddy Builder sites as fast, custom-coded static sites designed around your business, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). Keep your domain, drop the builder fee. Serving the Philadelphia area.`,
   },
 };
