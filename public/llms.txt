@@ -54,7 +54,7 @@
 
 ## Essays
 
-- [Essays](https://chadworks.co/essays/): Published thinking on the web, business and the industry, written by Chad, not generated. The argument behind how chadworks works.
+- [Essays](https://chadworks.co/essays/): Published thinking on the web, business and the industry, written by Chad Lewine, not generated. The argument behind how chadworks works.
 - [Chad Lewine: Worlds Combine](https://chadworks.co/essays/chad-lewine-worlds-combine/): Why the web design business and the music are one person's work under one purpose, not two careers kept apart. Chad ends the split he maintained between chadworks and his art, including the separate LinkedIn accounts, and explains how the song catalog now finds the clients.
 - [Is Your Digital Marketing Agency Ripping You Off?](https://chadworks.co/essays/is-your-agency-ripping-you-off/): How the perpetual retainer works as an industry con, why most clients are dormant rather than active, and the real email thread with an agency billing a client $1,000 a month for what amounted to hosting. Includes Chad's own account of selling retainers at $125 a month and then retiring the service.
 
