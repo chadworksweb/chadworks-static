@@ -403,11 +403,21 @@ export const WP_HOST_SAVING = WP_HOST_TYPICAL - STATIC_HOSTING; // the monthly g
 // MARKET -- what a website costs by who builds it. Read by the guide.
 //
 // VERIFY THESE FIGURES BEFORE LAUNCH. They are other people's prices and they
-// go stale; a wrong one is chadworks' credibility, not theirs. Last verified
-// 2026-07-19 (WebFX, Outliant, offshore re-confirmed). The DIY builder range is
-// the soft one: the builders render pricing in JS, so $16 to $99 is the
-// annual-billing ladder corroborated by a third party, not read off first-party
-// HTML. Eyeball it in a browser before this goes public.
+// go stale; a wrong one is chadworks' credibility, not theirs.
+//
+// Last verified 2026-07-23, against each row's own href:
+//   DIY builder   $16 to $99   CONFIRMED, and now first-party: Squarespace's
+//                              own blog says "starting at around $16 per month
+//                              ... up to $99 per month". It still does not say
+//                              whether that is the annual or the monthly ladder,
+//                              so that half of the old caveat stands.
+//   Agency        $6,500+      CONFIRMED. WebFX now publishes "Basic web design
+//                              costs $6,500 - $15,000" and an overall "$1,000 -
+//                              $30,000+ in 2026", so both ends of this row and
+//                              AGENCY_SMALL_BUSINESS_RANGE come straight off it.
+//   Offshore      $2,500-8,000 CONFIRMED exactly: three published packages at
+//                              $2,500 / $5,000 / $8,000, no form in the way.
+//   Freelancer    $500-$5,000  *** UNSOURCED. See the row's own note. ***
 // ---------------------------------------------------------------------
 export type MarketRow = { method: string; range: string; note: string; href: string };
 
@@ -419,6 +429,17 @@ export const MARKET: MarketRow[] = [
     href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
   },
   {
+    // CITATION IS BROKEN (checked 2026-07-23). Forbes rewrote this page as a
+    // "2026 Guide" and dropped the freelancer category entirely: the word
+    // "freelancer" no longer appears on it, and no figure on it exceeds
+    // $10,000 or matches $5,000. What it says now is "a professionally
+    // designed site generally starts around $1,500".
+    //
+    // So the href no longer supports the range OR the row's framing. Do not
+    // just move the number: this row needs a source that actually prices
+    // FREELANCE work (a marketplace rate study, say), and the range should
+    // follow whatever that source says. Left as Chad wrote it until he picks
+    // the replacement, because guessing a new number is worse than a stale one.
     method: "Hire a freelancer",
     range: "$500 to $5,000",
     note: "One person, one invoice, and a wide range because a freelancer might mean a student on a template or a twenty year veteran writing custom code. The word covers both.",
@@ -486,6 +507,19 @@ export const COMPONENTS: ComponentRow[] = [
 // VERIFY BEFORE LAUNCH, same as MARKET. websitecostcalculator.app has no
 // first-party price to check; it is named for its behavior (industry averages),
 // not a figure.
+//
+// Last verified 2026-07-23. Two rows had gone false and were corrected in the
+// same pass: WebFX and Outliant BOTH show a range on the page now, so calling
+// them "Gated" with the X watermark said they blocked something they no longer
+// block. Both are "Range only" with the ~ watermark instead, which is the
+// honest read: you get a number, just not a number anyone will stand behind
+// without your contact details.
+//
+// This is the failure mode this block's own warning predicted, and it is worth
+// naming: a competitor can fix the thing you criticised them for, and then the
+// criticism is the inaccurate one. Re-read the BEHAVIOUR here, not just the
+// figures. websitecostcalculator.app (still 2018 averages) and Pronto (still
+// "$2,000 - $10,000" on a 1-6 page brochure site) both re-confirmed unchanged.
 // ---------------------------------------------------------------------
 // `mark` is the oversized glyph the page paints BEHIND the tag as a watermark:
 // a drawn shorthand for the failure mode (X blocked, ~ approximate, [ ] a gap
@@ -502,16 +536,16 @@ export type CalculatorRow = {
 export const CALCULATORS: CalculatorRow[] = [
   {
     who: "WebFX",
-    tag: "Gated",
-    mark: "X",
-    note: "Puts the estimate behind a lead form. You answer their questions, then wait for an email with a range in it.",
+    tag: "Range only",
+    mark: "~",
+    note: "Gives you a range on the page, then puts the real number behind a lead form for a strategist to email you.",
     href: "https://www.webfx.com/web-design/learn/website-design-cost-calculator/",
   },
   {
     who: "Outliant",
-    tag: "Gated",
-    mark: "X",
-    note: "Gates the number behind your contact details, built to open a sales conversation rather than answer you on the spot.",
+    tag: "Range only",
+    mark: "~",
+    note: "Shows you a wide estimate, then asks for your contact details before anyone turns it into a quote, built to open a sales conversation rather than answer you on the spot.",
     href: "https://www.outliant.com/website-cost-calculator",
   },
   {
