@@ -20,9 +20,46 @@
 //
 // The rule that makes this a hub and not just another file: numbers live here,
 // pages import and render. A page never hand-types a figure the hub could own.
+//
+// ---------------------------------------------------------------------
+// THREE KINDS OF MONEY LIVE IN THIS FILE, AND THEY ARE NOT INTERCHANGEABLE.
+// The file is sectioned by which kind a figure is, because the kind decides
+// who may change it, what happens when it is wrong, and how often to re-check
+// it. Mixing them is how a competitor's stale quote ends up read as a chadworks
+// promise.
+//
+//   1. WHAT CHADWORKS CHARGES  -- Chad's own prices. He is the only authority.
+//      Wrong here means undercharging or a quote that does not match the site.
+//      Changing one is a business decision and takes effect the moment it lands.
+//
+//   2. WHAT OTHERS CHARGE FOR THE SAME WORK  -- the comparison set: agencies,
+//      freelancers, DIY builders, offshore shops, WordPress hosts, rival cost
+//      calculators. These exist to argue chadworks' value against an
+//      alternative for the SAME job. They are somebody else's published prices,
+//      they go stale on somebody else's schedule, and a wrong one is chadworks'
+//      credibility, not theirs. RE-VERIFY ON A CADENCE, and cite a source.
+//
+//   3. THIRD-PARTY SERVICES  -- what the client pays a vendor DIRECTLY,
+//      alongside a chadworks engagement: Google's Workspace subscription,
+//      OpenAI's ad-spend floor. Not competitors; chadworks does not sell these
+//      and takes no margin on them. They are quoted so a client can see the
+//      whole cost of the thing they are buying, and they move when the vendor
+//      says so. Never present one as a chadworks price.
+//
+// If a new figure does not clearly belong to one of the three, it does not
+// belong in the hub yet. Work out which it is first.
 // =====================================================================
 
 import { BASE, BASELINE, SMALL_BUSINESS, STORE, money, wire, type Scope } from "./package-builder";
+
+// =====================================================================
+// SECTION 1 -- WHAT CHADWORKS CHARGES
+//
+// Chad's own prices, and the only figures on this site he is the authority
+// for. Everything below this banner is revenue. Nothing below it is somebody
+// else's number, so nothing below it needs re-verifying against an outside
+// source: it is right when Chad says it is right.
+// =====================================================================
 
 // ---------------------------------------------------------------------
 // AFTER-LAUNCH RATES -- one definition, imported everywhere.
@@ -30,6 +67,23 @@ import { BASE, BASELINE, SMALL_BUSINESS, STORE, money, wire, type Scope } from "
 export const MINUTELY = 5.25; // $/min for work after launch. Also on /rates/.
 export const HOURLY = MINUTELY * 60; // the same rate said the other way, for the pages that quote an hour.
 export const WORDPRESS_CARE = 550; // $ per six months, the WordPress care plan.
+
+// ---------------------------------------------------------------------
+// AFTER-LAUNCH TASKS -- the ongoing-cost ledger. Read by the guide.
+//
+// NOTHING HERE IS A NEW PRICE. Each figure is MINUTELY applied to a task time,
+// computed rather than typed. Minutes are lifted from RATE_EXAMPLES on /rates/;
+// keep them in step.
+// ---------------------------------------------------------------------
+export type AfterLaunchTask = { task: string; min: number; max: number };
+
+export const AFTER_LAUNCH: AfterLaunchTask[] = [
+  { task: "Changing the text on a page", min: 1, max: 1 },
+  { task: "Swapping an image", min: 1, max: 1 },
+  { task: "Adding a page you did not plan for", min: 10, max: 10 },
+  { task: "Fixing something small that broke", min: 10, max: 20 },
+  { task: "Building a whole new page template", min: 30, max: 30 },
+];
 
 // ---------------------------------------------------------------------
 // THE TYPICAL BAND -- what most builds actually land at.
@@ -72,12 +126,14 @@ export const BAND_FROM_BASE = `${money(BASE)} - ${HIGH}+`; // "$3,250 - $10,000+
 //
 // The three-way $675 collision is intentional on Chad's side (one number, three
 // products) but it makes the constants easy to mix up, so each names its own
-// unit: the audit is charged ONCE, the ads figure is PER MONTH.
+// unit: the audit is charged ONCE, the other two are PER MONTH.
+//
+// The ad SPEND that sits beside ADS_MONTHLY is not here. It is OpenAI's floor,
+// billed to the client's own card, so it lives in section 3.
 // ---------------------------------------------------------------------
 export const AUDIT = 675; // $ flat, one-time. The AI visibility audit, no commitment attached.
-export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. Ad spend is the client's, billed by OpenAI.
+export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. The management only.
 export const AI_VIZ_MONTHLY = 675; // $ per month, the ongoing AI visibility campaign. The third of the three.
-export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own floor (as of June 2026), NOT chadworks revenue.
 
 // Two products whose starting figure happens to equal BASE today. They are NOT
 // wired to BASE, on purpose: a build baseline and a strategy session are
@@ -91,21 +147,17 @@ export const REDESIGN_TYPICAL = 6200; // $ where most redesigns settle. A postur
 // THE SWITCH LANE -- hosting and migration, sold off the /switch/ pages.
 //
 // Quoted across five service files that all describe the same two numbers, so
-// a hosting change used to be a five-file edit. WP_HOST_TYPICAL is somebody
-// else's price (what a typical WordPress host charges), kept here only so the
-// "puts $10 back in your pocket" line can be computed from the gap instead of
-// hand-typed as a third independent number that has to be kept in step.
+// a hosting change used to be a five-file edit. What a WordPress host charges
+// instead is a competitor figure and lives in section 2.
 // ---------------------------------------------------------------------
 export const STATIC_HOSTING = 20; // $/month, chadworks static hosting.
 export const STATIC_HOSTING_NONPROFIT = 10; // $/month, non-profits and tight-budget organizations.
-export const WP_HOST_TYPICAL = 30; // $/month, roughly what a WordPress host runs. NOT chadworks revenue.
-export const WP_HOST_SAVING = WP_HOST_TYPICAL - STATIC_HOSTING; // the monthly gap, computed.
 
-// Google Workspace setup. WORKSPACE_MONTHLY is Google's own subscription, paid
-// straight to Google, and is here for the same reason WP_HOST_TYPICAL is.
+// Google Workspace setup. Both of these are what CHADWORKS charges to do the
+// migration; Google's own per-user subscription is a third-party service and
+// lives in section 3.
 export const WORKSPACE_SETUP = 300; // $ one-time to chadworks: setup, training, signature.
 export const WORKSPACE_EXTRA_MAILBOX = 25; // $ per additional mailbox set up at the same time.
-export const WORKSPACE_MONTHLY = 10; // $/user/month, paid to Google. NOT chadworks revenue.
 
 // ---------------------------------------------------------------------
 // WORKED-EXAMPLE USE CASES -- real scopes, priced by the model at render.
@@ -259,6 +311,31 @@ export const EXAMPLES: Example[] = [
   },
 ];
 
+// =====================================================================
+// SECTION 2 -- WHAT OTHERS CHARGE FOR THE SAME WORK
+//
+// The comparison set. Every figure below is an alternative a client could buy
+// INSTEAD of chadworks for the same job: an agency, a freelancer, a DIY
+// builder, an offshore shop, a WordPress host, a rival cost calculator. That
+// is what separates this section from section 3, where the client pays a
+// vendor ALONGSIDE chadworks rather than instead of it.
+//
+// These are other people's published prices. They go stale on other people's
+// schedules, and a wrong one is chadworks' credibility, not theirs. Every entry
+// carries a source and a last-verified date, and they get re-checked on a
+// cadence rather than when somebody happens to notice.
+// =====================================================================
+
+// ---------------------------------------------------------------------
+// WHAT A WORDPRESS HOST COSTS -- the alternative to chadworks static hosting.
+//
+// Read by /switch/leave-wordpress/, which argues the gap rather than the two
+// prices: "leaving puts about $10 back in your pocket". That $10 is COMPUTED
+// from the gap, so it can never contradict the two figures it sits between.
+// ---------------------------------------------------------------------
+export const WP_HOST_TYPICAL = 30; // $/month, roughly what a WordPress host runs.
+export const WP_HOST_SAVING = WP_HOST_TYPICAL - STATIC_HOSTING; // the monthly gap, computed.
+
 // ---------------------------------------------------------------------
 // MARKET -- what a website costs by who builds it. Read by the guide.
 //
@@ -339,23 +416,6 @@ export const COMPONENTS: ComponentRow[] = [
 ];
 
 // ---------------------------------------------------------------------
-// AFTER-LAUNCH TASKS -- the ongoing-cost ledger. Read by the guide.
-//
-// NOTHING HERE IS A NEW PRICE. Each figure is MINUTELY applied to a task time,
-// computed rather than typed. Minutes are lifted from RATE_EXAMPLES on /rates/;
-// keep them in step.
-// ---------------------------------------------------------------------
-export type AfterLaunchTask = { task: string; min: number; max: number };
-
-export const AFTER_LAUNCH: AfterLaunchTask[] = [
-  { task: "Changing the text on a page", min: 1, max: 1 },
-  { task: "Swapping an image", min: 1, max: 1 },
-  { task: "Adding a page you did not plan for", min: 10, max: 10 },
-  { task: "Fixing something small that broke", min: 10, max: 20 },
-  { task: "Building a whole new page template", min: 30, max: 30 },
-];
-
-// ---------------------------------------------------------------------
 // CALCULATORS -- the other cost calculators, and what each one does instead of
 // answering you. Read by the calculator page's "what makes this different"
 // section, where citing the alternatives is the point.
@@ -406,3 +466,24 @@ export const CALCULATORS: CalculatorRow[] = [
     href: "https://www.prontomarketing.com/website-cost-calculator/",
   },
 ];
+
+// =====================================================================
+// SECTION 3 -- THIRD-PARTY SERVICES
+//
+// What the client pays a vendor DIRECTLY, alongside a chadworks engagement.
+// Not competitors and not revenue: chadworks does not sell any of this and
+// takes no margin on it. Each one is quoted so a client can see the whole cost
+// of what they are buying, not just the chadworks half.
+//
+// THE RULE AT THE CALL SITE: never let one of these read as a chadworks price.
+// Every sentence that renders one already names the vendor and says the money
+// goes straight to them ("paid straight to OpenAI", "paid directly to Google").
+// Keep that clause if you touch the copy -- it is the only thing separating a
+// pass-through cost from a fee in the reader's mind.
+//
+// These move when the VENDOR says so, on no schedule of Chad's. Each carries
+// the date it was last true.
+// =====================================================================
+
+export const WORKSPACE_MONTHLY = 10; // $/user/month for Google Workspace, paid to Google. Under-$10 as of July 2026.
+export const ADS_MIN_DAILY_SPEND = 25; // $/day, OpenAI's own ad-spend floor, billed to the client's card. As of June 2026.
