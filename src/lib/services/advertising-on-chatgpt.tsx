@@ -81,7 +81,7 @@ export const advertisingOnChatgpt: Service = {
 
   made: {
     eyebrow: "Made in the USA",
-    heading: "Hi, I'm Chad.",
+    heading: "Hi, I'm Chad Lewine.",
     intro:
       "I've been building and marketing websites for trade and service businesses since the MySpace days. ChatGPT ads are new. The discipline behind running them well is not.",
     manifesto: [
@@ -99,10 +99,10 @@ export const advertisingOnChatgpt: Service = {
     close:
       "When you call, I pick up, and I will tell you straight whether your category can even run.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad, founder of chadworks, who manages your ChatGPT advertising",
+    imgAlt: "Chad Lewine, founder of chadworks, who manages your ChatGPT advertising",
     captionMain: "It's me. I run the ads.",
     captionSub: "(Not a media buying floor.)",
-    sig: "Chad",
+    sig: "Chad Lewine",
     sigMeta: "chadworks - Greater Philadelphia",
   },
 

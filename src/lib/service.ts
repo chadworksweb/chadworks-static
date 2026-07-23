@@ -22,7 +22,7 @@ export const ORG = {
   legalName: "chadworks",
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
-  founder: "Chad",
+  founder: "Chad Lewine",
   sameAs: [] as string[],
 } as const;
 

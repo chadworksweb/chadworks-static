@@ -59,7 +59,7 @@ const hub: HubConfig = {
   answer: (
     <>
       A website is the one piece of your business you fully own on the
-      internet. I&apos;m Chad D. L., and I&apos;ve been designing and developing
+      internet. I&apos;m Chad Lewine, and I&apos;ve been designing and developing
       websites for 20 years: the look, the code, the hosting, all custom
       built and all in your name.
     </>

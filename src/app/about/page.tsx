@@ -24,9 +24,9 @@ import { AboutHeroArt } from "@/components/art/AboutHeroArt";
 
 const PAGE_PATH = "/about/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-const TITLE = "About Chad: Designing Since Age 11 | chadworks";
+const TITLE = "About Chad Lewine: Designing Since Age 11 | chadworks";
 const DESCRIPTION =
-  "chadworks is one person: Chad, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
+  "chadworks is one person: Chad Lewine, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -53,12 +53,12 @@ export const metadata: Metadata = {
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "AboutPage",
-  name: "About Chad",
+  name: "About Chad Lewine",
   url: PAGE_URL,
   description: DESCRIPTION,
   mainEntity: {
     "@type": "Person",
-    name: "Chad",
+    name: "Chad Lewine",
     url: PAGE_URL,
     image: `${SITE_URL}/people/chad-cutout.webp`,
     jobTitle: "Web designer and developer",
@@ -159,7 +159,7 @@ export default function AboutPage() {
         eyebrow="The Chad behind chadworks"
         title="About chadworks"
         heroArt={<AboutHeroArt />}
-        lede="Hi, I'm Chad D.L., the Chad behind chadworks. Yep, just me. I've been building websites for over 20 years—since I was 11 years old, in fact. Web design is not just an occupation for me, it's a method by which information is communicated between parties, whether that's person to person, business to person, or business to business. I specialize in getting the information to and from the right places in a meaningful and visually stunning yet effective manner."
+        lede="Hi, I'm Chad Lewine, the Chad behind chadworks. Yep, just me. I've been building websites for over 20 years—since I was 11 years old, in fact. Web design is not just an occupation for me, it's a method by which information is communicated between parties, whether that's person to person, business to person, or business to business. I specialize in getting the information to and from the right places in a meaningful and visually stunning yet effective manner."
         cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
 

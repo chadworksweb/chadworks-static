@@ -16,7 +16,7 @@ const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const EMAIL = "chad@chadworks.co";
 const TITLE = "Contact chadworks | Talk to the Person Who Builds It";
 const DESCRIPTION =
-  "Get in touch with chadworks. Email chad@chadworks.co or send the form, and it reaches Chad directly, the person who designs the site and writes the code. Honest read within a day.";
+  "Get in touch with chadworks. Email chad@chadworks.co or send the form, and it reaches Chad Lewine directly, the person who designs the site and writes the code. Honest read within a day.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -52,7 +52,7 @@ const contactPageJsonLd = {
     url: SITE_URL,
     email: EMAIL,
     areaServed: "US",
-    founder: { "@type": "Person", name: "Chad" },
+    founder: { "@type": "Person", name: "Chad Lewine" },
     contactPoint: {
       "@type": "ContactPoint",
       email: EMAIL,

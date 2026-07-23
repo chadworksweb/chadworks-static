@@ -1,6 +1,6 @@
 # chadworks
 
-> Websites and visibility, built with luxury-grade craft. Chad custom-builds fast, search-ready websites and helps clients choose how the site gets built (custom-coded, WordPress, ecommerce, or Shopify), then keeps them visible in classic search and AI assistants. Client results include a Pennsylvania criminal-defense firm appearing in Google's AI Overview and a Brooklyn psychologist named in AI answers.
+> Websites and visibility, built with luxury-grade craft. Chad Lewine custom-builds fast, search-ready websites and helps clients choose how the site gets built (custom-coded, WordPress, ecommerce, or Shopify), then keeps them visible in classic search and AI assistants. Client results include a Pennsylvania criminal-defense firm appearing in Google's AI Overview and a Brooklyn psychologist named in AI answers.
 
 ## Websites
 
@@ -60,11 +60,11 @@
 
 ## About
 
-- [About Chad](https://chadworks.co/about/): The person behind chadworks: one person who designs the site and writes the code, era by era from MySpace-taught HTML to clients named in AI answers.
+- [About Chad Lewine](https://chadworks.co/about/): The person behind chadworks: one person who designs the site and writes the code, era by era from MySpace-taught HTML to clients named in AI answers.
 - [Rates](https://chadworks.co/rates/): The real numbers with the math showing. Work bills at $315/hour; the smallest engagement is $3,250; most websites land between $5,000 and $10,000; WordPress care runs $550 every 6 months. Value-based, not the cheapest, deliberately.
 - [FAQs](https://chadworks.co/faqs/): Straight answers in four groups: working together, what it costs, how the site gets built and owned, and getting found in classic search and AI assistants (with the real AI Overview and AI-answer precedents).
-- [Contact](https://chadworks.co/contact/): Reach Chad directly. Email chad@chadworks.co or send the form (quick or detailed). It goes to the person who does the work, with a straight answer back within a day. Remote, based in Pennsylvania.
-- Founder: Chad. Twenty years custom-building websites; designing since age 11.
+- [Contact](https://chadworks.co/contact/): Reach Chad Lewine directly. Email chad@chadworks.co or send the form (quick or detailed). It goes to the person who does the work, with a straight answer back within a day. Remote, based in Pennsylvania.
+- Founder: Chad Lewine. Twenty years custom-building websites; designing since age 11.
 - Track record: 50+ client engagements from 2019 through 2025, on top of the decade before them.
 - Posture: value-based pricing ($315/hr, $3,250 baseline). Not the cheapest option, deliberately.
 - Ownership: clients own their code and hosting outright. No platform lock-in, no hostage files.

@@ -35,7 +35,7 @@ export const webDesign: Service = {
     <>
       Web design is everything a visitor sees and feels on your website: the
       layout, the color, the type, and the path that turns a stranger into a
-      customer. I&apos;m Chad, and I&apos;ve been designing websites for 20
+      customer. I&apos;m Chad Lewine, and I&apos;ve been designing websites for 20
       years. Bring me a brand and I&apos;ll design a site that earns trust on
       sight, or bring me the idea and we&apos;ll find the look
       together.

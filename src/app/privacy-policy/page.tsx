@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <p>
             chadworks is a sole-proprietor web design and development studio
-            operated by Chad and based in the Greater Philadelphia area of
+            operated by Chad Lewine and based in the Greater Philadelphia area of
             Pennsylvania. This policy explains what this site collects, how your
             consent controls analytics, and the choices you have. I keep data
             collection minimal on purpose.

@@ -485,7 +485,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/about/cutouts/chad_cutout_home.webp"
-              alt="Chad, the one person who designs and builds every chadworks site"
+              alt="Chad Lewine, the one person who designs and builds every chadworks site"
               decoding="async"
               loading="lazy"
             />

@@ -58,7 +58,7 @@ export const septic: Service = {
       tank to tap your number before they tap a competitor&apos;s. Most septic
       sites lose that job on load speed, a buried phone number, and no proof
       you&apos;re licensed. I build the opposite, and I&apos;ve been building for
-      trade businesses since the MySpace days. I&apos;m Chad. Every page is fast
+      trade businesses since the MySpace days. I&apos;m Chad Lewine. Every page is fast
       on a phone, leads with your license and insurance, and is written so Google
       and the assistants name you for{" "}
       <Link href="/industries-served/">your town and your service</Link>. Want it found in
@@ -192,7 +192,7 @@ export const septic: Service = {
 
   made: {
     eyebrow: "Made in the USA",
-    heading: "Hi, I'm Chad.",
+    heading: "Hi, I'm Chad Lewine.",
     intro:
       "I've been building websites for trade and service businesses since the MySpace days.",
     manifesto: [
@@ -209,10 +209,10 @@ export const septic: Service = {
     close:
       "When you call, I pick up. When something breaks at 11pm before your busy season, I'm the one fixing it.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad, founder of chadworks",
+    imgAlt: "Chad Lewine, founder of chadworks",
     captionMain: "Don't worry, I'm a professional.",
     captionSub: "(Web designer.)",
-    sig: "Chad",
+    sig: "Chad Lewine",
     sigMeta: "chadworks - Philadelphia, PA",
   },
 

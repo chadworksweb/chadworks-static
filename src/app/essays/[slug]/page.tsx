@@ -223,7 +223,7 @@ export default async function EssayPage({
             </Link>
           </p>
           <p className="essay-bio__text">
-            chadworks is one person: Chad, designing since age 11 and
+            chadworks is one person: Chad Lewine, designing since age 11 and
             custom-building client websites since 2008. More than 50 client
             engagements since 2019, and the person you email is the person who
             writes the code. Not the cheapest, deliberately.

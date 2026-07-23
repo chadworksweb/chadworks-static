@@ -30,7 +30,7 @@ export const foundationRepair: Service = {
       competitor&apos;s. Most foundation sites lose that job on load speed, a
       buried phone number, and no proof you&apos;re licensed and engineer-backed.
       I build the opposite, and I&apos;ve been building for trade businesses
-      since the MySpace days. I&apos;m Chad. Every page is fast on a phone, leads
+      since the MySpace days. I&apos;m Chad Lewine. Every page is fast on a phone, leads
       with your license, PE engineer signoff, and transferable warranty, and is
       written so Google and the assistants name you for your town and your
       method.
@@ -162,7 +162,7 @@ export const foundationRepair: Service = {
 
   made: {
     eyebrow: "Made in the USA",
-    heading: "Hi, I'm Chad.",
+    heading: "Hi, I'm Chad Lewine.",
     intro:
       "I've been building websites for trade and service businesses since the MySpace days.",
     manifesto: [
@@ -179,10 +179,10 @@ export const foundationRepair: Service = {
     close:
       "When you call, I pick up. When something breaks at 11pm before your busy season, I'm the one fixing it.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad, founder of chadworks",
+    imgAlt: "Chad Lewine, founder of chadworks",
     captionMain: "Don't worry, I'm a professional.",
     captionSub: "(Web designer.)",
-    sig: "Chad",
+    sig: "Chad Lewine",
     sigMeta: "chadworks - Philadelphia, PA",
   },
 

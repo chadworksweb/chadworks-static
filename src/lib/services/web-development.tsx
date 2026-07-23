@@ -28,7 +28,7 @@ export const webDevelopment: Service = {
     <>
       Web development is the technology behind a website: the code and the
       structural foundation that connects the site to the server and host and
-      makes the visual design interactive. I&apos;m Chad D.L., and I&apos;ve been
+      makes the visual design interactive. I&apos;m Chad Lewine, and I&apos;ve been
       developing websites for 20 years. Whether you
       already have a design in hand or you need one{" "}
       <Link href="/web-design/" className="svc-inline-link">

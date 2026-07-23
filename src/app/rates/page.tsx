@@ -165,7 +165,7 @@ export default function RatesPage() {
             {
               label: "About",
               detail:
-                "chadworks is one person: Chad, designing since age 11 and custom-building client websites since 2008. The person you email is the person who writes the code.",
+                "chadworks is one person: Chad Lewine, designing since age 11 and custom-building client websites since 2008. The person you email is the person who writes the code.",
               href: "/about/",
             },
           ],

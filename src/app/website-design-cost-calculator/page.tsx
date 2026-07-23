@@ -112,7 +112,7 @@ const webPageJsonLd = {
   // engine merges this into one author entity rather than a second Chad.
   author: {
     "@type": "Person",
-    name: "Chad",
+    name: "Chad Lewine",
     url: `${SITE_URL}/about/`,
     jobTitle: "Web designer and developer",
     knowsAbout: ["Web design", "Web development", "Website pricing", "Ecommerce"],

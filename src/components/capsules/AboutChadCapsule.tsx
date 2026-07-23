@@ -32,7 +32,7 @@ export function AboutChadCapsule({
           </>
         ),
         img: "/people/chad-cutout.webp",
-        imgAlt: "Chad, the person behind chadworks",
+        imgAlt: "Chad Lewine, the person behind chadworks",
         captionMain,
         captionSub,
         manifesto: [
@@ -55,7 +55,7 @@ export function AboutChadCapsule({
           "No pretending I'm an agency or that the web is a perfect system.",
         ],
         close: "Trends come and go and the web changes. My values don't.",
-        sig: "Chad D. L.",
+        sig: "Chad Lewine",
       }}
     />
   );

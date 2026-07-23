@@ -121,7 +121,7 @@ export const showUpOnChatgpt: Service = {
 
   made: {
     eyebrow: "Made in the USA",
-    heading: "Hi, I'm Chad.",
+    heading: "Hi, I'm Chad Lewine.",
     intro:
       "I've been getting trade and service businesses found online since the MySpace days. AI search is the newest place your customers look. The work to win it is the same work I've always done, aimed at a new target.",
     manifesto: [
@@ -139,10 +139,10 @@ export const showUpOnChatgpt: Service = {
     close:
       "When you call, I pick up. When the audit turns up something ugly, I tell you straight.",
     img: "/people/chad-cutout.webp",
-    imgAlt: "Chad, founder of chadworks, who runs the AI visibility work",
+    imgAlt: "Chad Lewine, founder of chadworks, who runs the AI visibility work",
     captionMain: "I do the audit myself.",
     captionSub: "(Line by line.)",
-    sig: "Chad",
+    sig: "Chad Lewine",
     sigMeta: "chadworks - Greater Philadelphia",
   },
 
