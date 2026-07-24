@@ -65,7 +65,15 @@ export function GoogleAnalytics() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
-          gtag('config', '${GA_ID}');
+          gtag('config', '${GA_ID}', {
+            // Measurement only, no ad-tech. Without these, gtag still pings
+            // stats.g.doubleclick.net and www.google.com/g/collect on every
+            // pageview even with Google Signals switched off at the property.
+            // The site CSP blocks both, so the only effect was a console error
+            // per pageview; this stops the attempt at the source instead.
+            allow_google_signals: false,
+            allow_ad_personalization_signals: false
+          });
         `}
       </Script>
     </>
