@@ -1,26 +1,24 @@
-// CodeFall worker source, as a STRING.
+// CodeFall worker -- the homepage hero art, running off the main thread.
 //
-// It is a string because it has to become a Blob URL inside the inline boot
-// script in CodeFall.tsx. That is what lets the hero art start before anything
-// else on the page: no module graph, no bundle, no extra network request. A
-// separate .js file in public/ would work too, but it would be a request that
-// has to land before a single glyph appears, which defeats the purpose.
+// SERVED AS A REAL FILE ON PURPOSE. The first version of this shipped as a Blob
+// URL to avoid the extra request, and the site's own Content-Security-Policy
+// silently killed it: script-src is "'self' 'unsafe-inline'" with no blob:, so
+// the worker never loaded. The canvas had ALREADY been transferred by then, so
+// the hero went permanently blank with no error anyone would notice. Same-origin
+// is what the CSP allows, and this file is ~4 KB before compression.
 //
-// WHY A WORKER AT ALL. requestAnimationFrame and canvas 2D both run on the main
-// thread. Measured on this site 2026-07-23: the main thread is blocked for
-// ~434ms while the browser parses 1,148 KB of application JavaScript, so
-// anything drawn from the page freezes solid through that window no matter how
-// early it started. Proven in lab/codefall/: across four consecutive 450ms
-// blocks the page-driven copy dropped 472ms while the worker copy's longest gap
-// was 35ms, which is one frame at the 30fps throttle.
+// WHY A WORKER. requestAnimationFrame and canvas 2D both run on the main thread,
+// and the main thread is blocked ~434ms on load while the browser parses this
+// site's application JavaScript. Anything drawn from the page freezes through
+// that window however early it starts. Measured in lab/codefall/ across four
+// 450ms blocks: page-driven longest gap 472ms, worker 35ms (one frame at 30fps).
 //
-// The algorithm below is the same one CodeFall.tsx runs as its fallback. Keep
-// them in step: same glyph set, same brand stops, same column ranges, same dt
-// cap, same orb constants. The lab folder holds the readable copy of this.
+// Nothing here may touch window or document; a worker has neither. The pointer
+// arrives as numbers, the font family arrives in the init message.
 //
-// Nothing here may touch window or document. A worker has neither.
-
-export const CODEFALL_WORKER_SOURCE = String.raw`
+// Loaded by the inline boot script in src/components/art/CodeFall.tsx. Keep the
+// algorithm in step with that file's main-thread fallback; lab/codefall/core.js
+// is the readable copy of the same thing.
 var GLYPHS="01<>/{}[]()=+-*;:&|!?$#@.abcdefghijklmnopqrstuvwxyz0123456789{}</>";
 var HEAD=[102,41,188],TN=[36,57,137],TF=[174,185,234];
 var ORB_R=59,SPRING=26,FRICTION=7,FRAME_MS=1000/30;
@@ -133,6 +131,10 @@ self.onmessage=function(e){
     layout(d.cssW,d.cssH,d.dpr);
     paint(); // first frame immediately, not on the next rAF
     requestAnimationFrame(frame);
+    // Tells the page the worker actually LOADED and drew. Without this the only
+    // observable state was "canvas was transferred", which stayed true even when
+    // the worker had been blocked and the hero was blank. See CodeFall.tsx.
+    postMessage({ type: "ready" });
   } else if(d.type==="resize"&&ctx){
     layout(d.cssW,d.cssH,d.dpr);
     last=0; // a fresh dt, so the resize does not integrate one huge step
@@ -147,4 +149,3 @@ self.onmessage=function(e){
     parked=!!d.value; if(!parked)last=0;
   }
 };
-`;

@@ -13,7 +13,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { isMotionPaused, setMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
-import { CODEFALL_WORKER_SOURCE } from "./codefall-source";
 
 // Code-flavored glyphs (drawn in the brand mono face). No CJK -- the mono font
 // has no katakana, which would render as tofu boxes.
@@ -27,7 +26,7 @@ const TRAIL_FAR: [number, number, number] = [174, 185, 234]; // #aeb9ea periwink
 
 
 // What the inline boot script leaves on window once the worker owns the canvas.
-type WorkerHandle = { worker: Worker; url: string; dpr: number };
+type WorkerHandle = { worker: Worker; dpr: number };
 
 type Column = {
   head: number; // fractional row index of the leading glyph
@@ -85,12 +84,19 @@ var d=Math.min(window.devicePixelRatio||1,2);
 // travel with the init message.
 var m=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||'monospace';
 var red=window.matchMedia('(prefers-reduced-motion: reduce)').matches&&!document.documentElement.classList.contains('cw-force-motion');
-var url=URL.createObjectURL(new Blob([${JSON.stringify(CODEFALL_WORKER_SOURCE)}],{type:'application/javascript'}));
-var wk=new Worker(url);
+// A REAL same-origin file, not a Blob URL. The CSP here is
+// script-src 'self' 'unsafe-inline' with no blob:, so a Blob worker is blocked
+// outright, and because the canvas is transferred either way the hero went
+// permanently blank with no visible error. Same-origin is what is allowed.
+var wk=new Worker('/codefall-worker.js');
 var off=c.transferControlToOffscreen();
 wk.postMessage({type:'init',canvas:off,cssW:W,cssH:H,dpr:d,font:m,animate:!red},[off]);
+// '1' means transferred, 'live' means the worker answered and drew. The
+// distinction exists because "transferred" was true in the broken case too.
 c.setAttribute('data-cw-codefall','1');
-window.__CW_CODEFALL={worker:wk,url:url,dpr:d};
+wk.addEventListener('message',function(ev){
+if(ev.data&&ev.data.type==='ready')c.setAttribute('data-cw-codefall','live')});
+window.__CW_CODEFALL={worker:wk,dpr:d};
 return true}catch(e){return true}}
 // React can HOIST an inline script above the markup it was written next to
 // (seen on this codebase 2026-07-23), so if the canvas is not parsed yet, wait.
