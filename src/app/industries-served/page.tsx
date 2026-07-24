@@ -62,13 +62,13 @@ const INDUSTRIES: IndexItem[] = [
 export const metadata: Metadata = {
   title: "Industries Served by chadworks Web Design",
   description:
-    "chadworks builds websites based on your industry, not a generic template. This page holds a list of a selection of industries served.",
+    "chadworks builds websites based on an industry's unique aspects. This page holds a list of a selection of industries served.",
   alternates: { canonical: `${SITE_URL}${PATH}` },
   robots: { index: isLaunched(PATH), follow: true },
   openGraph: {
     title: "Industries Served by chadworks Web Design",
     description:
-      "chadworks builds websites based on your industry, not a generic template. This page holds a list of a selection of industries served.",
+      "chadworks builds websites based on an industry's unique aspects. This page holds a list of a selection of industries served.",
     url: `${SITE_URL}${PATH}`,
     type: "website",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "chadworks" }],

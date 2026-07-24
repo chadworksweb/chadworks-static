@@ -151,16 +151,18 @@ const hub: HubConfig = {
   },
 };
 
+const TITLE = "Websites: Custom, Static, WordPress & Ecommerce by chadworks";
+const DESCRIPTION =
+  "chadworks designs, develops and maintains websites for motivated individuals, businesses and organizations.";
+
 export const metadata: Metadata = {
-  title: "Websites: Custom, Static, WordPress & Ecommerce by chadworks",
-  description:
-    "chadworks designs, develops and maintains websites for motivated individuals, businesses and organizations.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: `${SITE_URL}/websites/` },
   robots: { index: isLaunched("/websites/"), follow: true },
   openGraph: {
-    title: "Websites: Custom, Static, WordPress & Ecommerce by chadworks",
-    description:
-      "Custom websites designed and developed by one person: the look, the code, and the hosting, all in your name.",
+    title: TITLE,
+    description: DESCRIPTION,
     url: `${SITE_URL}/websites/`,
     type: "website",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "chadworks" }],

@@ -343,6 +343,6 @@ export const septic: Service = {
   meta: {
     title: "Website Design for Septic Companies | chadworks",
     description:
-      `Septic service websites built to win the 11pm emergency call: fast on a phone, tap-to-call in the header, license and insurance up top, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run ${TYPICAL_BAND}, quoted up front.`,
+      "chadworks builds websites specifically designed for septic service companies and the way their customers make decisions.",
   },
 };

@@ -34,19 +34,19 @@ import Link from "next/link";
 import { PageMotion } from "@/components/PageMotion";
 import { LegalToc } from "@/components/LegalToc";
 import { SITE_URL } from "@/lib/service";
-import { isLaunched } from "@/lib/launch";
+import { isIndexable } from "@/lib/launch";
 
 const PAGE_PATH = "/terms-of-service/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "Terms of Service | chadworks";
 const DESCRIPTION =
-  "Terms of Service governing access to and use of chadworks.co: license and restrictions, automated access and machine learning, intellectual property, published content and interactive tools, submissions, disclaimer of warranties, limitation of liability, and Pennsylvania governing law.";
+  "The terms governing use of chadworks.co: license and restrictions, AI and automated access limits, intellectual property, disclaimers, and more.";
 const EFFECTIVE_DATE = "July 23, 2026";
 
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
-  robots: { index: isLaunched(PAGE_PATH), follow: true },
+  robots: { index: isIndexable(PAGE_PATH), follow: true },
   alternates: { canonical: PAGE_URL },
   openGraph: {
     title: TITLE,

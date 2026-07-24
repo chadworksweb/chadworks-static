@@ -275,7 +275,7 @@ export const webDevelopment: Service = {
   },
 
   meta: {
-    title: "Website Development by chadworks | Code and tech behind the design",
+    title: "Website Development by chadworks™",
     description:
       "chadworks can develop your idea into a reality using commercial grade development practices that get you ranked and cited.",
   },

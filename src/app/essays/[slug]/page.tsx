@@ -47,8 +47,11 @@ export async function generateMetadata({
   if (!essay) return {};
   const url = `${SITE_URL}/essays/${slug}/`;
   const description = essay.description || essay.dek;
+  // One meta title, reused for OpenGraph + Twitter so the social title matches
+  // the search title exactly (house rule: OG mirrors meta).
+  const metaTitle = `${essay.title} | chadworks`;
   return {
-    title: `${essay.title} | chadworks`,
+    title: metaTitle,
     description,
     alternates: { canonical: url },
     // layout.tsx defaults every route to noindex; the collection launch lights
@@ -64,7 +67,7 @@ export async function generateMetadata({
     authors: [{ name: "Chad Lewine", url: `${SITE_URL}/about/` }],
     ...(essay.topics?.length ? { keywords: essay.topics } : {}),
     openGraph: {
-      title: essay.title,
+      title: metaTitle,
       description,
       url,
       type: "article",
@@ -86,7 +89,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: essay.title,
+      title: metaTitle,
       description,
       images: [essay.image || "/og-default.png"],
     },

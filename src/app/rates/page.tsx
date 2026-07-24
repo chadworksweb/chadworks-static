@@ -31,9 +31,9 @@ const RATE_EXAMPLES: { task: string; time: string }[] = [
 
 const PAGE_PATH = "/rates/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-const TITLE = "Rates: What a chadworks Website Costs | chadworks";
+const TITLE = "chadworks Rates | What it costs to work with chadworks";
 const DESCRIPTION =
-  `Work bills at ${money(MINUTELY)} a minute. The smallest engagement is ${money(BASE)}, and most websites land between ${LOW} and ${HIGH}. WordPress care runs ${money(WORDPRESS_CARE)} every 6 months. The real numbers, on the table before you decide, with the math showing.`;
+  "Rates start at $5.25/minute and $3,250 for flat rate builds. Visit this page to learn more.";
 
 export const metadata: Metadata = {
   title: TITLE,

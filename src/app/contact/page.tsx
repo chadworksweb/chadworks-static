@@ -14,9 +14,9 @@ import { PageComposer, MainContactCapsule } from "@/components/capsules";
 const PAGE_PATH = "/contact/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const EMAIL = "chad@chadworks.co";
-const TITLE = "Contact chadworks | Talk to the Person Who Builds It";
+const TITLE = "Contact chadworks | Inquire about websites or visibility";
 const DESCRIPTION =
-  "Get in touch with chadworks. Email chad@chadworks.co or send the form, and it reaches Chad Lewine directly, the person who designs the site and writes the code. Honest read within a day.";
+  "Contacting chadworks is quick and easy. Fill out the form on this page or call 215-872-1240. Talk soon!";
 
 export const metadata: Metadata = {
   title: TITLE,

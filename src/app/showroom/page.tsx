@@ -29,14 +29,30 @@ import { SHOWROOM_ITEMS } from "@/components/showroom/showroom-data";
 const ROUTE = "/showroom/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
 
+const TITLE = "Showroom | chadworks";
+const DESCRIPTION =
+  "Welcome to the immersive showcase of chadworks projects. A high-end, motion-driven portfolio built to show off my capabilities.";
+
 export const metadata: Metadata = {
-  title: "Showroom | chadworks",
-  description:
-    "The chadworks portfolio showroom: real client sites, shown one at a time in a full-screen cinematic slider.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
   // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so
   // being in launch.ts alone would still serve noindex. Both edits or neither.
   robots: { index: isLaunched(ROUTE), follow: true },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: PAGE_URL,
+    type: "website",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "chadworks" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og-default.png"],
+  },
 };
 
 // Same shape and order as /portfolio/: BreadcrumbList first, then the collection.

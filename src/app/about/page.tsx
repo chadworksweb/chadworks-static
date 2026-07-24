@@ -24,9 +24,9 @@ import { AboutHeroArt } from "@/components/art/AboutHeroArt";
 
 const PAGE_PATH = "/about/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
-const TITLE = "About Chad Lewine: Designing Since Age 11 | chadworks";
+const TITLE = "About chadworks and the Chad Behind It";
 const DESCRIPTION =
-  "chadworks is one person: Chad Lewine, designing since age 11 and custom-building client websites since 2008. More than 50 client engagements since 2019, and the person you email is the person who writes the code. Not the cheapest, deliberately.";
+  "chadworks builds digital destinations for individuals and organizations that want to double down on owned and authentic digital presence.";
 
 export const metadata: Metadata = {
   title: TITLE,

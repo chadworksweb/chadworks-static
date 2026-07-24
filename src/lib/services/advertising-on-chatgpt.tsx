@@ -178,8 +178,8 @@ export const advertisingOnChatgpt: Service = {
   },
 
   meta: {
-    title: "Advertising on ChatGPT | chadworks",
+    title: "Advertise on ChatGPT | chadworks",
     description:
-      `Managed ChatGPT advertising, done for you. I verify your advertiser account, build the campaign, write the creative, and run it for a flat ${money(ADS_MONTHLY)} a month. Your ad spend is paid straight to OpenAI, ${money(ADS_MIN_DAILY_SPEND)} a day minimum. Eligible businesses can be live as soon as tomorrow.`,
+      "Want to advertise your business on ChatGPT? Now you can. chadworks can design and manage ChatGPT ad campaigns.",
   },
 };

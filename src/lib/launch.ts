@@ -59,8 +59,18 @@ const LAUNCHED = new Set<string>([
               // Ripping You Off?"). This also flips <GoingToBat /> from the
               // inline email thread to the teaser capsule everywhere it runs.
   "/website-design-cost-calculator/", // launched 2026-07-20 -- the scope calculator (tool intent)
-  "/how-much-does-a-website-cost/", // launched 2026-07-20 -- the cost guide (informational intent).
-                                    // Launch WITH the calculator so their cross-links resolve.
+  // "/how-much-does-a-website-cost/" -- SEALED 2026-07-24. Pulled back from launch
+  // (was launched 2026-07-20). robots line gates on isLaunched, so it follows.
+]);
+
+// Launched for navigation but deliberately kept OUT of search: reachable and
+// footer-linked (isLaunched is true), yet noindex and absent from the sitemap.
+// Legal pages live here -- users must be able to reach them, but they should not
+// compete in search. A route here MUST also be in LAUNCHED (so the footer lights
+// it); isIndexable is what gates robots + sitemap.
+const NOINDEX = new Set<string>([
+  "/privacy-policy/", // noindex 2026-07-24 -- legal page, footer-linked, not searched
+  "/terms-of-service/", // noindex 2026-07-24 -- legal page, footer-linked, not searched
 ]);
 
 // Normalize any path to the canonical "/segment/" form ("/" for home), tolerant
@@ -72,6 +82,14 @@ function norm(path: string): string {
 
 export function isLaunched(path: string): boolean {
   return LAUNCHED.has(norm(path));
+}
+
+// True only when a route should be advertised to search: launched AND not in the
+// noindex set. Use this for a page's `robots.index` and for sitemap inclusion.
+// (isLaunched still drives nav/footer visibility, so noindex legals stay linked.)
+export function isIndexable(path: string): boolean {
+  const p = norm(path);
+  return LAUNCHED.has(p) && !NOINDEX.has(p);
 }
 
 // The launched routes, in declaration order -- used by the sitemap.

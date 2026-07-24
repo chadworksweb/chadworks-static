@@ -16,7 +16,7 @@ const ROUTE = "/essays/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
 const TITLE = "Essays: A Working Theory of the Web | chadworks";
 const DESCRIPTION =
-  "Short essays on where the web is going: originality against AI sameness, the interchangeable website, and why an organization needs a digital home of its own. The thinking behind chadworks, published in full.";
+  "Short essays on what the web is and where it might be going, by Chad Lewine of chadworks.";
 
 export const metadata: Metadata = {
   title: TITLE,

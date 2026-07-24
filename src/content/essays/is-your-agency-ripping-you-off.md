@@ -2,6 +2,7 @@
 title: "Is Your Digital Marketing Agency Ripping You Off?"
 date: 2026-07-18
 dek: "The web design industry has been scamming innocent clients for years."
+description: "The web design industry has scammed clients for years with the perpetual retainer. Here is how the con works, and how to tell whether you are the mark."
 # image: "/essays/your-image.jpg"   # optional; omitted = the house placeholder
 # imageAlt: ""
 section: "Essays"

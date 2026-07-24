@@ -4132,6 +4132,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .cw-form__message {
   padding: 1rem 1.5rem;
   border-radius: var(--radius);
+  margin-top: 1.25rem;
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
   font-weight: 500;

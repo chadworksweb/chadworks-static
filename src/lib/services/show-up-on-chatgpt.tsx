@@ -220,6 +220,6 @@ export const showUpOnChatgpt: Service = {
   meta: {
     title: "Show Up on ChatGPT | chadworks",
     description:
-      `Get your business named in AI answers. I make your site readable and quotable to the crawlers behind ChatGPT, Claude, Gemini, and Perplexity: AI crawlers allowed, structured data that names you, and content that answers real questions. Starts with a ${money(AUDIT)} AI visibility audit.`,
+      "Get your business or website content named and cited in ChatGPT and other AI search assistants.",
   },
 };

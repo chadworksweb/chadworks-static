@@ -317,6 +317,6 @@ export const webDesign: Service = {
   meta: {
     title: "Website Design by chadworks™",
     description:
-      "Web design is everything a visitor sees and feels on your website: the layout, color, type, and the path that turns a stranger into a customer. I design custom sites around your business, never from a theme, and develop them too.",
+      "Website design services by chadworks: Custom coded, static, WordPress, ecom and Shopify.",
   },
 };

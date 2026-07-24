@@ -31,9 +31,9 @@ import { HIGH, LOW } from "@/lib/pricing";
 
 const ROUTE = "/are-we-a-good-fit/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
-const TITLE = "Are We A Good Fit? | chadworks";
+const TITLE = "Are We A Good Fit? | chadworks' Preferred Client Type";
 const DESCRIPTION =
-  "You can already picture the thing you want built, and every template flattens it. The honest answer to whether chadworks is the person to build it, including who should walk away.";
+  "chadworks doesn't work with everyone. This page shares what chadworks looks for in a client partner.";
 
 export const metadata: Metadata = {
   title: TITLE,

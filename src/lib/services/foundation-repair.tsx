@@ -276,6 +276,6 @@ export const foundationRepair: Service = {
   meta: {
     title: "Website Design for Foundation Repair Contractors | chadworks",
     description:
-      `Foundation repair websites built to win the basement-flood call: fast on a phone, tap-to-call in the header, engineer signoff and transferable warranty up top, a dedicated ranking page for every method, and a page for every town you cover. Server-rendered and schema-rich so Google and the AI assistants name you. Custom builds run ${TYPICAL_BAND}, quoted up front.`,
+      "chadworks builds websites specifically designed for foundation repair contractors and the way their customers make decisions.",
   },
 };

@@ -32,9 +32,9 @@ import {
 
 const ROUTE = "/faqs/";
 const PAGE_URL = `${SITE_URL}${ROUTE}`;
-const TITLE = "FAQs: Working With chadworks, Costs, and Getting Found | chadworks";
+const TITLE = "FAQs | chadworks";
 const DESCRIPTION =
-  `Straight answers about working with chadworks: who builds your site, what it costs (${HOURLY_LONG}, ${money(BASE)} baseline, most between ${LOW} and ${HIGH}), how the site gets built and owned, and how a business gets found in classic search and AI assistants.`;
+  "Frequently asked questions about working with chadworks, including prices, process and more.";
 
 export const metadata: Metadata = {
   title: TITLE,

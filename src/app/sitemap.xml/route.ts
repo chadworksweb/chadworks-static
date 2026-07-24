@@ -7,7 +7,7 @@
 // (layout.tsx) and simply absent here. Launch a page = add it to launch.ts.
 
 import { SITE_URL } from "@/lib/service";
-import { LAUNCHED_ROUTES, isLaunched } from "@/lib/launch";
+import { LAUNCHED_ROUTES, isLaunched, isIndexable } from "@/lib/launch";
 import { getEssaySlugs } from "@/lib/essays";
 
 export const dynamic = "force-static";
@@ -19,7 +19,9 @@ export const dynamic = "force-static";
 const essayRoutes = isLaunched("/essays/")
   ? getEssaySlugs().map((slug) => `/essays/${slug}/`)
   : [];
-const routes = [...LAUNCHED_ROUTES, ...essayRoutes];
+// Advertise only indexable routes: launched AND not noindex (legal pages are
+// launched for the footer but excluded here -- see isIndexable in launch.ts).
+const routes = [...LAUNCHED_ROUTES.filter(isIndexable), ...essayRoutes];
 
 export async function GET(): Promise<Response> {
   const lastmod = new Date().toISOString().slice(0, 10);
