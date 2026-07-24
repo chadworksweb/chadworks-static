@@ -4467,6 +4467,16 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .home-hero__rule {
   display: block;
   height: 2px;
+  /* Hold it on its own compositor layer FOR GOOD, not just while the wipe runs.
+     The rule lands at a fractional y (measured 509.703px on the homepage; the
+     tagrow's clamp() margins and flex centring put it there), so a 2px line
+     straddles three device rows and antialiases into a soft, faded band. While
+     the scaleX transition is running the browser promotes it to its own layer
+     and rasterises it snapped, which is why it wipes in crisp and then visibly
+     thins the moment the transition ends and the layer is thrown away.
+     will-change keeps that layer, so the thickness never changes. The cost is
+     one composited 2px line. */
+  will-change: transform;
   width: clamp(120px, 22vw, 280px);
   margin: clamp(1.75rem, 3.5vw, 2.75rem) 0 clamp(1rem, 2vw, 1.5rem);
   border-radius: 2px;
