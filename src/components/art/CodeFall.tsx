@@ -67,10 +67,37 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 // If OffscreenCanvas or Worker is missing, this bails WITHOUT setting the
 // handle and without transferring, and the component falls back to drawing on
 // the main thread exactly as it always did.
+// HERO RENDERING IS ON THE MAIN THREAD. Flip to true to re-enable the worker.
+//
+// The worker version (2026-07-23) draws the art in the WRONG FACE on mobile. A
+// dedicated worker owns a separate FontFaceSet and cannot see the page's
+// self-hosted @font-face, so ctx.font in there can only match a SYSTEM font.
+// On a dev machine with JetBrains Mono installed that resolves and looks
+// perfect; on a phone nothing matches and it falls back to the browser default
+// (serif on iOS). The bug is invisible on the machine that built it.
+//
+// Re-enabling means loading the face INTO the worker: read the woff2 URL off
+// the page's own @font-face rule, absolutise it against the stylesheet that
+// declared it (next/font emits '../media/x.woff2', which a worker would resolve
+// against /codefall-worker.js and 404), post it in, and have the worker do
+// FontFace + self.fonts.add before it lays out. Attempted 2026-07-24 and backed
+// out: the seed script runs before the stylesheet is guaranteed to be parsed,
+// so on a cold mobile load the URL comes out empty and the face never loads.
+// Any retry needs to hang off document.fonts.ready, not boot().
+//
+// The main-thread path below has the document fonts and is the renderer that
+// shipped correctly before the worker landed. The perf win the worker bought
+// (35ms vs 472ms longest gap through a blocked main thread, lab/codefall/) is
+// real and worth reclaiming, but not at the cost of the brand face on mobile.
+const USE_WORKER = false;
+
 const SEED_SCRIPT = `(function(){function boot(){try{
 var w=document.querySelector('.home-hero__codefall');if(!w)return false;
 var c=w.querySelector('canvas');if(!c)return false;
 if(c.getAttribute('data-cw-codefall'))return true;
+// Main-thread rendering: bail WITHOUT transferring, exactly like the
+// no-OffscreenCanvas path below. Returning true prevents a pointless retry.
+if(!${String(USE_WORKER)})return true;
 // No OffscreenCanvas or no Worker: stop, leave the handle unset, let the
 // component draw on the main thread. Returning true prevents a pointless retry.
 if(!c.transferControlToOffscreen||typeof Worker==='undefined')return true;
