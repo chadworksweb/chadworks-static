@@ -33,7 +33,7 @@ const PAGE_PATH = "/rates/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "chadworks Rates | What it costs to work with chadworks";
 const DESCRIPTION =
-  "Rates start at $5.25/minute and $3,250 for flat rate builds. Visit this page to learn more.";
+  `Rates start at ${money(MINUTELY)}/minute and ${money(BASE)} for flat rate builds. Visit this page to learn more.`;
 
 export const metadata: Metadata = {
   title: TITLE,
