@@ -26,7 +26,7 @@ const TRAIL_FAR: [number, number, number] = [174, 185, 234]; // #aeb9ea periwink
 
 
 // What the inline boot script leaves on window once the worker owns the canvas.
-type WorkerHandle = { worker: Worker; dpr: number };
+type WorkerHandle = { worker: Worker; dpr: number; cssW: number; cssH: number };
 
 type Column = {
   head: number; // fractional row index of the leading glyph
@@ -96,7 +96,7 @@ wk.postMessage({type:'init',canvas:off,cssW:W,cssH:H,dpr:d,font:m,animate:!red},
 c.setAttribute('data-cw-codefall','1');
 wk.addEventListener('message',function(ev){
 if(ev.data&&ev.data.type==='ready')c.setAttribute('data-cw-codefall','live')});
-window.__CW_CODEFALL={worker:wk,dpr:d};
+window.__CW_CODEFALL={worker:wk,dpr:d,cssW:W,cssH:H};
 return true}catch(e){return true}}
 // React can HOIST an inline script above the markup it was written next to
 // (seen on this codebase 2026-07-23), so if the canvas is not parsed yet, wait.
@@ -136,8 +136,20 @@ export function CodeFall({ hideToggle = false }: { hideToggle?: boolean }) {
     if (handle && canvas.getAttribute("data-cw-codefall")) {
       const post = (m: Record<string, unknown>) => handle.worker.postMessage(m);
 
+      // ResizeObserver fires once on observe() with the size the worker already
+      // laid out from, so the first callback is always redundant. The worker
+      // ignores no-op resizes too; this just avoids the round trip.
+      // Seeded from the size the boot script laid out with, so the observer's
+      // mandatory first callback is recognised as the no-op it is.
+      let lastW = handle.cssW;
+      let lastH = handle.cssH;
       const ro = new ResizeObserver(() => {
-        post({ type: "resize", cssW: wrap.clientWidth, cssH: wrap.clientHeight, dpr: handle.dpr });
+        const cssW = wrap.clientWidth;
+        const cssH = wrap.clientHeight;
+        if (cssW === lastW && cssH === lastH) return;
+        lastW = cssW;
+        lastH = cssH;
+        post({ type: "resize", cssW, cssH, dpr: handle.dpr });
       });
       ro.observe(wrap);
 

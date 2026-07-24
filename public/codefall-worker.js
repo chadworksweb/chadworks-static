@@ -23,7 +23,7 @@ var GLYPHS="01<>/{}[]()=+-*;:&|!?$#@.abcdefghijklmnopqrstuvwxyz0123456789{}</>";
 var HEAD=[102,41,188],TN=[36,57,137],TF=[174,185,234];
 var ORB_R=59,SPRING=26,FRICTION=7,FRAME_MS=1000/30;
 var cv=null,ctx=null,font="monospace",animate=true,paused=false,parked=false;
-var cssW=0,cssH=0,colW=0,rowH=0,rows=0,fontPx=0,cols=0,columns=[],last=0;
+var cssW=0,cssH=0,colW=0,rowH=0,rows=0,fontPx=0,cols=0,columns=[],last=0,lastDpr=0;
 var mx=-9999,my=-9999,ox=-9999,oy=-9999,ovx=0,ovy=0,ostr=0,otar=0;
 
 function rand(a,b){return a+Math.random()*(b-a)}
@@ -38,7 +38,7 @@ function newColumn(above){
 }
 
 function layout(w,h,dpr){
-  cssW=w;cssH=h;
+  cssW=w;cssH=h;lastDpr=dpr;
   fontPx=Math.max(13,Math.min(17,Math.round(cssW/30)));
   cv.width=Math.round(cssW*dpr);cv.height=Math.round(cssH*dpr);
   // Assigning width/height resets every context property, so transform and font
@@ -136,7 +136,19 @@ self.onmessage=function(e){
     // the worker had been blocked and the hero was blank. See CodeFall.tsx.
     postMessage({ type: "ready" });
   } else if(d.type==="resize"&&ctx){
+    // IGNORE A NO-OP RESIZE. ResizeObserver always fires once on observe(), so
+    // the controller posts the size it already has the moment React mounts.
+    // layout() rebuilds every column from scratch, so acting on that message
+    // reshuffled the entire field a few hundred milliseconds in and read as the
+    // art resizing vertically. Same size means nothing to do.
+    if(d.cssW===cssW&&d.cssH===cssH&&d.dpr===lastDpr)return;
+    // A REAL resize. Keep the falling columns if the grid still has the same
+    // shape (a width change that does not alter the column count, or a height
+    // change within the same row count): rebuilding them is what makes a resize
+    // look like a cut rather than a reflow.
+    var keep=columns,prevRows=rows,prevCols=cols;
     layout(d.cssW,d.cssH,d.dpr);
+    if(keep.length&&prevRows===rows&&prevCols===cols)columns=keep;
     last=0; // a fresh dt, so the resize does not integrate one huge step
     paint();
   } else if(d.type==="pointer"&&ctx){
