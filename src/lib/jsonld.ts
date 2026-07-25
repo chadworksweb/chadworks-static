@@ -36,7 +36,7 @@ export function personNode() {
       "Web Development",
       "Search Engine Optimization",
       "Generative Engine Optimization",
-      "AI Visibility",
+      "AI Search Visibility",
       "WordPress",
       "Ecommerce",
       "Static Site Architecture",

@@ -147,7 +147,21 @@ function clockRelease() {
   if (clock.running === 0) clock.lastTs = 0; // reset so resume doesn't jump
 }
 
-export function Ribbon({ className, mask = false }: { className?: string; mask?: boolean }) {
+// The three hue pairs, in triad order. `rotate` shifts which pair lands on which
+// PATH: the motion of each ribbon is unchanged, only its colour moves round the
+// triad. 0 is the sitewide default; a page can pass 1 or 2 to recolour the band
+// without inventing new hues or forking the component.
+const TRIAD = [RIBBON_A, RIBBON_B, RIBBON_C];
+
+export function Ribbon({
+  className,
+  mask = false,
+  rotate = 0,
+}: {
+  className?: string;
+  mask?: boolean;
+  rotate?: 0 | 1 | 2;
+}) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -196,9 +210,16 @@ export function Ribbon({ className, mask = false }: { className?: string; mask?:
           },
         });
 
-      const matA = makeMat(RIBBON_A);
-      const matB = makeMat(RIBBON_B);
-      const matC = makeMat(RIBBON_C);
+      // Path (phase) stays with its slot; the colour comes from the rotated
+      // position in the triad.
+      const slot = (i: number) => ({
+        phase: TRIAD[i].phase,
+        dark: TRIAD[(i + rotate) % 3].dark,
+        light: TRIAD[(i + rotate) % 3].light,
+      });
+      const matA = makeMat(slot(0));
+      const matB = makeMat(slot(1));
+      const matC = makeMat(slot(2));
       const meshA = new THREE.Mesh(geo, matA);
       const meshB = new THREE.Mesh(geo, matB);
       const meshC = new THREE.Mesh(geo, matC);
@@ -282,7 +303,7 @@ export function Ribbon({ className, mask = false }: { className?: string; mask?:
       disposed = true;
       cleanup();
     };
-  }, []);
+  }, [mask, rotate]);
 
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }

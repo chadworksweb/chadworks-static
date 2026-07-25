@@ -19,7 +19,7 @@ export const aiSearchVisibility: Service = {
   eyebrow: "Being the answer, not just a result",
   title: "AI Search Visibility",
   intent:
-    "chadworks runs AI visibility as an ongoing service: the SEO, structured data, profiles, and answer-shaped pages that get a business recommended by ChatGPT and Google's AI.",
+    "chadworks runs AI search visibility as an ongoing service: the SEO, structured data, profiles, and answer-shaped pages that get a business recommended by ChatGPT and Google's AI.",
 
   answer: (
     <>
@@ -196,7 +196,7 @@ export const aiSearchVisibility: Service = {
     figure: HOURLY_RATE,
     figureSub: "Retained monthly, scoped in writing first",
     body:
-      `AI visibility runs as a monthly retainer built on my ${money(HOURLY)} hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.`,
+      `AI search visibility runs as a monthly retainer built on my ${money(HOURLY)} hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}if the one-time audit is all your
@@ -207,10 +207,10 @@ export const aiSearchVisibility: Service = {
   },
 
   faqLead:
-    "The questions buyers ask about AI visibility, answered the way I'd answer them on a call.",
+    "The questions buyers ask about AI search visibility, answered the way I'd answer them on a call.",
   faqs: [
     {
-      q: "What is AI visibility, exactly?",
+      q: "What is AI search visibility, exactly?",
       a: "Being found and recommended by AI assistants like ChatGPT, and by Google's AI answers, instead of just appearing in classic results. The work is real SEO plus structured data, consistent profiles, and pages written so an engine can quote them.",
     },
     {
@@ -309,6 +309,6 @@ export const aiSearchVisibility: Service = {
   meta: {
     title: "AI Search Visibility: Get Recommended by ChatGPT and Google AI | chadworks",
     description:
-      `AI visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. ${HOURLY_RATE}, scoped in writing.`,
+      `AI search visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. ${HOURLY_RATE}, scoped in writing.`,
   },
 };

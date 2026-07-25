@@ -6,8 +6,11 @@
 import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
 import { aiSearchVisibility as service } from "@/lib/services/ai-search-visibility";
-import { AiSearchFacetsCapsule, ProblemArtCapsule } from "@/components/capsules";
-import { AiChatDemo } from "@/components/art/AiChatDemo";
+import {
+  AiSearchFacetsCapsule,
+  AiDemoSplitCapsule,
+  ProblemCapsule,
+} from "@/components/capsules";
 import { serviceUrl } from "@/lib/service";
 
 export const metadata: Metadata = {
@@ -37,12 +40,11 @@ export default function AiSearchVisibilityPage() {
         // The chat mock runs SECOND, straight under the hero: the argument is
         // easier to show than to state. It moved up from the problem section,
         // so `problemArt` is dropped rather than rendering the same demo twice.
-        demo: (
-          <ProblemArtCapsule>
-            <AiChatDemo />
-          </ProblemArtCapsule>
-        ),
+        demo: <AiDemoSplitCapsule />,
         afterHero: <AiSearchFacetsCapsule />,
+        // Ribbon triad rotated one step on this page: same three brand hues,
+        // moved round to the next path each.
+        problem: <ProblemCapsule problem={service.problem} ribbonRotate={1} />,
         problemArt: null,
       }}
     />

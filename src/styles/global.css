@@ -5340,12 +5340,216 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   width: min(760px, 100%);
   margin-inline: auto;
 }
+
+/* --- AI DEMO SPLIT: the chat mock beside the inverted statement panel
+   (AiDemoSplitCapsule, second section on /ai-search-visibility/). The mock
+   carries its own 760px cap for the pages that run it full width, so inside
+   this grid the cap is released and the column decides the width. */
+.cw-demosplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: clamp(1.25rem, 2.6vw, 2.25rem);
+  align-items: stretch;
+}
+.cw-demosplit__demo { min-width: 0; }
+.cw-demosplit__demo .ai-demo { width: 100%; }
+/* The one inverted surface in the top half of the page, so it reads as the
+   raised voice rather than as another band. */
+.cw-demosplit__panel {
+  display: flex;
+  /* Column: the statement and its caveat stack, centred as a block. As a row
+     (the default) the fine print sat beside the headline instead of under it. */
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 0;
+  padding: clamp(1.75rem, 3.4vw, 3rem);
+  border-radius: var(--radius);
+  /* Shade-consistent: the deep indigo lifted toward the brand's own mid-purple
+     and back down, so it reads as one surface catching light rather than as two
+     colours meeting. Both stops are existing brand tokens, not new hues. */
+  background:
+    linear-gradient(
+      152deg,
+      var(--dark-bg) 0%,
+      color-mix(in srgb, var(--dark-bg) 82%, var(--accent)) 52%,
+      var(--dark-bg) 100%
+    );
+  box-shadow: 0 22px 50px rgba(36, 57, 137, 0.16), 0 6px 16px rgba(36, 57, 137, 0.08);
+}
+/* Mono, not the display face. The statement is the machine's observation about
+   the machine, and the terminal register says that before the words do. Mono
+   runs wide, so the size scale is a shade under the display equivalent and the
+   tracking is pulled in rather than pushed out. */
+.cw-demosplit__text {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 3.3vw, 3.15rem);
+  line-height: 1.14;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+.cw-demosplit__line { display: block; color: rgba(255, 255, 255, 0.62); }
+/* The caveat under the claim. Body face, not the mono of the statement: it is an
+   aside in Chad's voice, not more machine output. */
+.cw-demosplit__fine {
+  margin-top: clamp(1.1rem, 2.2vw, 1.75rem);
+  max-width: 34ch;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.58);
+}
+.cw-demosplit__fine a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration-color: rgba(255, 255, 255, 0.4);
+  text-underline-offset: 3px;
+}
+.cw-demosplit__fine a:hover { color: #fff; text-decoration-color: #fff; }
+/* The imperative is the half that has to land, so it keeps the full white. */
+.cw-demosplit__line--hit { color: #ffffff; }
+@media (max-width: 900px) {
+  .cw-demosplit { grid-template-columns: 1fr; }
+  .cw-demosplit__panel { order: -1; }
+}
 .ai-demo__window {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
   background: var(--bg-base);
   box-shadow: 0 22px 50px rgba(36, 57, 137, 0.10), 0 6px 16px rgba(36, 57, 137, 0.05);
   overflow: hidden;
+}
+
+/* The app shell: collapsed sidebar rail beside the conversation column. */
+.ai-demo__shell { display: flex; align-items: stretch; min-height: 0; }
+.ai-demo__main { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.ai-demo__rail {
+  flex: 0 0 auto;
+  width: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 0 0.8rem;
+  background: #f3effa;
+  border-right: 1px solid var(--border-subtle);
+}
+.ai-demo__railnew {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  color: var(--accent);
+}
+.ai-demo__railnew svg { width: 0.85rem; height: 0.85rem; }
+.ai-demo__railrows { display: flex; flex-direction: column; gap: 0.5rem; width: 1.5rem; }
+.ai-demo__railrows i { height: 4px; border-radius: 2px; background: #d9d2e8; }
+.ai-demo__railrows i:nth-child(1) { width: 100%; }
+.ai-demo__railrows i:nth-child(2) { width: 72%; }
+.ai-demo__railrows i:nth-child(3) { width: 88%; }
+.ai-demo__railrows i:nth-child(4) { width: 60%; }
+.ai-demo__railuser {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+}
+
+/* The model picker: the most recognisable piece of an assistant header. */
+.ai-demo__model {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-inline: auto;
+  padding: 0.22rem 0.5rem;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--border-subtle);
+}
+.ai-demo__chev { width: 0.7rem; height: 0.7rem; color: var(--text-tertiary); }
+
+/* Assistant avatar + the row it shares with the answer. */
+.ai-demo__row { display: flex; gap: 0.6rem; align-items: flex-start; min-width: 0; }
+.ai-demo__row .ai-demo__msg--ai { margin: 0; min-width: 0; }
+.ai-demo__avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.15rem;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  color: var(--accent);
+}
+.ai-demo__avatar svg { width: 1rem; height: 1rem; }
+
+/* Response toolbar under a resolved answer. */
+.ai-demo__acts {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+  color: var(--text-tertiary);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-smooth);
+}
+.ai-demo__acts.is-on { opacity: 1; }
+.ai-demo__acts i { position: relative; display: inline-flex; }
+.ai-demo__acts i:hover { color: var(--accent); }
+.ai-demo__acts i:hover .ai-demo__tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* The last two sit near the bubble's right edge; anchoring their bubbles right
+   keeps them inside the window, which clips. */
+.ai-demo__acts i:nth-last-child(-n + 2) .ai-demo__tip {
+  left: auto;
+  right: -0.35rem;
+  transform: translateY(4px);
+}
+.ai-demo__acts i:nth-last-child(-n + 2) .ai-demo__tip::after {
+  left: auto;
+  right: 0.75rem;
+  margin-left: 0;
+}
+.ai-demo__acts i:nth-last-child(-n + 2):hover .ai-demo__tip {
+  transform: translateY(0);
+}
+.ai-demo__acts svg { width: 0.85rem; height: 0.85rem; }
+
+/* The model-disclaimer line every assistant runs under its composer. */
+.ai-demo__disclaimer {
+  padding: 0 0.9rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+
+/* The attachment clip inside the field. */
+.ai-demo__clip { width: 0.95rem; height: 0.95rem; flex: 0 0 auto; color: var(--text-tertiary); margin-right: 0.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .ai-demo__acts { transition: none; }
+}
+@media (max-width: 560px) {
+  .ai-demo__rail { display: none; }
 }
 
 /* Window chrome bar (the design-reveal bar, verbatim treatment) */
@@ -5371,29 +5575,31 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
 }
-/* Replay. Sits at the right of the chrome so it never displaces the composer.
-   Offset by the dots' own width on the left so the centred title stays centred. */
+/* Replay. Last in the composer row, to the RIGHT of the send button. Ghosted
+   rather than filled so the (fake) send stays the visual anchor of the row. */
 .ai-demo__replay {
+  position: relative;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  margin-right: -0.2rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
-  border: 0;
+  border: 1px solid var(--border-subtle);
   border-radius: 50%;
   background: transparent;
   color: var(--text-tertiary);
   cursor: pointer;
-  transition: color 0.25s var(--ease-smooth), background-color 0.25s var(--ease-smooth);
+  transition: color 0.25s var(--ease-smooth), background-color 0.25s var(--ease-smooth),
+    border-color 0.25s var(--ease-smooth);
 }
-.ai-demo__replay svg { width: 0.95rem; height: 0.95rem; }
+.ai-demo__replay svg { width: 1rem; height: 1rem; }
 .ai-demo__replay:hover,
 .ai-demo__replay:focus-visible {
   color: var(--accent);
   background: rgba(128, 84, 188, 0.1);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) .ai-demo__replay { transition: none; }
@@ -5413,6 +5619,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   min-width: 0;
   display: flex;
   align-items: center;
+  gap: 0;
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--border-subtle);
   border-radius: 999px;
@@ -5424,6 +5631,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   color: var(--text-tertiary);
 }
 .ai-demo__send {
+  position: relative;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -5435,6 +5643,56 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   color: #fff;
 }
 .ai-demo__send svg { width: 1rem; height: 1rem; }
+/* The joke tooltip on the fake send button. Same bubble treatment as
+   .cw-soon__tip, centred on its anchor. */
+.ai-demo__tip {
+  position: absolute;
+  bottom: calc(100% + 0.45rem);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 5;
+  white-space: nowrap;
+  padding: 0.32rem 0.6rem;
+  border-radius: 7px;
+  background: var(--dark-bg);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease-smooth), transform 0.22s var(--ease-smooth);
+}
+.ai-demo__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border: 5px solid transparent;
+  border-top-color: var(--dark-bg);
+}
+.ai-demo__send:hover .ai-demo__tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+/* Replay is the LAST control in the row, so a centred bubble runs past the
+   window's clipped edge. Anchor this one to its right instead. */
+.ai-demo__replay .ai-demo__tip {
+  left: auto;
+  right: 0;
+  transform: translateY(4px);
+}
+.ai-demo__replay .ai-demo__tip::after { left: auto; right: 0.75rem; margin-left: 0; }
+.ai-demo__replay:hover .ai-demo__tip,
+.ai-demo__replay:focus-visible .ai-demo__tip {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .ai-demo__tip { transition: none; }
+}
 
 /* The thread. min-height reserves the final conversation's space so the
    typing sequence never shifts layout below the window (CLS green). */
@@ -5444,6 +5702,11 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   gap: 1rem;
   padding: 1.4rem 1.5rem 1.6rem;
   min-height: 21rem;
+  /* Conversation text sits 15% under the page's body size: an assistant's own
+     UI runs smaller than article copy, and the mock reads more like software
+     for being a notch tighter than the prose around it. `em` so everything in
+     the thread scales together off the one number. */
+  font-size: 0.85em;
 }
 .ai-demo__msg {
   max-width: 85%;
@@ -5475,20 +5738,39 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   display: block;
   transition: opacity 0.45s var(--ease-smooth);
 }
+.ai-demo__answer > * + * { margin-top: 0.55rem; }
+/* Text that has not streamed yet. It occupies its exact final space but is not
+   painted, so the answer grows in place instead of pushing the page down while
+   it runs, and every word is in the DOM from the first frame for extraction. */
+.ai-demo__pending { visibility: hidden; }
+/* A row's own treatment waits until the stream reaches it, so the shortlist
+   does not sit there as three empty boxes before the words arrive. */
+.ai-demo__pickrow {
+  transition: background-color 0.3s var(--ease-smooth), border-color 0.3s var(--ease-smooth);
+}
+.ai-demo__marker { opacity: 0; transition: opacity 0.25s var(--ease-smooth); }
+.ai-demo__marker.is-on { opacity: 1; }
+.ai-demo__sources { opacity: 0; transition: opacity 0.4s var(--ease-smooth); }
+.ai-demo__sources.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .ai-demo__pickrow,
+  html:not(.cw-force-motion) .ai-demo__marker,
+  html:not(.cw-force-motion) .ai-demo__sources { transition: none; }
+}
 
 /* Motion-hiding ONLY where scripting runs: no-JS UAs and crawlers render
    the conversation complete. */
 @media (scripting: enabled) {
   .ai-demo__msg--user { opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth); }
   .ai-demo__msg--user.is-on { opacity: 1; transform: none; }
-  .ai-demo__msg--ai { opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth); }
-  .ai-demo__msg--ai.is-on { opacity: 1; transform: none; }
+  .ai-demo__row { opacity: 0; transform: translateY(6px); transition: opacity 0.4s var(--ease-smooth), transform 0.4s var(--ease-smooth); }
+  .ai-demo__row.is-on { opacity: 1; transform: none; }
   .ai-demo__answer { opacity: 0; }
   .ai-demo__answer.is-on { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
-    .ai-demo__msg--user, .ai-demo__msg--ai { opacity: 1; transform: none; transition: none; }
+    .ai-demo__msg--user, .ai-demo__row { opacity: 1; transform: none; transition: none; }
     .ai-demo__answer { opacity: 1; transition: none; }
   }
 }
@@ -5533,22 +5815,80 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 
 /* The recommendation line -- the highlighted pick */
-.ai-demo__pick {
-  display: block;
-  margin-block: 0.45rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 6px;
-  background: rgba(128, 84, 188, 0.12);
-  color: var(--accent);
-  font-weight: 600;
+/* The cited shortlist. A real generated answer returns a ranked set with a
+   marker per item and a sources strip underneath, so the mock returns one too.
+   The top row is the only tinted one: the whole point of the page is which
+   name lands in slot 1. */
+.ai-demo__lead { margin: 0; }
+.ai-demo__picks {
+  margin: 0.7rem 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  counter-reset: none;
 }
-
-.ai-demo__caption {
-  margin-top: var(--space-sm);
-  text-align: center;
-  font-size: var(--text-sm);
+.ai-demo__pickrow {
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+.ai-demo__pickrow.is-top.is-reached {
+  background: rgba(128, 84, 188, 0.12);
+  border-color: rgba(128, 84, 188, 0.22);
+}
+.ai-demo__pickname { font-weight: 700; color: var(--text-primary); }
+.ai-demo__pickrow.is-top .ai-demo__pickname { color: var(--accent); }
+.ai-demo__pickdetail { color: var(--text-secondary); }
+.ai-demo__marker {
+  margin-left: 0.12rem;
+  font-family: var(--font-mono);
+  font-size: 0.58em;
+  font-weight: 500;
+  color: var(--accent);
+  vertical-align: super;
+  line-height: 0;
+}
+.ai-demo__tail { margin: 0; }
+.ai-demo__sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.ai-demo__sourceslabel {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-right: 0.15rem;
+}
+.ai-demo__source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.16rem 0.44rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  font-size: 0.66rem;
   color: var(--text-secondary);
 }
+.ai-demo__source b {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* .ai-demo__caption removed 2026-07-25 -- the mock now carries its own
+   in-window disclaimer line and the statement panel beside it makes the point,
+   so the caption underneath was saying it a third time. */
 
 @media (max-width: 600px) {
   .ai-demo__thread { padding: 1.1rem 1rem 1.3rem; min-height: 27rem; }

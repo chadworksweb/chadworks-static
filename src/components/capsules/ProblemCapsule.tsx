@@ -10,16 +10,21 @@ import { ProblemMore } from "@/components/ProblemMore";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type ProblemCapsuleProps = { problem: Service["problem"] };
+export type ProblemCapsuleProps = {
+  problem: Service["problem"];
+  // Rotate the ribbon triad for this page (see Ribbon). Both passes take the
+  // same value or the knockout coverage stops matching the colour band.
+  ribbonRotate?: 0 | 1 | 2;
+};
 
-export function ProblemCapsule({ problem }: ProblemCapsuleProps) {
+export function ProblemCapsule({ problem, ribbonRotate = 0 }: ProblemCapsuleProps) {
   return (
     <SectionShell full className="svc-block svc-problem">
       {/* visible colored ribbons (behind) -- sticky band inside a full-height
           rail: stays half-visible at the viewport top while the opened
           pop-down glides over it, until the section is scrolled through. */}
       <div className="svc-gradient-pin">
-        <Ribbon className="svc-gradient" />
+        <Ribbon className="svc-gradient" rotate={ribbonRotate} />
       </div>
 
       {/* real, accessible text -- dark blue over the page */}
@@ -54,7 +59,7 @@ export function ProblemCapsule({ problem }: ProblemCapsuleProps) {
           it. The duplicate is presentational; the heading above is the only
           real one in the DOM. */}
       <div className="svc-knockout" aria-hidden="true">
-        <Ribbon className="svc-knockout__cov" mask />
+        <Ribbon className="svc-knockout__cov" mask rotate={ribbonRotate} />
         <div className="svc-knockout__text">
           <div className="svc-block__heading">{problem.heading}</div>
           {problem.subheading && (

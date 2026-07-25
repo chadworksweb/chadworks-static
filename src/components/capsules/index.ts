@@ -6,6 +6,7 @@ export { W, ArrowRight, CheckIcon, CtaButton } from "./shared";
 export { HeroCapsule } from "./HeroCapsule";
 export { KeyFactsCapsule } from "./KeyFactsCapsule";
 export { AiSearchFacetsCapsule } from "./AiSearchFacetsCapsule";
+export { AiDemoSplitCapsule } from "./AiDemoSplitCapsule";
 export { ProblemCapsule, ProblemArtCapsule } from "./ProblemCapsule";
 export { ApproachCapsule } from "./ApproachCapsule";
 export { ProcessCapsule } from "./ProcessCapsule";
