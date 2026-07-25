@@ -43,6 +43,7 @@ import {
 // slot's node; `null` DROPS it.
 export type ServiceSlot =
   | "hero"
+  | "demo"
   | "afterHero"
   | "keyFacts"
   | "problem"
@@ -95,6 +96,10 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
         }
       />
     ),
+    // Optional demonstration slot, the FIRST thing under the hero. For a page
+    // whose argument is easier to show than to state (the AI chat mock on
+    // /ai-search-visibility/). Opt in via `overrides.demo`.
+    demo: null,
     // Optional interstitial between the hero and the key facts. No Service
     // field feeds it; a page opts in via `overrides.afterHero` (the pattern
     // `explainer` already uses further down the order).
@@ -145,6 +150,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
 
   const order: ServiceSlot[] = [
     "hero",
+    "demo",
     "afterHero",
     "keyFacts",
     "problem",

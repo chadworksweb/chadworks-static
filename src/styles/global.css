@@ -5371,6 +5371,70 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   letter-spacing: 0.04em;
   color: var(--text-tertiary);
 }
+/* Replay. Sits at the right of the chrome so it never displaces the composer.
+   Offset by the dots' own width on the left so the centred title stays centred. */
+.ai-demo__replay {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: -0.2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: color 0.25s var(--ease-smooth), background-color 0.25s var(--ease-smooth);
+}
+.ai-demo__replay svg { width: 0.95rem; height: 0.95rem; }
+.ai-demo__replay:hover,
+.ai-demo__replay:focus-visible {
+  color: var(--accent);
+  background: rgba(128, 84, 188, 0.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .ai-demo__replay { transition: none; }
+}
+
+/* The composer. Decorative -- there is no real input here (see the component),
+   so nothing in this row is focusable or announced. */
+.ai-demo__composer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem 0.9rem;
+  border-top: 1px solid var(--border-subtle);
+}
+.ai-demo__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--bg-surface);
+}
+.ai-demo__placeholder {
+  font-size: 0.85rem;
+  line-height: 1;
+  color: var(--text-tertiary);
+}
+.ai-demo__send {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+}
+.ai-demo__send svg { width: 1rem; height: 1rem; }
 
 /* The thread. min-height reserves the final conversation's space so the
    typing sequence never shifts layout below the window (CLS green). */

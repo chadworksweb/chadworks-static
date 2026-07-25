@@ -26,6 +26,14 @@ export function AiChatDemo() {
   const [phase, setPhase] = useState(0);
   const [chars, setChars] = useState(0);
 
+  // Replay runs the whole sequence again from an empty composer. Kept separate
+  // from the IntersectionObserver's one-shot start, so scrolling back past the
+  // demo never re-triggers it on its own: the reader has to ask for the repeat.
+  const replay = () => {
+    setChars(0);
+    setPhase(1);
+  };
+
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -65,11 +73,29 @@ export function AiChatDemo() {
   return (
     <div ref={rootRef} className="ai-demo">
       <div className="ai-demo__window">
-        <div className="ai-demo__bar" aria-hidden="true">
-          <span className="ai-demo__dot" />
-          <span className="ai-demo__dot" />
-          <span className="ai-demo__dot" />
-          <span className="ai-demo__title">an AI assistant</span>
+        <div className="ai-demo__bar">
+          <span className="ai-demo__dot" aria-hidden="true" />
+          <span className="ai-demo__dot" aria-hidden="true" />
+          <span className="ai-demo__dot" aria-hidden="true" />
+          <span className="ai-demo__title">ChadGPT</span>
+          <button
+            type="button"
+            className="ai-demo__replay"
+            onClick={replay}
+            title="Replay"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M20 12a8 8 0 1 1-2.34-5.66"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <path d="M20 3.4V9h-5.6z" fill="currentColor" />
+            </svg>
+            <span className="sr-only">Replay the conversation</span>
+          </button>
         </div>
         <div className="ai-demo__thread">
           <div className={`ai-demo__msg ai-demo__msg--user${phase >= 1 ? " is-on" : ""}`}>
@@ -96,6 +122,27 @@ export function AiChatDemo() {
               {ANSWER_TAIL}
             </span>
           </div>
+        </div>
+        {/* The composer, kept intact under the thread so the window reads as a
+            real chat surface. Styled, never a live <input>: a focusable field
+            that does nothing is worse than an obvious mock, and it would park a
+            dead form control in the tab order. */}
+        <div className="ai-demo__composer" aria-hidden="true">
+          <span className="ai-demo__field">
+            <span className="ai-demo__placeholder">Ask anything</span>
+          </span>
+          <span className="ai-demo__send">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M5 12h13M13 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
         </div>
       </div>
       <p className="ai-demo__caption">

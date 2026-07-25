@@ -6,7 +6,8 @@
 import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
 import { aiSearchVisibility as service } from "@/lib/services/ai-search-visibility";
-import { AiSearchFacetsCapsule } from "@/components/capsules";
+import { AiSearchFacetsCapsule, ProblemArtCapsule } from "@/components/capsules";
+import { AiChatDemo } from "@/components/art/AiChatDemo";
 import { serviceUrl } from "@/lib/service";
 
 export const metadata: Metadata = {
@@ -32,7 +33,18 @@ export default function AiSearchVisibilityPage() {
   return (
     <ServiceTemplate
       service={service}
-      overrides={{ afterHero: <AiSearchFacetsCapsule /> }}
+      overrides={{
+        // The chat mock runs SECOND, straight under the hero: the argument is
+        // easier to show than to state. It moved up from the problem section,
+        // so `problemArt` is dropped rather than rendering the same demo twice.
+        demo: (
+          <ProblemArtCapsule>
+            <AiChatDemo />
+          </ProblemArtCapsule>
+        ),
+        afterHero: <AiSearchFacetsCapsule />,
+        problemArt: null,
+      }}
     />
   );
 }
