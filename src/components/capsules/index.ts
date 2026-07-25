@@ -5,6 +5,7 @@ export { PageComposer, JsonLd } from "./PageComposer";
 export { W, ArrowRight, CheckIcon, CtaButton } from "./shared";
 export { HeroCapsule } from "./HeroCapsule";
 export { KeyFactsCapsule } from "./KeyFactsCapsule";
+export { AiSearchFacetsCapsule } from "./AiSearchFacetsCapsule";
 export { ProblemCapsule, ProblemArtCapsule } from "./ProblemCapsule";
 export { ApproachCapsule } from "./ApproachCapsule";
 export { ProcessCapsule } from "./ProcessCapsule";

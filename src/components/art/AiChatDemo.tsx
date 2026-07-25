@@ -1,6 +1,6 @@
 "use client";
 
-// AI-answer demo for /ai-viz/ -- a chat window where a buyer's question
+// AI-answer demo for /ai-search-visibility/ -- a chat window where a buyer's question
 // types out and the assistant's answer resolves, with the recommendation
 // line highlighted. Pure DOM typing (no canvas), IntersectionObserver
 // gated, reduced-motion and no-JS render the final state (all text is real

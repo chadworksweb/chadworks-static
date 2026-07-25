@@ -104,8 +104,8 @@ const WEBSITE_SUBS: { title: string; href: string; body: string }[] = [
 
 const VISIBILITY_SUBS: { title: string; href: string; body: string | ReactNode }[] = [
   {
-    title: "AI Visibility",
-    href: "/ai-viz/",
+    title: "AI Search Visibility",
+    href: "/ai-search-visibility/",
     body: (
       <>
         AI Visibility (aka AI Viz) is an emerging service focused on getting

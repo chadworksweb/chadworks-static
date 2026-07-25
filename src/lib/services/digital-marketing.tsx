@@ -128,9 +128,9 @@ export const digitalMarketing: Service = {
       "When the triage points somewhere specific, these are the doors it points to.",
     items: [
       {
-        label: "AI Visibility",
+        label: "AI Search Visibility",
         detail: "The umbrella for being found and recommended: search, AI answers, and the profiles engines trust.",
-        href: "/ai-viz/",
+        href: "/ai-search-visibility/",
       },
       {
         label: "SEO",

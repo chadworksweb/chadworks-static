@@ -26,7 +26,7 @@ export function AdvertisingHero() {
       </div>
       <div className="cw-art-hero__content">
         <nav className="cw-art-hero__eyebrow cw-art-hero__crumbs" aria-label="Breadcrumb">
-          <Link href="/ai-viz/">ChatGPT Ads</Link>
+          <Link href="/ai-search-visibility/">ChatGPT Ads</Link>
           <span aria-hidden="true">&nbsp;/&nbsp;</span>
           <span aria-current="page">Managed campaigns</span>
         </nav>

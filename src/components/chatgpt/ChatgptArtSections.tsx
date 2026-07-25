@@ -27,7 +27,7 @@ export function ChatgptHero() {
       </div>
       <div className="cw-art-hero__content">
         <nav className="cw-art-hero__eyebrow cw-art-hero__crumbs" aria-label="Breadcrumb">
-          <Link href="/ai-viz/">AI Visibility</Link>
+          <Link href="/ai-search-visibility/">AI Search Visibility</Link>
           <span aria-hidden="true">&nbsp;/&nbsp;</span>
           <span aria-current="page">GEO</span>
         </nav>

@@ -1339,6 +1339,9 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .svc-btn__label,
 .svc-btn__arrow { position: relative; z-index: 1; }
 .svc-btn__arrow { width: 1.4em; height: 1em; fill: currentColor; flex-shrink: 0; }
+/* Same glyph, quarter turn: a CTA that jumps to the next section on the page
+   rather than navigating away. */
+.svc-btn__arrow--down { transform: rotate(90deg); }
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     .svc-btn::before { transition: none; }
@@ -1509,6 +1512,10 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    shared 8px. */
 .cw-webdev-glance .svc-statements__heading {
   top: 7px;
+}
+/* AI Search Visibility page only: 2px lift off the shared 8px. */
+.cw-aisearch-glance .svc-statements__heading {
+  top: 6px;
 }
 /* The era-timeline heading (About) drops the white glyph outline the shared
    statements heading carries -- solid indigo only, no stroke. */
@@ -1939,6 +1946,100 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .svc-faq__intro > .eyebrow { display: block; margin-bottom: var(--space-2xs); }
 .svc-dark .eyebrow,
 .svc-faq-section--dark .eyebrow { color: #c9b3ec; }
+
+/* --- AI SEARCH FACETS -- the /ai-search-visibility/ breakdown section. The
+   prose stack keeps its own reading measure; the visual is an overlay pinned to
+   the right of the section, deliberately crossing over the text so the glass has
+   something to bend. Positioned (not a grid column) because the stack must run
+   full measure underneath it. */
+/* Anchor target for the hero's "Learn more" jump: clear the fixed header so
+   the section heading is not parked underneath it on arrival. */
+.cw-facets-section { scroll-margin-top: 5.5rem; }
+.cw-facets { position: relative; }
+.cw-facets__viz {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  width: min(52%, 34rem);
+  pointer-events: none;
+  /* BEHIND the copy: the frosted paragraph panels ride over the gem, so the
+     crystal is read through their blur rather than covering the sentences. */
+  z-index: 0;
+}
+/* Lifted above the visual so the homepage frost (rgba white + blur(5px)) has the
+   gem to work on. Same classes as the homepage lane blocks, untouched. */
+.cw-facets__stack {
+  position: relative;
+  z-index: 1;
+}
+/* Grouped into onsite / offsite / technical bands. The gap between groups is
+   wider than the gap between items inside one, which is the whole job: the
+   reader should see four bands before they see nine questions. */
+.cw-facets__group + .cw-facets__group { margin-top: clamp(2.25rem, 4vw, 3.25rem); }
+.cw-facets__grouplabel { display: block; margin-bottom: var(--space-2xs); }
+/* The stack's own top margin already spaces the first group off the heading. */
+.cw-facets__group .cw-lane-subs { margin-top: var(--space-sm); }
+/* The fade itself is driven from <ScrollFade> (rAF, compositor-only opacity
+   writes) rather than CSS, because view timelines are not available widely
+   enough to be the mechanism. This is only the resting state + the escape
+   hatches: no JS, paused motion, or a reduced-motion reader all land on a fully
+   visible gem rather than an invisible one. */
+.cw-facets__plate { will-change: opacity; }
+html.cw-motion-paused .cw-facets__plate { opacity: 1 !important; }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-facets__plate { opacity: 1 !important; }
+}
+/* Pinned to the MIDDLE of the viewport, not its top.
+   The sticky box itself is ZERO height and carries the `top: 50vh` offset, so it
+   parks a bare line at mid-screen; the plate hangs off it, absolutely positioned
+   and pulled back half its own height to straddle that line. A sticky box with
+   real height would eat its own travel (it can never leave its containing block,
+   so a 363px plate under a 700px offset gets clamped on the first pixel of
+   scroll and just rides away -- which is what it was doing). Zero height gives
+   the full container back as travel. */
+.cw-facets__sticky {
+  position: sticky;
+  top: 50vh;
+  height: 0;
+}
+.cw-facets__plate {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  transform: translateY(-50%);
+  aspect-ratio: 3 / 2;
+  display: grid;
+  place-items: center;
+}
+.cw-facets__plate > * { grid-area: 1 / 1; width: 100%; height: 100%; }
+/* The braille dot field, same 4.5px grid as the GoingToBat cutout, re-masked to
+   pool the grain behind the gem instead of behind a figure. */
+.cw-facets__grain {
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.5) 0.5px, transparent 0.9px),
+    radial-gradient(circle, color-mix(in srgb, var(--grad-deep) 26%, transparent) 1.3px, transparent 1.7px);
+  background-size: 4.5px 4.5px, 4.5px 4.5px;
+  -webkit-mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, #000 38%, transparent 78%);
+  mask-image: radial-gradient(ellipse 52% 52% at 50% 50%, #000 38%, transparent 78%);
+}
+/* The glass plate. The first declaration is the universal fallback; the second
+   adds the SVG displacement where backdrop-filter accepts a url() filter, which
+   is what actually bends the sentences passing behind it. */
+.cw-facets__glass {
+  -webkit-backdrop-filter: blur(1.4px) saturate(1.3);
+  backdrop-filter: blur(1.4px) saturate(1.3);
+  backdrop-filter: url(#cw-facets-refract) blur(1.4px) saturate(1.3);
+  -webkit-mask-image: radial-gradient(ellipse 58% 52% at 44% 50%, #000 46%, transparent 86%);
+  mask-image: radial-gradient(ellipse 58% 52% at 44% 50%, #000 46%, transparent 86%);
+}
+/* Held still (no spin) -- the gem is the lens, not the animation. */
+.cw-facets__gem { aspect-ratio: 3 / 2; }
+.cw-facets__defs { position: absolute; width: 0; height: 0; }
+/* Under the two-column threshold the overlay would sit on top of the copy with
+   nowhere to go, so it drops out and the stack runs full width. */
+@media (max-width: 900px) {
+  .cw-facets__viz { display: none; }
+}
 
 /* --- Cost-calculator intro: prose beside a static "at a glance" panel. The
    panel is server-rendered HTML (not the WebGL readout at the top of the page),
@@ -5227,7 +5328,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 
 /* =====================================================================
-   AI CHAT DEMO -- the /ai-viz/ problem-section signature. A chat window
+   AI CHAT DEMO -- the /ai-search-visibility/ problem-section signature. A chat window
    (the design-reveal browser-chrome treatment, re-cut as an assistant
    thread): the buyer's question types out, the assistant thinks, the
    answer resolves with the recommendation line highlighted. All text is

@@ -64,7 +64,7 @@ export const septic: Service = {
       and the assistants name you for{" "}
       <Link href="/industries-served/">your town and your service</Link>. Want it found in
       AI answers too?{" "}
-      <Link href="/ai-viz/">AI visibility</Link> rides on top of the same build.
+      <Link href="/ai-search-visibility/">AI visibility</Link> rides on top of the same build.
     </>
   ),
 

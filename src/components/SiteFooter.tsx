@@ -68,7 +68,7 @@ const COLUMNS: FooterGroup[][] = [
       heading: "Visibility",
       href: "/visibility/",
       links: [
-        { href: "/ai-viz/", label: "AI Visibility" },
+        { href: "/ai-search-visibility/", label: "AI Search Visibility" },
         { href: "/ai-visibility-audit/", label: "AI Visibility Audit" },
         { href: "/seo/", label: "SEO" },
         { href: "/digital-marketing/", label: "Digital Marketing" },

@@ -32,7 +32,7 @@ export type HeroCapsuleProps = {
   eyebrow: string;
   answer?: ReactNode | Prompted;
   heroArt?: ReactNode;
-  cta?: { href: string; buttonLabel: string };
+  cta?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
   // standalone overrides
   crumbs?: Crumb[];
   lede?: ReactNode;
@@ -104,7 +104,7 @@ export function HeroCapsule({
 
       {cta && (
         <div className="svc-hero__cta">
-          <CtaButton href={cta.href} label={cta.buttonLabel} />
+          <CtaButton href={cta.href} label={cta.buttonLabel} arrow={cta.arrow} />
         </div>
       )}
     </SectionShell>

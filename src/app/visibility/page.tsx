@@ -50,9 +50,9 @@ const hub: HubConfig = {
   },
   lanes: [
     {
-      label: "AI Visibility",
+      label: "AI Search Visibility",
       detail: "The umbrella, sold as an ongoing service: be found and quoted by the AI assistants people now ask, with the SEO and presence work that requires.",
-      href: "/ai-viz/",
+      href: "/ai-search-visibility/",
     },
     {
       label: "AI Visibility Audit",

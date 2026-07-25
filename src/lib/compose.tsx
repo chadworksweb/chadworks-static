@@ -43,6 +43,7 @@ import {
 // slot's node; `null` DROPS it.
 export type ServiceSlot =
   | "hero"
+  | "afterHero"
   | "keyFacts"
   | "problem"
   | "problemArt"
@@ -89,9 +90,15 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
         eyebrow={s.eyebrow}
         answer={s.answer}
         heroArt={s.heroArt}
-        cta={{ href: s.cta.href, buttonLabel: s.cta.buttonLabel }}
+        cta={
+          s.heroCta ?? { href: s.cta.href, buttonLabel: s.cta.buttonLabel }
+        }
       />
     ),
+    // Optional interstitial between the hero and the key facts. No Service
+    // field feeds it; a page opts in via `overrides.afterHero` (the pattern
+    // `explainer` already uses further down the order).
+    afterHero: null,
     keyFacts: (
       <KeyFactsCapsule
         heading={s.keyFactsHeading}
@@ -138,6 +145,7 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
 
   const order: ServiceSlot[] = [
     "hero",
+    "afterHero",
     "keyFacts",
     "problem",
     "problemArt",

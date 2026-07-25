@@ -1,6 +1,6 @@
 // Service: SEO (Visibility lane) -- the classic discipline, sold honestly:
 // still real, still working, and now the foundation layer of AI visibility.
-// The narrative routes UP into /ai-viz/ per the consolidation thesis. Proof
+// The narrative routes UP into /ai-search-visibility/ per the consolidation thesis. Proof
 // leads with the Brooklyn psychologist page-one result (ANONYMIZED per
 // CWS-ARCHIVE-INTELLIGENCE; phrase paraphrased, no quote, until Chad clears
 // it). problemArt = the VisibilitySpectrum scale. Copy in Chad's public
@@ -56,7 +56,7 @@ export const seo: Service = {
       rank, and the honest update is that SEO didn&apos;t die. It became
       the foundation: search engines and AI assistants decide from the same
       signals, which is why this page eventually points you at{" "}
-      <Link href="/ai-viz/">AI Visibility</Link>.
+      <Link href="/ai-search-visibility/">AI Search Visibility</Link>.
     </>
   ),
 
@@ -136,9 +136,9 @@ export const seo: Service = {
       "SEO stands on its own. It also happens to be the first half of something bigger.",
     items: [
       {
-        label: "AI Visibility",
+        label: "AI Search Visibility",
         detail: "Rankings plus the AI answers they feed: the whole stack, retained and maintained.",
-        href: "/ai-viz/",
+        href: "/ai-search-visibility/",
       },
       {
         label: "AI Visibility Audit",

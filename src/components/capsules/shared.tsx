@@ -21,10 +21,13 @@ export function W({ value }: { value: Writable | React.ReactNode }) {
 }
 
 // long-arrow-alt-right (Font Awesome solid) -- inline so there's no icon dep.
-export function ArrowRight() {
+// `down` rotates the same glyph a quarter turn rather than shipping a second
+// path, so a jump-to-the-next-section CTA reads as "keep going" without the
+// button picking up a different icon weight.
+export function ArrowRight({ down = false }: { down?: boolean }) {
   return (
     <svg
-      className="svc-btn__arrow"
+      className={"svc-btn__arrow" + (down ? " svc-btn__arrow--down" : "")}
       viewBox="0 0 448 512"
       aria-hidden="true"
       focusable="false"
@@ -56,11 +59,19 @@ export function CheckIcon() {
 // Every CTA button: label + the default long-arrow-alt-right icon.
 // THE sitewide CTA (design-system BUTTONS standard) -- standalone pages call it
 // too instead of re-rendering their own button markup.
-export function CtaButton({ href, label }: { href: string; label: string }) {
+export function CtaButton({
+  href,
+  label,
+  arrow = "right",
+}: {
+  href: string;
+  label: string;
+  arrow?: "right" | "down";
+}) {
   return (
     <Link href={href} className="svc-btn">
       <span className="svc-btn__label">{label}</span>
-      <ArrowRight />
+      <ArrowRight down={arrow === "down"} />
     </Link>
   );
 }

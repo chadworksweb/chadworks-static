@@ -1,8 +1,12 @@
-// Route: /ai-viz/ -- a Service page. Thin by design.
+// Route: /ai-search-visibility/ -- a Service page. Thin by design.
+// The one non-default slot: `afterHero` carries the query-shaped breakdown
+// section (the ChatGPT questions buyers actually ask), placed between the hero
+// and the key facts.
 
 import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
-import { aiViz as service } from "@/lib/services/ai-viz";
+import { aiSearchVisibility as service } from "@/lib/services/ai-search-visibility";
+import { AiSearchFacetsCapsule } from "@/components/capsules";
 import { serviceUrl } from "@/lib/service";
 
 export const metadata: Metadata = {
@@ -24,6 +28,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AiVizPage() {
-  return <ServiceTemplate service={service} />;
+export default function AiSearchVisibilityPage() {
+  return (
+    <ServiceTemplate
+      service={service}
+      overrides={{ afterHero: <AiSearchFacetsCapsule /> }}
+    />
+  );
 }

@@ -255,6 +255,11 @@ export type Service = {
 
   // --- conversion (checklist 7) --------------------------------------
   cta: { heading: string; body: Writable; buttonLabel: string; href: string };
+  // OPTIONAL: a different button in the HERO than the one in the CTA section.
+  // Absent everywhere by default, in which case the hero mirrors `cta`. Set it
+  // when the hero's job is to move the reader DOWN the page (an in-page anchor
+  // with `arrow: "down"`) rather than out to the contact form.
+  heroCta?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
   // The page's own comprehensive lead form, rendered in the RIGHT HALF of
   // the CTA section (Chad, 2026-06-11). When absent, the CTA keeps its
   // single-column button layout.

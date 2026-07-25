@@ -1,47 +1,57 @@
-// Service: AI Visibility (Visibility lane) -- THE UMBRELLA. Sold as an
+// Service: AI Search Visibility (Visibility lane) -- THE UMBRELLA. Sold as an
 // ongoing retained service; the GEO checklist is the spine ("the checklist
 // is the deliverable"). Proof leads: the Pennsylvania criminal-defense firm
 // in Google's AI Overview and the Brooklyn psychologist named in AI answers
 // (both ANONYMIZED per CWS-ARCHIVE-INTELLIGENCE until Chad clears names).
 // Copy in Chad's public voice. Real facts only.
 
-import Link from "next/link";
 import type { Service } from "@/lib/service";
-import { VisibilityHeroArt } from "@/components/art/VisibilityHeroArt";
+import { AiSearchHeroArt } from "@/components/art/AiSearchHeroArt";
+import { SECTION_ID } from "@/components/capsules/AiSearchFacetsCapsule";
 import { AiChatDemo } from "@/components/art/AiChatDemo";
 import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
-export const aiViz: Service = {
-  slug: "ai-viz",
+export const aiSearchVisibility: Service = {
+  slug: "ai-search-visibility",
   lane: "visibility",
   laneLabel: "Visibility",
   eyebrow: "Being the answer, not just a result",
-  title: "AI Visibility",
+  title: "AI Search Visibility",
   intent:
     "chadworks runs AI visibility as an ongoing service: the SEO, structured data, profiles, and answer-shaped pages that get a business recommended by ChatGPT and Google's AI.",
 
   answer: (
     <>
-      AI visibility is the work of being the business an AI recommends, and
-      it&apos;s measurable: after this work, a Pennsylvania criminal-defense
-      firm now appears in Google&apos;s AI Overview for its practice area,
-      and a Brooklyn psychologist gets named in AI answers. I&apos;m Chad,
-      I&apos;ve spent 20 years building websites and getting them found,
-      and this is that same work consolidated into one retained service. If
-      you want the one-time measurement first, that&apos;s the{" "}
-      <Link href="/ai-visibility-audit/">AI Visibility Audit</Link>.
+      AI search visibility is a suite of practices, implementations and
+      optimizations that help a brand name or web property show up and/or
+      get cited on AI search platforms like ChatGPT and Gemini (among
+      others.) I&apos;m Chad Lewine, and I&apos;ve been optimizing websites
+      for AI search visibility before the term even existed. AI search
+      optimization is built on a foundation of traditional SEO, but takes
+      it further because it accounts for the new signals and parameters
+      that these AI-driven technologies rely on when deciding which
+      results, names and links to surface.
     </>
   ),
 
-  heroArt: <VisibilityHeroArt />,
+  heroArt: <AiSearchHeroArt />,
 
-  keyFactsHeading: "AI visibility, at a glance",
+  // The hero sends the reader DOWN into the breakdown rather than out to the
+  // form; the CTA section at the foot of the page is what asks for contact.
+  heroCta: {
+    href: `#${SECTION_ID}`,
+    buttonLabel: "Learn more",
+    arrow: "down",
+  },
+
+  keyFactsHeading: "AI search visibility, at a glance",
+  keyFactsIntroClassName: "cw-aisearch-glance",
   keyFacts: [
-    "Buyers now ask ChatGPT and Google's AI who to hire. The answer box is the new first page, and most businesses aren't in it.",
-    "This work put a Pennsylvania criminal-defense firm into Google's AI Overview and a Brooklyn psychologist into AI answers. Real placements, not a theory.",
-    "The deliverable is a written checklist pass: intent, answer-first structure, schema, profiles, performance, and proof signals, run on every page that matters.",
-    "Sold as a monthly retainer because engines re-decide constantly. If the one-time read is all you need, I'll point you to the audit and say so.",
+    "Times have changed, and will continue to change over the next few years.",
+    "If you aren't optimized for AI search visibility now, you will get left behind. The market is becoming unforgiving.",
+    "Small businesses have a shot to compete with large, as the large are slower to evolve to new technologies.",
+    "AI search visibility is complex, but not impossible. It takes vision and commitment. Be prepared.",
   ],
   outlierFacts: [1],
 
@@ -230,8 +240,8 @@ export const aiViz: Service = {
   },
 
   form: {
-    source: "ai-viz page",
-    subject: "New AI Visibility Inquiry (chadworks)",
+    source: "ai-search-visibility page",
+    subject: "New AI Search Visibility Inquiry (chadworks)",
     submitLabel: "Send it to Chad",
     successMessage: "Got it. I read every one of these myself, and you'll hear back from me within a day.",
     fields: [
@@ -297,7 +307,7 @@ export const aiViz: Service = {
   },
 
   meta: {
-    title: "AI Visibility: Get Recommended by ChatGPT and Google AI | chadworks",
+    title: "AI Search Visibility: Get Recommended by ChatGPT and Google AI | chadworks",
     description:
       `AI visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. ${HOURLY_RATE}, scoped in writing.`,
   },

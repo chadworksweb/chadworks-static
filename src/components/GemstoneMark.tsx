@@ -36,6 +36,7 @@ export function GemstoneMark({
   tiltY = 0,
   tiltX = 0,
   cursorShimmer = false,
+  scrollShimmer = false,
   specDamp = 0,
   className,
 }: {
@@ -48,6 +49,13 @@ export function GemstoneMark({
   // "cursorShimmer": the cursor pans the refraction + speculars (the surface
   // shimmer) without moving the shape. The gradient still drifts so it's alive.
   cursorShimmer?: boolean;
+  // "scrollShimmer": the same surface pan, driven by PAGE SCROLL instead of the
+  // cursor. The shape never moves; what changes is what the crystal refracts, so
+  // a gem parked behind the copy reads as bending the page as it goes by. Page
+  // scroll (not the gem's own rect) is the driver on purpose: a sticky gem holds
+  // a constant rect while pinned, which would freeze the effect exactly when it
+  // should be running.
+  scrollShimmer?: boolean;
   // 0..1 -- scales the specular highlights DOWN, so the shimmer stays dynamic
   // without the peaks blowing out to white.
   specDamp?: number;
@@ -208,12 +216,24 @@ export function GemstoneMark({
     };
     if (cursorShimmer) window.addEventListener("pointermove", onMove, { passive: true });
 
+    // Scroll-driven pan: a triangle wave over scrollY so the sweep is continuous
+    // (a plain sawtooth snaps back at the wrap). One full sweep per two
+    // viewport-heights of scrolling.
+    const scrollTarget = () => {
+      const vh = Math.max(1, window.innerHeight);
+      const p = ((window.scrollY / vh) % 2 + 2) % 2;
+      tgtY = clamp1(p < 1 ? -1 + 2 * p : 3 - 2 * p);
+      const rect = host.getBoundingClientRect();
+      tgtX = clamp1(1 - ((rect.top + rect.height / 2) / vh) * 2) * 0.5;
+    };
+
     const renderFrame = (now: number) => {
       if (!t0) {
         t0 = now;
         prevTs = now;
       }
       const time = (now - t0) / 1000;
+      if (scrollShimmer) scrollTarget();
       const dt = Math.min(0.05, (now - prevTs) / 1000);
       prevTs = now;
       resize();
@@ -265,7 +285,8 @@ export function GemstoneMark({
       gl.uniform1f(u.gDis, LOCKED.disp);
       gl.uniform3fv(u.gTint, LOCKED.tint);
       gl.uniform1f(u.gFac, LOCKED.facet);
-      gl.uniform2f(u.gCursor, cursorShimmer ? curX : 0, cursorShimmer ? -curY : 0);
+      const shimmer = cursorShimmer || scrollShimmer;
+      gl.uniform2f(u.gCursor, shimmer ? curX : 0, shimmer ? -curY : 0);
       gl.uniform1f(u.gDamp, specDamp);
       gl.bindVertexArray(gemVao);
       gl.drawArrays(gl.TRIANGLES, 0, gemCount);
@@ -325,7 +346,7 @@ export function GemstoneMark({
       const lose = gl.getExtension("WEBGL_lose_context");
       if (lose) lose.loseContext();
     };
-  }, [spinDir, speed, still, tiltY, tiltX, cursorShimmer, specDamp]);
+  }, [spinDir, speed, still, tiltY, tiltX, cursorShimmer, scrollShimmer, specDamp]);
 
   return (
     <div className={"cw-gem-mark" + (className ? " " + className : "")} ref={hostRef} aria-hidden="true">

@@ -17,7 +17,7 @@ export const showUpOnChatgpt: Service = {
   slug: "show-up-on-chatgpt",
   lane: "visibility",
   laneLabel: "Visibility",
-  breadcrumbParent: { label: "AI Visibility", href: "/ai-viz/" },
+  breadcrumbParent: { label: "AI Search Visibility", href: "/ai-search-visibility/" },
   eyebrow: "AI Visibility / GEO",
   title: "Show Up on ChatGPT",
 

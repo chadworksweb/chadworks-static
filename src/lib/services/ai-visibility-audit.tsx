@@ -153,9 +153,9 @@ export const aiVisibilityAudit: Service = {
       "The audit is the measurement. These are the doors it usually opens.",
     items: [
       {
-        label: "AI Visibility",
+        label: "AI Search Visibility",
         detail: "The ongoing version: the audit plus the fixes plus the monthly cycle that keeps you in the answers.",
-        href: "/ai-viz/",
+        href: "/ai-search-visibility/",
       },
       {
         label: "SEO",
