@@ -173,11 +173,11 @@ export const showUpOnChatgpt: Service = {
     },
     {
       q: "What is llms.txt and do I need it?",
-      a: "It is a plain text file at the root of your site that points AI crawlers to the content you most want them to read. Honest answer: a check across roughly 300,000 domains found no link between having the file and getting cited, and only about one site in ten bothers with it. I add it because it takes minutes and costs nothing, not because it earns you anything. Anyone selling it as a visibility fix is selling you a text file.",
+      a: "It is a plain text file at the root of your site that points AI crawlers to the content you most want them to read. Honest answer: SE Ranking checked roughly 300,000 domains and found no link between having the file and getting cited, only about one site in ten has one, and of the fifty most-cited domains in AI answers exactly one bothered. I add it because it takes minutes and costs nothing, not because it earns you anything. Anyone selling it as a visibility fix is selling you a text file.",
     },
     {
       q: "Does schema markup help me get cited by AI?",
-      a: "It helps, but not the way it usually gets sold. Most assistants fetch your page live and read the visible text, dropping the markup before the model ever sees it, and controlled tests comparing pages that added schema against pages that did not have come back flat on citations. Where schema does pay is classic search, earning the rich results and rankings that decide whether an AI answer fires for your category at all. So it stays in the audit as part of the foundation. What gets you quoted is a clear answer sitting in the HTML where the fetch can find it.",
+      a: "It helps, but not the way it usually gets sold. Most assistants fetch your page live and read the visible text, dropping the markup before the model ever sees it. When Ahrefs tracked 1,885 pages that added schema against 4,000 matched control pages, citations did not rise anywhere: ChatGPT and AI Mode moved inside the noise, and Google's AI Overviews actually fell. Where schema does pay is classic search, earning the rich results and rankings that decide whether an AI answer fires for your category at all. So it stays in the audit as part of the foundation. What gets you quoted is a clear answer sitting in the HTML where the fetch can find it.",
     },
     {
       q: "Can you guarantee my business will get cited by ChatGPT?",

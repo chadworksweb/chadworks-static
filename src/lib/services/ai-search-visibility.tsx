@@ -240,7 +240,7 @@ export const aiSearchVisibility: Service = {
     },
     {
       q: "I've read that schema markup and llms.txt don't actually get you cited. Is that true?",
-      a: "Largely, yes, and it's worth knowing before you hire anyone. Controlled tests that matched pages adding schema against pages that didn't found no citation lift, because most assistants read the visible page and drop the markup first. Large-scale checks on llms.txt found no correlation either. Both still belong on a site, schema because it earns rich results in classic search and llms.txt because it costs minutes. Neither is the reason you get named. The reason is ranking where the AI looks and writing an answer worth quoting, which is what the retainer actually does.",
+      a: "Largely, yes, and it's worth knowing before you hire anyone. Ahrefs matched 1,885 pages that added schema against 4,000 control pages and found no citation lift on any platform, because most assistants read the visible page and drop the markup first. SE Ranking checked around 300,000 domains for llms.txt and found no correlation either. Both still belong on a site, schema because it earns rich results in classic search and llms.txt because it costs minutes. Neither is the reason you get named. The reason is ranking where the AI looks and writing an answer worth quoting, which is what the retainer actually does.",
     },
     {
       q: "Does the same work pay off on every AI platform?",
