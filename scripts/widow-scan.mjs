@@ -1,10 +1,39 @@
 // Widow scanner (CWS rule 12) -- loads a page at 1920w in the cached chromium
 // and flags any text block whose last visual line is < 20% of its widest line.
 // Usage: node scripts/widow-scan.mjs http://localhost:PORT/path/ [more urls...]
+import { existsSync, readdirSync } from "node:fs";
+import path from "node:path";
 import { chromium } from "playwright-core";
 
-const EXE =
-  "C:/Users/chad/AppData/Local/ms-playwright/chromium-1223/chrome-win64/chrome.exe";
+// The chromium build number used to be pinned here (chromium-1223), and it
+// rotted: the cache moved on, the path stopped existing, and the scanner died
+// on launch with an error that reads like the tool is broken rather than the
+// constant being stale. So find the browser instead of naming it. Newest build
+// in the cache wins; WIDOW_CHROME overrides, PLAYWRIGHT_BROWSERS_PATH is
+// honoured for a relocated cache.
+function resolveChrome() {
+  if (process.env.WIDOW_CHROME) return process.env.WIDOW_CHROME;
+  const localAppData =
+    process.env.LOCALAPPDATA || path.join(process.env.USERPROFILE || "", "AppData", "Local");
+  const root = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(localAppData, "ms-playwright");
+  const builds = existsSync(root)
+    ? readdirSync(root)
+        .filter((d) => /^chromium-\d+$/.test(d))
+        .sort((a, b) => Number(b.slice(9)) - Number(a.slice(9)))
+    : [];
+  for (const build of builds) {
+    for (const exe of ["chrome-win64/chrome.exe", "chrome-linux/chrome", "chrome-mac/chrome"]) {
+      const full = path.join(root, build, exe);
+      if (existsSync(full)) return full;
+    }
+  }
+  console.error(`No cached chromium found under ${root}.`);
+  console.error("Install one with `npx playwright install chromium`, or point");
+  console.error("WIDOW_CHROME at a chrome binary.");
+  process.exit(1);
+}
+
+const EXE = resolveChrome();
 const urls = process.argv.slice(2);
 
 const SEL = [
