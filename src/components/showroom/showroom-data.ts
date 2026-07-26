@@ -73,6 +73,18 @@ export const SHOWROOM_ITEMS: ShowroomItem[] = [
     bursts: ["Proof of where the work can go.", "Interaction past a client brief."],
   },
   {
+    key: "radiantarc",
+    slug: "radiantarc",
+    label: "Radiant Arc",
+    url: "chadlewine.com/radiant-arc",
+    href: "https://chadlewine.com/radiant-arc",
+    alt: "Radiant Arc interactive timeline, designed and developed by chadworks",
+    blurb: "A whole creative life on one interactive timeline, drawn live from the database.",
+    platform: "100% Custom Coded",
+    year: "2026",
+    bursts: ["Ten layers you switch on and off.", "Every view you land on has a link."],
+  },
+  {
     key: "audioplayer",
     slug: "audioplayer",
     label: "Streaming Audio Player",

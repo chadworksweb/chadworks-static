@@ -106,6 +106,16 @@ export const ARCHIVE: ArchiveItem[] = [
       "Likely the world's most immersive and custom-developed artist website. Custom: ecommerce shop, content development, AI integration, API integration, email campaign manager, 3D graphics, effects, branding, CMS and much more.",
   },
   {
+    key: "radiantarc",
+    slug: "radiantarc",
+    alt: "Radiant Arc interactive timeline, designed and developed by chadworks",
+    url: "chadlewine.com/radiant-arc",
+    label: "Radiant Arc",
+    href: "https://chadlewine.com/radiant-arc",
+    blurb:
+      "An interactive data visualization that puts a whole creative life on one screen: songs, albums, life eras, places, relationships, and the Rising Compass charge of every release, all read live from the database. Ten layers switch on and off while the span zooms and pans. Any view you land on carries its own link, so one year is something you can hand to someone.",
+  },
+  {
     key: "aac",
     slug: "aac",
     alt: "AAC Event Catering website, designed and developed by chadworks",
