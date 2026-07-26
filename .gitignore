@@ -34,3 +34,8 @@ next-env.d.ts
 
 # Lighthouse bench output (scripts/perf-measure.mjs). Local numbers, machine-specific.
 .perf/
+
+# Generated at prebuild by scripts/sync-llms-launch.mjs from
+# src/content/llms.source.txt (the hand-authored source). Never edit the
+# generated copy: the next build overwrites it.
+public/llms.txt

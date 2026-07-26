@@ -63,7 +63,7 @@ const personJsonLd = {
     image: `${SITE_URL}/people/chad-cutout.webp`,
     jobTitle: "Web designer and developer",
     description:
-      "Founder of chadworks. Designing since age 11, custom-building client websites since 2008, with more than 50 client engagements since 2019.",
+      "Chad Lewine is the Chad behind chadworks. His work transcends industrial and institutional silos, standing at the convergence of metaphysics, music & art and the world wide web.",
     knowsAbout: [
       "Web design",
       "Web development",

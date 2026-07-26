@@ -8,9 +8,22 @@
 //               answers is what /show-up-on-chatgpt/ and /visibility/ sell, so
 //               blocking them would work against the business.
 //   Blocked  -- the corpus collectors that exist to build training sets and
-//               cite nothing back. CCBot feeds Common Crawl; Google-Extended is
-//               Gemini/Vertex training and is SEPARATE from Googlebot, so
-//               disallowing it costs zero Search ranking.
+//               cite nothing back. CCBot feeds Common Crawl.
+//
+// GOOGLE-EXTENDED: MOVED TO ALLOWED, 2026-07-26. It sat on the blocked list on
+// the reading that it is training-only and separate from Googlebot, which is
+// half right: disallowing it does cost zero Search ranking. What the old note
+// missed is that Google's own crawler documentation lists Grounding in Gemini
+// Apps and Grounding with Google Search on Vertex AI among the things it gates.
+// Grounding is RETRIEVAL -- it is how a Gemini answer reaches a live page and
+// names the source. Disallowing it opted this site out of the Gemini contest
+// entirely, on a site that sells being named in AI answers, while the Scorecard
+// on /show-up-on-chatgpt/ tells clients an unblocked Google-Extended is a pass.
+// The token is now dual-purpose, so training and grounding cannot be split at
+// robots.txt. The split moves to the Terms instead: clause 2.3 prohibits
+// training use outright AND states that robots.txt compliance is not
+// authorization under it. So allowing the fetch here grants retrieval, not a
+// training license. If Google ever separates the two tokens, revisit.
 //
 // Keep this file and terms-of-service clause 2.3 in agreement. A permissive
 // robots.txt is the first thing pointed at when a scraping prohibition in the
@@ -35,7 +48,6 @@ export const dynamic = "force-static";
 // citation. Barred here and by clause 2.3 of the Terms.
 const TRAINING_ONLY_AGENTS = [
   "CCBot",
-  "Google-Extended",
   "Applebot-Extended",
   "Meta-ExternalAgent",
   "Bytespider",

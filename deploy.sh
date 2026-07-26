@@ -37,17 +37,17 @@ case "$ENV" in
     # leave a half-applied config: the vhosts restored to versions that do not
     # include the snippet, and the snippet itself still sitting in conf.d.
     cd "$(dirname "$0")"
-    echo "Syncing deploy/chadworks.conf + chadworks-staging.conf + security-headers.conf + compression.conf -> ${SERVER}"
-    scp deploy/chadworks.conf deploy/chadworks-staging.conf deploy/security-headers.conf deploy/compression.conf "$SERVER":/tmp/
+    echo "Syncing deploy/chadworks.conf + chadworks-staging.conf + security-headers.inc + compression.conf -> ${SERVER}"
+    scp deploy/chadworks.conf deploy/chadworks-staging.conf deploy/security-headers.inc deploy/compression.conf "$SERVER":/tmp/
     ssh "$SERVER" 'set -e
       TS=$(date +%Y%m%d%H%M%S); D=/root/proxy/nginx/conf.d
       sudo cp $D/chadworks.conf $D/chadworks.conf.bak-before-redirects-$TS
       [ -f $D/chadworks-staging.conf ] && sudo cp $D/chadworks-staging.conf $D/chadworks-staging.conf.bak-$TS || true
-      [ -f $D/security-headers.conf ] && sudo cp $D/security-headers.conf $D/security-headers.conf.bak-$TS || true
+      [ -f $D/security-headers.inc ] && sudo cp $D/security-headers.inc $D/security-headers.inc.bak-$TS || true
       [ -f $D/compression.conf ] && sudo cp $D/compression.conf $D/compression.conf.bak-$TS || true
       sudo cp /tmp/chadworks.conf $D/chadworks.conf
       sudo cp /tmp/chadworks-staging.conf $D/chadworks-staging.conf
-      sudo cp /tmp/security-headers.conf $D/security-headers.conf
+      sudo cp /tmp/security-headers.inc $D/security-headers.inc
       sudo cp /tmp/compression.conf $D/compression.conf
       if sudo docker exec le-nginx nginx -t; then
         sudo docker exec le-nginx nginx -s reload
@@ -56,7 +56,7 @@ case "$ENV" in
         echo "nginx -t FAILED -- restoring previous vhosts"
         sudo cp $D/chadworks.conf.bak-before-redirects-$TS $D/chadworks.conf
         [ -f $D/chadworks-staging.conf.bak-$TS ] && sudo cp $D/chadworks-staging.conf.bak-$TS $D/chadworks-staging.conf || true
-        [ -f $D/security-headers.conf.bak-$TS ] && sudo cp $D/security-headers.conf.bak-$TS $D/security-headers.conf || true
+        [ -f $D/security-headers.inc.bak-$TS ] && sudo cp $D/security-headers.inc.bak-$TS $D/security-headers.inc || true
         if [ -f $D/compression.conf.bak-$TS ]; then sudo cp $D/compression.conf.bak-$TS $D/compression.conf; else sudo rm -f $D/compression.conf; fi
         exit 1
       fi'
@@ -150,6 +150,21 @@ set +e
 curl -s -o /dev/null -w '  /            -> %{http_code}\n' "${BASE}/"
 curl -s -o /dev/null -w '  /about/      -> %{http_code}\n' "${BASE}/about/"
 curl -s -o /dev/null -w '  404 (/nope/) -> %{http_code}\n' "${BASE}/__nope__/"
+
+# IndexNow: push the launched URL set at Bing (and the other participating
+# engines) instead of waiting on a re-crawl. This is how the Copilot contest gets
+# entered at all, since Copilot answers off the Bing index.
+#
+# PROD ONLY. staging.chadworks.co serves X-Robots-Tag: noindex, so submitting it
+# would be asking an index to crawl a site that tells it not to.
+#
+# Runs AFTER the sync, so the URLs are live when the engine comes to fetch them,
+# and inside the `set +e` block because a flaky index endpoint must never fail a
+# deploy whose files already landed.
+if [ "$DOCROOT" = "/srv/chadworks" ]; then
+  echo "Submitting to IndexNow:"
+  node scripts/indexnow-submit.mjs
+fi
 set -e
 
 echo "Done. Target: ${BASE}/  (${DOCROOT})"

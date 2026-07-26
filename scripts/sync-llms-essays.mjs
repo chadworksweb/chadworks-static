@@ -1,8 +1,8 @@
-// llms.txt essay sync -- regenerates the `## Essays` section of public/llms.txt
+// llms.txt essay sync -- regenerates the `## Essays` section of src/content/llms.source.txt
 // from the markdown files, so a published essay is never invisible to the LLM
 // crawlers just because somebody forgot to add a line by hand.
 //
-// The rest of llms.txt stays hand-written: it describes services, and no script
+// The rest of the source stays hand-written: it describes services, and no script
 // can write those lines. Only the Essays section is generated, and only the
 // per-essay entries inside it -- the section's own lead line (the one pointing
 // at /essays/ itself) is preserved exactly as authored.
@@ -13,7 +13,7 @@
 // accurate even if nobody writes anything extra.
 //
 // Usage: node scripts/sync-llms-essays.mjs [--check]
-//   default   rewrites public/llms.txt in place when the section is stale
+//   default   rewrites src/content/llms.source.txt in place when the section is stale
 //   --check   exits 1 if it WOULD change anything, touching nothing (CI use)
 // Wired into package.json as `prebuild`, so `npm run build` keeps it current.
 
@@ -22,7 +22,7 @@ import { join } from "node:path";
 import matter from "gray-matter";
 
 const ESSAYS_DIR = join("src", "content", "essays");
-const LLMS_FILE = join("public", "llms.txt");
+const LLMS_FILE = join("src", "content", "llms.source.txt");
 const SITE_URL = "https://chadworks.co";
 const CHECK_ONLY = process.argv.includes("--check");
 
@@ -37,24 +37,23 @@ function publishedEssays() {
       const { data } = matter(readFileSync(join(ESSAYS_DIR, file), "utf8"));
       const title = (data.title ?? "").toString().trim();
       if (!title) return null;
-      const summary = [data.llmsSummary, data.description, data.dek]
-        .map((v) => (v ?? "").toString().trim())
-        .find(Boolean);
       // YAML turns an unquoted date into a Date; normalize for sorting only.
       const date =
         data.date instanceof Date
           ? data.date.toISOString().slice(0, 10)
           : (data.date ?? "").toString().trim();
-      return { slug: file.replace(/\.md$/, ""), title, summary, date };
+      return { slug: file.replace(/\.md$/, ""), title, date };
     })
     .filter(Boolean)
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
 
-const entryLine = (essay) =>
-  `- [${essay.title}](${SITE_URL}/essays/${essay.slug}/)${
-    essay.summary ? `: ${essay.summary}` : ""
-  }`;
+// Label and URL only. The SENTENCE comes from the essay page's own meta
+// description at postbuild (see build-llms.mjs), so writing one here would be
+// dead text: silently discarded, with no error to say why. The `llmsSummary`
+// frontmatter key is likewise unused now -- an essay's description is its
+// description, in one place.
+const entryLine = (essay) => `- [${essay.title}](${SITE_URL}/essays/${essay.slug}/)`;
 
 const source = readFileSync(LLMS_FILE, "utf8");
 // The checkout is CRLF on this machine and LF elsewhere. Split and rejoin on
@@ -65,7 +64,7 @@ const lines = source.split(EOL);
 
 const start = lines.findIndex((l) => l.trim() === "## Essays");
 if (start === -1) {
-  console.error("sync-llms-essays: no `## Essays` heading in public/llms.txt.");
+  console.error("sync-llms-essays: no `## Essays` heading in src/content/llms.source.txt.");
   process.exit(1);
 }
 // The section runs to the next top-level heading, or to end of file.
@@ -96,7 +95,7 @@ if (next === source) {
 
 if (CHECK_ONLY) {
   console.error(
-    "sync-llms-essays: public/llms.txt is stale. Run `node scripts/sync-llms-essays.mjs`.",
+    "sync-llms-essays: src/content/llms.source.txt is stale. Run `node scripts/sync-llms-essays.mjs`.",
   );
   process.exit(1);
 }

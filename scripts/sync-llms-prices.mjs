@@ -1,12 +1,17 @@
-// llms.txt price sync -- rewrites every chadworks figure in public/llms.txt
+// llms.txt price sync -- rewrites every chadworks figure in src/content/llms.source.txt
 // from the pricing hub, so the file the AI crawlers read can never quote a
 // price the site itself has stopped charging.
 //
-// WHY A SCRIPT AND NOT AN IMPORT. public/llms.txt is a static asset copied to
-// out/ verbatim. It is not compiled, so it cannot `import { BASE }` the way a
-// page does, and it was the one surface the 2026-07-22 baseline move had to
-// reach by hand. This closes that hole from the outside: the hub stays the
-// single source, and the text file is regenerated against it every build.
+// WHY A SCRIPT AND NOT AN IMPORT. llms.txt is a plain text surface, not a
+// compiled module, so it cannot `import { BASE }` the way a page does, and it
+// was the one surface the 2026-07-22 baseline move had to reach by hand. This
+// closes that hole from the outside: the hub stays the single source, and the
+// text is regenerated against it every build.
+//
+// WHICH FILE. This writes the SOURCE (src/content/llms.source.txt), not the
+// shipped public/llms.txt, which sync-llms-launch.mjs generates from it
+// afterwards. Pricing sealed lines too is deliberate: a held-back page's figures
+// stay current, so launching it never ships a stale price.
 //
 // HOW IT MATCHES. Each rule anchors on the WORDS around a figure and matches
 // the figure itself as a shape (PRICE below), never as a specific value. That
@@ -18,14 +23,14 @@
 // leaving a stale price behind.
 //
 // Usage: node scripts/sync-llms-prices.mjs [--check]
-//   default   rewrites public/llms.txt in place when a figure is stale
+//   default   rewrites src/content/llms.source.txt in place when a figure is stale
 //   --check   exits 1 if it WOULD change anything, touching nothing (CI use)
 // Wired into package.json as `prebuild`, alongside the essay sync.
 
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const LLMS_FILE = join("public", "llms.txt");
+const LLMS_FILE = join("src", "content", "llms.source.txt");
 const CHECK_ONLY = process.argv.includes("--check");
 
 // --- read the hub -----------------------------------------------------
@@ -81,33 +86,26 @@ const WP_HOST_SAVING = P.WP_HOST_TYPICAL - P.STATIC_HOSTING;
 const PRICE = String.raw`\$[\d,]+(?:\.\d+)?`;
 const COUNT = String.raw`[\d,]+`;
 
+// ONE RULE, and that is the point (2026-07-26). There used to be twelve, one per
+// price-carrying entry sentence in llms.txt. Those sentences are gone: every
+// entry's sentence is now the page's own meta description, read from the built
+// export by build-llms.mjs, and page metadata interpolates from the hub already
+// (`${money(BASE)}`), with price-audit.mjs failing any build where it does not.
+// So those eleven rules were guarding figures that a compiler now guards.
+//
+// What remains is the bare fact lines at the foot of the source, which have no
+// page behind them and so no metadata to inherit. Today that is one line.
+//
+// If a rule here stops matching, the copy was reworded: re-anchor it, do not
+// delete it. A deleted rule fails silent, which is the failure this whole script
+// exists to prevent.
 const RULES = [
-  // Websites
-  ["(# baseline, most land between # and #)",
-    [money(BASE), money(P.TYPICAL_LOW), money(P.TYPICAL_HIGH)]],
-  ["real maintenance (# every 6 months)", [money(P.WORDPRESS_CARE)]],
-  // Visibility
-  ["AI Visibility Audit (priced from #/hr)", [money(HOURLY)]],
-  ["Flat # a month management; ad spend separate at the #-a-day OpenAI floor",
-    [money(P.ADS_MONTHLY), money(P.ADS_MIN_DAILY_SPEND)]],
-  // Industry
-  ["Custom builds run # to #, quoted up front.",
-    [money(P.TYPICAL_LOW), money(P.TYPICAL_HIGH)]],
-  // Switch
-  ["Static hosting is # a month (about # less than a typical WordPress host), # for non-profits.",
-    [money(P.STATIC_HOSTING), money(WP_HOST_SAVING), money(P.STATIC_HOSTING_NONPROFIT)]],
-  ["Google Workspace runs under # a month per user; chadworks sets it up for a flat # (training and signature included), # per additional mailbox.",
-    [money(P.WORKSPACE_MONTHLY_CEILING), money(P.WORKSPACE_SETUP), money(P.WORKSPACE_EXTRA_MAILBOX)]],
-  // Visibility, cont. -- the one bare-count rule.
-  ["Mailchimp is free up to @ contacts", [String(P.MAILCHIMP_FREE_CONTACTS)]],
-  ["hosted for # a month (# non-profit)",
-    [money(P.STATIC_HOSTING), money(P.STATIC_HOSTING_NONPROFIT)], "all"],
-  ["hosting is # a month (# non-profit)",
-    [money(P.STATIC_HOSTING), money(P.STATIC_HOSTING_NONPROFIT)]],
-  // About
-  ["Work bills at #/hour; the smallest engagement is #; most websites land between # and #; WordPress care runs # every 6 months.",
-    [money(HOURLY), money(BASE), money(P.TYPICAL_LOW), money(P.TYPICAL_HIGH), money(P.WORDPRESS_CARE)]],
-  ["Posture: value-based pricing (#/hr, # baseline).", [money(HOURLY), money(BASE)]],
+  // The per-MINUTE rate, not the hourly one. /rates/ quotes the same figure the
+  // same way, so a change to MINUTELY has to move both or they disagree in
+  // public. HOURLY is derived from it (MINUTELY * 60) and is what the service
+  // pages quote, which is why both spellings of one rate exist at all.
+  ["Posture: chadworks charges #/min and starts flat rate projects at #.",
+    [money(P.MINUTELY), money(BASE)]],
 ];
 
 const source = readFileSync(LLMS_FILE, "utf8");
@@ -135,7 +133,7 @@ for (const [shape, values, mode] of RULES) {
 }
 
 if (unmatched.length) {
-  console.error("sync-llms-prices: these price sentences no longer match public/llms.txt:");
+  console.error("sync-llms-prices: these price sentences no longer match src/content/llms.source.txt:");
   for (const u of unmatched) console.error(`  - ${u}`);
   console.error("The copy was reworded. Re-anchor the rule in scripts/sync-llms-prices.mjs.");
   process.exit(1);
@@ -163,7 +161,7 @@ const unclaimed = next
   .filter((l) => !claimed.some((re) => re.test(l)));
 
 if (unclaimed.length) {
-  console.error("sync-llms-prices: these lines in public/llms.txt quote a price no rule owns:");
+  console.error("sync-llms-prices: these lines in src/content/llms.source.txt quote a price no rule owns:");
   for (const l of unclaimed) console.error(`  ${l.slice(0, 140)}`);
   console.error(
     "\nA figure here is invisible to the pricing hub: llms.txt is a static asset,",
@@ -180,7 +178,7 @@ if (next === source) {
 
 if (CHECK_ONLY) {
   console.error(
-    "sync-llms-prices: public/llms.txt holds a stale price. Run `node scripts/sync-llms-prices.mjs`.",
+    "sync-llms-prices: src/content/llms.source.txt holds a stale price. Run `node scripts/sync-llms-prices.mjs`.",
   );
   process.exit(1);
 }

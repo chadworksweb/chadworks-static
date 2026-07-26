@@ -110,17 +110,19 @@ export function ChatgptWhyLanes() {
         <div className="cw-art-lane cw-art-lane--text">
           <div className="cw-art-lane__num">02</div>
           <div className="cw-art-lane__content">
-            <h4 className="cw-art-lane__title">There&apos;s no structured data to read.</h4>
+            <h4 className="cw-art-lane__title">You rank nowhere underneath the answer.</h4>
             <p className="cw-art-lane__desc">
-              Without schema, an AI has to guess what your business is from prose.
-              With it, you are a defined entity with a name, a service, an area, and
-              reviews it can cite. Most small-business sites have none, or have it
-              wired up wrong.
+              Google&apos;s AI answer is assembled from the results below it, so if
+              you hold page one you have a real shot at the box above it, and if you
+              rank nowhere it will not invent you. This is also the job schema
+              actually does. It earns the rich results and rankings that decide
+              whether an answer fires for your category, rather than being read by
+              the model, which usually never sees it.
             </p>
             <ul className="cw-art-lane__caps">
-              <li>No Organization, Service, or FAQ schema</li>
-              <li>Inconsistent or broken markup</li>
-              <li>Nothing for the AI to attribute a claim to</li>
+              <li>No page-one standing for a real buying phrase</li>
+              <li>Missing or broken Organization, Service, and FAQ markup</li>
+              <li>Nothing in classic search for the answer to draw on</li>
             </ul>
           </div>
         </div>

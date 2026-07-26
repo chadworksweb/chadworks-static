@@ -57,8 +57,8 @@ export const metadata: Metadata = {
 };
 
 const COMPARE_ROWS: [string, string][] = [
-  ["robots.txt quietly blocks GPTBot", "AI crawlers allowed, llms.txt points the way"],
-  ["No schema, just a paragraph about you", "Structured data the AI can attribute claims to"],
+  ["robots.txt quietly blocks GPTBot", "AI crawlers allowed, nothing blocking the fetch"],
+  ["Ranking nowhere in classic search", "Ranking underneath the AI answer that names you"],
   ["Content appears only after scripts run", "Answers sitting in the HTML, ready to quote"],
   ["Slogans with nothing quotable", "Direct answers and real FAQs"],
   ["Name, address, and phone differ across the web", "Consistent details the AI can trust"],

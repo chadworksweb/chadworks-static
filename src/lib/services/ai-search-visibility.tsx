@@ -65,10 +65,18 @@ export const aiSearchVisibility: Service = {
       trigger: "What decides who gets named",
       paragraphs: [
         <>
-          <strong>Engines read structure first.</strong>{" "}Schema and
-          headings that match real questions. An AI decides what your page
-          says before any human does, and messy structure reads as
-          silence.
+          <strong>Engines read the page they fetch.</strong>{" "}When an
+          assistant answers, it usually pulls your page live and quotes the
+          visible text. Headings that match real questions, and the answer
+          sitting near the top rather than four paragraphs down. Messy
+          structure reads as silence.
+        </>,
+        <>
+          <strong>Classic rankings decide whether you are in the running.</strong>{" "}
+          Google&apos;s AI answer is assembled from the results underneath it,
+          so page one is the price of entry there. This is also where schema
+          earns its place, feeding rich results rather than being read by the
+          model.
         </>,
         <>
           <strong>They cross-check identity.</strong>{" "}Your Google Business
@@ -95,6 +103,11 @@ export const aiSearchVisibility: Service = {
           "Where you stand today in AI answers and the classic search they're built on. It's the same audit I sell on its own.",
       },
       {
+        title: "We pick the platform",
+        body:
+          "ChatGPT, Google's AI, Perplexity, Copilot and the rest are separate contests that happen to share a name, and the same change can lift one while doing nothing for another. So we name the one your buyers actually open and aim there, instead of spreading the budget evenly across platforms nobody in your industry has signed into.",
+      },
+      {
         title: "Every page gets one intent",
         body:
           "Each page answers one real buyer question. Pages that blend two intents lose both, in rankings and in answers.",
@@ -110,9 +123,9 @@ export const aiSearchVisibility: Service = {
           "Google Business Profile and every profile AI cross-checks, all telling the same story. Engines recommend what they can verify.",
       },
       {
-        title: "It stays maintained",
+        title: "It stays maintained, and it gets measured",
         body:
-          "Engines re-decide constantly, so the checklist runs on a cycle and you see what changed, in writing, every month.",
+          "Engines re-decide constantly, so the checklist runs on a cycle and you see what changed, in writing, every month. The same buyer prompts get re-run each cycle against pages we deliberately left alone, which is how you tell a real gain from a month when citations moved for everyone.",
       },
     ],
   },
@@ -224,6 +237,14 @@ export const aiSearchVisibility: Service = {
     {
       q: "Can you guarantee I'll show up in ChatGPT?",
       a: "No, and nobody honest can, because engines re-decide constantly and don't publish their rules. What I guarantee is the work: every check run and every change documented, with real precedent that it lands. The law firm now in Google's AI Overview started exactly where you are.",
+    },
+    {
+      q: "I've read that schema markup and llms.txt don't actually get you cited. Is that true?",
+      a: "Largely, yes, and it's worth knowing before you hire anyone. Controlled tests that matched pages adding schema against pages that didn't found no citation lift, because most assistants read the visible page and drop the markup first. Large-scale checks on llms.txt found no correlation either. Both still belong on a site, schema because it earns rich results in classic search and llms.txt because it costs minutes. Neither is the reason you get named. The reason is ranking where the AI looks and writing an answer worth quoting, which is what the retainer actually does.",
+    },
+    {
+      q: "Does the same work pay off on every AI platform?",
+      a: "No, and that's the part most agencies skip. Google's AI answer leans hard on classic ranking, ChatGPT fetches and quotes live pages, and Copilot runs off the Bing index. There are documented cases of one change lifting a site sharply in Google's AI Overviews during the same window its ChatGPT citations fell. So we name the platform your buyers use, aim there, and I tell you which contests you are not entered in.",
     },
     {
       q: "Why a retainer instead of a one-time fix?",

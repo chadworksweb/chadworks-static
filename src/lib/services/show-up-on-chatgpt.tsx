@@ -40,7 +40,7 @@ export const showUpOnChatgpt: Service = {
   keyFacts: [
     "When a customer asks ChatGPT, Claude, Gemini, or Perplexity for the best business near them, your name gets cited or someone else's does. A lot of sites never get named because the crawlers cannot even read them.",
     "The crawlers behind AI answers (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot) are often blocked by accident in a copied robots.txt. If they cannot fetch your pages, you are not in the running.",
-    "Without structured data an AI has to guess what your business is from prose. With it you are a defined entity with a name, a service, an area, and reviews it can cite.",
+    "Structured data is worth having, though not for the reason you have probably been told. Most assistants fetch your page and read the visible HTML, so what earns its keep is classic search: the rich results and rankings that decide whether an AI answer fires for your category at all.",
     "AI answers lift short, clear statements. Direct answers, real FAQs, and plain descriptions of what you do are what get quoted back to the person asking.",
   ],
 
@@ -49,8 +49,8 @@ export const showUpOnChatgpt: Service = {
       label="Six-point AI visibility check"
       title="Tap the rows that apply."
       items={[
-        { strong: "AI crawlers are allowed in your robots.txt and llms.txt", small: "GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, and Google-Extended are not blocked." },
-        { strong: "Your pages carry structured data", small: "Organization, Service, FAQ schema, not just a title tag." },
+        { strong: "AI crawlers are allowed in your robots.txt", small: "GPTBot, OAI-SearchBot, ClaudeBot, and PerplexityBot are not blocked, and neither is Google-Extended, which gates Gemini." },
+        { strong: "You rank in classic search for a real buying phrase", small: "Google's AI answer is built on the rankings underneath it. Rank nowhere and it will not invent you." },
         { strong: "Your content answers real questions directly", small: "Short, quotable answers an AI can lift, not a wall of marketing copy." },
         { strong: "Your text is in the HTML, not painted by JavaScript", small: "A crawler sees your words without running scripts." },
         { strong: "Your business details match everywhere", small: "Same name, address, phone, and links across the web." },
@@ -80,12 +80,12 @@ export const showUpOnChatgpt: Service = {
   approach: {
     heading: "From audit to cited, step by step.",
     steps: [
-      { title: "Audit", body: "I check crawlability, structured data, content, and where you stand against the businesses already getting cited. You get a prioritized fix list and a realistic read on your market." },
+      { title: "Audit", body: "I check crawlability, structured data, content, and where you stand against the businesses already getting cited. We also pick which platform your buyers actually open, because ChatGPT and Google's AI reward different work. You get a prioritized fix list and a realistic read on your market." },
       { title: "Open the doors", body: "Fix the robots.txt and llms.txt so AI crawlers can actually reach your pages, and clear anything blocking them at the server." },
-      { title: "Wire the schema", body: "Add and repair structured data so you read as a defined entity: name, services, area, reviews, the things an AI attributes claims to." },
-      { title: "Make it quotable", body: "Rewrite key pages with direct answers and real FAQs, niched to the questions your buyers actually ask, so the AI has something worth lifting." },
+      { title: "Wire the schema", body: "Add and repair structured data so classic search can place you: name, services, area, reviews. This is the rankings layer underneath AI answers, not a tag the model reads." },
+      { title: "Make it quotable", body: "Rewrite key pages with direct answers and real FAQs, niched to the questions your buyers actually ask. This is the layer an assistant actually reads when it fetches you, so it carries the most weight." },
       { title: "Build presence", body: "On a campaign, this is where the monthly articles, posts, and review outreach compound your authority over time." },
-      { title: "Track and adjust", body: "Watch the citations, positions, and topics the market is asking about, then aim the next month's work where it pays." },
+      { title: "Measure against a control", body: "The same buyer prompts re-run on a set cadence, checked against pages we deliberately left alone. If citations moved for your whole industry that month, you find out from me rather than from a chart that takes credit for it." },
     ],
   },
 
@@ -173,11 +173,11 @@ export const showUpOnChatgpt: Service = {
     },
     {
       q: "What is llms.txt and do I need it?",
-      a: "It is a plain text file at the root of your site that points AI crawlers to the content you most want them to read and cite. A newer convention, not a guarantee, but cheap to add and a clear signal about which pages matter. It is part of the visibility setup, not the whole thing.",
+      a: "It is a plain text file at the root of your site that points AI crawlers to the content you most want them to read. Honest answer: a check across roughly 300,000 domains found no link between having the file and getting cited, and only about one site in ten bothers with it. I add it because it takes minutes and costs nothing, not because it earns you anything. Anyone selling it as a visibility fix is selling you a text file.",
     },
     {
       q: "Does schema markup help me get cited by AI?",
-      a: "Yes. Structured data is how Google and now ChatGPT, Perplexity, Gemini, and Claude understand who you are, where you work, and what you do. Without it you are a name in a paragraph. With it you are an entity an AI can reference with confidence. It is one of the highest-leverage fixes in the audit.",
+      a: "It helps, but not the way it usually gets sold. Most assistants fetch your page live and read the visible text, dropping the markup before the model ever sees it, and controlled tests comparing pages that added schema against pages that did not have come back flat on citations. Where schema does pay is classic search, earning the rich results and rankings that decide whether an AI answer fires for your category at all. So it stays in the audit as part of the foundation. What gets you quoted is a clear answer sitting in the HTML where the fetch can find it.",
     },
     {
       q: "Can you guarantee my business will get cited by ChatGPT?",
