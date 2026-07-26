@@ -39,7 +39,12 @@
 // and other-calculator references). Both pages read it, so a number changes in
 // one place and cascades. This page pulls CALCULATORS for the differentiator.
 //
-// NOT in launch.ts, so the layout's noindex default keeps this sealed.
+// INDEXING IS DECIDED IN launch.ts, NOT HERE. The layout defaults to noindex and
+// metadata.robots below reads isLaunched(), so adding or removing this route's
+// entry in launch.ts is the whole switch. Do not restate the launched/sealed
+// state in this comment: the previous version claimed the page was sealed and
+// went stale the day it launched (2026-07-20), which is how it ended up saying
+// the opposite of what the file does.
 
 import type { ReactNode } from "react";
 import type { Metadata } from "next";

@@ -177,9 +177,9 @@ export const aiSearchVisibility: Service = {
           "I run a client inside OpenAI's advertising beta, so I see the paid side of AI answers from the inside, not from screenshots.",
       },
       {
-        label: "50 plus engagements behind it",
+        label: "300 plus clients behind it",
         detail:
-          "The client archive runs from 2019 through 2025 and past fifty businesses. This service grew out of what those clients actually needed next.",
+          "chadworks has served over 300 clients 1:1 since launching in 2011. This service grew out of what those clients actually needed next.",
       },
     ],
   },

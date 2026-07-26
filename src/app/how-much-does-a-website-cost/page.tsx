@@ -21,7 +21,11 @@
 // same one behind the calculator, so the two pages cannot disagree. Competitor
 // figures are sourced and carry a VERIFY comment on the data block below.
 //
-// NOT in launch.ts, so the layout's noindex default keeps this sealed.
+// INDEXING IS DECIDED IN launch.ts, NOT HERE. The layout defaults to noindex and
+// metadata.robots below reads isLaunched(), so adding or removing this route's
+// entry in launch.ts is the whole switch. Do not restate the launched/sealed
+// state in this comment: the identical line on the calculator page went stale
+// the day that page launched and ended up asserting the opposite of the code.
 
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
@@ -462,7 +466,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
             </p>
             <p>
               The capability holds even as the overhead falls away. I have
-              designed since I was eleven and built client websites since 2008,
+              served over 300 clients 1:1 since launching chadworks in 2011,
               and I do both the design and the code myself, so your idea reaches
               the browser without a handoff that could dilute it. You get the full
               craft, and one person who carries the whole project start to finish.

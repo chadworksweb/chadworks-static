@@ -164,9 +164,9 @@ export const digitalMarketing: Service = {
           "I don't sell follower counts, and I'll say when social is a maintenance channel for your business instead of a growth one. The no is part of the service.",
       },
       {
-        label: "50 plus engagements of watching what works",
+        label: "300 plus clients of watching what works",
         detail:
-          "The client archive runs from 2019 through 2025 and past fifty businesses. The triage is pattern recognition from all of them, applied to yours.",
+          "chadworks has served over 300 clients 1:1 since launching in 2011. The triage is pattern recognition from all of them, applied to yours.",
       },
       {
         label: "Recommendations with receipts",
