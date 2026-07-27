@@ -2887,6 +2887,30 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding-top: var(--section-pad-y);
   padding-bottom: var(--section-pad-y);
 }
+/* HOME ONLY -- the three-up lane module crosses the hero's bottom edge by 20px
+   instead of clearing it. Written as intent rather than one negative margin:
+   zero the section's own top spacing and the lanes' top margin FIRST, so the
+   -20px is measured from the hero's edge and survives a change to
+   --section-pad-y or --space-lg. Beats the :has(.svc-lanes) rule above on
+   specificity (four classes to three), so source order here is not load-bearing.
+   z-index lifts the cards over the hero, which paints first. */
+.section.svc-block.reveal.cw-home-paths {
+  padding-top: 0;
+  margin-top: -45px;
+  position: relative;
+  z-index: 2;
+}
+.cw-home-paths .svc-lanes { margin-top: 0; }
+/* The lanes are 40%-opaque glass everywhere else, which is fine over a plain
+   page background. Overlapping the hero, that translucency let the gradient and
+   the code rain read straight through the card tops -- the cards were already
+   painting ON TOP, they were just see-through, which looks identical to the
+   hero covering them (Chad, 2026-07-27). Home only: take the surface nearly
+   opaque so the overlap reads as a card sitting over the hero. The CTA card
+   keeps its own solid navy and is untouched. */
+.cw-home-paths .svc-lane:not(.svc-lane--cta) {
+  background: rgba(255, 255, 255, 0.94);
+}
 .svc-lanes {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3095,6 +3119,20 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 @media (max-width: 1024px) {
   .svc-lanes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+/* HOME ONLY -- tablet: the two-column grid drops the CTA into row 2 stranded in
+   the left half. Span it across both columns and center it, holding it to one
+   column's width so it stays a peer of the two above rather than growing into a
+   banner. The width tracks the grid: two columns share one 1.2rem gap, so a
+   column is calc(50% - 0.6rem) (Chad, 2026-07-27).
+   Bounded BELOW at 641px on purpose -- under that the lanes are a single
+   column, where a 50% width would shrink the card to half the page. */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .cw-home-paths .svc-lane--cta {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 0.6rem);
+  }
 }
 @media (max-width: 640px) {
   .svc-lanes { grid-template-columns: 1fr; }
