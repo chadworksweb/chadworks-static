@@ -1,17 +1,24 @@
 // Data for the portfolio showroom (Track A) -- THE portfolio page since 2026-07-15.
-// Carries the same work as PortfolioShowcaseCapsule's ARCHIVE (what the homepage and
-// the service pages render), plus Rising Compass, which that capsule holds separately
-// as its flagship instead of in the grid. Those two lists have to be kept in step by
-// hand: add a project to one and it silently goes missing from the other, which is
-// how rslgo dropped out of the showroom for a while. `scripts/portfolio-audit.mjs`
-// (a deploy gate since 2026-07-23) is what now catches that, so the sync is still
-// manual but no longer silent. Captures live at
-// /public/portfolio/<slug>-*.jpg. Order is the reel order (top to bottom): Rising
-// Compass leads, AAC Event Catering sits at the bottom.
+//
+// This file is now an ADAPTER, not a list. The work itself lives in ONE place,
+// `src/lib/projects.ts`, and this maps a Project into the shape the reel wants.
+// Before 2026-07-27 it carried its own hand-typed copy of every piece, kept in
+// step with PortfolioShowcaseCapsule's ARCHIVE by hand and, latterly, by a
+// deploy gate. Adding a project to one list and not the other was silent, which
+// is how rslgo dropped off the reel. There is no second list to fall out of step
+// with now.
+//
+// Reel order is PROJECTS array order: Rising Compass leads, AAC sits at the
+// bottom. To reorder the reel, reorder PROJECTS. The archive grid is ordered
+// separately by `archiveRank` and is unaffected.
+//
+// Captures live at /public/portfolio/<slug>-*.webp (see lib/captures.ts).
+
+import { PROJECTS } from "@/lib/projects";
 
 export type ShowroomItem = {
   key: string;
-  slug: string; // resolves /portfolio/<slug>-desktop.jpg
+  slug: string; // resolves /portfolio/<slug>-desktop.webp
   label: string;
   url: string; // chrome-bar display host
   href?: string; // live site; omit for a piece with no public link
@@ -23,284 +30,18 @@ export type ShowroomItem = {
   bursts: string[];
 };
 
-export const SHOWROOM_ITEMS: ShowroomItem[] = [
-  {
-    key: "risingcompass",
-    slug: "risingcompass",
-    label: "Rising Compass",
-    url: "risingcompass.net",
-    href: "https://risingcompass.net",
-    alt: "Rising Compass website, designed and developed by chadworks",
-    blurb: "One of my own builds: a data-driven product with a custom interface.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Custom interface, real data.", "Shipped the way client work ships."],
-  },
-  {
-    key: "scinet",
-    slug: "scinet",
-    label: "SciNet Industries",
-    url: "scinet-industries.vercel.app",
-    href: "https://scinet-industries.vercel.app",
-    alt: "SciNet Industries website, designed and developed by chadworks",
-    blurb: "A science-forward biotech concept, built to read clearly to any visitor.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Hard science, made legible.", "Concept brand, investor-ready."],
-  },
-  {
-    key: "sweatshop",
-    slug: "sweatshop",
-    label: "Sweatshop",
-    url: "sweatshop-studio.vercel.app",
-    href: "https://sweatshop-studio.vercel.app",
-    alt: "Sweatshop website, designed and developed by chadworks",
-    blurb: "An infrared fitness studio concept, with the energy of the room on the page.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Motion that matches the workout.", "Concept site, launch-ready."],
-  },
-  {
-    key: "chadlewine",
-    slug: "chadlewine",
-    label: "Chad Lewine",
-    url: "chadlewine.com",
-    href: "https://chadlewine.com",
-    alt: "chadlewine.com website, designed and developed by chadworks",
-    blurb: "My musician-first site, where I push the interaction further.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Proof of where the work can go.", "Interaction past a client brief."],
-  },
-  {
-    key: "radiantarc",
-    slug: "radiantarc",
-    label: "Radiant Arc",
-    url: "chadlewine.com/radiant-arc",
-    href: "https://chadlewine.com/radiant-arc",
-    alt: "Radiant Arc interactive timeline, designed and developed by chadworks",
-    blurb: "A whole creative life on one interactive timeline, drawn live from the database.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Ten layers you switch on and off.", "Every view you land on has a link."],
-  },
-  {
-    key: "audioplayer",
-    slug: "audioplayer",
-    label: "Streaming Audio Player",
-    url: "demos.chadworks.co/sap",
-    href: "https://demos.chadworks.co/sap",
-    alt: "Streaming Audio Player interface example, designed and developed by chadworks",
-    blurb: "An interface example: a rack-unit audio player with a live spectrum visualizer and a ten band EQ.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Spectrum bars run on real Web Audio.", "Ten band EQ, wired to the output."],
-  },
-  {
-    key: "rslgo",
-    slug: "rslgo",
-    label: "RSLgo",
-    url: "rslgo.com",
-    href: "https://rslgo.com",
-    alt: "RSLgo website, designed and developed by chadworks",
-    blurb: "A consulting practice with a real storefront, custom coded down to the landing pages.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Consulting work that actually sells.", "Every landing page built to fit."],
-  },
-  {
-    key: "abracadabragems",
-    slug: "abracadabragems",
-    label: "Abracadabra Gems",
-    url: "abracadabragems.com",
-    href: "https://abracadabragems.com",
-    alt: "Abracadabra Gems website, designed and developed by chadworks",
-    blurb: "Gemstones want color and light, so the layout puts the product first.",
-    platform: "WordPress x Avada",
-    year: "2024",
-    bursts: ["Product first, page second.", "Each piece carries the screen."],
-  },
-  {
-    key: "rozariolaw",
-    slug: "rozariolaw",
-    label: "Rozario Law",
-    url: "rozariolaw.com",
-    href: "https://rozariolaw.com",
-    alt: "Rozario Law website, designed and developed by chadworks",
-    blurb: "A law practice has seconds to earn trust.",
-    platform: "WordPress x Avada",
-    year: "2025",
-    bursts: ["Opens steady and serious.", "Tells a visitor what to do next."],
-  },
-  {
-    key: "videofeed",
-    slug: "videofeed",
-    label: "Short Form Vertical Video",
-    url: "demos.chadworks.co/sfvv",
-    href: "https://demos.chadworks.co/sfvv",
-    alt: "Short form vertical video feed interface example, designed and developed by chadworks",
-    blurb: "An interface example: a vertical feed that snaps clip to clip, where only the clip you land on plays.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Only the clip you land on plays.", "Sponsored cards fold into the run."],
-  },
-  {
-    key: "thorobird",
-    slug: "thorobird",
-    label: "Thorobird",
-    url: "thorobird.com",
-    // No live-site link: the client has not kept the site in good shape, so the
-    // piece stays in the showroom but does not point at it (2026-07-23).
-    alt: "Thorobird website, designed and developed by chadworks",
-    blurb: "A brand site with a distinct point of view, custom built.",
-    platform: "WordPress",
-    year: "2016",
-    bursts: ["Carries the personality the business has.", "Custom built, no template."],
-  },
-  {
-    key: "adsautomation",
-    slug: "adsautomation",
-    label: "ADS Automation",
-    url: "adsautomation.com",
-    href: "https://adsautomation.com",
-    alt: "ADS Automation website, designed and developed by chadworks",
-    blurb:
-      "Industrial automation is technical work, so the site reads clear and credible.",
-    platform: "WP-to-Static",
-    year: "2026",
-    bursts: ["Credible without the jargon.", "Technical work, made legible."],
-  },
-  {
-    key: "edenscapes",
-    slug: "edenscapes",
-    label: "EdenScapes",
-    url: "eden-scapes.com",
-    href: "https://eden-scapes.com/japanese-garden-design-installation/",
-    alt: "EdenScapes Japanese garden design website, designed and developed by chadworks",
-    blurb: "Japanese garden design deserves a quiet, deliberate site.",
-    platform: "WordPress x Divi",
-    year: "2026",
-    bursts: ["Gives the craft room to breathe.", "Lets the work sell itself."],
-  },
-  {
-    key: "massagepros",
-    slug: "massagepros",
-    label: "Massage Professionals",
-    url: "massageprofessionalsllc.com",
-    href: "https://massageprofessionalsllc.com",
-    alt: "Massage Professionals website, designed and developed by chadworks",
-    blurb: "A calm, trustworthy front door for a local practice.",
-    platform: "WP-to-Static",
-    year: "2025",
-    bursts: ["Booking one tap away on a phone.", "Calm, trustworthy, fast."],
-  },
-  {
-    key: "aes",
-    slug: "aes",
-    label: "Artist Empowerment Suite",
-    url: "artistempowermentsuite.com",
-    href: "https://artistempowermentsuite.com",
-    alt: "Artist Empowerment Suite website, designed and developed by chadworks",
-    blurb: "A musician-first toolkit, built so the artist owns the whole thing.",
-    platform: "WP-to-Static",
-    year: "2026",
-    bursts: ["Own it all, not rent it back.", "Custom store, custom throughout."],
-  },
-  {
-    key: "videoplayer",
-    slug: "videoplayer",
-    label: "Traditional Video Player",
-    url: "demos.chadworks.co/tvp",
-    href: "https://demos.chadworks.co/tvp",
-    alt: "Traditional Video Player interface example, designed and developed by chadworks",
-    blurb: "An interface example: a CRT video player with a searchable library and nested category playlists.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["A CRT monitor you can actually play.", "Search the library, browse the playlists."],
-  },
-  {
-    key: "jeremyhayes",
-    slug: "jeremyhayes",
-    label: "Jeremy John Hayes",
-    url: "jeremy-john-hayes.vercel.app",
-    href: "https://jeremy-john-hayes.vercel.app",
-    alt: "Jeremy John Hayes website, designed and developed by chadworks",
-    blurb: "A horror author's book launch, built to set the mood and sell the book.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Atmosphere first, then the sale.", "Custom built around one title."],
-  },
-  {
-    key: "detrixhe",
-    slug: "detrixhe",
-    label: "Dr. Jonathan Detrixhe",
-    url: "jonathandetrixhe.com",
-    href: "https://jonathandetrixhe.com",
-    alt: "Dr. Jonathan Detrixhe website, designed and developed by chadworks",
-    blurb: "A Brooklyn psychologist's practice, warm to read and easy to find.",
-    platform: "WP-to-Static",
-    year: "2023",
-    bursts: ["Warm for patients, legible for search.", "Structured to get cited."],
-  },
-  {
-    key: "salpattica",
-    slug: "salpattica",
-    label: "Salpattica",
-    url: "salpattica.com",
-    href: "https://www.salpattica.com",
-    alt: "Salpattica website, designed and developed by chadworks",
-    blurb: "A stationery and fine-art studio's shop, with its handmade character intact.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["Handmade feel, real storefront.", "Product first, cart a tap away."],
-  },
-  {
-    key: "tomweather",
-    slug: "tomweather",
-    label: "Weather Map Generator",
-    url: "map.tomtheweatherwizard.com",
-    href: "https://map.tomtheweatherwizard.com",
-    alt: "Weather Map Generator app, designed and developed by chadworks",
-    blurb: "A broadcast-style tool that turns a raw forecast into a clean, shareable weather map.",
-    platform: "Custom Web + Desktop App",
-    year: "2026",
-    bursts: ["Sketch the snow, drop the cities.", "Export a finished graphic, ready to post."],
-  },
-  {
-    key: "ttww",
-    slug: "ttww",
-    label: "Tom the Weather Wizard",
-    url: "tomtheweatherwizard.com",
-    href: "https://tomtheweatherwizard.com",
-    alt: "Tom the Weather Wizard website, designed and developed by chadworks",
-    blurb: "A meteorologist's brand and merch site, all personality and typographic wit.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["A running joke, turned into a page.", "Custom built, shirt a tap away."],
-  },
-  {
-    key: "therapistexample",
-    slug: "therapistexample",
-    label: "Mara Calloway, LPC",
-    url: "mara-calloway-lpc.vercel.app",
-    href: "https://mara-calloway-lpc.vercel.app",
-    alt: "Mara Calloway, LPC therapy website, designed and developed by chadworks",
-    blurb: "An example build for a therapy practice, calm and easy to trust.",
-    platform: "100% Custom Coded",
-    year: "2026",
-    bursts: ["A steady front door for a practice.", "Booking path kept obvious."],
-  },
-  {
-    key: "aac",
-    slug: "aac",
-    label: "AAC Event Catering",
-    url: "aaceventcatering.com",
-    href: "https://aaceventcatering.com",
-    alt: "AAC Event Catering website, designed and developed by chadworks",
-    blurb:
-      "A catering brand that needed to look as polished as the events it runs.",
-    platform: "WP-to-Static",
-    year: "2022",
-    bursts: ["Booking-ready front door.", "Built to win the local search."],
-  },
-];
+// The reel shows EVERY project, flagship included, in array order. `blurb` here
+// is the project's REEL blurb: short, written to be read while the piece moves
+// past. The longer showcase-grid copy is a separate field and is not used here.
+export const SHOWROOM_ITEMS: ShowroomItem[] = PROJECTS.map((p) => ({
+  key: p.key,
+  slug: p.slug,
+  label: p.label,
+  url: p.url,
+  ...(p.href ? { href: p.href } : {}),
+  alt: p.alt,
+  blurb: p.reelBlurb,
+  ...(p.platform ? { platform: p.platform } : {}),
+  ...(p.year ? { year: p.year } : {}),
+  bursts: p.bursts,
+}));

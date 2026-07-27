@@ -1,45 +1,43 @@
-// Portfolio audit -- keeps the three portfolio surfaces from drifting apart.
+// Portfolio audit -- integrity of the project entity and the surfaces it feeds.
 //
-// WHY THIS EXISTS. The work appears in three places driven by three DIFFERENT
-// hand-maintained lists (see "Portfolio surfaces" in CWS-COMPONENT-REGISTRY):
+// WHY THIS EXISTS, AND WHAT CHANGED 2026-07-27.
 //
-//   1. the showcase capsule  -> ARCHIVE + FEATURED + HELD_BACK in
-//                               src/components/capsules/PortfolioShowcaseCapsule.tsx
-//   2. /showroom/            -> SHOWROOM_ITEMS in
-//                               src/components/showroom/showroom-data.ts
-//   3. the ripple portfolio  -> a `portfolio:` block on a Service object
+// The work used to live in three hand-maintained lists that nothing connected:
+// ARCHIVE/FEATURED/HELD_BACK in PortfolioShowcaseCapsule, SHOWROOM_ITEMS in
+// showroom/showroom-data.ts, and a `portfolio:` block on Service objects. Adding
+// a project to one and not the others was silent -- tsc, next build and every
+// other gate passed -- and it landed three separate times. This script was built
+// to CATCH that drift: rules A, B and C reconciled the lists against each other
+// on every deploy.
 //
-// Nothing connects them. Add a project to one and it goes silently missing from
-// the other; tsc, next build and every existing gate pass. That failure has
-// already landed three times: rslgo dropped out of the showroom, a whole
-// `portfolio` block in web-development.tsx went dead behind a slot override, and
-// the same shape nearly left the staging vhost out of deploy.sh. The expansion
-// plan calls it "the recurring defect on this codebase".
+// Those rules are GONE, because the drift is gone. The work now lives in ONE
+// place, `src/lib/projects.ts`, and every surface is a projection of it. A
+// project cannot be on the reel and missing from the grid, because neither is a
+// list any more. Checking that they agree would be checking that a map() ran.
 //
-// This is the guard. It parses the lists instead of trusting a comment, and it
-// fails the deploy rather than the build, so `npm run dev` and a local
-// `npm run build` stay fast. Wired into deploy.sh beside index-audit.mjs,
-// price-audit.mjs and stack-query-audit.mjs.
-//
-// WHAT IT ENFORCES
-//   A. /showroom/ is the superset. Every ARCHIVE key and the FEATURED slug must
-//      appear in SHOWROOM_ITEMS.
-//   B. No showroom-only strays. Every SHOWROOM_ITEMS key must be in ARCHIVE or
-//      be the flagship, so a piece cannot exist on the reel and nowhere else.
-//   C. HELD_BACK entries must name a real ARCHIVE key. A typo there is silent:
-//      the item keeps showing and nobody finds out.
-//   D. Every capture a list points at must exist on disk, at the extension
+// What is left is the class of error the entity CANNOT rule out on its own:
+//   F. Entity integrity. Duplicate keys, two flagships, a grid card with no grid
+//      copy, two projects claiming the same archiveRank. Each one is quiet.
+//   G. Architecture guard. The surfaces must stay DERIVED. If a hand-typed array
+//      of projects reappears in the capsule or the showroom adapter, the
+//      original defect is back, and this catches the moment it returns.
+//   D. Every capture a project points at exists on disk, at the extension
 //      lib/captures.ts will actually request (.webp unless excepted).
 //   E. Dead ripple data. A page that overrides the `portfolio` slot can never
 //      render its Service's `portfolio` block, so carrying one is dead weight
 //      that reads as live.
 //
-// Orphaned captures (a file in public/portfolio no list points at) are reported
-// as a NOTE only, never a failure. Deleting assets needs Chad's approval, and
-// deploy.sh already excludes the JPG/PNG originals from the sync.
+// Orphaned captures (a file in public/portfolio no project points at) are
+// reported as a NOTE only, never a failure. Deleting assets needs Chad's
+// approval, and deploy.sh already excludes the JPG/PNG originals from the sync.
+//
+// It fails the deploy rather than the build, so `npm run dev` and a local
+// `npm run build` stay fast. Wired into deploy.sh beside index-audit.mjs,
+// price-audit.mjs and stack-query-audit.mjs.
 
 import { readFileSync, existsSync, readdirSync } from "node:fs";
 
+const PROJECTS_FILE = "src/lib/projects.ts";
 const CAPSULE = "src/components/capsules/PortfolioShowcaseCapsule.tsx";
 const SHOWROOM = "src/components/showroom/showroom-data.ts";
 const CAPTURES = "src/lib/captures.ts";
@@ -81,91 +79,189 @@ function sliceInitialiser(src, name, open, close) {
   return src.slice(m.index + m[0].length, i - 1);
 }
 
-// Every `key: "..."` / `slug: "..."` at any depth inside the sliced body. The
-// lists are flat objects, so this reads each entry exactly once.
-function fieldValues(body, field) {
+// Split a sliced array body into its top-level `{ ... }` entries, so a field can
+// be read PER PROJECT rather than as one flat stream. Flat was fine when this
+// audit only needed a set of keys; it is not fine now that it has to know which
+// rank belongs to which project.
+function objectEntries(body) {
   const out = [];
-  const re = new RegExp(`\\b${field}\\s*:\\s*["'\`]([^"'\`]+)["'\`]`, "g");
-  let m;
-  while ((m = re.exec(body))) out.push(m[1]);
+  let depth = 0;
+  let start = -1;
+  let inStr = null;
+  for (let i = 0; i < body.length; i++) {
+    const ch = body[i];
+    if (inStr) {
+      if (ch === "\\") i++;
+      else if (ch === inStr) inStr = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") inStr = ch;
+    else if (ch === "{") {
+      if (depth === 0) start = i + 1;
+      depth++;
+    } else if (ch === "}") {
+      depth--;
+      if (depth === 0 && start >= 0) out.push(body.slice(start, i));
+    }
+  }
   return out;
 }
 
-const capsuleSrc = read(CAPSULE);
-const showroomSrc = read(SHOWROOM);
+function str(entry, field) {
+  const m = new RegExp(`\\b${field}\\s*:\\s*["'\`]([^"'\`]*)["'\`]`).exec(entry);
+  return m ? m[1] : null;
+}
+function num(entry, field) {
+  const m = new RegExp(`\\b${field}\\s*:\\s*(-?\\d+)`).exec(entry);
+  return m ? Number(m[1]) : null;
+}
+function bool(entry, field) {
+  const m = new RegExp(`\\b${field}\\s*:\\s*(true|false)`).exec(entry);
+  return m ? m[1] === "true" : null;
+}
+// A value wrapped onto the next line ("gridBlurb:\n  \"...\"") still counts as
+// present, so prettier's wrapping cannot read as a missing field.
+function has(entry, field) {
+  return new RegExp(`\\b${field}\\s*:\\s*(["'\`]|\\r?\\n)`).test(entry);
+}
 
 // ---------------------------------------------------------------- parse
 
-const archiveBody = sliceInitialiser(capsuleSrc, "ARCHIVE", "[", "]");
-const showroomBody = sliceInitialiser(showroomSrc, "SHOWROOM_ITEMS", "[", "]");
-const featuredBody = sliceInitialiser(capsuleSrc, "FEATURED", "{", "}");
-const heldBackBody = sliceInitialiser(capsuleSrc, "HELD_BACK", "[", "]");
+const projectsSrc = read(PROJECTS_FILE);
+const projectsBody = sliceInitialiser(projectsSrc, "PROJECTS", "[", "]");
 
-if (archiveBody === null) problems.push(`Could not find the ARCHIVE array in ${CAPSULE}. Renamed? Update this audit with it.`);
-if (showroomBody === null) problems.push(`Could not find the SHOWROOM_ITEMS array in ${SHOWROOM}. Renamed? Update this audit with it.`);
-if (featuredBody === null) problems.push(`Could not find the FEATURED object in ${CAPSULE}. Renamed? Update this audit with it.`);
-if (heldBackBody === null) problems.push(`Could not find the HELD_BACK array in ${CAPSULE}. Renamed? Update this audit with it.`);
+if (projectsSrc && projectsBody === null) {
+  problems.push(
+    `Could not find the PROJECTS array in ${PROJECTS_FILE}. Renamed or moved?\n` +
+      `    Every portfolio surface is derived from it, so this audit can check nothing without it.`
+  );
+}
 
-const archiveKeys = archiveBody ? fieldValues(archiveBody, "key") : [];
-const archiveSlugs = archiveBody ? fieldValues(archiveBody, "slug") : [];
-const showroomKeys = showroomBody ? fieldValues(showroomBody, "key") : [];
-const showroomSlugs = showroomBody ? fieldValues(showroomBody, "slug") : [];
-const featuredSlug = featuredBody ? (fieldValues(featuredBody, "slug")[0] ?? null) : null;
-// HELD_BACK is a bare string array, not objects.
-const heldBack = heldBackBody ? [...heldBackBody.matchAll(/["'`]([^"'`]+)["'`]/g)].map((m) => m[1]) : [];
+const projects = (projectsBody ? objectEntries(projectsBody) : []).map((e) => ({
+  key: str(e, "key"),
+  slug: str(e, "slug"),
+  label: str(e, "label"),
+  archiveRank: num(e, "archiveRank"),
+  featured: bool(e, "featured") === true,
+  inShowcase: bool(e, "inShowcase") === true,
+  hasGridBlurb: has(e, "gridBlurb"),
+  hasReelBlurb: has(e, "reelBlurb"),
+}));
 
-if (archiveBody && archiveKeys.length === 0) problems.push(`Parsed ARCHIVE in ${CAPSULE} but found no \`key\` fields. The shape changed; update this audit.`);
-if (showroomBody && showroomKeys.length === 0) problems.push(`Parsed SHOWROOM_ITEMS in ${SHOWROOM} but found no \`key\` fields. The shape changed; update this audit.`);
+if (projectsBody && projects.length === 0) {
+  problems.push(`Parsed PROJECTS in ${PROJECTS_FILE} but found no entries. The shape changed; update this audit.`);
+}
 
-const archiveSet = new Set(archiveKeys);
-const showroomSet = new Set(showroomKeys);
+// ---------------------------------------------------------------- F: entity integrity
 
-// ---------------------------------------------------------------- A + B: the two lists
+const seenKeys = new Set();
+const seenRanks = new Map();
 
-for (const key of archiveKeys) {
-  if (!showroomSet.has(key)) {
+for (const p of projects) {
+  const where = p.key ?? p.label ?? "(entry with no key)";
+
+  if (!p.key) problems.push(`A project in ${PROJECTS_FILE} has no \`key\`. Every surface indexes on it.`);
+  if (!p.slug) problems.push(`Project "${where}" has no \`slug\`, so its capture cannot resolve.`);
+  if (!p.hasReelBlurb) problems.push(`Project "${where}" has no \`reelBlurb\`, so it renders blank on /showroom/.`);
+
+  if (p.key) {
+    if (seenKeys.has(p.key)) {
+      problems.push(
+        `Duplicate key "${p.key}" in ${PROJECTS_FILE}.\n` +
+          `    React keys collide, and the curated-grid filter matches both, so the piece renders twice.`
+      );
+    }
+    seenKeys.add(p.key);
+  }
+
+  if (p.featured) {
+    if (p.archiveRank !== null) {
+      problems.push(
+        `Flagship "${where}" carries an \`archiveRank\`.\n` +
+          `    The flagship renders full-width instead of as a card, so a rank on it does nothing\n` +
+          `    while reading as though it were in the grid. Remove it.`
+      );
+    }
+    if (p.inShowcase) {
+      problems.push(
+        `Flagship "${where}" is marked \`inShowcase\`.\n` +
+          `    It already renders above the grid; this would not add it, only mislead.`
+      );
+    }
+    continue;
+  }
+
+  // Everything that is not the flagship renders as a grid card.
+  if (!p.hasGridBlurb) {
     problems.push(
-      `"${key}" is in ARCHIVE (${CAPSULE}) but NOT in SHOWROOM_ITEMS (${SHOWROOM}).\n` +
-        `    /showroom/ is the full archive, so it must carry everything the showcase carries.\n` +
-        `    Add it to SHOWROOM_ITEMS, in the reel position you want.`
+      `Project "${where}" has no \`gridBlurb\`, so its showcase card silently falls back to the short\n` +
+        `    reel blurb, which is written for a piece moving past, not for a reader standing still.`
     );
+  }
+  if (p.archiveRank === null) {
+    problems.push(
+      `Project "${where}" has no \`archiveRank\`, so it sorts ahead of everything ranked and lands\n` +
+        `    at the front of the archive grid. Give it a rank (they are sparse, multiples of ten).`
+    );
+  } else if (seenRanks.has(p.archiveRank)) {
+    problems.push(
+      `Duplicate archiveRank ${p.archiveRank}: "${seenRanks.get(p.archiveRank)}" and "${where}".\n` +
+        `    Their grid order becomes whatever the sort happens to do, which is nobody's decision.`
+    );
+  } else {
+    seenRanks.set(p.archiveRank, where);
   }
 }
 
-for (const key of showroomKeys) {
-  if (archiveSet.has(key)) continue;
-  if (featuredSlug && key === featuredSlug) continue; // the flagship, held out of the grid by design
+const flagships = projects.filter((p) => p.featured);
+if (projects.length && flagships.length !== 1) {
   problems.push(
-    `"${key}" is in SHOWROOM_ITEMS (${SHOWROOM}) but NOT in ARCHIVE (${CAPSULE}).\n` +
-      `    It shows on /showroom/ and nowhere else. Add it to ARCHIVE, and to HELD_BACK\n` +
-      `    if it should stay out of the curated grid (that is the deliberate way to hide one).`
+    flagships.length === 0
+      ? `No project in ${PROJECTS_FILE} is marked \`featured\`. FEATURED_PROJECT falls back to the\n` +
+        `    first entry, so the flagship becomes whatever happens to sit at the top of the reel.`
+      : `${flagships.length} projects are marked \`featured\` (${flagships.map((p) => p.key).join(", ")}).\n` +
+        `    Only the first is used; the rest silently render as grid cards instead.`
   );
 }
 
-// ---------------------------------------------------------------- C: holdbacks must be real
+if (projects.length && !projects.some((p) => p.inShowcase)) {
+  problems.push(
+    `No project is marked \`inShowcase\`, so the curated grid on the homepage and the service\n` +
+      `    pages renders empty.`
+  );
+}
 
-for (const key of heldBack) {
-  if (!archiveSet.has(key)) {
+// ---------------------------------------------------------------- G: surfaces stay derived
+
+// The point of the entity is that no surface holds its own copy of the work. A
+// literal array of project objects reappearing in either surface file means the
+// original defect is back. Detected by SHAPE (project fields inside a local
+// array), not by constant name, so renaming it does not evade the check.
+for (const [file, src] of [[CAPSULE, read(CAPSULE)], [SHOWROOM, read(SHOWROOM)]]) {
+  if (!src) continue;
+  // EVERY top-level array in the file, not a fixed list of names. A known-names
+  // check is trivially evaded by calling the new list something else, which is
+  // precisely what a person reintroducing one would do without meaning to.
+  const declared = [...src.matchAll(/(?:export\s+)?const\s+(\w+)\s*(?::[^=]*)?=\s*\[/g)].map((m) => m[1]);
+  for (const name of new Set(declared)) {
+    const body = sliceInitialiser(src, name, "[", "]");
+    if (!body) continue;
+    const entryCount = objectEntries(body).filter((e) => /\bkey\s*:\s*["'`]/.test(e)).length;
+    if (entryCount > 0) {
+      problems.push(
+        `${name} in ${file} is a hand-typed array of ${entryCount} project object(s) again.\n` +
+          `    Every portfolio surface must be DERIVED from PROJECTS in ${PROJECTS_FILE}.\n` +
+          `    A second list is how rslgo dropped off the reel: nothing connects the two copies.\n` +
+          `    Map over PROJECTS (or a derived view) instead of restating the work here.`
+      );
+    }
+  }
+  if (!/@\/lib\/projects/.test(src)) {
     problems.push(
-      `HELD_BACK names "${key}", which is not an ARCHIVE key (${CAPSULE}).\n` +
-        `    A holdback that matches nothing does nothing, silently. Fix the spelling,\n` +
-        `    or drop the entry if the piece is gone.`
+      `${file} no longer imports from @/lib/projects.\n` +
+        `    It is a portfolio surface, so it must project the entity rather than hold its own data.`
     );
   }
-}
-
-if (featuredSlug && !showroomSet.has(featuredSlug)) {
-  problems.push(
-    `FEATURED is "${featuredSlug}" but SHOWROOM_ITEMS has no entry with that key (${SHOWROOM}).\n` +
-      `    The flagship has to lead the reel as well as the showcase.`
-  );
-}
-
-if (featuredSlug && archiveSet.has(featuredSlug)) {
-  problems.push(
-    `FEATURED "${featuredSlug}" is ALSO in ARCHIVE (${CAPSULE}).\n` +
-      `    The flagship would render twice on every surface: once full-width, once as a card.`
-  );
 }
 
 // ---------------------------------------------------------------- D: captures resolve
@@ -181,8 +277,9 @@ const notConverted = new Map(
     : []
 );
 
+const slugs = [...new Set(projects.map((p) => p.slug).filter(Boolean))];
 const wantedFiles = new Set();
-for (const slug of [...new Set([...archiveSlugs, ...showroomSlugs, ...(featuredSlug ? [featuredSlug] : [])])]) {
+for (const slug of slugs) {
   const base = `${slug}-desktop`;
   wantedFiles.add(`${base}.${notConverted.get(base) ?? "webp"}`);
 }
@@ -191,7 +288,7 @@ for (const file of [...wantedFiles].sort()) {
   if (!existsSync(`${PUBLIC_PORTFOLIO}/${file}`)) {
     problems.push(
       `Capture missing: ${PUBLIC_PORTFOLIO}/${file}\n` +
-        `    A list points at this slug but the file it resolves to is not there, so the\n` +
+        `    A project points at this slug but the file it resolves to is not there, so the\n` +
         `    card renders a broken image. Encode the .webp, or add the slug to\n` +
         `    NOT_CONVERTED in ${CAPTURES} if it should keep serving its original.`
     );
@@ -202,14 +299,14 @@ for (const file of [...wantedFiles].sort()) {
 
 if (existsSync(PUBLIC_PORTFOLIO)) {
   const onDisk = readdirSync(PUBLIC_PORTFOLIO).filter((f) => /\.(webp|jpg|jpeg|png)$/i.test(f));
-  const referencedSlugs = new Set([...archiveSlugs, ...showroomSlugs, ...(featuredSlug ? [featuredSlug] : [])]);
+  const referencedSlugs = new Set(slugs);
   const orphans = onDisk.filter((f) => {
     const slug = f.replace(/\.(webp|jpg|jpeg|png)$/i, "").replace(/-(desktop|tablet|mobile|phone)$/i, "");
     return !referencedSlugs.has(slug);
   });
   if (orphans.length) {
     notes.push(
-      `${orphans.length} capture file(s) in ${PUBLIC_PORTFOLIO} are referenced by neither list:\n` +
+      `${orphans.length} capture file(s) in ${PUBLIC_PORTFOLIO} are referenced by no project:\n` +
         orphans.map((f) => `      ${f}`).join("\n") +
         `\n    Not an error. Deleting assets needs Chad's approval, and deploy.sh already\n` +
         `    excludes ./portfolio/*.jpg and *.png from the sync, so the originals do not ship.`
@@ -221,7 +318,8 @@ if (existsSync(PUBLIC_PORTFOLIO)) {
 
 // A page that overrides the `portfolio` slot can never render its Service's
 // `portfolio` block. Carrying one is dead data that reads as live -- exactly
-// what web-development.tsx did until 2026-07-16b.
+// what web-development.tsx did until 2026-07-16b. These per-service blocks are
+// deliberately NOT folded into the entity: they are curated per service page.
 function appPages(dir) {
   const out = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -266,13 +364,14 @@ if (problems.length) {
   console.error(`Portfolio audit FAILED (${problems.length} problem${problems.length === 1 ? "" : "s"}):`);
   for (const p of problems) console.error(`  - ${p}`);
   console.error("");
-  console.error("The three portfolio surfaces are hand-synced lists with nothing connecting");
-  console.error("them. See \"Portfolio surfaces\" in CWS-COMPONENT-REGISTRY.md.");
+  console.error("The portfolio is ONE entity (src/lib/projects.ts) with derived surfaces.");
+  console.error("See \"Portfolio surfaces\" in CWS-COMPONENT-REGISTRY.md.");
   process.exit(1);
 }
 
+const showcaseCount = projects.filter((p) => p.inShowcase).length;
 console.log(
-  `Portfolio audit passed: ${archiveKeys.length} archive item(s) + 1 flagship reconcile ` +
-    `against ${showroomKeys.length} showroom item(s); ${heldBack.length} holdback(s) all resolve; ` +
-    `${wantedFiles.size} capture(s) present.`
+  `Portfolio audit passed: ${projects.length} project(s) = 1 flagship + ${projects.length - 1} archive ` +
+    `card(s), ${showcaseCount} of them in the curated grid; keys and ranks unique; ` +
+    `both surfaces derived; ${wantedFiles.size} capture(s) present.`
 );
