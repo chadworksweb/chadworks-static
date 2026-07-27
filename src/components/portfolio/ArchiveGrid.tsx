@@ -16,6 +16,11 @@ export type ArchiveItem = {
   label: string;
   href?: string; // live site; omit for pieces with no public link
   blurb: string;
+  // The project's own page at /showroom/<slug>/, when one exists. A project has
+  // a page because src/content/projects/<slug>.md exists and for no other
+  // reason, so this is set by the SERVER page that knows the filesystem, never
+  // by the entity. Omitted for the projects that are showroom-only.
+  storyHref?: string;
 };
 
 // The card title's heading LEVEL depends on what sits above the grid, so the page
@@ -76,6 +81,13 @@ export function ArchiveGrid({
                 rel="noopener noreferrer"
               >
                 View site <span className="cw-port-card__cue-arrow" aria-hidden="true">&#8599;</span>
+              </a>
+            )}
+            {/* Internal link, so it stays in the tab and is a real crawlable
+                edge from the room to the project's page. */}
+            {item.storyHref && (
+              <a className="cw-port-card__story" href={item.storyHref}>
+                Read the story
               </a>
             )}
           </div>

@@ -9,6 +9,7 @@
 import { SITE_URL } from "@/lib/service";
 import { LAUNCHED_ROUTES, isLaunched, isIndexable } from "@/lib/launch";
 import { getEssaySlugs } from "@/lib/essays";
+import { getProjectPageSlugs } from "@/lib/project-pages";
 
 export const dynamic = "force-static";
 
@@ -21,7 +22,14 @@ const essayRoutes = isLaunched("/essays/")
   : [];
 // Advertise only indexable routes: launched AND not noindex (legal pages are
 // launched for the footer but excluded here -- see isIndexable in launch.ts).
-const routes = [...LAUNCHED_ROUTES.filter(isIndexable), ...essayRoutes];
+// Project pages behave the same way: /showroom/<slug>/ is not listed in
+// LAUNCHED_ROUTES individually, it inherits the /showroom/ launch, so the ones
+// that exist are enumerated from the content dir. A project has a page because
+// src/content/projects/<slug>.md exists (see lib/project-pages.ts).
+const projectRoutes = isLaunched("/showroom/")
+  ? getProjectPageSlugs().map((slug) => `/showroom/${slug}/`)
+  : [];
+const routes = [...LAUNCHED_ROUTES.filter(isIndexable), ...essayRoutes, ...projectRoutes];
 
 export async function GET(): Promise<Response> {
   const lastmod = new Date().toISOString().slice(0, 10);

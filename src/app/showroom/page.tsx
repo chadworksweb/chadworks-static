@@ -22,6 +22,19 @@ import showroomStyles from "@/components/showroom/showroom.module.css";
 import { captureSrc } from "@/lib/captures";
 import { ShowroomRoute } from "@/components/showroom/ShowroomRoute";
 import { SHOWROOM_ITEMS } from "@/components/showroom/showroom-data";
+import { getProjectPageSlugs } from "@/lib/project-pages";
+
+// Which projects have a page of their own at /showroom/<slug>/. Resolved HERE,
+// on the server, because it is a filesystem question (a project has a page
+// because src/content/projects/<slug>.md exists) and showroom-data.ts is pulled
+// into the client bundle by the WebGL reel. An `fs` import in that chain breaks
+// the build. The cards below carry the link; the reel does not yet.
+const PAGE_SLUGS = new Set(getProjectPageSlugs());
+const ARCHIVE_ITEMS = SHOWROOM_ITEMS.map((item) =>
+  PAGE_SLUGS.has(item.slug)
+    ? { ...item, storyHref: `/showroom/${item.slug}/` }
+    : item
+);
 
 // The bare route (what launch.ts keys on) and the absolute URL (what canonical and
 // JSON-LD need) are different strings -- isLaunched normalizes paths, not URLs, and
@@ -121,7 +134,7 @@ function ShowroomArchive() {
       {/* h2, not the default h3: the only heading above these is the page h1, so
           h3 would skip a level. /portfolio/ and the homepage keep h3 -- there the
           grid sits under their own h2. */}
-        <ArchiveGrid items={SHOWROOM_ITEMS} headingLevel="h2" />
+        <ArchiveGrid items={ARCHIVE_ITEMS} headingLevel="h2" />
       </SectionShell>
       {/* The same contact band every other page closes on. Inside the archive
           branch, so the desktop showroom (which owns the whole viewport) never
