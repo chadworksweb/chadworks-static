@@ -6,7 +6,6 @@ description: "Why I stopped keeping chadworks and Chad Lewine apart. The web des
 image: "/essays/chad-lewine-worlds-combine.webp"
 imageAlt: "Chad Lewine twice: at left in a denim jacket and flat cap against a blue-and-gold abstract field, at right in a button-down holding a closed laptop against a field of code characters"
 section: "Essays"
-llmsSummary: "Why the web design business and the music are one person's work under one purpose, not two careers kept apart. Chad ends the split he maintained between chadworks and his art, including the separate LinkedIn accounts, and explains how the song catalog now finds the clients."
 topics:
   - "Personal branding"
   - "Artist identity"
@@ -14,7 +13,6 @@ topics:
   - "Creative independence"
   - "Multidisciplinary work"
 takeaways:
-  - "I kept my web design work and my music walled off from each other for years, and the split cost me more than it ever protected."
   - "The rule that a person has to be one thing is an industry convention, not a law."
   - "chadworks and Chad Lewine are two initiatives with one purpose, so they no longer get separate identities."
   - "My song catalog now helps me find the organizations whose websites I want to build."
