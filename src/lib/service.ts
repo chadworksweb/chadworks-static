@@ -34,10 +34,23 @@ export const ORG = {
   // "US" is the same claim /contact/'s ContactPage already makes and the same
   // one /faqs/ makes in prose ("clients across the USA").
   areaServed: "US",
-  // Fill in as real profiles are confirmed. Left EMPTY on purpose -- a sameAs
-  // pointing at a profile that is not demonstrably the same entity is worse
-  // than no sameAs at all.
+  // EMPTY ON PURPOSE, and not a to-do. chadworks the BUSINESS runs no social
+  // profiles (Chad, 2026-07-28). The one profile that exists is Chad's personal
+  // LinkedIn, which belongs on the Person node below, not here. Asserting a
+  // person's profile as an organization's sameAs fuses two entities that are
+  // not the same thing -- the fragmentation jsonld.ts exists to prevent.
   sameAs: [] as string[],
+} as const;
+
+// Person identity -- Chad Lewine, the founder. Separate from ORG on purpose:
+// sameAs is an identity claim ("this profile IS this entity"), so the two
+// cannot share one array. jsonld.ts emits these as two @id'd nodes linked by
+// founder/employee/worksFor.
+export const PERSON = {
+  name: "Chad Lewine",
+  jobTitle: "Web Designer and Developer",
+  // The ONLY social profile anywhere in the entity graph, deliberately.
+  sameAs: ["https://www.linkedin.com/in/chadlewine/"] as string[],
 } as const;
 
 // Lane 01 websites, Lane 02 visibility, Lane 03 consulting (added 2026-07-16,

@@ -10,7 +10,7 @@
 // Adding a node: declare it here, emit it in buildSiteGraph(), reference it by
 // its exported id. Never inline a second copy of an entity that already has an
 // id -- that is the failure this file exists to prevent.
-import { SITE_URL, ORG } from "@/lib/service";
+import { SITE_URL, ORG, PERSON } from "@/lib/service";
 
 export const ORG_ID = `${SITE_URL}/#organization`;
 export const PERSON_ID = `${SITE_URL}/about/#chad`;
@@ -27,9 +27,9 @@ export function personNode() {
   return {
     "@type": "Person",
     "@id": PERSON_ID,
-    name: "Chad Lewine",
+    name: PERSON.name,
     url: `${SITE_URL}/about/`,
-    jobTitle: "Web Designer and Developer",
+    jobTitle: PERSON.jobTitle,
     worksFor: ref(ORG_ID),
     knowsAbout: [
       "Web Design",
@@ -41,7 +41,7 @@ export function personNode() {
       "Ecommerce",
       "Static Site Architecture",
     ],
-    ...(ORG.sameAs.length ? { sameAs: ORG.sameAs } : {}),
+    ...(PERSON.sameAs.length ? { sameAs: PERSON.sameAs } : {}),
   };
 }
 
