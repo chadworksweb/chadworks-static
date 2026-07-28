@@ -23,6 +23,7 @@
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { readSitemapUrls } from "./lib/sitemap-urls.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -38,17 +39,24 @@ const MAX_URLS = 10000;
 
 const dry = process.argv.includes("--dry");
 
-function readSitemapUrls() {
-  const xml = readFileSync(resolve(ROOT, "out/sitemap.xml"), "utf8");
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
-  return [...new Set(urls)].filter((u) => u.startsWith(`https://${HOST}/`));
+// PAGE urls, read through the index to the child sitemaps. Submitting the raw
+// <loc> list from sitemap.xml would push the child SITEMAP files at IndexNow as
+// if they were pages (see scripts/lib/sitemap-urls.mjs).
+function pageUrls() {
+  const urls = readSitemapUrls(resolve(ROOT, "out"));
+  if (urls === null) return null;
+  return urls.filter((u) => u.startsWith(`https://${HOST}/`));
 }
 
 async function main() {
   let urlList;
   try {
-    urlList = readSitemapUrls();
-  } catch {
+    urlList = pageUrls();
+  } catch (err) {
+    console.log(`  IndexNow skipped: ${err.message}`);
+    return;
+  }
+  if (urlList === null) {
     console.log("  IndexNow skipped: out/sitemap.xml not found (build first).");
     return;
   }

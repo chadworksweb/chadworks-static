@@ -39,6 +39,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { readSitemapPaths } from "./lib/sitemap-urls.mjs";
 
 const OUT = process.argv[2] || "out";
 const SOURCE_FILE = join("src", "content", "llms.source.txt");
@@ -61,16 +62,13 @@ if (!existsSync(OUT)) {
 }
 
 // --- the launched set, straight from the generated sitemap ---
-const sitemapPath = join(OUT, "sitemap.xml");
-if (!existsSync(sitemapPath)) {
+// Via the index: sitemap.xml lists the child SITEMAPS, and the pages live in
+// those (see scripts/lib/sitemap-urls.mjs).
+const launched = readSitemapPaths(OUT, SITE_URL);
+if (launched === null) {
   console.error("build-llms: out/sitemap.xml missing -- the sitemap route did not export.");
   process.exit(1);
 }
-const launched = new Set(
-  [...readFileSync(sitemapPath, "utf8").matchAll(/<loc>([^<]+)<\/loc>/g)].map(
-    (m) => m[1].trim().replace(SITE_URL, "") || "/",
-  ),
-);
 
 // --- read a built page's meta description ---
 const DESC_RE = /<meta name="description" content="([^"]*)"/;

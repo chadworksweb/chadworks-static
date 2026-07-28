@@ -14,6 +14,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { join, relative, sep } from "node:path";
+import { readSitemapPaths } from "./lib/sitemap-urls.mjs";
 
 const OUT = process.argv[2] || "out";
 const SITE_URL = "https://chadworks.co";
@@ -24,17 +25,13 @@ if (!existsSync(OUT)) {
 }
 
 // --- the sitemap is the launched set, already normalized to "/segment/" ---
-const sitemapPath = join(OUT, "sitemap.xml");
-if (!existsSync(sitemapPath)) {
+// Read through the index to the child sitemaps -- sitemap.xml itself lists
+// SITEMAPS, not pages (see scripts/lib/sitemap-urls.mjs).
+const sitemapPaths = readSitemapPaths(OUT, SITE_URL);
+if (sitemapPaths === null) {
   console.error("index-audit: out/sitemap.xml missing -- the sitemap route did not export.");
   process.exit(1);
 }
-const sitemapXml = readFileSync(sitemapPath, "utf8");
-const sitemapPaths = new Set(
-  [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) =>
-    m[1].trim().replace(SITE_URL, "") || "/",
-  ),
-);
 
 // --- walk every exported index.html ---
 async function walk(dir) {
