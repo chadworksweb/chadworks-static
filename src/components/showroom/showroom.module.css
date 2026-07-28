@@ -551,6 +551,15 @@ html:has(.route) { scrollbar-gutter: stable; }
      the glow gets room to bleed into the card's own padding. */
   padding-left: 12px;
   margin-left: -12px;
+  /* Same trick on the BOTTOM edge, for the same reason. The primary CTA
+     (.visitPrimary) throws a purple glow that reaches 36px below itself on
+     hover, and this clip was cutting it off in a hard straight line across the
+     card. Push the clip 44px down and pull the box back by the same: the button
+     does not move, the glow gets room to bleed into the card's own padding and
+     past it. Collapsed still folds to nothing -- max-height: 0 is a border-box
+     clamp, so it crushes this padding with everything else. */
+  padding-bottom: 44px;
+  margin-bottom: -44px;
   overflow: hidden;
   max-height: 24rem;
   opacity: 1;
@@ -626,6 +635,39 @@ html:has(.route) { scrollbar-gutter: stable; }
 .visit:hover {
   border-color: #cbb4f5;
   color: #cbb4f5;
+}
+
+/* The STANDOUT link (Chad, 2026-07-28). A piece with a page of its own is the
+   one thing on this panel worth a button rather than a text cue, so it gets a
+   filled purple pill instead of the underline every other link here wears. The
+   underline is dropped rather than overridden -- a bordered pill with a
+   border-bottom on top of it draws a seam across the fill.
+   It reads the same on both panel skins, so .metaInvert needs no companion rule:
+   white on purple already clears contrast against a light card. */
+.visitPrimary {
+  border-bottom: none;
+  padding: 0.62rem 1.15rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #6629bc 0%, #4a1d8f 100%);
+  color: #fff;
+  letter-spacing: 0.02em;
+  box-shadow: 0 6px 18px rgba(102, 41, 188, 0.38);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+.visitPrimary:hover {
+  color: #fff;
+  background: linear-gradient(135deg, #7a35d6 0%, #5a24aa 100%);
+  box-shadow: 0 10px 26px rgba(102, 41, 188, 0.5);
+  transform: translateY(-1px);
+}
+.metaInvert .visitPrimary {
+  color: #fff;
+  border-bottom: none;
+}
+.metaInvert .visitPrimary:hover { color: #fff; border-color: transparent; }
+@media (prefers-reduced-motion: reduce) {
+  .visitPrimary { transition: none; }
+  .visitPrimary:hover { transform: none; }
 }
 .close {
   position: absolute;

@@ -32,6 +32,15 @@
 // Captures resolve through lib/captures.ts as /portfolio/<slug>-<device>.webp.
 
 export type Project = {
+  // KEY == SLUG, always (Chad, 2026-07-28). The two drifted apart twice --
+  // key "risingcompass" against slug "rising-compass", key "russ-tree-service"
+  // against slug "russtree" -- and a key that only ALMOST matches its slug is
+  // the worst of both: every surface indexes on the key, every file resolves
+  // from the slug, and typing one where you meant the other fails silently.
+  // When they disagree the SLUG wins, because it is the half with consequences:
+  // it builds the public URL and it names the capture files on disk. The key is
+  // internal and free to move. portfolio-audit.mjs enforces this, so a new
+  // project cannot reintroduce the split.
   key: string;
   slug: string; // resolves the capture: /portfolio/<slug>-<device>.webp
   label: string;
@@ -75,8 +84,15 @@ export type Project = {
 // Reel order. Rising Compass leads, AAC sits at the bottom.
 export const PROJECTS: Project[] = [
   {
-    key: "risingcompass",
-    slug: "risingcompass",
+    key: "rising-compass",
+    // Renamed from "risingcompass" 2026-07-28 (Chad). The slug is what the
+    // public URL is built from (/showroom/rising-compass/), so it takes the
+    // hyphen, and the key follows it -- see the KEY == SLUG rule above.
+    // Renaming the slug also renamed the captures it resolves
+    // (/portfolio/rising-compass-<device>.webp, /portfolio/wall/rising-compass.jpg)
+    // and the content file behind the page. The old URL 301s (see
+    // deploy/chadworks.conf).
+    slug: "rising-compass",
     label: "Rising Compass",
     url: "risingcompass.net",
     href: "https://risingcompass.net",
@@ -441,11 +457,13 @@ export const PROJECTS: Project[] = [
   // curated showcase (Chad, 2026-07-28). No `gridBlurb`, no `archiveRank`, no
   // `inShowcase` -- a hidden project renders no card, so any of those would be
   // dead data that reads as live, and portfolio-audit.mjs rejects them here.
-  // `slug` is "russtree", not the key: the slug is what resolves the capture
-  // (/portfolio/russtree-desktop.webp), and renaming it would orphan the files
-  // this entry exists to claim.
+  // Key and slug are both "russtree". The key used to be "russ-tree-service";
+  // it was aligned down to the slug on 2026-07-28, not the other way round,
+  // because the slug is what resolves the capture
+  // (/portfolio/russtree-desktop.webp) and it already matches the run-together
+  // form every other slug on this list uses.
   {
-    key: "russ-tree-service",
+    key: "russtree",
     slug: "russtree",
     label: "Russ Tree Service",
     url: "russtreeservice.com",

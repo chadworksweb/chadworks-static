@@ -8,7 +8,8 @@
 // rail navigates. Esc releases the lock back to normal page flow; clicking the
 // gem re-enters. Picks WebGL vs a lite gallery; always keeps a crawlable list.
 
-import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Reel } from "./Reel";
@@ -194,8 +195,18 @@ function StageShift() {
 // so by the time we are here the mode is settled and is never "static". Taking it as
 // a prop rather than reading the hook again is what lets the route keep three.js off
 // the wire for the devices that never render this at all.
-export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "static"> }) {
+export function PortfolioShowroom({
+  mode,
+  pageSlugs = [],
+}: {
+  mode: Exclude<ShowroomMode, "static">;
+  pageSlugs?: string[];
+}) {
   const items = SHOWROOM_ITEMS;
+  // Which pieces have a page of their own. Handed down from the server route
+  // (see ShowroomRoute) because a page exists only because a markdown file
+  // does, and this file cannot touch the filesystem.
+  const pageSet = useMemo(() => new Set(pageSlugs), [pageSlugs]);
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [interacted, setInteracted] = useState(false);
@@ -518,7 +529,14 @@ export function PortfolioShowroom({ mode }: { mode: Exclude<ShowroomMode, "stati
           JS, pre-decision, phone, tablet), and this component no longer mounts in
           any of them. */}
 
-      {sel && <SelectedFrame item={sel} closing={closing} onClose={requestClose} />}
+      {sel && (
+        <SelectedFrame
+          item={sel}
+          closing={closing}
+          onClose={requestClose}
+          pageHref={pageSet.has(sel.slug) ? `/showroom/${sel.slug}/` : undefined}
+        />
+      )}
 
       {/* Motion gate: the showroom needs live motion, so if the visitor has paused
           it, ask to turn it back on before entering (reuses the motion-invite card). */}
@@ -681,18 +699,25 @@ function LiteGallery({
   );
 }
 
+// `pageHref` is set only for a piece that HAS a page of its own. When it is set
+// it REPLACES the live-site link rather than joining it (Chad, 2026-07-28): the
+// room hands the visitor to the story, and the story is what hands them to the
+// live site. Every other piece keeps pointing straight out, so a project with no
+// page never loses its only way off the reel.
 function SelectedFrame({
   item,
   closing,
   onClose,
+  pageHref,
 }: {
   item: ShowroomItem;
   closing: boolean;
   onClose: () => void;
+  pageHref?: string;
 }) {
   const [hidden, setHidden] = useState(false);
   const invert =
-    item.key === "risingcompass" ||
+    item.key === "rising-compass" ||
     item.key === "chadlewine" ||
     item.key === "scinet" ||
     item.key === "aes" ||
@@ -735,17 +760,30 @@ function SelectedFrame({
                 <li key={i}>{b}</li>
               ))}
             </ul>
-            {/* Omitted for a piece with no public link (see showroom-data). */}
-            {item.href && (
-              <a
-                className={styles.visit}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
+            {/* One CTA, never two. A piece with a page sends the visitor there
+                (internal, same tab); a piece without one still points at the
+                live site; a piece with neither renders nothing at all, which is
+                only Thorobird today (see showroom-data). */}
+            {pageHref ? (
+              <Link
+                className={`${styles.visit} ${styles.visitPrimary}`}
+                href={pageHref}
                 onClick={(e) => e.stopPropagation()}
               >
-                Visit live site <span aria-hidden="true">&#8599;</span>
-              </a>
+                View project details <span aria-hidden="true">&#8594;</span>
+              </Link>
+            ) : (
+              item.href && (
+                <a
+                  className={styles.visit}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Visit live site <span aria-hidden="true">&#8599;</span>
+                </a>
+              )
             )}
           </div>
         </div>

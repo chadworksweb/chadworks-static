@@ -52,7 +52,7 @@
 ## Showroom
 
 - [Showroom](https://chadworks.co/showroom/)
-- [Rising Compass](https://chadworks.co/showroom/risingcompass/)
+- [Rising Compass](https://chadworks.co/showroom/rising-compass/)
 
 ## Essays
 

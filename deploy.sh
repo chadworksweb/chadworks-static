@@ -144,6 +144,19 @@ tar czf - -C out --no-wildcards-match-slash \
       --exclude='./portfolio/*.jpg' --exclude='./portfolio/*.png' . \
   | ssh "$SERVER" "sudo tar xzf - -C ${DOCROOT} && sudo chmod -R a+rX ${DOCROOT}"
 
+# Ghost audit. The four gates above all read out/, so none of them can see a
+# route that is on the SERVER and not in the build -- the sync never prunes, so a
+# deleted or renamed page keeps serving its last copy forever, carrying whatever
+# robots directive was baked in that day.
+#
+# Runs AFTER the sync (it reports on final server state) and never blocks: a
+# ghost is a cleanup task, not a reason to reject a build whose own content is
+# fine. It prints the prune command; removing files on prod is a decision someone
+# makes on purpose, not something a deploy does silently on the strength of a
+# diff. Add --prune here if you ever want it automatic.
+echo "Auditing for ghost routes (server-only) ..."
+node scripts/ghost-audit.mjs "$ENV" || true
+
 echo "Verifying (${ENV}):"
 # Non-fatal: don't let a failed curl abort a deploy whose files already synced.
 set +e

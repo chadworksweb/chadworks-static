@@ -18,6 +18,17 @@ import { isLaunched } from "@/lib/launch";
 import { FeaturedShowcase, type FeaturedItem } from "@/components/portfolio/FeaturedShowcase";
 import { ArchiveGrid, type ArchiveItem } from "@/components/portfolio/ArchiveGrid";
 import { ARCHIVE_PROJECTS, FEATURED_PROJECT, SHOWCASE_PROJECTS } from "@/lib/projects";
+import { getProjectPageSlugs } from "@/lib/project-pages";
+
+// Which projects have a page of their own at /showroom/<slug>/. A filesystem
+// question (a project has a page because src/content/projects/<slug>.md exists),
+// so it can only be asked from the server -- which this capsule and all four of
+// its host pages are. Nothing in this chain is a client component; if that ever
+// changes, this import is what will break the build, and the fix is to resolve
+// the list in each page and pass it down the way /showroom/ does for the reel.
+const PAGE_SLUGS = new Set(getProjectPageSlugs());
+const pageHrefFor = (slug: string): string | undefined =>
+  PAGE_SLUGS.has(slug) ? `/showroom/${slug}/` : undefined;
 
 // The flagship, taken from the entity rather than re-typed here.
 const FEATURED: FeaturedItem = {
@@ -51,6 +62,15 @@ export const ARCHIVE: ArchiveItem[] = ARCHIVE_PROJECTS.map((p) => ({
   label: p.label,
   ...(p.href ? { href: p.href } : {}),
   blurb: p.gridBlurb ?? p.reelBlurb,
+  // Only for a piece that has a page. The card swaps its live-site arrow for an
+  // "Explore <piece>" cue when this is set (see ArchiveGrid). Nothing in the
+  // curated grid has a page today -- the only one that does is the flagship,
+  // which renders as FeaturedShowcase and never as a card -- so this is dormant
+  // until the next project file lands. It is wired now rather than later
+  // because the alternative is a surface that quietly disagrees with /showroom/
+  // about which pieces have pages, and that is the exact defect lib/projects.ts
+  // was built to end.
+  ...(pageHrefFor(p.slug) ? { storyHref: pageHrefFor(p.slug) } : {}),
 }));
 
 // The default flagship lede -- used everywhere unless a host page overrides it.
@@ -124,6 +144,7 @@ export function PortfolioShowcaseCapsule({
           headingAs="h3"
           ctaUnderLede
           lede={featuredLede ?? FEATURED_LEDE}
+          pageHref={pageHrefFor(FEATURED_PROJECT.slug)}
         />
       </SectionShell>
       <SectionShell className="cw-port-archive-shell" trailingClassName={early}>

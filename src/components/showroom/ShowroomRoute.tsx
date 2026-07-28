@@ -26,7 +26,17 @@ const PortfolioShowroom = dynamic(
   { ssr: false },
 );
 
-export function ShowroomRoute({ archive }: { archive: ReactNode }) {
+// `pageSlugs` is the list of projects that have a page of their own at
+// /showroom/<slug>/. It is computed on the SERVER (it is a filesystem question)
+// and passed through here rather than imported, because anything the reel
+// imports lands in the three.js chunk and `fs` there breaks the build.
+export function ShowroomRoute({
+  archive,
+  pageSlugs = [],
+}: {
+  archive: ReactNode;
+  pageSlugs?: string[];
+}) {
   const { mode } = useShowroomMode();
 
   // `null` is the undecided first paint, `static` is a phone or a tablet. Both keep
@@ -36,5 +46,5 @@ export function ShowroomRoute({ archive }: { archive: ReactNode }) {
   // the archive from flashing there before the showroom's chunk lands.
   if (mode === null || mode === "static") return <div className={styles.archive}>{archive}</div>;
 
-  return <PortfolioShowroom mode={mode} />;
+  return <PortfolioShowroom mode={mode} pageSlugs={pageSlugs} />;
 }

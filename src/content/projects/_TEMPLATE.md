@@ -16,7 +16,7 @@ dek: ""
   back to being showroom-only. There is no flag to flip anywhere else.
 
   1. Copy this file. Rename it to the project's SLUG exactly as it appears in
-     src/lib/projects.ts, e.g. content/projects/risingcompass.md -> /showroom/risingcompass/.
+     src/lib/projects.ts, e.g. content/projects/rising-compass.md -> /showroom/rising-compass/.
      A file whose slug matches no project is ignored, deliberately: the page would
      have no capture, no live link, and nowhere in the room to be linked from.
   2. Fill title (or leave it blank to use the project's label) and dek.

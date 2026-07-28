@@ -176,6 +176,21 @@ for (const p of projects) {
     seenKeys.add(p.key);
   }
 
+  // KEY == SLUG. They drifted apart twice before this check existed
+  // (risingcompass/rising-compass, russ-tree-service/russtree) and both times
+  // it was silent: surfaces index on the key, files resolve from the slug, and
+  // reaching for the wrong one simply finds nothing. When they disagree the
+  // SLUG is right -- it builds the public URL and names the captures on disk.
+  if (p.key && p.slug && p.key !== p.slug) {
+    problems.push(
+      `Project "${where}" has key "${p.key}" but slug "${p.slug}".\n` +
+        `    These must match (Chad, 2026-07-28). The slug is the half with consequences -- it is\n` +
+        `    the public URL and the capture filename -- so change the KEY to "${p.slug}", not the\n` +
+        `    other way round. Renaming a slug means renaming /portfolio/${p.slug}-<device>.webp,\n` +
+        `    /portfolio/wall/${p.slug}.jpg, any src/content/projects/${p.slug}.md, and adding a 301.`
+    );
+  }
+
   if (p.featured) {
     if (p.archiveRank !== null) {
       problems.push(

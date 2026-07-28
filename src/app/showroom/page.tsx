@@ -29,8 +29,15 @@ import { getProjectPageSlugs } from "@/lib/project-pages";
 // on the server, because it is a filesystem question (a project has a page
 // because src/content/projects/<slug>.md exists) and showroom-data.ts is pulled
 // into the client bundle by the WebGL reel. An `fs` import in that chain breaks
-// the build. The cards below carry the link; the reel does not yet.
-const PAGE_SLUGS = new Set(getProjectPageSlugs());
+// the build.
+//
+// Both surfaces read the same answer. The archive cards take it as a resolved
+// href per item; the reel takes the bare slug LIST and is handed it as a prop
+// through ShowroomRoute, which is the only way across the server/client line
+// that does not put `fs` in the three.js chunk. An array of strings serializes;
+// a filesystem call does not.
+const PAGE_SLUG_LIST = getProjectPageSlugs();
+const PAGE_SLUGS = new Set(PAGE_SLUG_LIST);
 const ARCHIVE_ITEMS = SHOWROOM_ITEMS.map((item) =>
   PAGE_SLUGS.has(item.slug)
     ? { ...item, storyHref: `/showroom/${item.slug}/` }
@@ -150,7 +157,7 @@ export default function ShowroomPage() {
     <div className={`full ${showroomStyles.route}`}>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
-      <ShowroomRoute archive={<ShowroomArchive />} />
+      <ShowroomRoute archive={<ShowroomArchive />} pageSlugs={PAGE_SLUG_LIST} />
     </div>
   );
 }

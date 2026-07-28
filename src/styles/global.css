@@ -7640,7 +7640,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .cw-art-why__lead a { color: var(--accent); font-weight: 500; }
 .cw-art-why__lead a:hover { color: var(--text-primary); }
 .cw-art-why__right { min-width: 0; }
-.cw-art-last-updated { display: block; margin-top: 1.6rem; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-secondary); opacity: 0.7; }
+/* .cw-art-last-updated removed 2026-07-28: no visible dates outside /essays/. */
 
 /* ---- text-only lanes (no viz column): full width, four offset cards ---- */
 .cw-art-lane--text { grid-template-columns: 1fr; }
@@ -8186,6 +8186,10 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   display: inline-block;
   vertical-align: -0.12em;
 }
+/* The internal variant's arrow. A glyph rather than the outbound SVG, because
+   the two links mean different things and should not wear the same mark: this
+   one goes deeper into the site, that one leaves it. */
+.cw-port-feat__link-arrow { display: inline-block; }
 
 /* the layered stage: front piece over a counter-drifting back piece */
 .cw-port-feat__stage {
@@ -8252,53 +8256,23 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 @media (max-width: 600px) { .cw-port-grid { grid-template-columns: 1fr; } }
 
 .cw-port-card { display: flex; flex-direction: column; gap: var(--space-sm); }
-.cw-port-card__link {
-  display: block;
-  position: relative;
-  border-radius: calc(var(--radius) + 4px);
-  transition: transform 0.4s var(--ease-smooth);
-}
-.cw-port-card__link:hover { transform: translateY(-6px); }
-.cw-port-card__link:hover .cw-port-frame {
-  box-shadow:
-    0 1px 2px rgba(36, 57, 137, 0.10),
-    0 16px 30px rgba(36, 57, 137, 0.14),
-    0 40px 74px rgba(36, 57, 137, 0.22);
-  border-color: rgba(128, 84, 188, 0.4);
-}
-.cw-port-card__link:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 4px;
-}
-.cw-port-card__cue {
-  position: absolute;
-  right: 0.7rem;
-  bottom: 0.7rem;
-  z-index: 6;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.42rem 0.7rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(128, 84, 188, 0.35);
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.3s var(--ease-smooth), transform 0.3s var(--ease-smooth);
-  pointer-events: none;
-}
+/* REMOVED 2026-07-28: the whole .cw-port-card__link block, and with it a second
+   .cw-port-card__cue definition.
+   That was the retired card pattern, where the entire card was one <a> and the
+   cue was a pill that faded up from the frame's bottom-right on card hover. No
+   component has rendered .cw-port-card__link for some time -- it appears in zero
+   TSX files -- so the hover rules that revealed the pill could never fire.
+   The cue rule outlived it and kept matching, though. .cw-port-card__cue is
+   defined a second time further down as the inline text link ArchiveGrid
+   actually renders, but that block only overrides the properties it names: it
+   never reset `position: absolute`, `opacity: 0`, `transform` or
+   `pointer-events: none`. So every "View site" cue on every archive card -- the
+   homepage grid, the service-page grids, and /showroom/'s archive -- was
+   rendering invisible, unclickable and parked in the bottom-right corner.
+   Deleting the dead pattern leaves ONE definition of the cue, which is the one
+   that was always meant to apply. .cw-port-card__cue-arrow stays; the arrow
+   spans are still rendered. */
 .cw-port-card__cue-arrow { font-size: 0.8rem; line-height: 1; }
-.cw-port-card__link:hover .cw-port-card__cue,
-.cw-port-card__link:focus-visible .cw-port-card__cue {
-  opacity: 1;
-  transform: translateY(0);
-}
 .cw-port-card__meta { display: flex; flex-direction: column; gap: 0.35rem; }
 .cw-port-card__label {
   font-family: var(--font-display);
@@ -8307,8 +8281,23 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   color: var(--text-primary);
   margin: 0;
 }
-.cw-port-card__label a { color: inherit; text-decoration: none; }
-.cw-port-card__label a:hover { color: var(--accent); }
+/* A linked card title (only a piece with its own page gets one -- see
+   ArchiveGrid). NO resting treatment by design: it inherits the heading's colour
+   and carries no underline, so a card that links looks exactly like a card that
+   does not until you hover it. The hover is a colour shift and nothing else,
+   eased rather than snapped so it reads as a response and not a flicker. */
+.cw-port-card__label a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.25s var(--ease-smooth);
+}
+.cw-port-card__label a:hover,
+.cw-port-card__label a:focus-visible { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) {
+    .cw-port-card__label a { transition: none; }
+  }
+}
 
 /* ---- /showroom/'s archive only ----
    The card styles above are SHARED: the homepage runs 12 of these cards and
@@ -8334,6 +8323,12 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 .cw-showroom-archive .cw-port-card__blurb {
   text-align: center;
+}
+/* The cue is the last thing in the centered stack, so it centers with the rest.
+   `align-self` rather than `text-align` because .cw-port-card__meta is a flex
+   column and the cue sets its own align-self, which text-align cannot reach. */
+.cw-showroom-archive .cw-port-card__story {
+  align-self: center;
 }
 /* Space between the mockup card and the project title. On __meta (the whole text
    block below the card) rather than the title, so the card's own gap rhythm
@@ -8412,12 +8407,9 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   line-height: var(--leading-body);
   margin: 0;
 }
-@media (prefers-reduced-motion: reduce) {
-  html:not(.cw-force-motion) {
-    .cw-port-card__link, .cw-port-card__cue { transition: none; }
-    .cw-port-card__link:hover { transform: none; }
-  }
-}
+/* The .cw-port-card__link half of this went with the pattern above. The cue no
+   longer animates either (it is a plain text link now, not a pill that fades
+   up), so there is nothing left here to switch off. */
 
 /* ---- PORTFOLIO DEVICE VIEWER (desktop / tablet / mobile toggle) -------
    Each site is shown through a DeviceMockup: a fixed-height stage hosts the
@@ -8596,12 +8588,10 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   width: 100%;
   aspect-ratio: 1.5;
 }
-.cw-port-card__cue {
-  align-self: flex-start; margin-top: 0.2rem;
-  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.05em;
-  color: var(--accent); text-decoration: none;
-}
-.cw-port-card__cue:hover { text-decoration: underline; }
+/* .cw-port-card__cue removed 2026-07-28 along with its markup. It was the
+   card's "View site" text link, retired when the live-site affordance moved up
+   beside the heading (.cw-port-card__visit). Only .cw-port-card__story sits on
+   this row now, and only for a piece that has a page. */
 
 /* =====================================================================
    GEMSTONE CW (GemstoneCW.tsx) -- the faceted-glass CW mark section.
@@ -10925,14 +10915,36 @@ html.cw-motion-paused *::after {
   object-position: top center; /* screenshots read from the top */
 }
 
+/* Facts on the left, the live-site button top-right; one column on mobile
+   with the button last. The RULE lives on this wrapper rather than on the
+   fact list, so it spans the full reading column in both directions instead
+   of stopping short under the facts. */
+.cw-proj-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* flex-start, not stretch: the button sits at the TOP of the fact list, level
+   with the first row, rather than growing to the list's height. */
+.cw-proj-live { flex: 0 0 auto; }
+@media (max-width: 600px) {
+  .cw-proj-meta {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* Bottom of the stack, and left-aligned with the facts above it. */
+  .cw-proj-live { align-self: flex-start; }
+}
+
 /* The facts come from the project entity, so this row is the one place
    the page states them and the prose never repeats them. */
 .cw-proj-facts {
   display: grid;
   gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-md);
-  border-bottom: 1px solid var(--border-subtle);
 }
 .cw-proj-facts__row {
   display: flex;
@@ -10963,17 +10975,48 @@ html.cw-motion-paused *::after {
 }
 .cw-proj-facts dd a:hover { text-decoration: underline; }
 
-/* The "read the story" cue on an archive card, shown only for a project
-   that HAS a page (i.e. a markdown file exists for it). */
-.cw-port-card__story {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-  margin-top: 0.6rem;
+/* The live-site CTA. The showroom now hands a piece WITH a page to this page
+   instead of straight out, so this button is the only route to the client's
+   actual site.
+   It adds NOTHING to .svc-btn's box. The first pass wrapped it in a `p`, which
+   matched the global `p a` prose-link rule, so it had to opt out with
+   `background-image: none; padding-bottom: unset` -- and `unset` on
+   padding-bottom resolves to 0, which ate the button's own bottom padding and
+   pushed the label off centre. The wrapper is a `div` now, the selector never
+   matches, and .svc-btn's `align-items: center` and symmetric padding do the
+   centring unaided. */
+.cw-proj-live__arrow {
+  position: relative;
+  z-index: 1; /* ride above the .svc-btn hover wipe, same as .svc-btn__arrow */
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+/* A project that lost its live link keeps its page and says so. */
+.cw-proj-live--gone {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+/* The "view project details" cue on an archive card, shown INSTEAD of the
+   live-site cue for a project that HAS a page (i.e. a markdown file exists
+   for it). The two are mutually exclusive and occupy the same rung, so this
+   takes .cw-port-card__cue's metrics exactly and adds weight rather than a
+   different treatment -- a second look on the same row would read as a second
+   kind of link when it is the same link, aimed one step closer. */
+.cw-port-card__story {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  font-weight: 700;
   color: var(--accent);
   text-decoration: none;
   background-image: none;
