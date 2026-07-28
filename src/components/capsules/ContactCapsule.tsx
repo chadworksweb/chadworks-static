@@ -12,6 +12,10 @@ import { SectionShell } from "@/components/capsules/SectionShell";
 export type ContactCapsuleProps = {
   id?: string; // anchor target (e.g. "contact" for the header Contact button)
   heading: ReactNode;
+  // h2 everywhere the capsule CLOSES a page (the page owns its own h1). "h1"
+  // only on /contact/, where this capsule IS the page and there is no other
+  // heading above it -- without the override that page ships no h1 at all.
+  headingLevel?: "h1" | "h2";
   intro: ReactNode; // the "two ways in" note
   emailLabel: string;
   email: string;
@@ -29,6 +33,7 @@ export type ContactCapsuleProps = {
 export function ContactCapsule({
   id,
   heading,
+  headingLevel = "h2",
   intro,
   emailLabel,
   email,
@@ -40,13 +45,14 @@ export function ContactCapsule({
   quickLabel,
   detailedLabel,
 }: ContactCapsuleProps) {
+  const Heading = headingLevel;
   return (
     <SectionShell id={id} full className="band-dark cw-contact">
       <ContactOrbs />
       <div className="cw-contact__inner">
         <div className="cw-contact__layout">
           <div className="cw-contact__copy">
-            <h2 className="svc-cta__heading">{heading}</h2>
+            <Heading className="svc-cta__heading">{heading}</Heading>
             <p className="cw-contact__note">{intro}</p>
             <div>
               <p className="cw-contact__email-label">{emailLabel}</p>

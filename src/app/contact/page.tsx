@@ -8,6 +8,7 @@
 
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule } from "@/components/capsules";
 
@@ -45,21 +46,13 @@ const contactPageJsonLd = {
   name: "Contact",
   url: PAGE_URL,
   description: DESCRIPTION,
-  about: { "@type": "Organization", name: "chadworks", url: SITE_URL },
-  mainEntity: {
-    "@type": "Organization",
-    name: "chadworks",
-    url: SITE_URL,
-    email: EMAIL,
-    areaServed: "US",
-    founder: { "@type": "Person", name: "Chad Lewine" },
-    contactPoint: {
-      "@type": "ContactPoint",
-      email: EMAIL,
-      contactType: "sales",
-      availableLanguage: "English",
-    },
-  },
+  about: ref(ORG_ID),
+  // A REFERENCE, not a second Organization. This used to restate chadworks
+  // inline with no @id, which is exactly the fragmentation lib/jsonld.ts was
+  // written to prevent -- two "chadworks" org entities on the same page, one
+  // of them unlinked. The email, telephone, areaServed and contactPoint that
+  // lived here now live once on the canonical node (lib/jsonld.ts).
+  mainEntity: ref(ORG_ID),
 };
 
 const breadcrumbJsonLd = {
@@ -74,7 +67,10 @@ const breadcrumbJsonLd = {
 export default function ContactPage() {
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, contactPageJsonLd]}>
-      <MainContactCapsule />
+      {/* h1 here and NOWHERE else this capsule is used: /contact/ is the one
+          page where the capsule is the entire page, so its heading is the
+          page heading. Shipped without one until 2026-07-28. */}
+      <MainContactCapsule headingLevel="h1" />
     </PageComposer>
   );
 }

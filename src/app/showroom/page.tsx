@@ -12,6 +12,7 @@
 
 import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import { JsonLd } from "@/components/capsules/PageComposer";
 import { MainContactCapsule } from "@/components/capsules/MainContactCapsule";
@@ -83,7 +84,7 @@ const collectionJsonLd = {
   "@type": "CollectionPage",
   name: "chadworks portfolio showroom",
   url: PAGE_URL,
-  provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+  provider: ref(ORG_ID),
   mainEntity: {
     "@type": "ItemList",
     numberOfItems: SHOWROOM_ITEMS.length,

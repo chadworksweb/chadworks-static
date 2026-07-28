@@ -8,6 +8,7 @@
 
 import type { Metadata } from "next";
 import { SITE_URL, ORG } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import {
   PageComposer,
@@ -72,7 +73,7 @@ const personJsonLd = {
       "Ecommerce",
       "Email marketing",
     ],
-    worksFor: { "@type": "Organization", name: ORG.name, url: ORG.url },
+    worksFor: ref(ORG_ID),
   },
 };
 

@@ -933,9 +933,17 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 /* Per-letter staggered COLOR wave on hover: each letter pulses to the deep
    purple and back, offset by its index, so the pulse travels across the word.
    (chad-site logo-text-shimmer, staggered into a traveling wave.) */
-.nav-wave { display: inline-flex; }
+/* `inline`, NOT inline-flex/inline-block, and this is load-bearing for SEO.
+   Blockified letters become separate boxes in the layout tree, so Chrome's
+   rendered-text extraction -- which is what Googlebot indexes -- reads a
+   WaveText heading as "W\ne\nb\n \nD\ne\ns\ni\ng\nn" instead of "Web Design".
+   That silently gibberished all 15 service-name h3s on the homepage (verified
+   at both the Googlebot Smartphone and desktop viewports, 2026-07-28).
+   Nothing here needs a block box: the wave animates `color` only, which
+   applies just fine to inline spans. */
+.nav-wave { display: inline; }
 .nav-wave__letter {
-  display: inline-block;
+  display: inline;
   white-space: pre;
   transition: color var(--duration-base) var(--ease-smooth);
 }

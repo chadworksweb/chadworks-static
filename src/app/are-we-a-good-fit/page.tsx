@@ -20,6 +20,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import { LaunchLink } from "@/components/LaunchLink";
 import { PageComposer, MainContactCapsule } from "@/components/capsules";
@@ -63,7 +64,7 @@ const webPageJsonLd = {
   name: "Are We A Good Fit?",
   url: PAGE_URL,
   description: DESCRIPTION,
-  about: { "@type": "Organization", name: "chadworks", url: SITE_URL },
+  about: ref(ORG_ID),
 };
 
 const breadcrumbJsonLd = {

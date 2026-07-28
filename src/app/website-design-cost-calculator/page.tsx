@@ -50,6 +50,7 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
@@ -111,7 +112,7 @@ const webPageJsonLd = {
   name: "Website Design Cost Calculator",
   url: PAGE_URL,
   description: DESCRIPTION,
-  about: { "@type": "Organization", name: "chadworks", url: SITE_URL },
+  about: ref(ORG_ID),
   // E-E-A-T: the calculator and its rates are authored by a named expert. Points
   // at the canonical Person on /about/ (same name, url and jobTitle), so an
   // engine merges this into one author entity rather than a second Chad.
@@ -128,7 +129,7 @@ const webPageJsonLd = {
     name: "Custom website design and development",
     // Country, not State: the targets are national (Chad, 2026-07-17). This
     // scopes the entity to the US without pinning it to a region.
-    provider: { "@type": "Organization", name: "chadworks", url: SITE_URL },
+    provider: ref(ORG_ID),
     areaServed: { "@type": "Country", name: "United States" },
     offers: {
       "@type": "Offer",

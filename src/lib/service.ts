@@ -23,6 +23,20 @@ export const ORG = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   founder: "Chad Lewine",
+  // Both are already published in the footer and on /contact/, so the schema
+  // only restates what a visitor can see (the toolkit's "schema must match
+  // visible content" rule).
+  email: "chad@chadworks.co",
+  telephone: "+1-215-872-1240",
+  // NATIONAL, deliberately. chadworks is not run as a local-search business and
+  // is not targeting Greater Philadelphia as a market (Chad, 2026-07-28), so
+  // there is no LocalBusiness node, no address, and no metro areaServed here.
+  // "US" is the same claim /contact/'s ContactPage already makes and the same
+  // one /faqs/ makes in prose ("clients across the USA").
+  areaServed: "US",
+  // Fill in as real profiles are confirmed. Left EMPTY on purpose -- a sameAs
+  // pointing at a profile that is not demonstrably the same entity is worse
+  // than no sameAs at all.
   sameAs: [] as string[],
 } as const;
 
@@ -298,22 +312,10 @@ export function serviceUrl(s: Service): string {
   return `${SITE_URL}/${s.slug}/`;
 }
 
-// Site-wide Organization identity (GEO checklist 2 + 6). Emitted once in the
-// root layout so every page carries a consistent provider entity. `sameAs`
-// fills in as real profiles are confirmed; `logo` points at /logo.png (asset
-// pending -- add before ship).
-export function buildOrgJsonLd() {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: ORG.name,
-    legalName: ORG.legalName,
-    url: ORG.url,
-    logo: ORG.logo,
-    founder: { "@type": "Person", name: ORG.founder },
-    ...(ORG.sameAs.length ? { sameAs: ORG.sameAs } : {}),
-  };
-}
+// The canonical Organization @id, written literally rather than imported from
+// lib/jsonld.ts -- that module imports THIS one, so importing back would close
+// a cycle. Keep the string in step with jsonld.ts's ORG_ID.
+const ORG_REF = { "@id": `${SITE_URL}/#organization` } as const;
 
 export function buildServiceJsonLd(s: Service) {
   return {
@@ -323,11 +325,7 @@ export function buildServiceJsonLd(s: Service) {
     description: s.meta.description,
     url: serviceUrl(s),
     serviceType: s.title,
-    provider: {
-      "@type": "Organization",
-      name: ORG.name,
-      url: ORG.url,
-    },
+    provider: ORG_REF,
     // Value-based posture: an Offer with no fixed price, not a fake number.
     offers: {
       "@type": "Offer",

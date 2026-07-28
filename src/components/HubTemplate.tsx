@@ -14,6 +14,7 @@ import { PageMotion } from "@/components/PageMotion";
 import type { LeadFormConfig } from "@/lib/forms";
 import { MainContactCapsule } from "@/components/capsules";
 import { SITE_URL, ORG } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 
 export interface HubLane {
   label: string;
@@ -62,7 +63,7 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
     "@type": "CollectionPage",
     name: hub.title,
     url,
-    provider: { "@type": "Organization", name: ORG.name, url: ORG.url },
+    provider: ref(ORG_ID),
     hasPart: hub.lanes.map((l) => ({
       "@type": "WebPage",
       name: l.label,

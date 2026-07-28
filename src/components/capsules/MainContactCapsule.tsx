@@ -64,15 +64,20 @@ const DETAILED: LeadFormConfig = {
 export function MainContactCapsule({
   heading = "Tell me about your project.",
   intro = "Send me a message about your business, project or initiative. There are no dumb ideas and no stupid questions. Tell me your vision, big or small.",
+  headingLevel = "h2",
 }: {
   heading?: string;
   intro?: string;
+  // Only /contact/ passes "h1" -- there this capsule is the whole page. See
+  // ContactCapsule for why.
+  headingLevel?: "h1" | "h2";
 } = {}) {
   return (
     <ContactCapsule
       id="contact"
       scheme="inverted"
       heading={heading}
+      headingLevel={headingLevel}
       intro={intro}
       emailLabel="Email directly"
       email={EMAIL}

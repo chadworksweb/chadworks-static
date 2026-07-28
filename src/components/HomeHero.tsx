@@ -129,10 +129,13 @@ export default function HomeHero({ bare = false }: { bare?: boolean }) {
 
       <div className="home-hero__inner">
         <div className="home-hero__mark">
-        <h1 className="home-hero__wordmark">
-          {/* Accessible label; the per-letter spans below are decorative. */}
-          <span className="home-hero__sr">chadworks&trade;</span>
-
+        {/* The accessible name lives on the h1 itself rather than in a
+            visually-hidden span. aria-hidden keeps assistive tech out of the
+            decorative per-letter spans, but it does NOT remove them from the
+            rendered text layer, so the old sr span made the h1 index as
+            "chadworks(tm)>chadworks(tm)" -- the brand twice. aria-label gives
+            screen readers the same string with nothing duplicated. */}
+        <h1 className="home-hero__wordmark" aria-label="chadworks">
           <span className="home-hero__word" aria-hidden="true">
             {/* Terminal prompt cue -- a quiet mono chevron, the only nod to a
                 shell. Sits inline so the caret types just to its right. */}

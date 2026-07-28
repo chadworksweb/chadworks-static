@@ -8,6 +8,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
+import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
@@ -62,12 +63,12 @@ const webPageJsonLd = {
   name: "Rates",
   url: PAGE_URL,
   description: DESCRIPTION,
-  about: { "@type": "Organization", name: "chadworks", url: SITE_URL },
+  about: ref(ORG_ID),
   // Real, public numbers as a price specification an engine can lift.
   mainEntity: {
     "@type": "Service",
     name: "Website design and development",
-    provider: { "@type": "Organization", name: "chadworks", url: SITE_URL },
+    provider: ref(ORG_ID),
     offers: {
       "@type": "Offer",
       priceCurrency: "USD",
