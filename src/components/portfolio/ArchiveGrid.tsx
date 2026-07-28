@@ -42,8 +42,26 @@ export function ArchiveGrid({
           <DeviceMockup slug={item.slug} alt={item.alt} url={item.url} label={item.label} />
           <div className="cw-port-card__meta">
             <div className="cw-port-card__labelrow">
-              <Heading className="cw-port-card__label">{item.label}</Heading>
-              {item.href && (
+              {/* The title becomes the link when the piece HAS a page, pointing
+                  at the same place the cue below does -- a card title that reads
+                  as clickable should be. It carries no resting treatment at all
+                  (see .cw-port-card__label a: inherited color, no underline), so
+                  a card with a page looks identical to one without until the
+                  pointer lands. Every other card keeps a plain heading rather
+                  than linking out to the live site: the whole point of the rule
+                  above is that a piece with a page is reached through its page. */}
+              <Heading className="cw-port-card__label">
+                {item.storyHref ? (
+                  <a href={item.storyHref}>{item.label}</a>
+                ) : (
+                  item.label
+                )}
+              </Heading>
+              {/* The corner icon is the live-site affordance, so it follows the
+                  same rule as the cue below: a piece with a page of its own
+                  sends the visitor to the page, and the page carries the live
+                  link. Only pieces WITHOUT a page still point straight out. */}
+              {item.href && !item.storyHref && (
                 <a
                   className="cw-port-card__visit"
                   href={item.href}
@@ -73,21 +91,23 @@ export function ArchiveGrid({
               )}
             </div>
             <p className="cw-port-card__blurb">{item.blurb}</p>
-            {item.href && (
-              <a
-                className="cw-port-card__cue"
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View site <span className="cw-port-card__cue-arrow" aria-hidden="true">&#8599;</span>
-              </a>
-            )}
-            {/* Internal link, so it stays in the tab and is a real crawlable
+            {/* The ONLY cue on this row, and only a piece with a page of its own
+                gets one (Chad, 2026-07-28). There is deliberately no live-site
+                cue down here to pair it with: the live link moved up next to the
+                heading some time ago (.cw-port-card__visit) and that arrow is the
+                whole affordance now. A "View site" text link used to be rendered
+                here too and has been dead CSS-side ever since the move; the
+                markup went with it.
+                The cue NAMES the piece rather than saying "project", so it still
+                describes where it goes when it is read away from the card it sits
+                on -- a screen reader's link list, or a crawler weighing anchor
+                text, sees 23 identical cues otherwise.
+                Internal link, so it stays in the tab and is a real crawlable
                 edge from the room to the project's page. */}
             {item.storyHref && (
               <a className="cw-port-card__story" href={item.storyHref}>
-                Read the story
+                Explore {item.label}{" "}
+                <span className="cw-port-card__cue-arrow" aria-hidden="true">&#8594;</span>
               </a>
             )}
           </div>

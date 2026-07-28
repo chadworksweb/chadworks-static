@@ -163,7 +163,6 @@ export function ChatgptWhyLanes() {
         </div>
       </div>
 
-      <span className="cw-art-last-updated">Last updated 2026-05-30</span>
     </SectionShell>
   );
 }
