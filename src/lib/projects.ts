@@ -56,6 +56,20 @@ export type Project = {
   // The flagship. Renders as the full-width FeaturedShowcase instead of a card,
   // so it is excluded from the grid rather than ranked within it.
   featured?: boolean;
+
+  // ON THE RECORD, ON NO SURFACE. A hidden project exists as an entity -- it owns
+  // its slug, and therefore its captures -- but renders nowhere: not the reel,
+  // not the archive grid, not the curated showcase. It is how a piece stays
+  // accounted for without being shown (Chad, 2026-07-28).
+  //
+  // This is a FLAG, not a fourth list, for the reason in the header: a list of
+  // keys pointing at other keys is the shape that made a HELD_BACK typo silent.
+  //
+  // Because it renders no card, a hidden project carries no `gridBlurb` and no
+  // `archiveRank`, and portfolio-audit.mjs skips both checks for it. It still
+  // needs a unique key, a slug, and a capture on disk -- owning the capture is
+  // most of the point.
+  hidden?: boolean;
 };
 
 // Reel order. Rising Compass leads, AAC sits at the bottom.
@@ -421,6 +435,25 @@ export const PROJECTS: Project[] = [
       "Custom WordPress-to-static catering company website with pixel-perfection and custom form spam blocking.",
     archiveRank: 80,
   },
+
+  // HIDDEN. Exists as an entity so the russtree captures belong to something,
+  // and renders on no surface: not the reel, not the archive grid, not the
+  // curated showcase (Chad, 2026-07-28). No `gridBlurb`, no `archiveRank`, no
+  // `inShowcase` -- a hidden project renders no card, so any of those would be
+  // dead data that reads as live, and portfolio-audit.mjs rejects them here.
+  // `slug` is "russtree", not the key: the slug is what resolves the capture
+  // (/portfolio/russtree-desktop.webp), and renaming it would orphan the files
+  // this entry exists to claim.
+  {
+    key: "russ-tree-service",
+    slug: "russtree",
+    label: "Russ Tree Service",
+    url: "russtreeservice.com",
+    alt: "Russ Tree Service website, designed and developed by chadworks",
+    reelBlurb: "",
+    bursts: [],
+    hidden: true,
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -428,12 +461,18 @@ export const PROJECTS: Project[] = [
 // its own copy of the work, so a project cannot go missing from one of them.
 // ---------------------------------------------------------------------------
 
+/** Everything the site actually SHOWS, in reel order. Hidden projects exist in
+ *  PROJECTS (they own their slug and captures) but render on no surface, so
+ *  every view below is built from this rather than from PROJECTS directly.
+ *  Declared FIRST: the views below read it at module scope. */
+export const VISIBLE_PROJECTS: Project[] = PROJECTS.filter((p) => !p.hidden);
+
 /** The flagship: rendered full-width by FeaturedShowcase, never as a grid card. */
 export const FEATURED_PROJECT: Project =
-  PROJECTS.find((p) => p.featured) ?? PROJECTS[0];
+  VISIBLE_PROJECTS.find((p) => p.featured) ?? VISIBLE_PROJECTS[0];
 
 /** Everything that renders as a grid card, in ARCHIVE order (not reel order). */
-export const ARCHIVE_PROJECTS: Project[] = PROJECTS.filter((p) => !p.featured).sort(
+export const ARCHIVE_PROJECTS: Project[] = VISIBLE_PROJECTS.filter((p) => !p.featured).sort(
   (a, b) => (a.archiveRank ?? 0) - (b.archiveRank ?? 0)
 );
 

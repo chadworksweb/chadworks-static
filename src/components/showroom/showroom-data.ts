@@ -14,7 +14,7 @@
 //
 // Captures live at /public/portfolio/<slug>-*.webp (see lib/captures.ts).
 
-import { PROJECTS } from "@/lib/projects";
+import { VISIBLE_PROJECTS } from "@/lib/projects";
 
 export type ShowroomItem = {
   key: string;
@@ -30,10 +30,13 @@ export type ShowroomItem = {
   bursts: string[];
 };
 
-// The reel shows EVERY project, flagship included, in array order. `blurb` here
-// is the project's REEL blurb: short, written to be read while the piece moves
-// past. The longer showcase-grid copy is a separate field and is not used here.
-export const SHOWROOM_ITEMS: ShowroomItem[] = PROJECTS.map((p) => ({
+// The reel shows every VISIBLE project, flagship included, in array order.
+// (Hidden projects are entities that render on no surface -- see `hidden` in
+// lib/projects.ts. Reading VISIBLE_PROJECTS rather than PROJECTS is what keeps
+// them off the reel.) `blurb` here is the project's REEL blurb: short, written
+// to be read while the piece moves past. The longer showcase-grid copy is a
+// separate field and is not used here.
+export const SHOWROOM_ITEMS: ShowroomItem[] = VISIBLE_PROJECTS.map((p) => ({
   key: p.key,
   slug: p.slug,
   label: p.label,

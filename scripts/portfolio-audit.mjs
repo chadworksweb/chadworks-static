@@ -143,6 +143,7 @@ const projects = (projectsBody ? objectEntries(projectsBody) : []).map((e) => ({
   label: str(e, "label"),
   archiveRank: num(e, "archiveRank"),
   featured: bool(e, "featured") === true,
+  hidden: bool(e, "hidden") === true,
   inShowcase: bool(e, "inShowcase") === true,
   hasGridBlurb: has(e, "gridBlurb"),
   hasReelBlurb: has(e, "reelBlurb"),
@@ -162,7 +163,8 @@ for (const p of projects) {
 
   if (!p.key) problems.push(`A project in ${PROJECTS_FILE} has no \`key\`. Every surface indexes on it.`);
   if (!p.slug) problems.push(`Project "${where}" has no \`slug\`, so its capture cannot resolve.`);
-  if (!p.hasReelBlurb) problems.push(`Project "${where}" has no \`reelBlurb\`, so it renders blank on /showroom/.`);
+  if (!p.hasReelBlurb && !p.hidden)
+    problems.push(`Project "${where}" has no \`reelBlurb\`, so it renders blank on /showroom/.`);
 
   if (p.key) {
     if (seenKeys.has(p.key)) {
@@ -186,6 +188,23 @@ for (const p of projects) {
       problems.push(
         `Flagship "${where}" is marked \`inShowcase\`.\n` +
           `    It already renders above the grid; this would not add it, only mislead.`
+      );
+    }
+    continue;
+  }
+
+  // A hidden project renders on NO surface (see `hidden` in lib/projects.ts), so
+  // the grid-card requirements below do not apply to it. It still had to clear
+  // the key/slug checks above and its capture is still verified in section D --
+  // owning the capture is most of why a hidden project exists at all.
+  if (p.hidden) {
+    if (p.archiveRank !== null || p.inShowcase) {
+      problems.push(
+        `Hidden project "${where}" carries \`archiveRank\` or \`inShowcase\`.
+` +
+          `    Hidden means it renders on no surface, so grid placement on it is dead data
+` +
+          `    that reads as live. Drop the field, or drop \`hidden\`.`
       );
     }
     continue;
@@ -370,8 +389,15 @@ if (problems.length) {
 }
 
 const showcaseCount = projects.filter((p) => p.inShowcase).length;
+// Hidden projects render on no surface, so they are counted OUT of the card
+// total rather than into it -- a summary that folded them in would overstate
+// what the site actually shows, which is the class of quiet wrongness this
+// script exists to catch.
+const hiddenCount = projects.filter((p) => p.hidden).length;
+const cardCount = projects.length - hiddenCount - 1;
 console.log(
-  `Portfolio audit passed: ${projects.length} project(s) = 1 flagship + ${projects.length - 1} archive ` +
-    `card(s), ${showcaseCount} of them in the curated grid; keys and ranks unique; ` +
-    `both surfaces derived; ${wantedFiles.size} capture(s) present.`
+  `Portfolio audit passed: ${projects.length} project(s) = 1 flagship + ${cardCount} archive ` +
+    `card(s), ${showcaseCount} of them in the curated grid` +
+    (hiddenCount ? `, plus ${hiddenCount} hidden (on no surface)` : "") +
+    `; keys and ranks unique; both surfaces derived; ${wantedFiles.size} capture(s) present.`
 );
