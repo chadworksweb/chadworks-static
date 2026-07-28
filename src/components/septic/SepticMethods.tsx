@@ -273,10 +273,13 @@ export function SepticSitemapChapter() {
         </p>
       </div>
 
+      {/* data-nosnippet: a sample sitemap for a fictional company, with
+          placeholder town names under Service Areas. */}
       <div
         className="cw-art-sitemap"
         role="img"
         aria-label="Sample sitemap for a septic services site: Home branches into Services (8 pages), Service Areas (9 pages), and Company (5 pages)."
+        data-nosnippet
       >
         <div className="cw-art-sitemap__root">
           <div className="cw-art-sitemap__node cw-art-sitemap__node--home">

@@ -68,7 +68,11 @@ export function SepticBuild() {
         </div>
 
         <div className="cw-art-why__right" aria-hidden="true">
-          <div className="cw-art-mockup">
+          {/* data-nosnippet: this is a fictional septic company, and its copy
+              names placeholder towns. Without it Google can lift "Same-day
+              septic pumping in Anytown, Everytown" into a snippet for a real
+              query, and an assistant can quote it as a real business. */}
+          <div className="cw-art-mockup" data-nosnippet>
             <div className="cw-art-mockup__chrome">
               <span className="cw-art-mockup__dot" />
               <span className="cw-art-mockup__dot" />
@@ -168,7 +172,8 @@ export function SepticBuild() {
               <li>llms.txt for ChatGPT and Perplexity</li>
             </ul>
           </div>
-          <div className="cw-art-lane__viz">
+          {/* data-nosnippet: the nine town names in this list are placeholders. */}
+          <div className="cw-art-lane__viz" data-nosnippet>
             <svg viewBox="0 0 290 168" role="img" aria-labelledby="lane-02-title lane-02-desc" xmlns="http://www.w3.org/2000/svg">
               <title id="lane-02-title">Service-area schema covering nine towns</title>
               <desc id="lane-02-desc">A schema service-area list showing nine illustrative town entries.</desc>

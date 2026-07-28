@@ -346,7 +346,12 @@ export function WireframeCamera({
 
         <div className="cw-wfcam__sticky">
           <div className="cw-wfcam__stage">
-            <div className="cw-wfcam__viewport" ref={cameraRef}>
+            {/* data-nosnippet on the whole mock page: every section inside
+                depicts a FICTIONAL client site (SepticPros, placeholder towns,
+                555 numbers). It is illustration, not chadworks copy, and it
+                must never be lifted into a search snippet or quoted by an
+                assistant as a real business. */}
+            <div className="cw-wfcam__viewport" ref={cameraRef} data-nosnippet>
               <div className="cw-wfcam__page" ref={pageRef}>
                 {sections.map((s) => (
                   <div
