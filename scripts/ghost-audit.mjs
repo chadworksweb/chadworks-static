@@ -38,7 +38,14 @@
 // actually remove them, which is a decision someone makes on purpose.
 //
 // Usage:
-//   node scripts/ghost-audit.mjs [prod|staging] [--prune] [outDir]
+//   node scripts/ghost-audit.mjs [prod|staging] [--prune] [--only=/a/,/b/] [outDir]
+//
+// --only restricts the prune to the paths listed. It exists because the audit
+// runs against the LOCAL build, which can be ahead of what is deployed, and a
+// route caught mid-rename is a ghost that is still the live page. Pruning
+// /showroom/risingcompass/ off prod before the new URL and its 301 had shipped
+// would have 404'd an indexed page with no successor -- so the three genuinely
+// dead routes were pruned and that one was held. Same situation, same flag.
 //
 // Exits 1 when ghosts are found (so it can gate in CI or a pre-flight), 0 when
 // clean or after a successful --prune. deploy.sh calls it with `|| true`.
@@ -58,6 +65,18 @@ const DOCROOTS = {
 
 const args = process.argv.slice(2);
 const prune = args.includes("--prune");
+// --only=/a/,/b/ -- normalized to the same bare "a/b" keys the sets use, so it
+// accepts what the report prints ("/ai-viz/") without the caller reformatting.
+const onlyArg = args.find((a) => a.startsWith("--only="));
+const only = onlyArg
+  ? new Set(
+      onlyArg
+        .slice("--only=".length)
+        .split(",")
+        .map((s) => s.trim().replace(/^\//, "").replace(/\/$/, ""))
+        .filter(Boolean)
+    )
+  : null;
 const positional = args.filter((a) => !a.startsWith("--"));
 const envArg = positional[0] && DOCROOTS[positional[0]] ? positional.shift() : "prod";
 const OUT = positional[0] || "out";
@@ -161,15 +180,34 @@ if (!prune) {
 // Routes come from `find` output on the box, not from anything user-supplied,
 // but they are still built into a shell string, so anything outside a
 // conservative character set is refused rather than escaped.
-const unsafe = ghosts.filter((g) => !/^[A-Za-z0-9._\-/]*$/.test(g));
+// --only narrows the target list. A name that matches no ghost is an error
+// rather than a silent no-op: it means the caller is working from a stale
+// report, and the difference between "already gone" and "typo" matters when the
+// next thing you do is assume it was removed.
+let targets = ghosts;
+if (only) {
+  const unknown = [...only].filter((o) => !ghosts.includes(o));
+  if (unknown.length) {
+    console.error(`\nghost-audit: --only named ${unknown.length} path(s) that are not ghosts here:`);
+    for (const u of unknown) console.error(`  ${toUrlPath(u)}`);
+    console.error("Re-run without --prune to see the current list.\n");
+    process.exit(1);
+  }
+  targets = ghosts.filter((g) => only.has(g));
+  const held = ghosts.filter((g) => !only.has(g));
+  console.error(`\n--only: pruning ${targets.length}, HOLDING ${held.length}:`);
+  for (const h of held) console.error(`  ${toUrlPath(h)}  (left in place)`);
+}
+
+const unsafe = targets.filter((g) => !/^[A-Za-z0-9._\-/]*$/.test(g));
 if (unsafe.length) {
   console.error(`\nghost-audit: refusing to prune, unexpected characters in: ${unsafe.join(", ")}`);
   process.exit(1);
 }
 
-console.error(`\nPruning ${ghosts.length} route(s) from ${envArg} ...`);
+console.error(`\nPruning ${targets.length} route(s) from ${envArg} ...`);
 console.error("(page files only -- a directory that also holds assets keeps them)\n");
-const rmCmd = ghosts
+const rmCmd = targets
   .map((g) => {
     const dir = `'${DOCROOT}/${g}'`;
     return (
@@ -183,9 +221,13 @@ execFileSync("ssh", [SERVER, rmCmd], { stdio: "inherit" });
 
 const after = serverRoutes();
 const left = [...after].filter((r) => !built.has(r));
-if (left.length) {
-  console.error(`ghost-audit: ${left.length} route(s) still present after prune.`);
-  for (const g of left) console.error(`  ${toUrlPath(g)}`);
+const unexpected = left.filter((r) => !only || only.has(r));
+if (unexpected.length) {
+  console.error(`ghost-audit: ${unexpected.length} route(s) still present after prune.`);
+  for (const g of unexpected) console.error(`  ${toUrlPath(g)}`);
   process.exit(1);
 }
-console.log(`ghost-audit: pruned. ${after.size} route(s) on ${envArg}, all present in the build.`);
+console.log(
+  `ghost-audit: pruned ${targets.length}. ${after.size} route(s) on ${envArg}` +
+    (left.length ? `, ${left.length} ghost(s) deliberately held.` : ", all present in the build.")
+);
