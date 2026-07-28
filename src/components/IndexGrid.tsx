@@ -1,9 +1,9 @@
-// IndexGrid -- the shared layout for the two design-lane index pages
-// (/industries-served/ and /my-service-areas/). A hero (eyebrow + H1 +
+// IndexGrid -- the shared layout for the design-lane index pages. Only
+// /industries-served/ uses it now; the location index (/my-service-areas/) was
+// removed 2026-07-28 when the geo pages were scrapped. A hero (eyebrow + H1 +
 // lede) followed by a compact responsive card grid, reusing the existing
 // cross-industry grid classes (cw-industries__*) that the niche pages already
-// use. Industry and location are NEVER mixed: each index renders its own set.
-// Server component.
+// use. Server component.
 
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";

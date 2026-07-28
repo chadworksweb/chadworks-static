@@ -1,6 +1,8 @@
 // Route: /industries-served/ -- the INDUSTRY index (web design by trade).
-// Successor to the old chadworks /my-industry-specialties/ page. Industry only;
-// locations live separately at /my-service-areas/. A compact card grid, not a
+// Successor to the old chadworks /my-industry-specialties/ page. Industry only.
+// There is no location index: the geo pages (/my-service-areas/ and the nine
+// PA town pages) were REMOVED 2026-07-28 -- chadworks targets by ambition, not
+// location. Do not re-add a location axis here. A compact card grid, not a
 // long list. The full roster is listed; an industry without a launched page
 // renders sealed (dim, non-clickable) via IndexGrid's isLaunched gating.
 
@@ -24,7 +26,6 @@ const INDUSTRIES: IndexItem[] = [
   { name: "Bands & Musicians", desc: "Tours, EPK, merch", href: "/website-design-for-bands-musicians/" },
   { name: "Authors", desc: "Launches, mailing list", href: "/web-design-for-authors/" },
   { name: "Music Industry", desc: "Labels, studios, managers", href: "/music-industry-web-design/" },
-  { name: "PA Preferred Members", desc: "PA-grown, PA-made", href: "/web-design-for-pa-preferred-members/" },
   // Trades
   { name: "Chimney Sweep", desc: "Cleaning, repair", href: "/website-design-for-chimney-sweep/" },
   { name: "Excavation", desc: "Land clearing", href: "/website-design-for-excavation/" },

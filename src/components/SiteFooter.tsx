@@ -90,7 +90,6 @@ const COLUMNS: FooterGroup[][] = [
         { href: "/switch/gmail-to-workspace/", label: "Gmail to Workspace" },
         { href: "/switch/stop-paying-indeed/", label: "Stop Paying Indeed" },
         { href: "/industries-served/", label: "Industries Served" },
-        { href: "/my-service-areas/", label: "Service Areas" },
       ],
     },
   ],

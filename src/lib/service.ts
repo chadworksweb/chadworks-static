@@ -43,9 +43,10 @@ export const ORG = {
 // Lane 01 websites, Lane 02 visibility, Lane 03 consulting (added 2026-07-16,
 // Chad). `design` is NOT a lane in the IA (which names two, now three); it sits
 // in this union as a breadcrumb convenience for the specialized design pages,
-// which all override `breadcrumbParent` to point at /industries-served/ or
-// /my-service-areas/ rather than a /design/ hub. Do not read this union as the
-// lane model -- CWS-INFORMATION-ARCHITECTURE.md is the lane model.
+// which all override `breadcrumbParent` to point at /industries-served/ rather
+// than a /design/ hub. (It used to also point at /my-service-areas/; the geo
+// pages were scrapped 2026-07-28.) Do not read this union as the lane model --
+// CWS-INFORMATION-ARCHITECTURE.md is the lane model.
 export type Lane = "websites" | "visibility" | "design" | "consulting";
 
 // ---------------------------------------------------------------------
@@ -159,7 +160,7 @@ export type Service = {
   laneLabel: string;       // human label of the lane (breadcrumb)
   // OPTIONAL: override the middle breadcrumb crumb (the parent index) for pages
   // that do NOT sit under their lane hub. The flat-root design pages set this to
-  // point at /industries-served/ or /my-service-areas/ instead of /lane/.
+  // point at /industries-served/ instead of /lane/.
   breadcrumbParent?: { label: string; href: string };
   eyebrow: string;         // mono kicker
   title: string;           // the H1 -- matches the intent, one per page

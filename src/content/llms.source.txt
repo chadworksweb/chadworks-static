@@ -42,12 +42,6 @@
 - [Website Design for Bands & Musicians](https://chadworks.co/website-design-for-bands-musicians/)
 - [Web Design for Authors](https://chadworks.co/web-design-for-authors/)
 - [Music Industry Web Design](https://chadworks.co/music-industry-web-design/)
-- [Web Design for PA Preferred Members](https://chadworks.co/web-design-for-pa-preferred-members/)
-
-## Local web design (Pennsylvania)
-
-- [Service Areas](https://chadworks.co/my-service-areas/)
-- Town pages, each at its own flat URL: [Norristown](https://chadworks.co/website-design-for-norristown-pa/), [Ambler](https://chadworks.co/website-design-for-ambler-pa/), [Lansdale](https://chadworks.co/website-design-for-lansdale-pa/), [Conshohocken](https://chadworks.co/website-design-for-conshohocken-pa/), [Collegeville](https://chadworks.co/website-design-for-collegeville-pa/), [Pottstown](https://chadworks.co/website-design-for-pottstown-pa/), [Doylestown](https://chadworks.co/website-design-for-doylestown-pa/), [Phoenixville](https://chadworks.co/website-design-for-phoenixville-pa/), and [Lancaster](https://chadworks.co/website-design-for-lancaster-pa/).
 
 ## Switch
 
