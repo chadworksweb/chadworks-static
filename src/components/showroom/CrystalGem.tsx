@@ -33,6 +33,12 @@ const STAGE_SHIFT_FRAC = 0.1;
 const tmpA = new THREE.Vector3();
 const tmpB = new THREE.Vector3();
 const tmpC = new THREE.Vector3();
+// Scratch for the per-frame modelView. Module-level for the same reason as the
+// vectors above: this runs inside useFrame, so allocating here would mint a
+// matrix ~60 times a second and hand the collector a steady drip of garbage.
+// GC pauses on the main thread are what a visitor feels as a hover that hangs
+// before it responds, because :hover style recalc and paint queue behind them.
+const tmpNormalMV = new THREE.Matrix4();
 const BASE = 0.759; // 0.66 * 1.15 (gem sized up 15%)
 const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
@@ -890,8 +896,9 @@ export function CrystalGem({
     u.uProj.value.copy(camera.projectionMatrix);
     u.uView.value.copy(camera.matrixWorldInverse);
     u.uModel.value.copy(mesh.matrixWorld);
-    const mv = new THREE.Matrix4().multiplyMatrices(camera.matrixWorldInverse, mesh.matrixWorld);
-    u.uNormal.value.getNormalMatrix(mv);
+    u.uNormal.value.getNormalMatrix(
+      tmpNormalMV.multiplyMatrices(camera.matrixWorldInverse, mesh.matrixWorld),
+    );
     // uRes stays the VIEWPORT: it frames the room. The gradient carries its own frame
     // (uBoxOrigin/uBoxSize), so the two sources never fight over one uniform.
     u.uRes.value.set(w, h);
