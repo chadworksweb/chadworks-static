@@ -652,11 +652,7 @@ html:has(.route) { scrollbar-gutter: stable; }
   color: #fff;
   letter-spacing: 0.02em;
   box-shadow: 0 6px 18px rgba(102, 41, 188, 0.38);
-  /* Halved and matched to the card's curve, same reasoning. */
-  transition:
-    transform 90ms cubic-bezier(0.22, 0.7, 0.2, 1),
-    box-shadow 90ms cubic-bezier(0.22, 0.7, 0.2, 1),
-    background 90ms cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 .visitPrimary:hover {
   color: #fff;
@@ -747,16 +743,10 @@ html:has(.route) { scrollbar-gutter: stable; }
   appearance: none;
   -webkit-appearance: none;
   color: inherit;
-  /* HOVER TIMING (Chad, 2026-07-28): halved, and every property on the SAME
-     fast-start curve. It used to lift on cubic-bezier(0.22, 0.7, 0.2, 1) while
-     the glow and the border crawled in on plain `ease`, which is nearly flat at
-     the start: 30ms in, the lift was 36% done and the ignition only 11%. The
-     card moved and the response arrived late behind it, which is what read as
-     lag. It was never the frame rate. Keep these three on one curve. */
   transition:
-    transform 0.14s cubic-bezier(0.22, 0.7, 0.2, 1),
-    box-shadow 0.14s cubic-bezier(0.22, 0.7, 0.2, 1),
-    border-color 0.14s cubic-bezier(0.22, 0.7, 0.2, 1);
+    transform 0.28s cubic-bezier(0.22, 0.7, 0.2, 1),
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
 }
 /* Ornate hover: a masked gradient-ring frame that ignites around the card. */
 .featureCard::before {
@@ -771,9 +761,7 @@ html:has(.route) { scrollbar-gutter: stable; }
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
   opacity: 0;
-  /* Same clock and same curve as the card's lift -- this ring IS the hover
-     feedback, so it must not trail the movement. See .featureCard's transition. */
-  transition: opacity 0.14s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: opacity 0.28s ease;
   pointer-events: none;
 }
 /* ...and viewfinder corner flourishes inside the frame. */
@@ -792,8 +780,7 @@ html:has(.route) { scrollbar-gutter: stable; }
     linear-gradient(#cbb4f5, #cbb4f5) bottom right / 15px 1px no-repeat,
     linear-gradient(#cbb4f5, #cbb4f5) bottom right / 1px 15px no-repeat;
   opacity: 0;
-  /* Same clock and curve as the ring above and the lift itself. */
-  transition: opacity 0.14s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: opacity 0.28s ease;
   pointer-events: none;
 }
 .featureCard:hover,
@@ -1158,10 +1145,7 @@ html:has(.route) { scrollbar-gutter: stable; }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #eae4fb;
-  /* Halved and moved off `ease` (Chad, 2026-07-28). At 0.4s ease this colour was
-     6% along after 30ms and did not reach halfway until ~120ms, so the button
-     felt dead on approach with no frames dropped anywhere. */
-  transition: color 0.2s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: color 0.4s ease;
 }
 
 /* Leaves as the room arrives; returns as it goes. Same clock, same curve. */
@@ -1194,12 +1178,7 @@ html:has(.route) { scrollbar-gutter: stable; }
   );
   z-index: -1;
   pointer-events: none;
-  /* THIS is the ENTER button's loud feedback -- the ellipse, not the label
-     colour -- so it sets the felt response time. Halved and moved onto the same
-     fast-start curve as the label and the feature card. */
-  transition:
-    --enter-c0 0.2s cubic-bezier(0.22, 0.7, 0.2, 1),
-    --enter-c1 0.2s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: --enter-c0 0.4s ease, --enter-c1 0.4s ease;
 }
 /* Hover: the ellipse fades from brand blue to lavender -- colour only, same alpha. */
 .enter:hover,
@@ -1214,10 +1193,7 @@ html:has(.route) { scrollbar-gutter: stable; }
 /* The label lifts slightly on hover (the ellipse pool stays put as the anchor). */
 .enterText {
   display: inline-block;
-  /* Halved and matched: the label lift, the ellipse and the label colour are one
-     gesture, so they must share a clock or the button reads as three things
-     arriving separately. */
-  transition: transform 0.18s cubic-bezier(0.22, 0.7, 0.2, 1);
+  transition: transform 0.35s ease;
 }
 .enter:hover .enterText,
 .enter:focus-visible .enterText {
