@@ -148,7 +148,8 @@ const HOME_PATHS = [
 // only TEASES it: the eyebrow + heading right under the gemstone, then a frosted
 // "Read the manifesto" CTA into /about/.
 
-const PAGE_URL = `${SITE_URL}/`;
+const PAGE_PATH = "/";
+const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const TITLE = "chadworks | so you don't have to";
 const DESCRIPTION =
   "chadworks plans and builds digital destinations (cutting edge websites) and helps them show up where customers are searching (Google/ChatGPT, etc).";
@@ -157,9 +158,13 @@ export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
   alternates: { canonical: PAGE_URL },
-  // Override the site-wide noindex default (see layout.tsx). The homepage is
-  // the only route exposed to search during the staged relaunch.
-  robots: { index: true, follow: true },
+  // Override the site-wide noindex default (see layout.tsx). Gated on
+  // isLaunched like every other route, NOT hardcoded: launch.ts is explicit
+  // that a hardcoded `index: true` is the drift index-audit exists to catch,
+  // and it means pulling a route back from LAUNCHED would not actually seal
+  // the page. Harmless on the homepage, which is never coming out of the
+  // launched set, but the rule holds or it does not.
+  robots: { index: isLaunched(PAGE_PATH), follow: true },
 };
 
 // ---- BANDS ("At a glance") -- judgment count, every band earns its place. ----
