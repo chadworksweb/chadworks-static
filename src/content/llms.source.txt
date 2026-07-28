@@ -6,8 +6,6 @@
 
 - [chadworks](https://chadworks.co/)
 - [Are We A Good Fit?](https://chadworks.co/are-we-a-good-fit/)
-- [Showroom](https://chadworks.co/showroom/)
-- [Rising Compass](https://chadworks.co/showroom/risingcompass/)
 - [Website Design Cost Calculator](https://chadworks.co/website-design-cost-calculator/)
 
 ## Websites
@@ -50,6 +48,11 @@
 - [Squarespace to Static](https://chadworks.co/switch/squarespace-to-static/)
 - [Wix to Static](https://chadworks.co/switch/wix-to-static/)
 - [GoDaddy to Static](https://chadworks.co/switch/godaddy-to-static/)
+
+## Showroom
+
+- [Showroom](https://chadworks.co/showroom/)
+- [Rising Compass](https://chadworks.co/showroom/risingcompass/)
 
 ## Essays
 
