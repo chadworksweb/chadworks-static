@@ -167,15 +167,26 @@ const RAIL_IN_MS = STAGE_SECONDS * 1000;
 // state we are in rather than playing to an end.
 function IntroController({ immersive }: { immersive: boolean }) {
   useFrame((_, delta) => {
+    // CLAMP THE STEP, all three clocks (Chad, 2026-07-28). `advanceStage` always
+    // did; `entrance` and `intro` took raw delta, and that is a real bug the moment
+    // the shatter starts on mount: the wall's tile textures decode and upload on the
+    // MAIN THREAD, which stalls the frame loop for a few hundred ms. Raw delta then
+    // pushes the timeline ~20% forward in one frame, so the shards freeze mid-flight
+    // and TELEPORT rather than resume -- which reads as them vanishing.
+    //
+    // Clamped, a stall costs the animation a pause and nothing else: it picks up
+    // exactly where it stopped. The pause itself is the decode, and the only real
+    // cure for that is to stop decoding on this thread (see the note in TileWall).
+    const dt = Math.min(delta, 0.05);
     if (entrance.playing) {
-      entrance.p = Math.min(1, entrance.p + delta / ENTRANCE_DURATION);
+      entrance.p = Math.min(1, entrance.p + dt / ENTRANCE_DURATION);
       if (entrance.p >= 1) entrance.playing = false;
     }
     if (intro.playing) {
-      intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
+      intro.p = Math.min(1, intro.p + dt / INTRO_DURATION);
       if (intro.p >= 1) intro.playing = false;
     }
-    advanceStage(immersive ? 1 : 0, Math.min(delta, 0.05));
+    advanceStage(immersive ? 1 : 0, dt);
   });
   return null;
 }
@@ -218,21 +229,42 @@ export function PortfolioShowroom({
   const [wallRevealed, setWallRevealed] = useState(false);
   const [gemAssembled, setGemAssembled] = useState(false);
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
+  // The stage element. Handed to RightRail so a wheel gesture over the rail can be
+  // forwarded to the canvas and handled by the reel's one motion model.
+  const canvasWrapRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
   const [motionGate, setMotionGate] = useState(false);
-  // The load sequence: the grid dissolves in, THEN the gem shatters together out of
-  // its facets, THEN the enter button appears. The gem waits for the wall because it
-  // has no texture of its own -- it refracts the wall, so arriving first would show a
-  // hollow silhouette. Stable identity: TileWall calls this from a useFrame.
-  const onWallRevealed = useCallback(() => {
-    setWallRevealed(true);
+  // THE SHATTER STARTS ON MOUNT, NOT ON THE WALL (Chad, 2026-07-28).
+  //
+  // It used to be chained to the wall's reveal: the tiles had to decode and the veil
+  // had to dissolve before a single shard moved, which left a few hundred ms of a
+  // dead, motionless stage on every cold load. The stated reason was that the gem
+  // "has no texture of its own -- it refracts the wall, so arriving first would show
+  // a hollow silhouette."
+  //
+  // That reason does not survive the shards now starting OFF SCREEN. For the first
+  // stretch of the cascade there is nothing on screen to look hollow: the chips are
+  // outside the frame, flying in. By the time the earliest of them crosses the edge
+  // the wall has typically decoded, and any that beat it refract a dark stage, which
+  // is what the exit gem refracts anyway.
+  //
+  // So the entrance is started once, on mount, and the wall's reveal is now only
+  // what it always literally was: the moment the wall is up.
+  useEffect(() => {
+    if (mode !== "webgl") return;
     if (prefersReducedMotion() || isMotionPaused()) {
       skipEntrance(); // gem simply appears, assembled
       setGemAssembled(true);
       return;
     }
     startEntrance();
-    window.setTimeout(() => setGemAssembled(true), ENTRANCE_DURATION * 1000);
+    const t = window.setTimeout(() => setGemAssembled(true), ENTRANCE_DURATION * 1000);
+    return () => window.clearTimeout(t);
+  }, [mode]);
+
+  // Stable identity: TileWall calls this from a useFrame.
+  const onWallRevealed = useCallback(() => {
+    setWallRevealed(true);
   }, []);
 
   const total = items.length;
@@ -368,7 +400,7 @@ export function PortfolioShowroom({
       )}
 
       {mode === "webgl" && (
-        <div className={styles.canvasWrap}>
+        <div className={styles.canvasWrap} ref={canvasWrapRef}>
           <Canvas
             camera={{ position: [0, 0, 6], fov: 38 }}
             dpr={[1, 2]}
@@ -388,7 +420,7 @@ export function PortfolioShowroom({
                 the wall (veil included) until every reel texture had decoded, so
                 the pre-click stage sat empty on first load. */}
             <Suspense fallback={null}>
-              <TileWall items={items} onRevealed={onWallRevealed} />
+              <TileWall onRevealed={onWallRevealed} />
             </Suspense>
             {/* The reel pulls the full-res shots (~5.7MB, and ~20MB of GPU upload
                 EACH once decoded) and is invisible until entry, so mounting it up
@@ -409,7 +441,12 @@ export function PortfolioShowroom({
                 />
               </Suspense>
             )}
-            <CrystalGem immersive={immersive} show={wallRevealed} focused={selected != null} />
+            {/* `show` no longer waits for the wall. It was what held the mark back
+                until the tiles had decoded, and with the entrance now starting on
+                mount that would have run the whole cascade invisibly and revealed an
+                already-assembled gem. The shards start off screen, so there is
+                nothing to see too early. */}
+            <CrystalGem immersive={immersive} show focused={selected != null} />
           </Canvas>
 
           {/* Entry: click the gem to enter (and trigger the cold open). Held back
@@ -463,6 +500,7 @@ export function PortfolioShowroom({
                 exiting={!immersive}
                 onGo={goTo}
                 onOpen={setSelected}
+                canvasWrapRef={canvasWrapRef}
               />
 
               <div className={`${styles.feature} ${immersive ? "" : styles.featureOut}`}>
@@ -592,6 +630,7 @@ function RightRail({
   exiting,
   onGo,
   onOpen,
+  canvasWrapRef,
 }: {
   items: ShowroomItem[];
   index: number;
@@ -599,6 +638,8 @@ function RightRail({
   exiting: boolean;
   onGo: (i: number) => void;
   onOpen: (i: number) => void;
+  /** The stage the rail forwards its wheel gestures to -- see the note on onWheel. */
+  canvasWrapRef: React.RefObject<HTMLDivElement | null>;
 }) {
   // Normal: click the centered item to open it, any other to slide to it. While a
   // project is focused, a click switches the focus straight to the clicked item
@@ -640,25 +681,38 @@ function RightRail({
   // canvas never saw these events and the strip that says "scroll" was the one
   // place scrolling did nothing.
   //
-  // Same semantics as the reel's handler on purpose (Reel.tsx): one step per
-  // gesture, a 420ms lock so a trackpad's inertia does not fire a dozen, and
-  // preventDefault so the locked page underneath cannot take the scroll instead.
-  // Routed through onGo so the reel and the rail stay the same one selection.
-  const wheelLock = useRef(0);
+  // It must feel like ONE SURFACE, so it does not get its own motion model -- it
+  // FORWARDS the gesture to the canvas and the reel handles it exactly as if the
+  // pointer had been over the stage (Chad, 2026-07-29: "it still scrolls in chunks").
+  //
+  // This used to be a copy of the reel's old semantics: one step per gesture behind a
+  // 420ms lock. Once the reel went continuous, a duplicate stepper here would have
+  // meant the strip labelled "scroll" was the one place that still moved in hops, and
+  // scrolling would change character depending on which few hundred pixels the pointer
+  // happened to be over. Forwarding means there is one implementation and it cannot
+  // drift out of step with itself again.
   useEffect(() => {
     const nav = navRef.current;
     if (!nav || exiting) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const now = performance.now();
-      if (now < wheelLock.current) return;
-      wheelLock.current = now + 420;
-      const next = Math.min(items.length - 1, Math.max(0, index + (e.deltaY > 0 ? 1 : -1)));
-      if (next !== index) onGo(next);
+      const canvas = canvasWrapRef.current?.querySelector("canvas");
+      if (!canvas) return;
+      // A fresh event rather than the original: a dispatched event carries
+      // `defaultPrevented` with it, and the reel's handler calls preventDefault of its
+      // own. deltaMode is copied because the reel normalises lines/pages to pixels.
+      canvas.dispatchEvent(
+        new WheelEvent("wheel", {
+          deltaY: e.deltaY,
+          deltaMode: e.deltaMode,
+          bubbles: false,
+          cancelable: true,
+        }),
+      );
     };
     nav.addEventListener("wheel", onWheel, { passive: false });
     return () => nav.removeEventListener("wheel", onWheel);
-  }, [index, items.length, onGo, exiting]);
+  }, [exiting]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;

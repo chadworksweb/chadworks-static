@@ -17,8 +17,9 @@
 // only hand us a hydration mismatch against the archive above.
 
 import dynamic from "next/dynamic";
-import { useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { useShowroomMode } from "./useShowroomMode";
+import { preloadWallComposite } from "./wall-composite";
 import { getServerSurface, getSurface, setSurface, subscribeSurface } from "./showroom-surface";
 import styles from "./showroom.module.css";
 
@@ -66,6 +67,16 @@ export function ShowroomRoute({
   // than a page to be ranked. The two surfaces are a rendering choice, not two
   // documents. A reload returns to the default.
   const surface = useSyncExternalStore(subscribeSurface, getSurface, getServerSurface);
+
+  // Ask for the wall image the moment we know this device is getting the showroom,
+  // which is BEFORE the three.js chunk has finished downloading. Left to TileWall,
+  // the fetch could not start until that ~1MB chunk had parsed and mounted, so the
+  // stage waited for the chunk and THEN for the image, back to back. Requested here
+  // the two overlap. Not in the served HTML, because only a desktop-class device
+  // ever needs it and a phone should never spend 610KB on a wall it will not draw.
+  useEffect(() => {
+    if (mode === "webgl") preloadWallComposite();
+  }, [mode]);
   const archiveChosen = surface === "simple";
 
   // `null` is the undecided first paint, `static` is a phone or a tablet. Both keep
