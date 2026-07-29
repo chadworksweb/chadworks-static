@@ -85,8 +85,8 @@ export const aiSearchVisibility: Service = {
         <>
           No tricks, no schemes and no ploys. This is all the art and science of
           AI search visibility.{" "}
-          <Link href="/contact/">Contact me</Link> if you don&apos;t want to
-          become invisible.
+          <Link href="/contact/">Contact me</Link>{" "}
+          if you don&apos;t want to become invisible.
         </>,
       ],
     },
