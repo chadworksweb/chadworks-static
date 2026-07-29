@@ -39,3 +39,41 @@ export function subscribeSurface(fn: () => void): () => void {
     subscribers.delete(fn);
   };
 }
+
+// ---------------------------------------------------------------------------
+// CAN THIS DEVICE RUN THE ROOM AT ALL -- a separate question from which surface
+// the visitor asked for, and it travels the same way and for the same reason:
+// ShowroomRoute knows the answer, and the "view immersive showroom" button is
+// built into SERVER markup with no prop path back to it.
+//
+// `null` means undecided (the first paint, before useShowroomMode's effect runs).
+// The button reads this to know whether a click can succeed. It does NOT read it
+// to decide whether to EXIST: the button is always offered on a desktop-class
+// device, because a control that silently vanishes teaches a visitor that the
+// feature is gone rather than that their browser cannot run it (Chad, 2026-07-29 --
+// the archive was a dead end with no way back and no explanation).
+
+let roomAvailable: boolean | null = null;
+const roomSubscribers = new Set<() => void>();
+
+export function getRoomAvailable(): boolean | null {
+  return roomAvailable;
+}
+
+/** The server has no device to test, so it can never answer this. */
+export function getServerRoomAvailable(): boolean | null {
+  return null;
+}
+
+export function setRoomAvailable(next: boolean | null): void {
+  if (next === roomAvailable) return;
+  roomAvailable = next;
+  for (const fn of roomSubscribers) fn();
+}
+
+export function subscribeRoomAvailable(fn: () => void): () => void {
+  roomSubscribers.add(fn);
+  return () => {
+    roomSubscribers.delete(fn);
+  };
+}

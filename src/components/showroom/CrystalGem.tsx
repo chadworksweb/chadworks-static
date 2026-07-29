@@ -49,6 +49,39 @@ const BASE = 0.759; // 0.66 * 1.15 (gem sized up 15%)
 // plus the mark's own extent, with room to spare. See the distance note in the
 // per-facet loop below -- it is the target that loop solves for.
 const OFFSCREEN_R = 6;
+// The mark's own half-extent, so a shard is clear of the frame by its whole body
+// rather than by its centroid.
+const MARK_EXTENT = 0.8;
+// Breathing room past the corner, in world units.
+const OFFSCREEN_MARGIN = 0.35;
+// Ceiling, and it is the Z BUDGET that sets it: the longest travel is R * 1.45 and
+// MAX_Z_FRAC of that must stay inside the 2.4 units between the mark and the wall, or
+// shards fly behind an opaque depth-tested plane and get culled (the old "starts,
+// freezes, restarts" bug). 7.5 * 1.45 * 0.16 = 1.74, still clear.
+const OFFSCREEN_R_MAX = 7.5;
+
+/**
+ * How far out a shard must start to be off screen, measured from the ACTUAL viewport.
+ *
+ * WHY THIS IS NOT A CONSTANT ANY MORE (Chad, 2026-07-29: "can the shatter start
+ * sooner?"). It was 6 -- a single number that had to hold on an ultrawide, where the
+ * visible corner is ~5.3 world units out. On a 16:10 screen the corner is only ~3.9,
+ * so every shard began 2+ units further away than it needed to and spent the opening
+ * of the timeline travelling through empty space. With the smoothstep ease that is
+ * ~0.28 of `uAssemble` before the first chip crosses the edge: about 810ms of a 2.9s
+ * entrance in which the stage is provably empty.
+ *
+ * Measuring the corner instead gives back most of that on a normal screen, and still
+ * puts the shards outside the frame on a wide one -- which is the property that
+ * actually has to hold.
+ */
+function offscreenRadius(camera: THREE.PerspectiveCamera, aspect: number, markZ: number): number {
+  const dist = camera.position.z - markZ;
+  const halfH = Math.tan(((camera.fov * Math.PI) / 180) / 2) * dist;
+  const halfW = halfH * aspect;
+  const corner = Math.hypot(halfW, halfH);
+  return Math.min(OFFSCREEN_R_MAX, corner + MARK_EXTENT + OFFSCREEN_MARGIN);
+}
 // How much of that travel a shard may spend on DEPTH, as a fraction. The wall is at
 // z -1.6 and the mark at +0.8, so anything past ~2.4 deep is behind an opaque,
 // depth-tested plane and gets culled the moment the tiles paint. Longest travel here
@@ -74,7 +107,7 @@ const SHATTER_VERT = `precision highp float;
 in vec3 position; in vec3 normal;
 in vec3 aCentroid; in vec3 aShardDir; in vec3 aShardAxis; in vec3 aShardRnd; in vec3 aLetterC; in float aSelfDir;
 uniform mat4 uProj, uView, uModel; uniform mat3 uNormal;
-uniform float uAssemble, uOrbit, uSelf; uniform vec3 uBary;
+uniform float uAssemble, uOrbit, uSelf, uOffscreenR; uniform vec3 uBary;
 out vec3 vN; out vec3 vViewPos; out vec3 vPos; out vec4 vHomeClip;
 mat3 axisRot(vec3 ax, float ang){
   float s = sin(ang), c = cos(ang), t = 1.0 - c; vec3 a = normalize(ax);
@@ -96,7 +129,12 @@ void main(){
   float sh = 1.0 - e;               // 1 = fully exploded, 0 = assembled
   mat3 R = axisRot(aShardAxis, sh * aShardRnd.y);
   vec3 local = R * (position - aCentroid);
-  vec3 disp = aShardDir * (sh * aShardRnd.z);
+  // aShardRnd.z is a NORMALISED multiplier (0.95-1.45); the world distance comes from
+  // uOffscreenR, which is measured from the live viewport. See the note beside
+  // offscreenRadius() -- a fixed radius had to be sized for an ultrawide, so on a
+  // normal screen the shards flew a long way in empty space before anyone could see
+  // them, and the shatter looked like it started late.
+  vec3 disp = aShardDir * (sh * aShardRnd.z * uOffscreenR);
   vec3 P = aCentroid + local + disp;
   // The chip TUMBLES, but it is SHADED as its seated self (see vViewPos/vHomeClip
   // below), so its normal must stay the seated one -- rotating it here would swing
@@ -616,7 +654,9 @@ export function CrystalGem({
       // angle. OFFSCREEN_R is the radius to clear in world units at the mark's depth:
       // it covers half-width on an ultrawide plus the mark's own extent, so nothing
       // is ever caught on screen at rest, whatever the viewport.
-      sRnd[s * 3 + 2] = OFFSCREEN_R * (0.95 + h2 * 0.5);
+      // NORMALISED, not absolute: the world distance is applied in the shader from
+      // uOffscreenR so it can follow the viewport without rebuilding this geometry.
+      sRnd[s * 3 + 2] = 0.95 + h2 * 0.5;
       sLetterC[s * 3] = isC ? lax : wax;
       sLetterC[s * 3 + 1] = isC ? lay : way;
       sLetterC[s * 3 + 2] = isC ? laz : waz;
@@ -677,6 +717,10 @@ export function CrystalGem({
         uCursor: { value: new THREE.Vector2(0, 0) },
         uSpecDamp: { value: 0 },
         uAssemble: { value: 1 },
+        // Replaced every frame from the live viewport (see offscreenRadius). The old
+        // constant is the seed so the very first frame is never SHORTER than the
+        // worst case, which would flash a shard on screen at rest.
+        uOffscreenR: { value: OFFSCREEN_R },
         uOrbit: { value: 0 },
         uSelf: { value: 0 },
         uBary: { value: new THREE.Vector3() },
@@ -796,6 +840,16 @@ export function CrystalGem({
     // Drive the reverse-shatter: shards fly in and reassemble in the vertex
     // shader as this climbs 0 -> 1 (default 1 = solid gem for return visits).
     material.uniforms.uAssemble.value = entrance.p;
+
+    // Only while it can matter. Once assembled, `sh` is 0 and the radius multiplies
+    // nothing, so there is no reason to keep measuring the frustum every frame.
+    if (entrance.p < 1) {
+      material.uniforms.uOffscreenR.value = offscreenRadius(
+        camera as THREE.PerspectiveCamera,
+        size.width / size.height,
+        GEM_Z,
+      );
+    }
 
     // The crossfade: 0 = the exit gem, 1 = the entered gem. Everything that differs
     // between them rides this one value, so the look, the dance and the lens shift

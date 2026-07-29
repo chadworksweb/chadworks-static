@@ -21,11 +21,12 @@
 // The trade, stated plainly: three fixed walls picked at random, instead of a fresh
 // shuffle every visit. Re-run the capture to reroll them.
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
 import { useThree, useFrame, useLoader } from "@react-three/fiber";
 import { stage, intro } from "./showroom-intro";
 import * as THREE from "three";
 import { WALL_COMPOSITE_SRC } from "./wall-composite";
+import { wmark } from "./wall-perf";
 
 // BEHIND the reel (ITEM_Z = -1.4), not on it. The wall is the backdrop: the reel has
 // to be able to cover it.
@@ -39,20 +40,28 @@ const COMPOSITE_W = 2560;
 const COMPOSITE_H = 1600;
 
 export function TileWall({ onRevealed }: { onRevealed?: () => void }) {
-  const { camera } = useThree();
+  const { camera, size } = useThree();
   const groupRef = useRef<THREE.Group>(null);
   useWallHide(groupRef);
-  // Lay the wall out against the STABLE viewport, not the R3F canvas size, so the
-  // enter/exit canvas resize never re-sizes the wall.
-  const [vp, setVp] = useState(() => ({
-    w: typeof window !== "undefined" ? window.innerWidth : 1440,
-    h: typeof window !== "undefined" ? window.innerHeight : 900,
-  }));
-  useEffect(() => {
-    const onResize = () => setVp({ w: window.innerWidth, h: window.innerHeight });
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  // ONE WIDTH, USED TWICE. The plane's aspect and the texture's `repeat` MUST come
+  // from the same number or the mapping is not 1:1 and the bricks come out the wrong
+  // size.
+  //
+  // This used to lay out against `window.innerWidth` while `repeat` came from the
+  // canvas, on the theory that the window is the stable measure and the canvas
+  // resizes on enter/exit. Both halves of that were wrong:
+  //
+  //   - The canvas does NOT resize. It is 1585x1000 on the landing screen, in
+  //     immersive, and back again -- `scrollbar-gutter: stable` on the route is what
+  //     holds it still, which is exactly what that rule is there for.
+  //   - `window.innerWidth` INCLUDES the scrollbar gutter and the canvas does not, so
+  //     the two disagreed by 15px at 1600. The plane was sized for a 1600-wide
+  //     viewport and drawn into 1585, magnifying the wall ~0.95% -- about 24px of
+  //     drift across the 2560px texture. Visible as the wall "stretching" the moment
+  //     the canvas took over from the CSS backdrop (Chad, 2026-07-29).
+  //
+  // `size` is the canvas, so this is now 1:1 with CSS pixels and lands exactly on the
+  // CSS background in showroom.module.css. Change one, change the other.
 
   // EXACTLY the visible box at the wall's depth. Not a pixel more.
   //
@@ -68,8 +77,11 @@ export function TileWall({ onRevealed }: { onRevealed?: () => void }) {
     const dist = cam.position.z - WALL_Z;
     const vFov = (cam.fov * Math.PI) / 180;
     const visH = 2 * Math.tan(vFov / 2) * dist;
-    return { wallW: visH * (vp.w / vp.h), wallH: visH };
-  }, [camera, vp.w, vp.h]);
+    // R3F takes the camera's aspect from the canvas, so visible width at this depth
+    // is visH * (canvas aspect). Using the same aspect here makes the plane EXACTLY
+    // the visible box.
+    return { wallW: visH * (size.width / size.height), wallH: visH };
+  }, [camera, size.width, size.height]);
 
   return (
     <group ref={groupRef} position={[0, 0, WALL_Z]}>
@@ -121,6 +133,9 @@ function WallImage({
   const bitmap = useLoader(THREE.ImageBitmapLoader, WALL_COMPOSITE_SRC, (loader) => {
     (loader as THREE.ImageBitmapLoader).setOptions({ imageOrientation: "flipY" });
   }) as unknown as ImageBitmap;
+  // TEMPORARY DIAGNOSTIC. useLoader suspends, so reaching this line at all means the
+  // bytes are fetched AND the bitmap is decoded.
+  wmark("bitmap-ready");
 
   const { size } = useThree();
 
@@ -164,6 +179,10 @@ function WallImage({
   // The wall is up the moment this commits. There is no dissolve to wait for any more,
   // so everything that was gated on the reveal is released a full 620ms earlier.
   useEffect(() => {
+    wmark("wall-committed");
+    // TEMPORARY DIAGNOSTIC. The commit puts the mesh in the tree; this is the frame
+    // that actually draws it, which is when a visitor first SEES the wall.
+    requestAnimationFrame(() => wmark("wall-painted"));
     onRevealed?.();
   }, [onRevealed]);
 

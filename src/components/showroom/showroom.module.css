@@ -1,6 +1,6 @@
 /* Portfolio showroom (Track A). Full-bleed, ~100dvh cinematic stage. The 3D
    drum draws into the canvas; this module owns the chrome (HUD, selected frame,
-   lite gallery, SEO fallback). Brand palette pulled from GemstoneCW / CodeFall. */
+   SEO fallback). Brand palette pulled from GemstoneCW / CodeFall. */
 
 /* Hold the scrollbar's width for the LIFE OF THIS ROUTE, and only this route.
    `.route` is on the server-rendered page wrapper, so the gutter is reserved the
@@ -11,6 +11,33 @@
    scroll container, so the gutter survives that too. Nothing outside /showroom/
    sees this rule. */
 html:has(.route) { scrollbar-gutter: stable; }
+
+/* THE BAKED WALL, PAINTED AS A CSS BACKGROUND.
+   ---------------------------------------------------------------------------
+   WHY. Measured 2026-07-29 on a 4g cold load: the wall image is downloaded and
+   sitting in cache ~260ms in, and did not reach the screen until ~1840ms. None of
+   that 1.6s was the image. It was the serial chain only WebGL can walk -- wait for
+   the 246KB three.js chunk, create a GL context, mount R3F, then upload 2560x1600
+   as a 15.6MB RGBA texture. A background-image skips every step and paints the
+   moment the bytes land.
+
+   The WebGL wall STAYS. The gem refracts whatever is behind it on the landing
+   screen (uBg), so the wall has to exist in the scene as well as under it. This
+   layer is what covers the gap until it does.
+
+   THESE TWO VALUES MIRROR TileWall's COMPOSITE_W / COMPOSITE_H. They are what makes
+   the handoff invisible: TileWall maps the texture 1:1 to CSS pixels, centred, with
+   RepeatWrapping, which is precisely `center / 2560px 1600px repeat`. So the CSS
+   wall and the WebGL wall put the same brick on the same pixel, and when the canvas
+   takes over nothing moves. CHANGE ONE, CHANGE BOTH -- and the capture size in
+   scripts/build-wall-composites.mjs is the third copy.
+
+   `--wall-src` itself is set by an inline script in the showroom page, because
+   choosing one of three bakes at random is the one part of this CSS cannot do. */
+html:has(.route) {
+  --wall-w: 2560px;
+  --wall-h: 1600px;
+}
 
 .wrap {
   /* THE GEM IS THE NORTH STAR. Its dark->light crossfade (showroom-intro's `stage`,
@@ -114,6 +141,20 @@ html:has(.route) { scrollbar-gutter: stable; }
   position: absolute;
   inset: 0;
   touch-action: none; /* the reel owns drag on touch devices that hit webgl */
+  /* THE WALL, AS A PLAIN BACKGROUND. See the block above .stageHold for why. The
+     canvas is alpha:true, so this sits directly behind it and the WebGL wall lands
+     on top of the identical pixels when it is ready. */
+  background-image: var(--wall-src, none);
+  background-position: center;
+  background-size: var(--wall-w) var(--wall-h);
+  background-repeat: repeat;
+}
+/* Immersive: the reel owns the frame and TileWall stops drawing the wall
+   (useWallHide). Drop it here too, or it would show through wherever the canvas is
+   transparent. Safe to drop the instant `locked` lands, because the WebGL wall is
+   still painting over this until the reel has fully covered it. */
+.wrap.locked .canvasWrap {
+  background-image: none;
 }
 .canvasWrap canvas {
   display: block;
@@ -125,7 +166,8 @@ html:has(.route) { scrollbar-gutter: stable; }
    and never fetches the three.js chunk there, so this would be a control that leads
    nowhere. The query is the SAME one .archive and .stageHold use -- if that gate
    ever moves, move all three together. */
-.immersiveLink {
+.immersiveLink,
+.noRoomNote {
   display: none;
 }
 @media (min-width: 901px) and (pointer: fine) and (hover: hover) {
@@ -153,6 +195,19 @@ html:has(.route) { scrollbar-gutter: stable; }
     text-decoration-color: #6629bc;
     outline: none;
   }
+  /* Shown only after a click that could not land, so it never occupies space on a
+     machine that can run the room. Carries the same desktop gate as the button it
+     belongs to: it can only ever be triggered by that button, so it must not be
+     able to outlive it at a narrower width. */
+  .noRoomNote {
+    display: block;
+    max-width: 46ch;
+    margin: 0.7rem auto 0;
+    font-size: 0.78rem;
+    line-height: 1.55;
+    text-align: center;
+    color: rgba(90, 80, 120, 0.92);
+  }
 }
 
 /* The stage's placeholder: the box the showroom will occupy, standing before the
@@ -170,7 +225,12 @@ html:has(.route) { scrollbar-gutter: stable; }
     width: 100%;
     min-height: 100dvh;
     margin-top: calc(-1 * var(--nav-height));
+    /* The wall rides ON TOP of the gradients, exactly as the opaque WebGL plane does
+       once it exists. Until --wall-src is set (or the image has yet to arrive) this
+       layer is `none` and the gradients below are what shows, which is the stage
+       that was already here. */
     background:
+      var(--wall-src, none) center / var(--wall-w) var(--wall-h) repeat,
       radial-gradient(120% 90% at 50% 42%, rgba(102, 41, 188, 0.18) 0%, rgba(8, 8, 15, 0) 58%),
       radial-gradient(90% 70% at 82% 88%, rgba(36, 57, 137, 0.28) 0%, rgba(8, 8, 15, 0) 60%),
       #08080f;
@@ -273,6 +333,17 @@ html:has(.route) { scrollbar-gutter: stable; }
     display: block;
   }
 }
+
+/* `.archive.noRoom .immersiveLink { display: none }` USED TO LIVE HERE, and it was
+   the wrong answer to a real problem. With the lite gallery gone, a desktop without
+   WebGL2 resolves to `static`, so the "view immersive showroom" control was still
+   there, still clickable, and did nothing. Hiding it made that worse rather than
+   better: you land on /showroom/, you get a grid, and the room appears to have been
+   deleted with no way back and no reason given. That was the complaint (Chad,
+   2026-07-29).
+
+   The control now stays on every desktop-class device and a click that cannot land
+   explains itself instead -- see .noRoomNote above and ImmersiveLink.tsx. */
 
 /* ---- Selected state: full-bleed takeover, inset stylized frame ---- */
 .selected {
@@ -965,61 +1036,6 @@ html:has(.route) { scrollbar-gutter: stable; }
 @keyframes cw-fade-up {
   from { opacity: 0; transform: translateY(0.5rem); }
   to { opacity: 1; transform: none; }
-}
-
-/* ---- Lite gallery (mobile / low-capability) ---- */
-.lite {
-  position: relative;
-  min-height: var(--fold);
-  display: flex;
-  flex-direction: column;
-}
-.liteCrystal {
-  height: 34vh;
-  min-height: 200px;
-  background:
-    radial-gradient(60% 60% at 50% 45%, rgba(229, 210, 244, 0.5), transparent 62%),
-    radial-gradient(40% 40% at 50% 45%, rgba(102, 41, 188, 0.6), transparent 70%);
-  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent);
-  mask-image: radial-gradient(closest-side, #000 60%, transparent);
-}
-.liteTrack {
-  list-style: none;
-  margin: 0;
-  padding: 1rem 1.2rem 3rem;
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-}
-.liteCard {
-  flex: 0 0 82%;
-  scroll-snap-align: center;
-}
-.liteBtn {
-  display: block;
-  width: 100%;
-  padding: 0;
-  border: 1px solid rgba(174, 185, 234, 0.25);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #10101f;
-  color: #eef0fb;
-  cursor: pointer;
-}
-.liteBtn img {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  object-position: top center;
-}
-.liteLabel {
-  display: block;
-  padding: 0.7rem 0.9rem;
-  font-weight: 600;
-  text-align: left;
 }
 
 /* ---- Right-edge project rail (Colombel-style reel selector) ---- */

@@ -21,9 +21,26 @@
 
 const COMPOSITE_COUNT = 3;
 
-export const WALL_COMPOSITE_SRC = `/portfolio/wall/bake-${
-  1 + Math.floor(Math.random() * COMPOSITE_COUNT)
-}.jpg`;
+// THE PICK IS MADE IN THE HTML, not here. An inline script in the showroom page
+// chooses a bake during parse and writes it to `--wall-src`, so the CSS backdrop can
+// paint the wall without waiting for React (see the note there). This reads that
+// choice back rather than rolling again -- two rolls would put a different wall in
+// the CSS than on the texture, and the swap would be visible the moment the canvas
+// took over.
+//
+// The fallback matters for the [slug] pages and for any route that mounts the
+// showroom without that script: roll here, and the invariant still holds because
+// this module is the single source either way.
+function pick(): string {
+  if (typeof document !== "undefined") {
+    const set = getComputedStyle(document.documentElement).getPropertyValue("--wall-src");
+    const found = set.match(/bake-(\d+)\.jpg/);
+    if (found) return `/portfolio/wall/bake-${found[1]}.jpg`;
+  }
+  return `/portfolio/wall/bake-${1 + Math.floor(Math.random() * COMPOSITE_COUNT)}.jpg`;
+}
+
+export const WALL_COMPOSITE_SRC = pick();
 
 let injected = false;
 

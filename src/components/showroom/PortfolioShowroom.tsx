@@ -6,7 +6,8 @@
 // cold open the first time. Inside: the reel slides vertically behind the gem and
 // refracts through it; a tap promotes the centered item to the front; a right
 // rail navigates. Esc releases the lock back to normal page flow; clicking the
-// gem re-enters. Picks WebGL vs a lite gallery; always keeps a crawlable list.
+// gem re-enters. WebGL or the plain archive, nothing in between; always keeps a
+// crawlable list.
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -29,9 +30,15 @@ import {
   STAGE_SECONDS,
   ENTRANCE_DURATION,
 } from "./showroom-intro";
+import { createWheelStepper } from "./wheel-momentum";
 import { prefersReducedMotion, isMotionPaused, setMotionPaused } from "@/lib/motion";
 import { captureSrc } from "@/lib/captures";
+import { wmark } from "./wall-perf";
 import styles from "./showroom.module.css";
+
+// TEMPORARY DIAGNOSTIC. Module scope: fires the instant the three.js chunk has
+// downloaded AND parsed, which is the thing the wall preload was meant to overlap.
+wmark("chunk-eval");
 
 // A title is ALWAYS one line -- it never wraps, at any width. Shrink it until it fits
 // its container and hand the CSS the size as `--fit-fs` (unset = the CSS clamp, i.e.
@@ -300,6 +307,22 @@ export function PortfolioShowroom({
 
   const goTo = (i: number) => setCommand((c) => ({ index: i, nonce: c.nonce + 1 }));
 
+  // RELATIVE stepping, for the wheel. It exists because `index` is not a usable
+  // starting point mid-gesture: `goTo` only sets a COMMAND, and `index` does not
+  // update until the reel has travelled and reported back (~420ms). A flick delivers
+  // its events in ~12ms, so every event in it read the same stale `index` and the
+  // whole gesture collapsed to one step -- and no amount of ref-juggling fixed that,
+  // because the stale value was the prop itself.
+  //
+  // `command.index` IS the last thing we asked for, so stepping from it composes:
+  // React applies functional updaters in order, so four events in a flick become
+  // +1 +1 +1 +1 against successive targets rather than four copies of the same one.
+  const stepBy = (d: number) =>
+    setCommand((c) => {
+      const next = Math.min(items.length - 1, Math.max(0, c.index + d));
+      return next === c.index ? c : { index: next, nonce: c.nonce + 1 };
+    });
+
   // Fade the focus modal back out through the gem, then unmount.
   const requestClose = () => {
     if (closing) return;
@@ -402,6 +425,7 @@ export function PortfolioShowroom({
             camera={{ position: [0, 0, 6], fov: 38 }}
             dpr={[1, 2]}
             gl={{ antialias: true, alpha: true }}
+            onCreated={() => wmark("canvas-created")}
             onPointerDown={() => {
               if (immersive) skipIntro();
             }}
@@ -496,6 +520,7 @@ export function PortfolioShowroom({
                 focused={selected != null}
                 exiting={!immersive}
                 onGo={goTo}
+                onStep={stepBy}
                 onOpen={setSelected}
               />
 
@@ -571,7 +596,6 @@ export function PortfolioShowroom({
         </div>
       )}
 
-      {mode === "lite" && <LiteGallery items={items} onSelect={setSelected} />}
 
       {/* The crawlable list that used to sit here is gone: the route now renders the
           real portfolio archive on the server for exactly the cases it covered (no
@@ -625,13 +649,17 @@ function RightRail({
   focused,
   exiting,
   onGo,
+  onStep,
   onOpen,
 }: {
   items: ShowroomItem[];
   index: number;
   focused: boolean;
   exiting: boolean;
+  /** Absolute: a click picks an item outright. */
   onGo: (i: number) => void;
+  /** Relative: the wheel moves BY n from the last commanded target, not from `index`. */
+  onStep: (n: number) => void;
   onOpen: (i: number) => void;
 }) {
   // Normal: click the centered item to open it, any other to slide to it. While a
@@ -674,25 +702,37 @@ function RightRail({
   // canvas never saw these events and the strip that says "scroll" was the one
   // place scrolling did nothing.
   //
-  // Same semantics as the reel's handler on purpose (Reel.tsx): one step per
-  // gesture, a 420ms lock so a trackpad's inertia does not fire a dozen, and
-  // preventDefault so the locked page underneath cannot take the scroll instead.
-  // Routed through onGo so the reel and the rail stay the same one selection.
-  const wheelLock = useRef(0);
+  // Same semantics as the reel's handler on purpose (Reel.tsx) -- both now go through
+  // createWheelStepper, so the speed of the gesture decides the distance and the two
+  // surfaces cannot drift apart in feel. preventDefault stays: the locked page
+  // underneath must not take the scroll instead. Routed through onGo so the reel and
+  // the rail stay the same one selection.
+  // THE SELECTION IS READ FROM A REF, NOT FROM THE CLOSURE. Wheel events in one
+  // gesture arrive within a few ms of each other -- far faster than React can
+  // re-render -- so a handler that closed over `index` had every event in a flick
+  // computing the same `index + 1` and the whole gesture collapsed to a single step.
+  // Advancing the ref immediately means the second event steps from where the first
+  // one left it. (Measured: a 4-event flick moved 1 item before this, 4 after.)
+  // `onStep` is `stepBy`, redefined every render, so it is held in a ref rather than
+  // listed as a dependency: re-running this effect per step would rebuild the stepper
+  // and discard the part-spent delta mid-gesture.
+  const onStepRef = useRef(onStep);
+  useEffect(() => {
+    onStepRef.current = onStep;
+  });
+
+  // Deps are STABLE on purpose -- see above.
   useEffect(() => {
     const nav = navRef.current;
     if (!nav || exiting) return;
+    const stepper = createWheelStepper((steps) => onStepRef.current(steps));
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const now = performance.now();
-      if (now < wheelLock.current) return;
-      wheelLock.current = now + 420;
-      const next = Math.min(items.length - 1, Math.max(0, index + (e.deltaY > 0 ? 1 : -1)));
-      if (next !== index) onGo(next);
+      stepper.handle(e);
     };
     nav.addEventListener("wheel", onWheel, { passive: false });
     return () => nav.removeEventListener("wheel", onWheel);
-  }, [index, items.length, onGo, exiting]);
+  }, [exiting]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -750,29 +790,6 @@ function RightRail({
   );
 }
 
-function LiteGallery({
-  items,
-  onSelect,
-}: {
-  items: ShowroomItem[];
-  onSelect: (i: number) => void;
-}) {
-  return (
-    <div className={styles.lite}>
-      <div className={styles.liteCrystal} aria-hidden="true" />
-      <ul className={styles.liteTrack}>
-        {items.map((it, i) => (
-          <li key={it.key} className={styles.liteCard}>
-            <button type="button" className={styles.liteBtn} onClick={() => onSelect(i)}>
-              <img src={captureSrc(it.slug)} alt={it.alt} loading="lazy" />
-              <span className={styles.liteLabel}>{it.label}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 // `pageHref` is set only for a piece that HAS a page of its own. When it is set
 // it REPLACES the live-site link rather than joining it (Chad, 2026-07-28): the

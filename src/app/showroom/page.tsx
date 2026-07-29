@@ -158,11 +158,36 @@ function ShowroomArchive() {
   );
 }
 
+// PICKS THE WALL DURING HTML PARSE, so the browser can start fetching it before a
+// single byte of React has run.
+//
+// The wall is a plain CSS background now (see --wall-src in showroom.module.css). The
+// only thing CSS cannot do is choose one of the three bakes at random, so this does
+// that and nothing else.
+//
+// WHY IT IS NOT IN A useEffect. That is where it used to be, and it cost ~600ms: the
+// effect cannot run until React has hydrated, which on a 4g cold load is ~670ms in.
+// Inline, the request goes out at ~80ms alongside the stylesheet.
+//
+// THE MEDIA QUERY IS THE SAME GATE useShowroomMode uses. A phone renders the archive
+// and never draws a wall, so it must never spend 136KB on one. If that gate moves,
+// move it here too.
+//
+// Sets a CSS custom property rather than an <img> or a preload tag, because the
+// stylesheet is what consumes it -- and wall-composite.ts reads this same value back,
+// so the CSS backdrop and the WebGL texture can never end up as two different files.
+const WALL_PICK = `(function(){try{
+if(!matchMedia("(min-width: 901px) and (pointer: fine) and (hover: hover)").matches)return;
+var n=1+Math.floor(Math.random()*3);
+document.documentElement.style.setProperty("--wall-src",'url("/portfolio/wall/bake-'+n+'.jpg")');
+}catch(e){}})();`;
+
 export default function ShowroomPage() {
   return (
     <div className={`full ${showroomStyles.route}`}>
       <JsonLd data={breadcrumbJsonLd} />
       <JsonLd data={collectionJsonLd} />
+      <script dangerouslySetInnerHTML={{ __html: WALL_PICK }} />
       <ShowroomRoute archive={<ShowroomArchive />} pageSlugs={PAGE_SLUG_LIST} />
     </div>
   );

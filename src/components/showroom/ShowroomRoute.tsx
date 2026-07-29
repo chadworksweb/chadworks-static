@@ -20,7 +20,14 @@ import dynamic from "next/dynamic";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { useShowroomMode } from "./useShowroomMode";
 import { preloadWallComposite } from "./wall-composite";
-import { getServerSurface, getSurface, setSurface, subscribeSurface } from "./showroom-surface";
+import { wmark } from "./wall-perf";
+import {
+  getServerSurface,
+  getSurface,
+  setSurface,
+  setRoomAvailable,
+  subscribeSurface,
+} from "./showroom-surface";
 import styles from "./showroom.module.css";
 
 // THE STAGE IS NEVER ABSENT (Chad, 2026-07-28). There are two windows on a
@@ -75,8 +82,22 @@ export function ShowroomRoute({
   // the two overlap. Not in the served HTML, because only a desktop-class device
   // ever needs it and a phone should never spend 610KB on a wall it will not draw.
   useEffect(() => {
-    if (mode === "webgl") preloadWallComposite();
+    if (mode === "webgl") {
+      wmark("mode-webgl");
+      preloadWallComposite();
+      wmark("preload-injected");
+    }
   }, [mode]);
+
+  // Tell the "view immersive showroom" button whether a click can actually land.
+  // The button lives in server-built archive markup and has no prop path to here,
+  // which is the same reason the surface choice is a module store. It is published
+  // rather than used to HIDE the button: see the note in ImmersiveLink about why a
+  // control that disappears is worse than one that explains itself.
+  useEffect(() => {
+    setRoomAvailable(mode === null ? null : mode === "webgl");
+  }, [mode]);
+
   const archiveChosen = surface === "simple";
 
   // `null` is the undecided first paint, `static` is a phone or a tablet. Both keep
@@ -97,7 +118,19 @@ export function ShowroomRoute({
     );
   }
 
-  if (mode === "static") return <div className={styles.archive}>{archive}</div>;
+  // `archiveChosen` is REQUIRED here, not decoration. `.archive` is display:none
+  // inside the desktop media query, because on a desktop the showroom normally takes
+  // its place. So a desktop that lands on `static` -- which since the lite gallery was
+  // removed is exactly what a desktop with no WebGL2 does -- would render an empty
+  // page: 25 archive cards present in the DOM and every one of them hidden. The
+  // override is what the "view simple portfolio grid" link already uses to say "show
+  // this on desktop anyway", and this is the same statement.
+  //
+  // A `.noRoom` class used to ride along here and hide the way back. It is gone
+  // (Chad, 2026-07-29): the button stays, and explains itself when it cannot work.
+  if (mode === "static") {
+    return <div className={`${styles.archive} ${styles.archiveChosen}`}>{archive}</div>;
+  }
 
   // Chosen explicitly, so the media query that hides the archive on desktop has to
   // be overridden -- that query exists to stop a FLASH of the grid, not to forbid it.
