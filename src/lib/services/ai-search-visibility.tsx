@@ -96,34 +96,34 @@ export const aiSearchVisibility: Service = {
     heading: "How the retainer runs",
     steps: [
       {
-        title: "The audit comes first",
+        title: "AI Visibility Audit",
         body:
-          "Where you stand today in AI answers and the classic search they're built on. It's the same audit I sell on its own.",
+          "Auditing the site and its competitors is the first thing. We discover where you are, why you are there and what directly improves the site from that precise position.",
       },
       {
-        title: "We pick the platform",
+        title: "Choose Focus Platforms",
         body:
-          "ChatGPT, Google's AI, Perplexity, Copilot and the rest are separate contests that happen to share a name, and the same change can lift one while doing nothing for another. So we name the one your buyers actually open and aim there, instead of spreading the budget evenly across platforms nobody in your industry has signed into.",
+          "Once we know where you stand, we'll pick the platforms to optimize for. ChatGPT, Google AI and the others are all slightly different, so we'll focus our efforts on the places your audience actually is.",
       },
       {
-        title: "Every page gets one intent",
+        title: "Intention Optimization",
         body:
-          "Each page answers one real buyer question. Pages that blend two intents lose both, in rankings and in answers.",
+          "Every page and post is edited to cover one single intention. Pages that blend more than one core focus turn into noise and are skipped.",
       },
       {
-        title: "Pages get answer-shaped",
+        title: "Content Restructuring",
         body:
-          "Direct answers up top, structured data underneath. The craft is invisible until you ask an AI about you.",
+          "I'll restructure the content of your pages so the answer is on top and the rest of the page matches how AI assistants like to read. The invisible schema code is also added here.",
       },
       {
-        title: "Identity gets consistent",
+        title: "Identity Consistency",
         body:
-          "Google Business Profile and every profile AI cross-checks, all telling the same story. Engines recommend what they can verify.",
+          "I'll update all of your existing off-site profiles to match, and create new ones on relevant platforms. This helps AI engines verify you are real and relevant to the user's prompt.",
       },
       {
-        title: "It stays maintained, and it gets measured",
+        title: "Ongoing Processes",
         body:
-          "Engines re-decide constantly, so the checklist runs on a cycle and you see what changed, in writing, every month. The same buyer prompts get re-run each cycle against pages we deliberately left alone, which is how you tell a real gain from a month when citations moved for everyone.",
+          "From there, rinse and repeat. I'll monitor the activity of your brand using manual checks and AI-tracking platforms. We'll then make tactical moves and create new or alter existing content based on the incoming data.",
       },
     ],
   },

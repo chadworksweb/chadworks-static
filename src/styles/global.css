@@ -2924,9 +2924,65 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   margin-top: var(--space-2xs);
   line-height: var(--leading-body);
 }
+/* Optional per-step cross-link, under the body. Mono + small, so it reads as an
+   affordance rather than a second sentence. Live and sealed states share the
+   class (LaunchLink swaps the element, not the styling). */
+.cw-process__cta {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+}
+.cw-process__cta a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.22s var(--ease-smooth);
+}
+.cw-process__cta a:hover,
+.cw-process__cta a:focus-visible { border-bottom-color: currentColor; }
+/* .cw-soon dims with `opacity`, which applies to the whole subtree -- on this
+   dark band that bled straight through the "coming soon" bubble. Dim the text
+   with a translucent colour instead and leave the element opaque, the same fix
+   the calculator page makes for its sealed links. */
+.cw-process__cta .cw-soon {
+  opacity: 1;
+  color: color-mix(in srgb, var(--dark-text) 62%, transparent);
+}
+/* NESTED variant (opt in per instance via className): the cards interlock as
+   they stagger instead of every card clearing the one before it.
+   The pitch is FIXED, not derived from card height. A negative margin was the
+   first cut, and it made the gap a function of the card above it -- the tallest
+   card opened the widest gap and the short ones closed to nearly touching. Here
+   each row is exactly `--cw-process-pitch` tall and the card overflows it, so
+   every card's top sits the SAME distance below the previous card's top no
+   matter how the copy lands.
+   CEILING: two cards on the same side are 2 pitches apart, so a card taller
+   than that would collide with the one above it in its own column. At 10.5rem
+   that ceiling is 336px against cards that run ~250-290px here. The narrow half
+   of the two-column band wraps the copy taller, so the pitch opens up under
+   1200px. Below 900px the timeline is a single rail and the rows go back to
+   content height -- a fixed pitch there is a literal card-on-card overlap. */
+.cw-process--nested { --cw-process-pitch: 10.5rem; }
+.cw-process--nested .cw-process__item {
+  height: var(--cw-process-pitch);
+  padding-bottom: 0;
+}
+/* The last row carries no card under it, so it keeps its content height and the
+   band closes on the card instead of cutting it off at one pitch. */
+.cw-process--nested .cw-process__item:last-child { height: auto; }
+@media (max-width: 1200px) {
+  .cw-process--nested { --cw-process-pitch: 13rem; }
+}
+
 /* Tablet vertical + mobile: collapse to a single left rail. */
 @media (max-width: 900px) {
   .cw-process__line::before { left: 1.2rem; transform: none; }
+  .cw-process--nested .cw-process__item {
+    height: auto;
+    padding-bottom: var(--space-lg);
+  }
+  .cw-process--nested .cw-process__item:last-child { padding-bottom: 0; }
   .cw-process__item,
   .cw-process__item:nth-child(odd),
   .cw-process__item:nth-child(even) {

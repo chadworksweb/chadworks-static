@@ -14,7 +14,14 @@ import type { Scheme } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
-export type ProcessStep = { title: string; body?: Writable | ReactNode };
+// `cta` is an OPTIONAL node rendered under the step body (a cross-link out to
+// the page that step names). Kept out of ServiceStep on purpose: it is a
+// presentation choice the placing page makes, not copy the service data owns.
+export type ProcessStep = {
+  title: string;
+  body?: Writable | ReactNode;
+  cta?: ReactNode;
+};
 
 export type ProcessCapsuleProps = {
   // Heading is "The <page> process" by default (e.g. "The web design process"),
@@ -24,6 +31,9 @@ export type ProcessCapsuleProps = {
   intro?: Writable;
   steps: ProcessStep[];
   stepLabel?: (i: number) => string; // supertitle text; default "Step N"
+  // Per-instance modifier hook (e.g. `cw-process--nested`, which halves the
+  // vertical pitch so the alternating cards nest instead of clearing).
+  className?: string;
   scheme?: Scheme;
   schemeAuto?: boolean;
 };
@@ -34,11 +44,15 @@ export function ProcessCapsule({
   intro,
   steps,
   stepLabel = (i) => `Step ${i + 1}`,
+  className,
 }: ProcessCapsuleProps) {
   const resolvedHeading =
     heading ?? (pageName ? `The ${pageName} process` : "The process");
   return (
-    <SectionShell full className="svc-block svc-dark cw-process">
+    <SectionShell
+      full
+      className={`svc-block svc-dark cw-process${className ? ` ${className}` : ""}`}
+    >
       <h2 className="svc-block__heading">{resolvedHeading}</h2>
       {intro && (
         <p className="svc-block__body measure-prose cw-process__intro">
@@ -59,6 +73,7 @@ export function ProcessCapsule({
                   <W value={s.body} />
                 </p>
               )}
+              {s.cta && <p className="cw-process__cta">{s.cta}</p>}
             </div>
           </li>
         ))}
