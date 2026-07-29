@@ -5,6 +5,7 @@
 import type { Metadata } from "next";
 import HubTemplate, { type HubConfig } from "@/components/HubTemplate";
 import { SITE_URL } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { VisibilityHeroArt } from "@/components/art/VisibilityHeroArt";
 
 const hub: HubConfig = {
@@ -129,6 +130,9 @@ export const metadata: Metadata = {
   description:
     "Visibility is being found and chosen: in Google, in the AI assistants people now ask instead, and in the inbox. AI visibility is the umbrella; SEO, presence, and email are the pieces underneath. I do it all, as one ongoing service.",
   alternates: { canonical: `${SITE_URL}/visibility/` },
+  // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so being
+  // in launch.ts alone would put this in the sitemap while still serving noindex.
+  robots: { index: isLaunched("/visibility/"), follow: true },
   openGraph: {
     title: "Visibility -- Found in Google, Quoted by AI | chadworks",
     description:

@@ -59,6 +59,13 @@ const LAUNCHED = new Set<string>([
               // Ripping You Off?"). This also flips <GoingToBat /> from the
               // inline email thread to the teaser capsule everywhere it runs.
   "/website-design-cost-calculator/", // launched 2026-07-20 -- the scope calculator (tool intent)
+  "/visibility/", // launched 2026-07-29 -- the visibility hub. AI visibility is the
+                  // umbrella; SEO, presence and email are the lanes underneath.
+  "/ai-search-visibility/", // launched 2026-07-29 -- the service page under the hub above.
+                            // Neither of these two carried a robots line before launch,
+                            // which is the exact failure the note at the top of this file
+                            // describes: in the sitemap, serving noindex. Both gained one
+                            // in the same commit as this edit.
   // "/how-much-does-a-website-cost/" -- SEALED 2026-07-24. Pulled back from launch
   // (was launched 2026-07-20). robots line gates on isLaunched, so it follows.
 ]);

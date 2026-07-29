@@ -20,11 +20,17 @@ import {
 } from "@/components/capsules";
 import { LaunchLink } from "@/components/LaunchLink";
 import { serviceUrl } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 
 export const metadata: Metadata = {
   title: service.meta.title,
   description: service.meta.description,
   alternates: { canonical: serviceUrl(service) },
+  // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so being
+  // in launch.ts alone would put this in the sitemap while still serving noindex.
+  // The literal path, not serviceUrl(): isLaunched normalizes PATHS and returns false
+  // for an absolute URL.
+  robots: { index: isLaunched("/ai-search-visibility/"), follow: true },
   openGraph: {
     title: service.meta.title,
     description: service.meta.description,
