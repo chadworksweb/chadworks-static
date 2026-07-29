@@ -6,6 +6,7 @@
 import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { LANE_COLORS } from "@/lib/capsule";
+import { isLaunched } from "@/lib/launch";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
 
@@ -13,14 +14,32 @@ import { W } from "@/components/capsules/shared";
 // wired through every service page's paths section AND HubTemplate, so the card
 // grid stays the default and a caller opts into "rows" on its own. Adding a
 // second copy of this capsule to vary one axis is how the two gems got tangled.
+// `autoSeal` locks each lane INDIVIDUALLY against launch.ts, rather than
+// `paths.comingSoon` locking the whole set. Opt-in, so every page already
+// placing this capsule renders exactly as before; a lane unlocks itself the day
+// its route joins LAUNCHED, with nothing to remember to undo.
+//
+// `cta` appends the inverted contact lane the /websites/ and /visibility/ hubs
+// close their lane grid with (svc-lane--cta, same chrome).
 export type PathsCapsuleProps = {
   paths: NonNullable<Service["paths"]>;
   layout?: "grid" | "rows";
+  autoSeal?: boolean;
+  cta?: { title: string; body: React.ReactNode; label: string; href: string };
+  // Per-instance modifier hook (e.g. `cw-visibility-paths`, which hands this
+  // one its standard top padding back).
+  className?: string;
 };
 
-export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
+export function PathsCapsule({
+  paths,
+  layout = "grid",
+  autoSeal,
+  cta,
+  className,
+}: PathsCapsuleProps) {
   return (
-    <SectionShell className="svc-block">
+    <SectionShell className={`svc-block${className ? ` ${className}` : ""}`}>
       <h2 className="svc-block__heading">{paths.heading}</h2>
       {paths.intro && (
         <p className="svc-block__body measure-prose">
@@ -29,6 +48,7 @@ export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
       )}
       <div className={`svc-lanes${layout === "rows" ? " svc-lanes--rows" : ""}`}>
         {paths.items.map((p, i) => {
+          const soon = paths.comingSoon || (autoSeal && !isLaunched(p.href));
           const style = {
             "--lane-color": LANE_COLORS[i % LANE_COLORS.length],
           } as React.CSSProperties;
@@ -42,7 +62,7 @@ export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
                 <span className="svc-lane__desc">
                   <W value={p.detail} />
                 </span>
-                {paths.comingSoon ? (
+                {soon ? (
                   <span
                     className="svc-lane__arrow svc-lane__arrow--soon"
                     tabIndex={0}
@@ -64,7 +84,7 @@ export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
               )}
             </>
           );
-          return paths.comingSoon ? (
+          return soon ? (
             <div key={i} className="svc-lane svc-lane--soon" style={style}>
               {content}
             </div>
@@ -74,6 +94,17 @@ export function PathsCapsule({ paths, layout = "grid" }: PathsCapsuleProps) {
             </Link>
           );
         })}
+        {cta && (
+          <a href={cta.href} className="svc-lane svc-lane--cta">
+            <span className="svc-lane__content">
+              <span className="svc-lane__title">{cta.title}</span>
+              <span className="svc-lane__desc">{cta.body}</span>
+              <span className="svc-lane__arrow" aria-hidden="true">
+                {cta.label} -&gt;
+              </span>
+            </span>
+          </a>
+        )}
       </div>
     </SectionShell>
   );

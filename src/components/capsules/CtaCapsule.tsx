@@ -14,13 +14,17 @@ import { W, CtaButton } from "@/components/capsules/shared";
 export type CtaCapsuleProps = {
   cta: Service["cta"];
   form?: LeadFormConfig;
+  // Optional anchor target, for a page whose own copy jumps down to this form
+  // (`id="contact"`, the same hook MainContactCapsule carries). Left unset
+  // everywhere else, so no page can end up with the id twice.
+  id?: string;
   scheme?: Scheme;
   schemeAuto?: boolean;
 };
 
-export function CtaCapsule({ cta, form }: CtaCapsuleProps) {
+export function CtaCapsule({ cta, form, id }: CtaCapsuleProps) {
   return (
-    <SectionShell full className="band-dark svc-cta">
+    <SectionShell full id={id} className="band-dark svc-cta">
       <div className="svc-cta__panel">
         {form ? (
           <div className="svc-cta__split">

@@ -80,6 +80,16 @@ export const HOURLY = MINUTELY * 60; // the same rate said the other way, for th
 export const WORDPRESS_CARE = 550; // $ per six months, the WordPress care plan.
 
 // ---------------------------------------------------------------------
+// RETAINERS -- flat monthly, NOT the minutely rate said monthly. A retainer
+// buys a cycle of work at one number; deriving it from MINUTELY would make it
+// move every time the after-launch rate does, which is not how it is sold.
+// ---------------------------------------------------------------------
+export const VISIBILITY_MONTHLY = 675; // $/month FLOOR for the AI search visibility retainer ("starts at").
+export const VISIBILITY_AUDIT = 675; // $ FLAT for the one-time AI Visibility Audit, the gate into the retainer.
+// The two figures above are equal TODAY and are not the same number: one is a
+// recurring floor, the other a one-time flat. Move one without the other.
+
+// ---------------------------------------------------------------------
 // AFTER-LAUNCH TASKS -- the ongoing-cost ledger. Read by the guide.
 //
 // NOTHING HERE IS A NEW PRICE. Each figure is MINUTELY applied to a task time,

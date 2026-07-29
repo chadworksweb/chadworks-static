@@ -3018,6 +3018,14 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding-top: var(--section-pad-y);
   padding-bottom: var(--section-pad-y);
 }
+/* ...and except on /ai-search-visibility/, where the lanes follow the full-bleed
+   dark timeline band rather than sitting under a block on the same surface. At
+   15% the heading landed hard against that band's edge. Standard top rhythm
+   here (Chad, 2026-07-29). Four classes, the same weight as the :has() rule
+   above, so this has to stay after it. */
+.section.svc-block.reveal.cw-visibility-paths {
+  padding-top: var(--section-pad-y);
+}
 /* HOME ONLY -- the three-up lane module crosses the hero's bottom edge by 20px
    instead of clearing it. Written as intent rather than one negative margin:
    zero the section's own top spacing and the lanes' top margin FIRST, so the
@@ -9382,7 +9390,10 @@ html.cw-motion-paused *::after {
   gap: clamp(1rem, 2vw, 1.5rem);
 }
 .cw-price-card {
-  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  /* Held as a variable so a flush-to-the-edge child (the CTA footer below) can
+     cancel the padding exactly instead of restating the clamp. */
+  --card-pad: clamp(1.5rem, 2.5vw, 2.25rem);
+  padding: var(--card-pad);
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
@@ -9434,6 +9445,71 @@ html.cw-motion-paused *::after {
 }
 @media (max-width: 600px) {
   .cw-pricing__grid { grid-template-columns: 1fr; }
+}
+/* SPLIT variant (/ai-search-visibility/): the price is one flat figure, not two
+   cards to compare, so the left column carries the argument and the card holds
+   the number. The card sizes to its own content instead of stretching down the
+   full height of the copy beside it. */
+/* The price column is a WIDTH, not a fraction: the card only has to hold a
+   label, a figure and a button, and everything left over goes to the copy so
+   the heading has the room to hold one line. A fraction made the card grow with
+   the viewport and pushed the heading into a second line at exactly the widths
+   where there was the most room to spare. */
+.cw-pricing__grid--split {
+  grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+  align-items: start;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+}
+/* The heading lives inside the copy column here, so it drops the top offset it
+   carries when it sits above the grid and takes the standard gap under itself. */
+.cw-pricing--split .cw-pricing__heading { margin-top: 0; }
+.cw-pricing__copy > .cw-pricing__heading + * { margin-top: var(--space-md); }
+/* Body copy, not a lede: the standard paragraph size rather than the --text-lg
+   the section headings and block ledes run at. */
+.cw-pricing__copy {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+.cw-pricing__copy > * + * { margin-top: var(--space-sm); }
+/* The fine print rides in the left column under the copy, so it drops the
+   centring the rates band gives it when it sits under the whole grid. */
+.cw-pricing__disclaimer--inline {
+  text-align: left;
+  margin-top: var(--space-md);
+}
+/* The figure sits straight under its label: the card is a flex column with a
+   gap, so the one gap above the price is cancelled here rather than dropped
+   from the card (the rates band's own cards keep it). */
+.cw-price-card--cta .cw-price-card__figure {
+  margin-top: calc(-1 * var(--space-2xs));
+}
+/* CTA as the card's bottom edge: it cancels the card padding on three sides so
+   it runs full width and sits flush, square on top and carrying the panel's
+   radius below. The bottom radius is the panel's LESS its 1px border, which is
+   the inner curve the button actually has to meet. */
+.cw-price-card__cta {
+  display: flex;
+  margin: var(--space-md) calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad));
+}
+/* Dark-blue primary. Only the four button TOKENS are restated, so the diagonal
+   clip-path wipe, its easing and the reduced-motion guard all run untouched --
+   they read these vars. The wipe is the grad-mid -> accent pair the timeline
+   markers use, and .svc-btn:hover already takes the label white. */
+.cw-price-card__cta .svc-btn {
+  --btn-bg: var(--dark-bg);
+  --btn-text: #fff;
+  --btn-hover-from: var(--grad-mid);
+  --btn-hover-to: var(--accent);
+  flex: 1;
+  justify-content: center;
+  padding-block: var(--space-sm);
+  font-size: var(--text-base);
+  border-radius: 0 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px);
+}
+/* One column below the two-card breakpoint, copy first. */
+@media (max-width: 860px) {
+  .cw-pricing__grid--split { grid-template-columns: 1fr; }
 }
 
 /* =====================================================================

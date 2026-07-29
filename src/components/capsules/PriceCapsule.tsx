@@ -20,11 +20,15 @@ export type PriceCapsuleProps = {
   // The price-panel CTA label. Default preserves the template's wording; pages
   // override per placement.
   ctaLabel?: string;
-  variant?: "glass" | "ledger";
+  variant?: "glass" | "ledger" | "rates";
   ledger?: LedgerRow[];
   panelClassName?: string;
   headingFill?: boolean; // svc-fill wipe on the heading (ledger uses it)
   heading?: ReactNode; // override price.heading
+  // "rates" only: the mono label over the figure, and the small unit trailing
+  // it ("/ month"). The figure itself stays price.figure.
+  cardLabel?: string;
+  unit?: string;
 };
 
 export function PriceCapsule({
@@ -36,7 +40,48 @@ export function PriceCapsule({
   panelClassName,
   headingFill,
   heading,
+  cardLabel = "Flat monthly rate",
+  unit,
 }: PriceCapsuleProps) {
+  // RATES variant -- the global rates band's design language (cw-pricing head,
+  // panel card, centred disclaimer + CTA), split so the argument holds the left
+  // column and the number sits on the right. Used where the price is one flat
+  // figure rather than a posture about an hourly rate.
+  if (variant === "rates") {
+    return (
+      <SectionShell full className="scheme-alternate cw-pricing cw-pricing--split">
+        <div className="cw-pricing__grid cw-pricing__grid--split">
+          {/* Left column: the heading, the argument, then the fine print. The
+              rates band runs its heading above the grid; here it belongs to the
+              copy, so the card can start level with it. */}
+          <div className="cw-pricing__copy">
+            <h2 className="cw-pricing__heading">{heading ?? price.heading}</h2>
+            <p>
+              <W value={price.body} />
+            </p>
+            {price.disclaimer && (
+              <p className="cw-pricing__disclaimer cw-pricing__disclaimer--inline">
+                {price.disclaimer}
+              </p>
+            )}
+          </div>
+          {/* Right column: the number, closed by the CTA sitting flush in the
+              card's bottom edge (square on top, the panel's radius below). */}
+          <div className="cw-price-card panel cw-price-card--cta">
+            <p className="cw-price-card__label">{cardLabel}</p>
+            <p className="cw-price-card__figure">
+              {price.figure}
+              {unit && <span className="cw-price-card__unit">{unit}</span>}
+            </p>
+            <div className="cw-price-card__cta">
+              <CtaButton href={ctaHref} label={ctaLabel} />
+            </div>
+          </div>
+        </div>
+      </SectionShell>
+    );
+  }
+
   return (
     <SectionShell full className="scheme-alternate svc-block svc-pricing">
       <h2 className={cx("svc-block__heading", headingFill && "svc-fill")}>

@@ -11,6 +11,11 @@ import {
   AiDemoSplitCapsule,
   ProblemCapsule,
   ProcessCapsule,
+  PathsCapsule,
+  PriceCapsule,
+  CtaCapsule,
+  NextStepsCapsule,
+  SectionShell,
 } from "@/components/capsules";
 import { LaunchLink } from "@/components/LaunchLink";
 import { serviceUrl } from "@/lib/service";
@@ -76,6 +81,76 @@ export default function AiSearchVisibilityPage() {
             scheme="inverted"
           />
         ),
+        // The service lanes run the /websites/ hub treatment: each lane locks
+        // itself against launch.ts (`autoSeal`), so the four routes that are not
+        // live yet carry the "coming soon" tooltip instead of linking into a
+        // noindex page, and the grid closes on the hubs' inverted contact lane.
+        paths: (
+          <PathsCapsule
+            paths={service.paths!}
+            className="cw-visibility-paths"
+            autoSeal
+            cta={{
+              title: "Not sure which piece you need?",
+              body: (
+                <>
+                  Say what you sell and who buys it. I&apos;ll tell you which of
+                  these actually moves your visibility, and which you can skip.
+                </>
+              ),
+              label: "Contact me",
+              href: "#contact",
+            }}
+          />
+        ),
+        // The cost section runs the global rates band's design language rather
+        // than the glass price panel: this price is one flat monthly figure, so
+        // the argument holds the left column and the number sits in a rates card
+        // on the right.
+        price: (
+          <PriceCapsule
+            price={service.price}
+            // Jumps to this page's own form rather than out to /contact/.
+            ctaHref="#contact"
+            ctaLabel="Inquire"
+            variant="rates"
+            cardLabel="Starting at"
+            unit="/month"
+          />
+        ),
+        // What the engagement asks of the CLIENT, straight after the number.
+        // Default (white) section, so it reads as its own room between the
+        // tinted price band and the qualification block.
+        afterPrice: (
+          <SectionShell className="svc-block">
+            <h2 className="svc-block__heading">
+              Client Expectations During an AI Search Visibility Campaign
+            </h2>
+            <p className="svc-block__body measure-prose">
+              This should be seen as an investment, and one that requires input
+              from you, the client. I can build the airplane but I need to know
+              where to fly it, how many seats, what food to serve and what
+              materials to build with, ya know? This is not a push-button
+              service. It requires your knowledge, expertise and feedback on a
+              regular basis. Not every day, but once a week.
+            </p>
+          </SectionShell>
+        ),
+        // "Proof, not promises" is off this page (Chad, 2026-07-29). Dropped at
+        // the slot rather than deleted from the service, so the written proof
+        // points stay one line away if it comes back. Nothing else reads them:
+        // `proof` feeds no JSON-LD.
+        proof: null,
+        // "Why it's safe to start" is off this page (Chad, 2026-07-29).
+        assurance: null,
+        // "What happens after you reach out" moves BELOW the contact section,
+        // the order /web-design/ runs. That page gets it by swapping its
+        // nextSteps and cta slots; this CTA carries the form, so the steps take
+        // the afterCta tail slot instead and the form stays in place.
+        nextSteps: null,
+        // Carries the id the lane above jumps to.
+        cta: <CtaCapsule cta={service.cta} form={service.form} id="contact" scheme="inverted" />,
+        afterCta: <NextStepsCapsule nextSteps={service.nextSteps!} />,
       }}
     />
   );

@@ -160,7 +160,7 @@ export default function AboutPage() {
         eyebrow="The Chad behind chadworks"
         title="About chadworks"
         heroArt={<AboutHeroArt />}
-        lede="Hi, I'm Chad Lewine, the Chad behind chadworks. Yep, just me. I've been building websites for over 20 years—since I was 11 years old, in fact. Web design is not just an occupation for me, it's a method by which information is communicated between parties, whether that's person to person, business to person, or business to business. I specialize in getting the information to and from the right places in a meaningful and visually stunning yet effective manner."
+        lede="Hi, I'm Chad Lewine, the Chad behind chadworks. Yep, just me. I've been building websites for over 20 years—since I was 11 years old, in fact. Web design is not just &quot;web design&quot; to me. It's a method by which information is communicated between parties, whether that's person to person, business to person, or business to business. I specialize in getting the information to and from the right places in a meaningful and visually stunning yet effective manner."
         cta={{ href: "/contact/", buttonLabel: "Start a conversation" }}
       />
 

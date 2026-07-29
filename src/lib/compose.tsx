@@ -57,11 +57,13 @@ export type ServiceSlot =
   | "testimonials"
   | "made"
   | "price"
+  | "afterPrice"
   | "qualification"
   | "faq"
   | "assurance"
   | "nextSteps"
-  | "cta";
+  | "cta"
+  | "afterCta";
 
 export type ServiceOverrides = Partial<Record<ServiceSlot, ReactNode | null>>;
 
@@ -136,6 +138,12 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     ) : null,
     made: s.made ? <MadeByCapsule made={s.made} /> : null,
     price: <PriceCapsule price={s.price} ctaHref={s.cta.href} />,
+    // Optional interstitial between the price and the qualification block, for
+    // a section that belongs to the money conversation but is not the number
+    // (e.g. what the engagement asks of the CLIENT). No Service field feeds it;
+    // a page opts in via `overrides.afterPrice`, the pattern `afterHero` and
+    // `explainer` already use.
+    afterPrice: null,
     qualification: s.qualification ? (
       <QualificationCapsule qualification={s.qualification} />
     ) : null,
@@ -151,6 +159,12 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     assurance: s.assurance ? <AssuranceCapsule assurance={s.assurance} /> : null,
     nextSteps: s.nextSteps ? <NextStepsCapsule nextSteps={s.nextSteps} /> : null,
     cta: <CtaCapsule cta={s.cta} form={s.form} scheme="inverted" />,
+    // Optional tail section, BELOW the CTA. For a page that wants "what happens
+    // after you reach out" to follow the ask rather than precede it, while the
+    // CTA slot keeps the real form. (web-design gets the same order by swapping
+    // its nextSteps and cta slots; that trick is unavailable to a page whose CTA
+    // carries the form.) Opt in via `overrides.afterCta`.
+    afterCta: null,
   };
 
   const order: ServiceSlot[] = [
@@ -169,11 +183,13 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     "testimonials",
     "made",
     "price",
+    "afterPrice",
     "qualification",
     "faq",
     "assurance",
     "nextSteps",
     "cta",
+    "afterCta",
   ];
 
   // Flat list of placed capsule elements, each keyed by slot. Passed directly

@@ -9,7 +9,7 @@ import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { AiSearchHeroArt } from "@/components/art/AiSearchHeroArt";
 import { AiChatDemo } from "@/components/art/AiChatDemo";
-import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { VISIBILITY_AUDIT, VISIBILITY_MONTHLY } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 export const aiSearchVisibility: Service = {
@@ -129,7 +129,7 @@ export const aiSearchVisibility: Service = {
   },
 
   paths: {
-    heading: "The pieces, sold on their own",
+    heading: "Services that Contribute to AI Search Visibility",
     intro:
       "The retainer is the whole stack. These are the parts it's made of.",
     items: [
@@ -144,9 +144,14 @@ export const aiSearchVisibility: Service = {
         href: "/seo/",
       },
       {
-        label: "Show Up on ChatGPT",
-        detail: "The specific question everyone suddenly has, answered in plain English.",
-        href: "/show-up-on-chatgpt/",
+        label: "Content Development",
+        detail: "The writing itself: pages and posts that answer one question well. Engines quote text, so the text has to be worth quoting.",
+        href: "/content-development/",
+      },
+      {
+        label: "Web Design",
+        detail: "Being named in the answer only pays if the site holds the person who clicks. The visual angle lives here.",
+        href: "/web-design/",
       },
       {
         label: "Digital Marketing",
@@ -203,16 +208,20 @@ export const aiSearchVisibility: Service = {
   */
 
   price: {
-    heading: "What it costs, plainly",
-    figure: HOURLY_RATE,
-    figureSub: "Retained monthly, scoped in writing first",
+    heading: "What Does AI Search Visibility Cost?",
+    figure: money(VISIBILITY_MONTHLY),
+    // The rates-variant card renders the label + figure only; the sub line is
+    // kept for the glass variant and for anything else reading this Service.
+    figureSub: "Flat monthly rate, scoped in writing first",
     body:
-      `AI search visibility runs as a monthly retainer built on my ${money(HOURLY)} hourly rate. The scope goes in writing before anything is billed: which pages get which checks, and what you'll see each month. I'm not the cheapest option, deliberately. This is for businesses where being the recommended answer is worth real money, and the retainer is sized to what that's worth in your market.`,
+      `The scope of what I do, what you do, and what I deliver each month is set in writing before we begin. Each plan is tailored to your specific needs, which is why the price starts at ${money(VISIBILITY_MONTHLY)}/mo. An online business requires different tactics than a local business with a geographic limit.`,
     disclaimer: (
       <>
-        <strong>Straight up:</strong>{" "}if the one-time audit is all your
-        situation needs, I&apos;ll tell you before you commit to a retainer.
-        The audit stands on its own, and you can act on it with anyone.
+        <strong>Straight up:</strong>{" "}The AI Visibility Audit is a required
+        service that must happen before monthly servicing begins. The audit
+        itself is a flat {money(VISIBILITY_AUDIT)} for most businesses. If you
+        get what you need from the audit itself, I won&apos;t trick you into the
+        retainer.
       </>
     ),
   },
@@ -326,8 +335,8 @@ export const aiSearchVisibility: Service = {
   },
 
   meta: {
-    title: "AI Search Visibility: Get Recommended by ChatGPT and Google AI | chadworks",
+    title: "AI Search Visibility | Get Cited, Get Mentioned",
     description:
-      `AI search visibility as an ongoing service: SEO, schema, profiles, and answer-shaped pages that get businesses into ChatGPT answers and Google's AI Overview. Real precedent: a PA law firm in the AI Overview, a Brooklyn psychologist named in AI answers. ${HOURLY_RATE}, scoped in writing.`,
+      "AI search is where it's at. If you aren't there, you aren't anywhere. chadworks helps you get mentioned and cited on ChatGPT et al.",
   },
 };
