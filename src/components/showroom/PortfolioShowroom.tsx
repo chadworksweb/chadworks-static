@@ -229,6 +229,9 @@ export function PortfolioShowroom({
   const [wallRevealed, setWallRevealed] = useState(false);
   const [gemAssembled, setGemAssembled] = useState(false);
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
+  // The stage element. Handed to RightRail so a wheel gesture over the rail can be
+  // forwarded to the canvas and handled by the reel's one motion model.
+  const canvasWrapRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
   const [motionGate, setMotionGate] = useState(false);
   // THE SHATTER STARTS ON MOUNT, NOT ON THE WALL (Chad, 2026-07-28).
@@ -397,7 +400,7 @@ export function PortfolioShowroom({
       )}
 
       {mode === "webgl" && (
-        <div className={styles.canvasWrap}>
+        <div className={styles.canvasWrap} ref={canvasWrapRef}>
           <Canvas
             camera={{ position: [0, 0, 6], fov: 38 }}
             dpr={[1, 2]}
@@ -497,6 +500,7 @@ export function PortfolioShowroom({
                 exiting={!immersive}
                 onGo={goTo}
                 onOpen={setSelected}
+                canvasWrapRef={canvasWrapRef}
               />
 
               <div className={`${styles.feature} ${immersive ? "" : styles.featureOut}`}>
@@ -626,6 +630,7 @@ function RightRail({
   exiting,
   onGo,
   onOpen,
+  canvasWrapRef,
 }: {
   items: ShowroomItem[];
   index: number;
@@ -633,6 +638,8 @@ function RightRail({
   exiting: boolean;
   onGo: (i: number) => void;
   onOpen: (i: number) => void;
+  /** The stage the rail forwards its wheel gestures to -- see the note on onWheel. */
+  canvasWrapRef: React.RefObject<HTMLDivElement | null>;
 }) {
   // Normal: click the centered item to open it, any other to slide to it. While a
   // project is focused, a click switches the focus straight to the clicked item
@@ -674,25 +681,38 @@ function RightRail({
   // canvas never saw these events and the strip that says "scroll" was the one
   // place scrolling did nothing.
   //
-  // Same semantics as the reel's handler on purpose (Reel.tsx): one step per
-  // gesture, a 420ms lock so a trackpad's inertia does not fire a dozen, and
-  // preventDefault so the locked page underneath cannot take the scroll instead.
-  // Routed through onGo so the reel and the rail stay the same one selection.
-  const wheelLock = useRef(0);
+  // It must feel like ONE SURFACE, so it does not get its own motion model -- it
+  // FORWARDS the gesture to the canvas and the reel handles it exactly as if the
+  // pointer had been over the stage (Chad, 2026-07-29: "it still scrolls in chunks").
+  //
+  // This used to be a copy of the reel's old semantics: one step per gesture behind a
+  // 420ms lock. Once the reel went continuous, a duplicate stepper here would have
+  // meant the strip labelled "scroll" was the one place that still moved in hops, and
+  // scrolling would change character depending on which few hundred pixels the pointer
+  // happened to be over. Forwarding means there is one implementation and it cannot
+  // drift out of step with itself again.
   useEffect(() => {
     const nav = navRef.current;
     if (!nav || exiting) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      const now = performance.now();
-      if (now < wheelLock.current) return;
-      wheelLock.current = now + 420;
-      const next = Math.min(items.length - 1, Math.max(0, index + (e.deltaY > 0 ? 1 : -1)));
-      if (next !== index) onGo(next);
+      const canvas = canvasWrapRef.current?.querySelector("canvas");
+      if (!canvas) return;
+      // A fresh event rather than the original: a dispatched event carries
+      // `defaultPrevented` with it, and the reel's handler calls preventDefault of its
+      // own. deltaMode is copied because the reel normalises lines/pages to pixels.
+      canvas.dispatchEvent(
+        new WheelEvent("wheel", {
+          deltaY: e.deltaY,
+          deltaMode: e.deltaMode,
+          bubbles: false,
+          cancelable: true,
+        }),
+      );
     };
     nav.addEventListener("wheel", onWheel, { passive: false });
     return () => nav.removeEventListener("wheel", onWheel);
-  }, [index, items.length, onGo, exiting]);
+  }, [exiting]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
