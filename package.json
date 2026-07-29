@@ -6,7 +6,7 @@
     "dev": "next dev -p 8890",
     "prebuild": "node scripts/build-lastmod.mjs && node scripts/sync-llms-essays.mjs && node scripts/sync-llms-projects.mjs && node scripts/sync-llms-prices.mjs",
     "build": "next build",
-    "postbuild": "node scripts/build-llms.mjs",
+    "postbuild": "node scripts/build-llms.mjs && node scripts/fix-rsc-aliases.mjs",
     "sync:llms": "node scripts/sync-llms-essays.mjs && node scripts/sync-llms-projects.mjs && node scripts/sync-llms-prices.mjs",
     "audit:prices": "node scripts/price-audit.mjs",
     "audit:index": "node scripts/index-audit.mjs",

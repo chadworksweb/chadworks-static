@@ -39,6 +39,9 @@ const tmpC = new THREE.Vector3();
 // GC pauses on the main thread are what a visitor feels as a hover that hangs
 // before it responds, because :hover style recalc and paint queue behind them.
 const tmpNormalMV = new THREE.Matrix4();
+// Refraction target scale, as a fraction of the viewport. See the sizing block in
+// the frame loop for why this is safe to turn down and what it buys.
+const FBO_SCALE = 0.5;
 const BASE = 0.759; // 0.66 * 1.15 (gem sized up 15%)
 const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
@@ -839,7 +842,20 @@ export function CrystalGem({
     const dpr = gl.getPixelRatio();
     const w = Math.max(2, Math.floor(size.width * dpr));
     const h = Math.max(2, Math.floor(size.height * dpr));
-    if (fbo.width !== w || fbo.height !== h) fbo.setSize(w, h);
+    // The refraction target runs at HALF the viewport (2026-07-28). Pass 1 below
+    // re-renders the ENTIRE scene into it, so this is the single most expensive
+    // thing in the frame, and it is the one place resolution can be bought back
+    // for free: the gem samples uBg with NORMALIZED uv (gl_FragCoord.xy/uRes ->
+    // texture()), never texelFetch, so the source can be any size. What it costs
+    // is sharpness in an image that is already being bent per-channel through a
+    // faceted surface. uRes stays the VIEWPORT -- it frames the sampling, not the
+    // target -- so nothing else has to move.
+    const fw = Math.max(2, Math.floor(w * FBO_SCALE));
+    const fh = Math.max(2, Math.floor(h * FBO_SCALE));
+    if (fbo.width !== fw || fbo.height !== fh) fbo.setSize(fw, fh);
+    // The gradient target stays FULL SIZE on purpose: its shader measures itself
+    // in uRes pixels, so shrinking the target without also rescaling uRes would
+    // crop the sweep. It is one fullscreen triangle -- not worth the risk.
     if (grad.rt.width !== w || grad.rt.height !== h) grad.rt.setSize(w, h);
 
     // Neon wireframe: it belongs to the EXIT gem (its edges match the assembled CW,
@@ -858,7 +874,12 @@ export function CrystalGem({
     // pass 1: whatever the gem is about to refract -- which IS its colour. Mid-fade it
     // is bending BOTH, so both have to be drawn; at either end only one is, so the
     // settled states each cost exactly what they did before.
-    if (mix > 0) {
+    // `show` gates BOTH passes (2026-07-28). Their only consumer is the gem's own
+    // material, so while the mark is not drawn -- it is held back until the wall it
+    // refracts exists -- these render into targets nothing samples. Pass 2 below
+    // already keys the mesh off the same flag; this just stops paying for the
+    // source of an image that is not on screen.
+    if (mix > 0 && show) {
       // The brand gradient: the master's own colour, so the mark holds its pink and
       // the room cannot be read through it. Just a fullscreen triangle.
       grad.mat.uniforms.uTime.value = state.clock.elapsedTime;
@@ -878,7 +899,7 @@ export function CrystalGem({
       su.uBoxSize.value.set(Math.max(2, hw * w), Math.max(2, hh * h));
       su.uBoxOrigin.value.set(((cx0 - hw) * 0.5 + 0.5) * w, ((cy0 - hh) * 0.5 + 0.5) * h);
     }
-    if (mix < 1) {
+    if (mix < 1 && show) {
       // The room: the reel (and everything but the gem) into the FBO, so the mark
       // refracts what it stands in. Exclude the load veil / dissolve
       // grain (REFRACT_EXCLUDE_LAYER) so the gem never refracts it.
