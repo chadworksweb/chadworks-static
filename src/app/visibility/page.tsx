@@ -126,15 +126,16 @@ const hub: HubConfig = {
 };
 
 export const metadata: Metadata = {
-  title: "Visibility -- Found in Google, Quoted by AI | chadworks",
+  title: "Visibility | Stay visible online with chadworks",
   description:
-    "Visibility is being found and chosen: in Google, in the AI assistants people now ask instead, and in the inbox. AI visibility is the umbrella; SEO, presence, and email are the pieces underneath. I do it all, as one ongoing service.",
+    "Visibility is being found online. It includes SEO, AIO/GEO, digital marketing and social media presence.",
   alternates: { canonical: `${SITE_URL}/visibility/` },
   // Launch-driven, and REQUIRED: layout.tsx defaults every route to noindex, so being
   // in launch.ts alone would put this in the sitemap while still serving noindex.
   robots: { index: isLaunched("/visibility/"), follow: true },
   openGraph: {
-    title: "Visibility -- Found in Google, Quoted by AI | chadworks",
+    // Mirrors the meta title, as it did before -- the two were the same string.
+    title: "Visibility | Stay visible online with chadworks",
     description:
       "Be found in Google and quoted by AI assistants. One umbrella service with every piece underneath.",
     url: `${SITE_URL}/visibility/`,
