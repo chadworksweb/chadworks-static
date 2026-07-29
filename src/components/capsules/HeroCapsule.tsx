@@ -30,6 +30,7 @@ export type HeroCapsuleProps = {
   title: string;
   titleNode?: ReactNode;
   eyebrow: string;
+  eyebrowNode?: ReactNode;
   answer?: ReactNode | Prompted;
   heroArt?: ReactNode;
   cta?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
@@ -46,6 +47,7 @@ export function HeroCapsule({
   title,
   titleNode,
   eyebrow,
+  eyebrowNode,
   answer,
   heroArt,
   cta,
@@ -86,7 +88,7 @@ export function HeroCapsule({
         )}
       </nav>
 
-      <p className="eyebrow">{eyebrow}</p>
+      <p className="eyebrow">{eyebrowNode ?? eyebrow}</p>
       {titleReveal ? (
         <TitleReveal artImageUrl={titleReveal}>{h1}</TitleReveal>
       ) : (
