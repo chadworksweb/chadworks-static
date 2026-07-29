@@ -5391,6 +5391,13 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    (AiDemoSplitCapsule, second section on /ai-search-visibility/). The mock
    carries its own 760px cap for the pages that run it full width, so inside
    this grid the cap is released and the column decides the width. */
+/* No top margin, and the section's own top padding cut by 70% (Chad,
+   2026-07-28): the split follows the hero closely rather than opening the
+   standard rhythm gap under it. Bottom padding keeps the full measure. */
+.section.cw-demosplit-section.reveal {
+  padding-top: calc(var(--section-pad-y) * 0.3);
+}
+.cw-demosplit-section { scroll-margin-top: 5.5rem; }
 .cw-demosplit {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -5402,6 +5409,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 /* The one inverted surface in the top half of the page, so it reads as the
    raised voice rather than as another band. */
 .cw-demosplit__panel {
+  position: relative; /* anchors the SCROLL hint riding above the top edge */
   display: flex;
   /* Column: the statement and its caveat stack, centred as a block. As a row
      (the default) the fine print sat beside the headline instead of under it. */
@@ -5455,6 +5463,50 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .cw-demosplit__fine a:hover { color: #fff; text-decoration-color: #fff; }
 /* The imperative is the half that has to land, so it keeps the full white. */
 .cw-demosplit__line--hit { color: #ffffff; }
+
+/* SCROLL hint -- OUTSIDE the panel, in the page's own whitespace just above the
+   panel's top-left corner (Chad, ss6). Absolute against the panel so it stays
+   pinned to that corner at every width. Left is the panel's own inline padding,
+   so the hint lines up with the statement text below it. */
+.cw-demosplit__scroll {
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  left: clamp(1.75rem, 3.4vw, 3rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  /* Long cycle, short move: the nudge reads as an occasional prompt rather than
+     a looping animation competing with the chat mock beside it. */
+  animation: cw-scroll-nudge 4.5s ease-in-out infinite;
+  transition: opacity 0.4s ease;
+}
+/* Past 45% of the viewport the reader is already scrolling; the prompt goes
+   quiet rather than riding along (see ScrollHint.tsx). */
+.cw-demosplit__scroll.is-past {
+  opacity: 0;
+  animation-play-state: paused;
+}
+.cw-demosplit__scroll svg { display: block; }
+@keyframes cw-scroll-nudge {
+  0%, 26%, 100% { transform: translateY(0); }
+  7%  { transform: translateY(5px); }
+  14% { transform: translateY(0); }
+  20% { transform: translateY(2px); }
+}
+@media (max-width: 900px) {
+  /* Panel comes FIRST on narrow screens, so the hint would point up at the
+     lede instead of down into the mock. */
+  .cw-demosplit__scroll { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw-demosplit__scroll { animation: none; }
+}
 @media (max-width: 900px) {
   .cw-demosplit { grid-template-columns: 1fr; }
   .cw-demosplit__panel { order: -1; }

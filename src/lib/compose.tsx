@@ -89,10 +89,15 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
         title={s.title}
         titleNode={s.titleNode}
         eyebrow={s.eyebrow}
+        eyebrowNode={s.eyebrowNode}
         answer={s.answer}
         heroArt={s.heroArt}
+        // Explicit null means the page wants NO hero button; undefined means it
+        // never asked, so the hero mirrors the contact CTA.
         cta={
-          s.heroCta ?? { href: s.cta.href, buttonLabel: s.cta.buttonLabel }
+          s.heroCta === null
+            ? undefined
+            : s.heroCta ?? { href: s.cta.href, buttonLabel: s.cta.buttonLabel }
         }
       />
     ),

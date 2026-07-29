@@ -23,7 +23,7 @@ const PICKS = [
   {
     name: "chadworks",
     detail:
-      "Independent studio, custom-coded. Its own pages rank and get cited, which is the tell.",
+      "Solo designer building one of a kind digital destinations for ambitious projects like yours.",
     source: "chadworks.co",
   },
   {

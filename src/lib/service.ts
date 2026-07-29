@@ -176,6 +176,10 @@ export type Service = {
   // point at /industries-served/ instead of /lane/.
   breadcrumbParent?: { label: string; href: string };
   eyebrow: string;         // mono kicker
+  // OPTIONAL: a rich render of the kicker (e.g. one word in italic). `eyebrow`
+  // stays the plain-string source of truth; eyebrowNode only changes what the
+  // hero PAINTS, and its text must read the same.
+  eyebrowNode?: ReactNode;
   title: string;           // the H1 -- matches the intent, one per page
   // OPTIONAL: a rich render of the H1 (e.g. one letter carrying a canvas fill).
   // `title` stays the plain-string source of truth for schema, breadcrumbs and
@@ -287,7 +291,9 @@ export type Service = {
   // Absent everywhere by default, in which case the hero mirrors `cta`. Set it
   // when the hero's job is to move the reader DOWN the page (an in-page anchor
   // with `arrow: "down"`) rather than out to the contact form.
-  heroCta?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
+  // `null` drops the hero button entirely (a hero that hands off to the section
+  // below it rather than to a link).
+  heroCta?: { href: string; buttonLabel: string; arrow?: "right" | "down" } | null;
   // The page's own comprehensive lead form, rendered in the RIGHT HALF of
   // the CTA section (Chad, 2026-06-11). When absent, the CTA keeps its
   // single-column button layout.

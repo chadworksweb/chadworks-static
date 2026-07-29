@@ -5,9 +5,9 @@
 // (both ANONYMIZED per CWS-ARCHIVE-INTELLIGENCE until Chad clears names).
 // Copy in Chad's public voice. Real facts only.
 
+import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { AiSearchHeroArt } from "@/components/art/AiSearchHeroArt";
-import { SECTION_ID } from "@/components/capsules/AiSearchFacetsCapsule";
 import { AiChatDemo } from "@/components/art/AiChatDemo";
 import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
@@ -16,7 +16,12 @@ export const aiSearchVisibility: Service = {
   slug: "ai-search-visibility",
   lane: "visibility",
   laneLabel: "Visibility",
-  eyebrow: "Being the answer, not just a result",
+  eyebrow: "Be the answer",
+  eyebrowNode: (
+    <>
+      Be <em>the</em> answer
+    </>
+  ),
   title: "AI Search Visibility",
   intent:
     "chadworks runs AI search visibility as an ongoing service: the SEO, structured data, profiles, and answer-shaped pages that get a business recommended by ChatGPT and Google's AI.",
@@ -26,24 +31,19 @@ export const aiSearchVisibility: Service = {
       AI search visibility is a suite of practices, implementations and
       optimizations that help a brand name or web property show up and/or
       get cited on AI search platforms like ChatGPT and Gemini (among
-      others.) I&apos;m Chad Lewine, and I&apos;ve been optimizing websites
-      for AI search visibility before the term even existed. AI search
-      optimization is built on a foundation of traditional SEO, but takes
-      it further because it accounts for the new signals and parameters
-      that these AI-driven technologies rely on when deciding which
-      results, names and links to surface.
+      others.) AI search optimization is built on a foundation of
+      traditional SEO, but takes it further because it accounts for the new
+      signals and parameters that these AI-driven technologies rely on when
+      deciding which results, names and links to surface.
     </>
   ),
 
   heroArt: <AiSearchHeroArt />,
 
-  // The hero sends the reader DOWN into the breakdown rather than out to the
-  // form; the CTA section at the foot of the page is what asks for contact.
-  heroCta: {
-    href: `#${SECTION_ID}`,
-    buttonLabel: "Learn more",
-    arrow: "down",
-  },
+  // No hero button. The demo underneath is the next move, and the SCROLL hint
+  // riding above it does the pointing; the CTA section at the foot of the page
+  // is what asks for contact.
+  heroCta: null,
 
   keyFactsHeading: "AI search visibility, at a glance",
   keyFactsIntroClassName: "cw-aisearch-glance",
@@ -57,39 +57,37 @@ export const aiSearchVisibility: Service = {
 
   problemArt: <AiChatDemo />,
   problem: {
-    heading: "The search results page quietly changed",
-    subheading: "Your buyers ask and something answers. Is it you?",
+    heading: "Searching the web has changed",
+    subheading: "Your audience is asking. Are you answering?",
     body:
-      "Buyers used to scan ten blue links and click around. Now an assistant reads everything and names one or two businesses. Most owners never find out they were skipped.",
+      "First, it was Ask Jeeves (ironic). Then, it was Google. Now, it's ChatGPT and friends. The first two return many pages of results. The last one averages 3 to 5 sources in an initial response. Do you know if you're even still in the conversation?",
     more: {
       trigger: "What decides who gets named",
       paragraphs: [
         <>
-          <strong>Engines read the page they fetch.</strong>{" "}When an
+          <strong>AI engines read the page they fetch.</strong>{" "}When an
           assistant answers, it usually pulls your page live and quotes the
-          visible text. Headings that match real questions, and the answer
-          sitting near the top rather than four paragraphs down. Messy
-          structure reads as silence.
+          visible text. Headings that match real questions, and answers sitting
+          towards the top of the page, not buried in the body. Page structure is
+          critical.
         </>,
         <>
-          <strong>Classic rankings decide whether you are in the running.</strong>{" "}
+          <strong>Ranking on Google still matters.</strong>{" "}
           Google&apos;s AI answer is assembled from the results underneath it,
-          so page one is the price of entry there. This is also where schema
-          earns its place, feeding rich results rather than being read by the
-          model.
+          mostly from page one. Schema helps here because AI models read Google
+          rankings, too!
         </>,
         <>
           <strong>They cross-check identity.</strong>{" "}Your Google Business
-          Profile, your reviews, your socials, and the site they all need
-          to match. Inconsistency reads as risk, and engines don&apos;t
-          recommend risk.
+          Profile, socials, press and directories all need to match.
+          Inconsistency isn&apos;t something AI models want to recommend.
         </>,
         <>
-          <strong>The quotable gets quoted.</strong>{" "}Pages that answer the
-          question in the first two sentences get lifted into answers.
-          Pages that warm up for four paragraphs get read and discarded.
+          No tricks, no schemes and no ploys. This is all the art and science of
+          AI search visibility.{" "}
+          <Link href="/contact/">Contact me</Link>{" "}
+          if you don&apos;t want to become invisible.
         </>,
-        "None of that is a trick, and no part of it is bought. It's craft, applied page by page, and it's checkable. That's the whole service.",
       ],
     },
   },

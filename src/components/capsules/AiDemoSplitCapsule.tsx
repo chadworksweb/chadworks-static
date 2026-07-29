@@ -10,15 +10,36 @@
 import Link from "next/link";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { AiChatDemo } from "@/components/art/AiChatDemo";
+import { ScrollHint } from "@/components/ScrollHint";
+
+// The hero's "Learn more" arrow lands here -- the section directly below it.
+export const SECTION_ID = "see-it-in-action";
 
 export function AiDemoSplitCapsule() {
   return (
-    <SectionShell className="cw-demosplit-section">
+    <SectionShell id={SECTION_ID} className="cw-demosplit-section">
       <div className="cw-demosplit">
         <div className="cw-demosplit__demo">
           <AiChatDemo />
         </div>
         <aside className="cw-demosplit__panel">
+          {/* Sits in the page's whitespace above the panel's top-left corner
+              and nudges every few seconds, then clears out once it passes 45%
+              of the viewport. Decorative: it points at what the page already
+              does on its own, so it is hidden from assistive tech rather than
+              announced as an instruction. */}
+          <ScrollHint className="cw-demosplit__scroll">
+            Scroll
+            <svg viewBox="0 0 12 14" width="9" height="11" fill="none">
+              <path
+                d="M6 1v11M1.6 8.2 6 12.6l4.4-4.4"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </ScrollHint>
           <p className="cw-demosplit__text">
             <span className="cw-demosplit__line">
               Everyone&apos;s using it.

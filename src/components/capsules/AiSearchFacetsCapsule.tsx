@@ -12,11 +12,14 @@
 // gem. The gem is held still -- no spin -- but takes `scrollShimmer`, so what it
 // refracts sweeps with the page while the shape stays put.
 
+import type { ReactNode } from "react";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { GemstoneMark } from "@/components/GemstoneMark";
 import { ScrollFade } from "@/components/ScrollFade";
 
-type Facet = { title: string; body: string };
+// `body` is a ReactNode so a facet can emphasize a word inline (the mentioned /
+// cited pair below); a plain string is still the normal case.
+type Facet = { title: string; body: ReactNode };
 type Group = { label: string; facets: Facet[] };
 
 // Exported so the hero CTA can anchor to it without the id being written out
@@ -32,22 +35,30 @@ const GROUPS: Group[] = [
       {
         title: "Showing up on ChatGPT",
         body:
-          "When someone asks ChatGPT for a business like yours, it answers from whatever it can read about you across the open web, and a business it cannot verify quietly never makes the list. Getting named starts with being legible: a site that states plainly what you do and who you serve, backed by enough mention elsewhere that the assistant is not taking your word for it.",
+          "When someone asks ChatGPT for a business like yours, it answers from whatever it can read about you across the open web, and a business it cannot verify never makes the list. Getting named starts with being visible and legible: a site that states plainly what you do and who you serve, backed by enough mention elsewhere that the assistant is not taking your word for it.",
       },
       {
         title: "Getting cited on ChatGPT",
-        body:
-          "Being mentioned and being cited are two different outcomes. The citation is the link under the answer, the one a reader actually clicks, and it lands on pages that answer a question completely enough to be quoted without editing. That usually means the real answer sits in the first two sentences of the page instead of four paragraphs down.",
+        body: (
+          <>
+            Being <em>mentioned</em> and being <em>cited</em> are two different
+            outcomes. The citation is the link under the answer, much like
+            references listed at the bottom of Wikipedia. Those links actually
+            get people over to your site, as opposed to just having your name
+            mentioned. These cited pages usually display the real answer in the
+            first two sentences instead of four paragraphs down.
+          </>
+        ),
       },
       {
         title: "Showing up in Google's AI Overviews",
         body:
-          "Google's AI answers sit much closer to classic ranking than ChatGPT does. If you already hold page one for a phrase, you have a real shot at the box above it, and if you rank nowhere the overview is not going to invent you. That makes Overviews the place where ordinary SEO pays off most directly, and usually where the first visible wins show up.",
+          "Google's AI answers sit much closer to classic ranking than ChatGPT does. If you already hold page one for a phrase, you have a real shot at the AI overview box above it. If you rank nowhere, you have no chance. This makes Google's AI Overviews the AI visibility channel that traditional SEO affects most directly, and it is usually where the first visible wins show up.",
       },
       {
         title: "All other platforms",
         body:
-          "Perplexity, Claude, Copilot and the rest run on the same fundamentals, and each one has quirks of its own, the way Bing and Google have always answered the same query a little differently. What decides the work is which of them your buyers actually open. If your market lives in Claude and Claude Code because the field is technical, or in NotebookLM because the work is research, I tune the campaign in that direction instead of spreading it evenly across platforms nobody in your industry has ever signed into.",
+          "Perplexity, Claude, Copilot and the rest run on the same fundamentals, with each one having its own quirks. This is similar to how Google and Bing each surface mostly — but not exactly — the same results. Your market/audience decides which platform(s) we spend time optimizing for. No one is shopping for luggage on Claude Code, amirite?",
       },
     ],
   },
@@ -55,14 +66,14 @@ const GROUPS: Group[] = [
     label: "On your site",
     facets: [
       {
-        title: "Optimizing my website for AI search",
+        title: "Optimizing your website for AI search",
         body:
-          "Most of this work is structural rather than cosmetic. Headings have to match the questions people type, and each page needs one job instead of two, because a page blending intents reads as noise to an engine. Underneath that sits the schema markup that tells an assistant what your page is before it reads a word of it.",
+          "Most of this work is structural rather than cosmetic. Headings have to match the questions people type, and each page is finely tuned to answer one query or intention, which is why expanding your site is likely part of the visibility optimization process. Beneath the content itself is the schema markup. This is the invisible code that tells an assistant what your page is before it reads a word of it.",
       },
       {
         title: "Creating content for AI search",
         body:
-          "The old playbook of posting every week to feed an algorithm does very little now. What gets pulled into answers is writing that settles one specific question a buyer asks out loud and puts something checkable in reach: a real number, a named process, a position you are willing to defend in public. Assistants reward the parts nobody else could have written and skip the parts that read like a competitor's site with the name swapped out.",
+          "The old playbook of posting every week to feed an algorithm does very little now. What gets cited and mentioned now is content that addresses a granularly specific query, something like \"that movie with the yellow boat\" or \"the best cinnamon bun in xyz town.\" This kind of content requires something that the agent can confirm, like a number, a process or a position that you defend or describe publicly. AI chat assistants reward uniqueness and depth.",
       },
     ],
   },
@@ -72,12 +83,12 @@ const GROUPS: Group[] = [
       {
         title: "Getting mentioned where AI looks",
         body:
-          "Assistants do not only read your website. They read Reddit threads, Wikipedia, YouTube descriptions, industry roundups and whichever directories your trade actually lives in, and they weigh what other people say about you more heavily than what you say about yourself. A flawless site with no footprint anywhere else reads as unverifiable, which is why a real share of this work happens off your own property.",
+          "AI assistants read more than your website. Comprehensive AI visibility requires presence off your site too, similar to traditional SEO but to a greater extent. What people say about you is weighted more heavily than what you say about yourself. Getting talked about on Reddit, Wikipedia, in YouTube descriptions and industry round ups are just a few examples of off-site signals that greatly influence your chance of being mentioned or cited by an AI chat bot.",
       },
       {
         title: "Keeping your business identity consistent",
         body:
-          "Engines cross-check who you are before they recommend you. Your name, your address, your phone number and the description of what you do all have to agree across your Google Business Profile, your site's schema, and every profile pointing back at you. Contradictions no human would ever notice, an old suite number or a former business name, are enough to make an assistant hedge and name somebody else.",
+          "Engines cross-check who you are before they recommend you. Your name, address, phone number, email address and the description of what you do all have to agree across your Google Business Profile, your site's schema, and every profile pointing back at you. Micro contradictions, an old zipcode, or one rogue social media profile that isn't yours but has your name is enough to make an assistant hedge and name somebody else.",
       },
     ],
   },
@@ -87,12 +98,12 @@ const GROUPS: Group[] = [
       {
         title: "Letting the AI crawlers in",
         body:
-          "Assistants read your site with their own crawlers, and a robots.txt written a few years ago may be quietly turning them away. GPTBot, OAI-SearchBot, Google-Extended and PerplexityBot each have to be allowed on purpose. The other half of this is whether your words exist in the HTML at all, because a site that paints its content in with JavaScript can look blank to a reader that does not wait around.",
+          "Assistants read your site with their own crawlers, and a robots.txt written a few years ago may be quietly turning them away. GPTBot, OAI-SearchBot, Google-Extended and PerplexityBot each have to be allowed on purpose. Another factor, among many others, is ensuring the text exists in the HTML, because a site that builds its content with client-side JavaScript can look blank, and AI assistant bots won't hang around for it to render.",
       },
       {
         title: "Measuring AI search visibility",
         body:
-          "There is no rank tracker for this the way there is for Google, and anyone selling you one is guessing. What works is asking the assistants the questions your buyers ask, on a schedule, and keeping a written record of what comes back. Alongside that, watch your analytics for the visits arriving from chatgpt.com and its neighbors. It is slower and messier than a ranking report, and it is the honest way to know whether any of this moved.",
+          "There is no rank tracker for this the way there is for Google, because the answer changes based on the who, what, where, when and whys that shape their prompt. What works is asking the assistants the questions your buyers ask, on a schedule, and keeping a written record of what comes back. There are platforms that I use to monitor citations, sentiment, competitors and all that jazz, but checking every phrase manually is still the only way to know for sure, just like manually checking your rank on Google.",
       },
     ],
   },
