@@ -2,6 +2,17 @@ import Link from "next/link";
 import { GemstoneMark } from "@/components/GemstoneMark";
 import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 import { isLaunched } from "@/lib/launch";
+import { ORG } from "@/lib/service";
+
+// ORG.telephone is stored schema-shaped (+1-215-872-1240). Both the visible
+// number and the dial target are derived from it, so the footer and the schema
+// cannot drift apart.
+const PHONE_DIGITS = ORG.telephone.replace(/\D/g, "").slice(-10);
+const PHONE_DISPLAY = `(${PHONE_DIGITS.slice(0, 3)}) ${PHONE_DIGITS.slice(
+  3,
+  6
+)}-${PHONE_DIGITS.slice(6)}`;
+const PHONE_HREF = `tel:${ORG.telephone.replace(/[^\d+]/g, "")}`;
 
 // Footer sitemap: every column heading links to its hub where one exists.
 // This is load-bearing for GEO (internal links; every rankable page reachable
@@ -112,9 +123,14 @@ export default function SiteFooter() {
               className="site-footer__gem"
             />
             <span className="site-footer__brand">chadworks&trade;</span>
-            <span className="site-footer__tag">Websites &amp; Visibility</span>
+            <span className="site-footer__tag">so you don&apos;t have to</span>
             <a className="site-footer__contact" href="mailto:chad@chadworks.co">
               chad@chadworks.co
+            </a>
+            {/* Display and href both derive from ORG.telephone so the visible
+                number and the schema can never drift apart. */}
+            <a className="site-footer__contact" href={PHONE_HREF}>
+              {PHONE_DISPLAY}
             </a>
           </div>
           {/* Launch control: launched links are live; unlaunched ones render as
@@ -157,21 +173,37 @@ export default function SiteFooter() {
             </div>
           </div>
         </nav>
+        {/* Three centred lines, in this order: where the studio is, the policy
+            links, then the copyright. */}
         <div className="site-footer__legal">
-          <span>&copy; {new Date().getFullYear()} chadworks&trade;</span>
+          {/* Where the studio IS, not a market it targets: chadworks runs no
+              LocalBusiness node and no metro areaServed (see ORG). */}
+          <span className="site-footer__based">
+            Based in Greater Philadelphia, PA, USA
+          </span>
           <span className="site-footer__legal-links">
             {isLaunched("/terms-of-service/") ? (
               <Link href="/terms-of-service/">Terms of Service</Link>
             ) : (
               <span className="site-footer__item--sealed">Terms of Service</span>
             )}
+            {/* Separators are their own elements, not a ::before on the links:
+                inside an <a> the pipe joins the hit area and picks up the hover
+                colour. Same shape as the hero breadcrumb. */}
+            <span className="site-footer__sep" aria-hidden="true">
+              |
+            </span>
             {isLaunched("/privacy-policy/") ? (
               <Link href="/privacy-policy/">Privacy Policy</Link>
             ) : (
               <span className="site-footer__item--sealed">Privacy Policy</span>
             )}
+            <span className="site-footer__sep" aria-hidden="true">
+              |
+            </span>
             <CookiePreferencesButton />
           </span>
+          <span>&copy; {new Date().getFullYear()} Chad Lewine</span>
         </div>
       </div>
     </footer>

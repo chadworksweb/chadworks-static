@@ -1185,7 +1185,10 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 }
 .site-footer__inner {
   grid-column: content;
-  padding-block: var(--space-xl);
+  /* Bottom is 0 on purpose: the legal block below carries its own symmetric
+     padding, so the space under the copyright matches the space above the
+     location line instead of stacking --space-xl on top of it. */
+  padding-block: var(--space-xl) 0;
   color: var(--text-tertiary);
   font-size: var(--text-sm);
 }
@@ -1214,13 +1217,31 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .site-footer__brandcol {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2xs);
+  /* Centered as a column (Chad, 2026-07-28): the mark, the wordmark, the
+     tagline and the contact lines all share one centre axis, and the stack
+     rides the middle of the row the sitemap sets. The grid stretches this cell
+     to the tallest column, so centring here is measured against the links. */
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  /* THE knob for this column. It is the rhythm INSIDE a text group (brand +
+     tagline, and the contact block), tightened from the old full step and then
+     eased back up 15% (Chad, 2026-07-28). The two distances that must NOT move
+     with it -- gem to brand, and tagline to the contact block -- are written
+     below as the original distance MINUS this gap, so they hold still no matter
+     what this is set to. */
+  --footer-line-gap: calc(var(--space-2xs) * 0.575);
+  gap: var(--footer-line-gap);
 }
 .site-footer__gem {
   width: 8.5rem;
   aspect-ratio: 16 / 10;
-  margin-bottom: var(--space-xs);
+  /* 35% of what the mark used to hold below it (Chad, 2026-07-28). The column
+     gap is subtracted so this reads as the TOTAL distance to the wordmark, not
+     an addition to it. */
+  margin-bottom: calc(
+    (var(--space-xs) + var(--space-2xs)) * 0.35 - var(--footer-line-gap)
+  );
 }
 .site-footer__brand {
   font-family: var(--font-display);
@@ -1231,16 +1252,50 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .site-footer__tag {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  /* 15% off the old 0.06em: lowercase does not need the tracking that held the
+     caps apart. */
+  letter-spacing: 0.051em;
+  /* Lowercase, not the usual kicker caps: the line reads as an aside in Chad's
+     voice rather than a label (Chad, 2026-07-28). */
+  text-transform: lowercase;
   color: var(--accent);
+  /* Rides 50% closer to the mark above it, and the contact block follows in
+     flow. Written against the column's own knob so it stays proportional. */
+  margin-top: calc(var(--footer-line-gap) * -0.5);
 }
 .site-footer__contact {
-  margin-top: var(--space-2xs);
   color: var(--text-tertiary);
   transition: color var(--duration-base) var(--ease-smooth);
 }
+/* Only the FIRST contact line breaks from the tagline above it, and it carries
+   the whole group-to-group distance, which must NOT tighten with the rest.
+   Three parts: 2x the base step is the original distance, minus the column gap
+   that is already there, plus the half-leading that dropping to
+   --leading-tight took off the tagline's underside and this line's top. */
+.site-footer__contact:first-of-type {
+  margin-top: calc(
+    var(--space-2xs) * 2 - var(--footer-line-gap) + 0.45rem
+  );
+}
 .site-footer__contact:hover { color: var(--text-primary); }
+/* First of the three centred legal lines. A statement, not a link: no hover,
+   no pointer. */
+.site-footer__based {
+  color: var(--text-tertiary);
+  /* 20% up on the two lines below it: this one is a statement about the studio,
+     the others are boilerplate. */
+  font-size: 1.2em;
+}
+/* The air between these lines is mostly LEADING, not the column gap: at
+   --leading-body (1.65) each single-line item carries about two thirds of an em
+   of its own space, which dwarfs the gap. Every one of them is a single line
+   that needs no reading rhythm, so they drop to the display leading. Halving
+   the gap alone left the block looking untouched (Chad, 2026-07-28). */
+.site-footer__brand,
+.site-footer__tag,
+.site-footer__contact {
+  line-height: var(--leading-tight);
+}
 /* A column can stack more than one group (Company + Tools share the first).
    The gap has to clear the heading's own margin so the second group reads as a
    new module rather than a continuation of the list above it. */
@@ -1283,15 +1338,27 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
   transition: color var(--duration-base) var(--ease-smooth);
 }
 .site-footer__list a:hover { color: var(--text-primary); }
+/* Three centred lines, stacked (Chad, 2026-07-28): location, policy links,
+   copyright. The links stay a wrapping inline row within their own line. */
 .site-footer__legal {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: var(--space-md);
-  padding-top: var(--space-md);
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* 0.3 of the base step (Chad, 2026-07-28): three short centred lines read as
+     one block, not three rows. */
+  gap: calc(var(--space-2xs) * 0.3);
+  /* Equal air above and below the block. The footer's own bottom padding is
+     zeroed for this (see .site-footer__inner), so this padding IS the whole
+     gap under the copyright rather than adding to one. */
+  padding-block: var(--space-md);
   border-top: 1px solid var(--border-subtle);
 }
-.site-footer__legal-links { display: inline-flex; flex-wrap: wrap; gap: var(--space-md); align-items: center; }
+/* One space either side of each pipe, so the row reads as a sentence of links
+   rather than a spaced-out row. Still flex-wrap, so the run stacks normally
+   when the viewport cannot hold it. */
+.site-footer__legal-links { display: inline-flex; flex-wrap: wrap; justify-content: center; gap: 0.3em; align-items: center; }
+.site-footer__sep { color: var(--text-tertiary); opacity: 0.5; }
 .site-footer__legal a { color: var(--text-tertiary); }
 .site-footer__legal a:hover { color: var(--text-primary); }
 /* Cookie preferences: a link-styled button living beside the legal links. */
@@ -4402,7 +4469,6 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md) var(--space-sm);
   }
-  .site-footer__legal { flex-direction: column; gap: var(--space-2xs); }
 }
 
 /* =====================================================================
