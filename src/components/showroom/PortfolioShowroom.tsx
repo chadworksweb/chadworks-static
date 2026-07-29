@@ -167,15 +167,26 @@ const RAIL_IN_MS = STAGE_SECONDS * 1000;
 // state we are in rather than playing to an end.
 function IntroController({ immersive }: { immersive: boolean }) {
   useFrame((_, delta) => {
+    // CLAMP THE STEP, all three clocks (Chad, 2026-07-28). `advanceStage` always
+    // did; `entrance` and `intro` took raw delta, and that is a real bug the moment
+    // the shatter starts on mount: the wall's tile textures decode and upload on the
+    // MAIN THREAD, which stalls the frame loop for a few hundred ms. Raw delta then
+    // pushes the timeline ~20% forward in one frame, so the shards freeze mid-flight
+    // and TELEPORT rather than resume -- which reads as them vanishing.
+    //
+    // Clamped, a stall costs the animation a pause and nothing else: it picks up
+    // exactly where it stopped. The pause itself is the decode, and the only real
+    // cure for that is to stop decoding on this thread (see the note in TileWall).
+    const dt = Math.min(delta, 0.05);
     if (entrance.playing) {
-      entrance.p = Math.min(1, entrance.p + delta / ENTRANCE_DURATION);
+      entrance.p = Math.min(1, entrance.p + dt / ENTRANCE_DURATION);
       if (entrance.p >= 1) entrance.playing = false;
     }
     if (intro.playing) {
-      intro.p = Math.min(1, intro.p + delta / INTRO_DURATION);
+      intro.p = Math.min(1, intro.p + dt / INTRO_DURATION);
       if (intro.p >= 1) intro.playing = false;
     }
-    advanceStage(immersive ? 1 : 0, Math.min(delta, 0.05));
+    advanceStage(immersive ? 1 : 0, dt);
   });
   return null;
 }
@@ -220,19 +231,37 @@ export function PortfolioShowroom({
   const [command, setCommand] = useState<{ index: number; nonce: number }>({ index: 0, nonce: 0 });
   const [closing, setClosing] = useState(false);
   const [motionGate, setMotionGate] = useState(false);
-  // The load sequence: the grid dissolves in, THEN the gem shatters together out of
-  // its facets, THEN the enter button appears. The gem waits for the wall because it
-  // has no texture of its own -- it refracts the wall, so arriving first would show a
-  // hollow silhouette. Stable identity: TileWall calls this from a useFrame.
-  const onWallRevealed = useCallback(() => {
-    setWallRevealed(true);
+  // THE SHATTER STARTS ON MOUNT, NOT ON THE WALL (Chad, 2026-07-28).
+  //
+  // It used to be chained to the wall's reveal: the tiles had to decode and the veil
+  // had to dissolve before a single shard moved, which left a few hundred ms of a
+  // dead, motionless stage on every cold load. The stated reason was that the gem
+  // "has no texture of its own -- it refracts the wall, so arriving first would show
+  // a hollow silhouette."
+  //
+  // That reason does not survive the shards now starting OFF SCREEN. For the first
+  // stretch of the cascade there is nothing on screen to look hollow: the chips are
+  // outside the frame, flying in. By the time the earliest of them crosses the edge
+  // the wall has typically decoded, and any that beat it refract a dark stage, which
+  // is what the exit gem refracts anyway.
+  //
+  // So the entrance is started once, on mount, and the wall's reveal is now only
+  // what it always literally was: the moment the wall is up.
+  useEffect(() => {
+    if (mode !== "webgl") return;
     if (prefersReducedMotion() || isMotionPaused()) {
       skipEntrance(); // gem simply appears, assembled
       setGemAssembled(true);
       return;
     }
     startEntrance();
-    window.setTimeout(() => setGemAssembled(true), ENTRANCE_DURATION * 1000);
+    const t = window.setTimeout(() => setGemAssembled(true), ENTRANCE_DURATION * 1000);
+    return () => window.clearTimeout(t);
+  }, [mode]);
+
+  // Stable identity: TileWall calls this from a useFrame.
+  const onWallRevealed = useCallback(() => {
+    setWallRevealed(true);
   }, []);
 
   const total = items.length;
@@ -388,7 +417,7 @@ export function PortfolioShowroom({
                 the wall (veil included) until every reel texture had decoded, so
                 the pre-click stage sat empty on first load. */}
             <Suspense fallback={null}>
-              <TileWall items={items} onRevealed={onWallRevealed} />
+              <TileWall onRevealed={onWallRevealed} />
             </Suspense>
             {/* The reel pulls the full-res shots (~5.7MB, and ~20MB of GPU upload
                 EACH once decoded) and is invisible until entry, so mounting it up
@@ -409,7 +438,12 @@ export function PortfolioShowroom({
                 />
               </Suspense>
             )}
-            <CrystalGem immersive={immersive} show={wallRevealed} focused={selected != null} />
+            {/* `show` no longer waits for the wall. It was what held the mark back
+                until the tiles had decoded, and with the entrance now starting on
+                mount that would have run the whole cascade invisibly and revealed an
+                already-assembled gem. The shards start off screen, so there is
+                nothing to see too early. */}
+            <CrystalGem immersive={immersive} show focused={selected != null} />
           </Canvas>
 
           {/* Entry: click the gem to enter (and trigger the cold open). Held back

@@ -49,6 +49,12 @@ const BASE = 0.759; // 0.66 * 1.15 (gem sized up 15%)
 // plus the mark's own extent, with room to spare. See the distance note in the
 // per-facet loop below -- it is the target that loop solves for.
 const OFFSCREEN_R = 6;
+// How much of that travel a shard may spend on DEPTH, as a fraction. The wall is at
+// z -1.6 and the mark at +0.8, so anything past ~2.4 deep is behind an opaque,
+// depth-tested plane and gets culled the moment the tiles paint. Longest travel here
+// is OFFSCREEN_R * 1.45 = 8.7, so 0.16 puts the deepest shard at ~1.4 -- comfortably
+// in front of the wall, with the mark's own half-depth to spare.
+const MAX_Z_FRAC = 0.16;
 const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
 // Vertex shader for the showroom gem. Same MVP + varyings as gemstone-core's
@@ -568,14 +574,26 @@ export function CrystalGem({
       const seed = s + 1;
       const h1 = hash(seed), h2 = hash(seed * 1.7 + 5), h3 = hash(seed * 2.3 + 11);
       const h4 = hash(seed * 3.1 + 7), h5 = hash(seed * 0.7 + 2), h6 = hash(seed * 1.3 + 13);
-      // Radial-outward fly direction in xy, jittered, with a random z so some
-      // shards arrive from in front of / behind the plane of the mark.
+      // Radial-outward fly direction, UNIT IN XY, with a small bounded z so some
+      // shards still arrive from in front of / behind the plane of the mark.
+      //
+      // THE Z BUDGET IS LOAD-BEARING (Chad, 2026-07-28). The wall sits at z -1.6 and
+      // the mark at +0.8, and the wall is opaque and depth-tested. Normalising all
+      // three axes together (as this did) let z take up to ~0.7 of the direction, so
+      // once travel rose to clear the frame the far shards were flying 8 units deep
+      // -- behind the wall. They were invisible on an empty stage and then CULLED the
+      // instant the tiles painted, which read as the shatter starting, freezing, and
+      // restarting. It was occlusion, not timing.
+      //
+      // So xy is normalised on its own and carries the whole travel distance, while z
+      // is a bounded FRACTION of it. MAX_Z_FRAC * the longest travel must stay well
+      // inside the 2.4 units between the mark and the wall.
       const rlen = Math.hypot(ccx, ccy) || 1e-4;
       let dx = ccx / rlen + (h1 - 0.5) * 0.8;
       let dy = ccy / rlen + (h2 - 0.5) * 0.8;
-      let dz = (h3 - 0.5) * 2.2;
-      const dl = Math.hypot(dx, dy, dz) || 1;
-      dx /= dl; dy /= dl; dz /= dl;
+      const dl = Math.hypot(dx, dy) || 1;
+      dx /= dl; dy /= dl;
+      const dz = (h3 - 0.5) * 2 * MAX_Z_FRAC;
       // Random unit spin axis.
       let rx = h4 - 0.5, ry = h5 - 0.5, rz = h6 - 0.5;
       const al = Math.hypot(rx, ry, rz) || 1;
@@ -593,19 +611,12 @@ export function CrystalGem({
       // that range began INSIDE the frame: those shards appeared in place and then
       // slid home, which read as a blink rather than an arrival.
       //
-      // Distance is now derived from the shard's own direction instead of drawn
-      // independently of it. A shard flying mostly sideways needs less travel to
-      // clear the edge than one angled steeply into z, so dividing by the XY length
-      // of its unit direction gives each one the distance IT needs. Same jitter on
-      // top, so the cascade keeps its variety.
-      //
-      // OFFSCREEN_R is the radius to clear, in world units at the gem's depth: it
-      // covers half-width on an ultrawide plus the mark's own extent, so no shard is
-      // ever caught on screen at rest, whatever the viewport. The clamp stops a
-      // steeply-angled shard from being flung absurdly far.
-      const xyLen = Math.hypot(dx, dy);
-      const travel = Math.min(12, Math.max(5, OFFSCREEN_R / Math.max(xyLen, 0.4)));
-      sRnd[s * 3 + 2] = travel * (0.95 + h2 * 0.5);
+      // Because the direction above is UNIT IN XY, this distance IS the sideways
+      // travel -- no division, no clamp, and no shard can be flung deep by a steep
+      // angle. OFFSCREEN_R is the radius to clear in world units at the mark's depth:
+      // it covers half-width on an ultrawide plus the mark's own extent, so nothing
+      // is ever caught on screen at rest, whatever the viewport.
+      sRnd[s * 3 + 2] = OFFSCREEN_R * (0.95 + h2 * 0.5);
       sLetterC[s * 3] = isC ? lax : wax;
       sLetterC[s * 3 + 1] = isC ? lay : way;
       sLetterC[s * 3 + 2] = isC ? laz : waz;
