@@ -1790,6 +1790,16 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 .svc-knockout .svc-knockout__text .svc-block__heading { color: #fff; }
 .svc-knockout .svc-knockout__text .svc-block__subheading,
 .svc-knockout .svc-knockout__text .svc-block__body { color: transparent; }
+/* The duplicate has to BREAK ITS LINES exactly like the real text, and the base
+   stylesheet hands that out by TAG: h1-h4 get `text-wrap: balance`, p gets
+   `pretty`. The duplicate is divs (it must not be a second set of headings in
+   the DOM), so it was wrapping greedily while the real h2 balanced -- same box,
+   different line breaks, and the white knockout landed beside the dark copy
+   instead of on it. Only shows where the two algorithms disagree, which is why
+   it read fine on a desktop measure and was obvious on a phone (Chad, ss0214). */
+.svc-knockout .svc-knockout__text .svc-block__heading,
+.svc-knockout .svc-knockout__text .svc-block__subheading { text-wrap: balance; }
+.svc-knockout .svc-knockout__text .svc-block__body { text-wrap: pretty; }
 
 /* Problem pop-down (ProblemMore): the section prose lives in a frosted panel
    opened from a CTA trigger, OFF the ribbons. The collapsed panel is a 0fr
@@ -2110,10 +2120,36 @@ html.cw-motion-paused .cw-facets__plate { opacity: 1 !important; }
 /* Held still (no spin) -- the gem is the lens, not the animation. */
 .cw-facets__gem { aspect-ratio: 3 / 2; }
 .cw-facets__defs { position: absolute; width: 0; height: 0; }
-/* Under the two-column threshold the overlay would sit on top of the copy with
-   nowhere to go, so it drops out and the stack runs full width. */
+/* Under the two-column threshold the overlay has no right-hand half to pin it
+   to, so it drops out and the HOMEPAGE gemstone runs above the section title
+   instead, on the same halftone field (Chad, 2026-07-29). Two different gems,
+   one visible at a time: the small still mark is a lens for copy to be read
+   through, which stacked there is nothing to be, and the big CW is an image in
+   its own right, which is what the top of a section wants. */
 @media (max-width: 900px) {
   .cw-facets__viz { display: none; }
+}
+/* The gem section is this capsule's OWN sibling, matched by what follows it so
+   the homepage's copy of .cw-gem is untouched. */
+.cw-gem:has(+ .cw-facets-section) { display: none; }
+@media (max-width: 900px) {
+  .cw-gem:has(+ .cw-facets-section) { display: grid; }
+  /* Halftone BEHIND the crystal, as its own layer: masking the host itself
+     would fade the canvas edges with it. Same 4.5px braille grid as the
+     overlay's field, pooled to the middle. */
+  .cw-gem:has(+ .cw-facets-section) .cw-gem__host::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.5) 0.5px, transparent 0.9px),
+      radial-gradient(circle, color-mix(in srgb, var(--grad-deep) 22%, transparent) 1.3px, transparent 1.7px);
+    background-size: 4.5px 4.5px, 4.5px 4.5px;
+    -webkit-mask-image: radial-gradient(ellipse 60% 58% at 50% 50%, #000 34%, transparent 80%);
+    mask-image: radial-gradient(ellipse 60% 58% at 50% 50%, #000 34%, transparent 80%);
+  }
+  .cw-gem:has(+ .cw-facets-section) .cw-gem__canvas { z-index: 1; }
 }
 
 /* --- Cost-calculator intro: prose beside a static "at a glance" panel. The
@@ -3201,6 +3237,64 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 .svc-lane:hover .svc-lane__arrow { transform: translateX(0.4rem); }
 
+/* TOUCH FOCUS -- the hover look, driven by SCROLL POSITION instead of a pointer.
+   A touch screen has nothing to hover with, and iOS latches :hover on tap and
+   never clears it, so the lit card is decided by where it sits: PageMotion parks
+   .is-touch-focus on whichever card is in the top third of the screen.
+   These declarations MIRROR the :hover rules above rather than joining their
+   selector lists, because the hover half is switched off on touch just below and
+   a shared selector list cannot be half-disabled. Keep the two in step. */
+.svc-lane.is-touch-focus {
+  transform: translateY(-2px);
+  border-color: var(--lane-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06),
+    0 0 16px color-mix(in srgb, var(--lane-color) 12%, transparent);
+}
+.svc-lane.is-touch-focus::before { height: 100%; opacity: 0.06; }
+.svc-lane.is-touch-focus .svc-lane__arrow { transform: translateX(0.4rem); }
+.svc-lanes--rows .svc-lane.is-touch-focus { transform: translateX(3px); }
+.svc-lanes--rows .svc-lane.is-touch-focus::before { width: 100%; height: 100%; opacity: 0.06; }
+.svc-lane--cta.is-touch-focus { border-color: var(--accent); }
+.svc-lane--cta.is-touch-focus .svc-lane__arrow {
+  border-color: color-mix(in srgb, #fff 45%, transparent);
+}
+.cw-lane-sub.is-touch-focus {
+  border-left-color: var(--accent);
+  background-color: rgba(237, 231, 246, 0.62);
+  box-shadow: 0 12px 28px -14px rgba(36, 57, 137, 0.3);
+}
+/* No pointer: :hover is either never delivered or left latched by a tap, so it
+   is sent back to rest and the class is the only thing that lights a card.
+   `:not(.is-touch-focus)` so a tapped card that is ALSO the one in the band
+   keeps its light rather than flickering off under its own hover. */
+@media (hover: none) {
+  .svc-lane:hover:not(.is-touch-focus) {
+    transform: none;
+    border-color: var(--border-subtle);
+    border-bottom-color: var(--lane-color);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 18px rgba(128, 84, 188, 0.12);
+  }
+  .svc-lane:hover:not(.is-touch-focus)::before { height: 3px; opacity: 0.5; }
+  .svc-lane:hover:not(.is-touch-focus) .svc-lane__arrow { transform: none; }
+  .svc-lanes--rows .svc-lane:hover:not(.is-touch-focus) { transform: none; }
+  .svc-lanes--rows .svc-lane:hover:not(.is-touch-focus)::before {
+    width: 3px;
+    height: 100%;
+    opacity: 0.5;
+  }
+  .svc-lane--cta:hover:not(.is-touch-focus) {
+    border-color: color-mix(in srgb, #fff 14%, transparent);
+  }
+  .svc-lane--cta:hover:not(.is-touch-focus) .svc-lane__arrow {
+    border-color: color-mix(in srgb, #fff 22%, transparent);
+  }
+  .cw-lane-sub:hover:not(.is-touch-focus) {
+    border-left-color: var(--border-subtle);
+    background-color: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+  }
+}
+
 /* Coming-soon lanes: the sub-page isn't live yet, so the lane doesn't link.
    The Explore button greys out and shows a "coming soon" tooltip on hover. */
 .svc-lane--soon { cursor: default; }
@@ -3558,6 +3652,75 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   .svc-faq__intro { position: sticky; top: 110px; }
   /* homepage-only even split (opt-in via FaqCapsule evenSplit) */
   .svc-faq-section--even .svc-faq__layout { grid-template-columns: 1fr 1fr; }
+}
+/* HALFTONE behind the FAQ heading + lede (opt-in, FaqCapsule `halftone`). The
+   same braille dot field the facets section runs on this page, re-masked to
+   pool behind the intro column's text rather than behind the gem. The dots are
+   a positioned layer, so the copy is lifted over them the way
+   .cw-shell--has-bg does it: statically positioned text would otherwise paint
+   UNDER an absolute sibling no matter its z-index. */
+.cw-faq-halftone {
+  position: absolute;
+  /* A FIXED portrait box anchored to the intro's top-left, not an inset off the
+     text block: the field is meant to sit left of the heading and run down past
+     the lede, so tying its right/bottom edges to where the copy happens to end
+     would move it every time the heading rewraps. */
+  top: -3.5rem;
+  left: -5rem;
+  width: 27rem;
+  height: 29rem;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.38) 0.5px, transparent 0.9px),
+    radial-gradient(circle, color-mix(in srgb, var(--grad-deep) 20%, transparent) 1.3px, transparent 1.7px);
+  background-size: 4.5px 4.5px, 4.5px 4.5px;
+  -webkit-mask-image: radial-gradient(ellipse 58% 58% at 50% 46%, #000 34%, transparent 78%);
+  mask-image: radial-gradient(ellipse 58% 58% at 50% 46%, #000 34%, transparent 78%);
+}
+.svc-faq__intro--halftone > *:not(.cw-faq-halftone) {
+  position: relative;
+  z-index: 1;
+}
+/* The lede rides over the dot field on the site's frosted-paragraph treatment:
+   .svc-lede's blur(5px), 10px radius, and negative left margin, so the frost
+   bleeds out while the text still lines up with the heading above it. The white
+   is carried heavier than .svc-lede's 0.5 (Chad) -- that one only ever has a
+   drifting hero chip behind it, this one sits on a dot field that never moves. */
+.svc-faq__intro--halftone .svc-faq__lead {
+  padding: var(--space-2xs) var(--space-sm);
+  /* Flush to the content column on BOTH edges. .svc-lede bleeds its frost a
+     space-sm to the left so the text hangs level with the hero title; here that
+     read as a panel sitting a notch outside the column while its right edge
+     stayed on it (Chad). Squared up, the panel aligns and the text takes the
+     small inset. */
+  margin-left: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.74);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  /* Lifts the panel off the dot field. Same deep-indigo cast the glass boxes
+     and .panel drop, just carried a little stronger so it reads over texture. */
+  box-shadow: 0 18px 40px -22px rgba(36, 57, 137, 0.45);
+}
+/* Stacked layout: the intro runs the full column with the accordion under it,
+   so the field spans that width rather than keeping the desktop box. A fixed
+   20rem left the frosted lede's right half sitting on plain white, reading as a
+   stray panel with a shadow (measured at 768px). */
+@media (max-width: 900px) {
+  .cw-faq-halftone {
+    left: -2rem;
+    right: -2rem;
+    width: auto;
+    height: 22rem;
+  }
+}
+/* On the dark band the indigo layer disappears into the background, so the
+   field runs on the lavender end of the ramp instead. */
+.svc-faq-section--dark .cw-faq-halftone {
+  background-image:
+    radial-gradient(circle at 38% 38%, rgba(255, 255, 255, 0.26) 0.5px, transparent 0.9px),
+    radial-gradient(circle, color-mix(in srgb, var(--grad-peak) 16%, transparent) 1.3px, transparent 1.7px);
 }
 .svc-faq__lead { margin-top: var(--space-xs); color: var(--text-secondary); }
 .svc-faq-section--dark .svc-faq__lead { color: rgba(229, 210, 244, 0.82); }
@@ -5630,16 +5793,44 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   20% { transform: translateY(2px); }
 }
 @media (max-width: 900px) {
-  /* Panel comes FIRST on narrow screens, so the hint would point up at the
-     lede instead of down into the mock. */
+  /* Stacked, the hint would sit over the panel's own copy rather than in the
+     page's whitespace, and the mock above it has already done the pointing. */
   .cw-demosplit__scroll { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cw-demosplit__scroll { animation: none; }
 }
 @media (max-width: 900px) {
+  /* Pulled up 75px so the top of the mock breaks the fold and peeks out of the
+     bottom of the viewport, rather than the hero ending on clean empty space
+     (Chad, 2026-07-29).
+     It also leaves the scroll-reveal behind and joins the HERO CASCADE instead:
+     .reveal only fires once the section crosses PageMotion's threshold, which a
+     75px sliver never does, so on a phone the peek stayed invisible until you
+     scrolled -- exactly the thing it exists to prevent. Same keyframes and
+     easing as the hero, one beat behind the lede's 0.5s. `both` holds the end
+     state, so it does not matter whether the observer later adds .is-visible. */
+  .section.cw-demosplit-section.reveal {
+    margin-top: -75px;
+    transform: none;
+    filter: none;
+    transition: none;
+    animation: cw-hero-in 1s 0.85s var(--ease-swoop) both;
+  }
+  /* Motion off: the rest of the hero cascade is cut the same way, and an
+     entrance the reader did not ask for is the whole thing being opted out of.
+     The section is simply there. */
+  @media (prefers-reduced-motion: reduce) {
+    html:not(.cw-force-motion) .section.cw-demosplit-section.reveal {
+      animation: none;
+      opacity: 1;
+    }
+  }
   .cw-demosplit { grid-template-columns: 1fr; }
-  .cw-demosplit__panel { order: -1; }
+  /* Stacked order matches the desktop reading order: the mock shows the
+     mechanism, then the panel names the stake. The panel used to be pulled
+     above it (Chad, 2026-07-29). */
+  .cw-demosplit__panel { order: 0; }
 }
 .ai-demo__window {
   border: 1px solid var(--border-subtle);
@@ -9460,10 +9651,9 @@ html.cw-motion-paused *::after {
   align-items: start;
   gap: clamp(1.5rem, 3vw, 2.75rem);
 }
-/* The heading lives inside the copy column here, so it drops the top offset it
-   carries when it sits above the grid and takes the standard gap under itself. */
-.cw-pricing--split .cw-pricing__heading { margin-top: 0; }
-.cw-pricing__copy > .cw-pricing__heading + * { margin-top: var(--space-md); }
+/* The heading is the standard section h2 and brings its own bottom margin, so
+   the copy flow does not add a second gap under it. */
+.cw-pricing__copy > .svc-block__heading + * { margin-top: 0; }
 /* Body copy, not a lede: the standard paragraph size rather than the --text-lg
    the section headings and block ledes run at. */
 .cw-pricing__copy {

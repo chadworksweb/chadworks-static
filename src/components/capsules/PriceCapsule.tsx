@@ -55,7 +55,10 @@ export function PriceCapsule({
               rates band runs its heading above the grid; here it belongs to the
               copy, so the card can start level with it. */}
           <div className="cw-pricing__copy">
-            <h2 className="cw-pricing__heading">{heading ?? price.heading}</h2>
+            {/* The standard section heading, NOT .cw-pricing__heading: inside
+                the copy column that one inherits the column's --text-secondary
+                and reads grey against every other h2 on the page. */}
+            <h2 className="svc-block__heading">{heading ?? price.heading}</h2>
             <p>
               <W value={price.body} />
             </p>

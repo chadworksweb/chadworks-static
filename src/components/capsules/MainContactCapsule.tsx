@@ -4,6 +4,7 @@
 // contact block instead of a page-specific CTA form.
 
 import type { LeadFormConfig } from "@/lib/forms";
+import type { Scheme } from "@/lib/capsule";
 import { ContactCapsule } from "@/components/capsules/ContactCapsule";
 
 const EMAIL = "chad@chadworks.co";
@@ -71,6 +72,12 @@ export function MainContactCapsule({
   // Only /contact/ passes "h1" -- there this capsule is the whole page. See
   // ContactCapsule for why.
   headingLevel?: "h1" | "h2";
+  // Declared for PageComposer's rule-9 adjacency pass only: this band is ALWAYS
+  // dark, and the pass reads the scheme off the element it was handed. Placed
+  // in a composed slot without it, the section above cannot see a dark band
+  // coming and will not yield -- which is how two darks end up stacked.
+  scheme?: Scheme;
+  schemeAuto?: boolean;
 } = {}) {
   return (
     <ContactCapsule

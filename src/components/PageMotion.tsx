@@ -81,6 +81,59 @@ export function PageMotion() {
     setupReveal(".reveal-early", "0px 0px 14% 0px");
     setupReveal(".reveal-late", "0px 0px -32% 0px");
 
+    // --- touch focus: hover, decided by scroll position ---
+    // A touch screen has no pointer to hover with, and iOS latches :hover on tap
+    // and never clears it, so on those devices the card the reader is actually
+    // looking at is decided by position. That card wears the hover look
+    // (.is-touch-focus); the CSS switches :hover off there.
+    //
+    // The trigger is a LINE, not a band. A band the full depth of the top third
+    // still contains a card that is nearly scrolled off the top, and that card
+    // was winning (Chad). A 3%-tall stripe a quarter of the way down the screen
+    // is crossed by one card at a time, so the lit card is the one arriving at
+    // the top of the reader's view rather than the one leaving it.
+    //
+    // Cut with rootMargin, so the observer fires only on a crossing -- no scroll
+    // listener, and none of this runs on a pointer device.
+    if (window.matchMedia("(hover: none)").matches) {
+      const focusEls = Array.from(
+        document.querySelectorAll<HTMLElement>(".svc-lane, .cw-lane-sub")
+      );
+      if (focusEls.length) {
+        const onLine = new Set<Element>();
+        let lit: HTMLElement | null = null;
+        const light = (next: HTMLElement | null) => {
+          if (next === lit) return;
+          lit?.classList.remove("is-touch-focus");
+          next?.classList.add("is-touch-focus");
+          lit = next;
+        };
+        const relight = () => {
+          // Last in DOM order: at the moment two cards touch the line, the lower
+          // one is arriving and the upper one is leaving.
+          const next = focusEls.filter((el) => onLine.has(el)).pop() ?? null;
+          if (next) return light(next);
+          // Nothing on the line (a gap between cards passing through it): hold
+          // the current one rather than blinking off, until it has left the
+          // screen entirely.
+          if (!lit) return;
+          const r = lit.getBoundingClientRect();
+          if (r.bottom < 0 || r.top > window.innerHeight) light(null);
+        };
+        const lineObs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) =>
+              e.isIntersecting ? onLine.add(e.target) : onLine.delete(e.target)
+            );
+            relight();
+          },
+          { rootMargin: "-25% 0px -72% 0px", threshold: 0 }
+        );
+        focusEls.forEach((el) => lineObs.observe(el));
+        observers.push(lineObs);
+      }
+    }
+
     // --- scroll-fill headings ---
     const fillEls = Array.from(
       document.querySelectorAll<HTMLElement>(".svc-fill")

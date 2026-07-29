@@ -217,45 +217,44 @@ export const aiSearchVisibility: Service = {
       `The scope of what I do, what you do, and what I deliver each month is set in writing before we begin. Each plan is tailored to your specific needs, which is why the price starts at ${money(VISIBILITY_MONTHLY)}/mo. An online business requires different tactics than a local business with a geographic limit.`,
     disclaimer: (
       <>
-        <strong>Straight up:</strong>{" "}The AI Visibility Audit is a required
-        service that must happen before monthly servicing begins. The audit
-        itself is a flat {money(VISIBILITY_AUDIT)} for most businesses. If you
-        get what you need from the audit itself, I won&apos;t trick you into the
-        retainer.
+        <strong>Straight up:</strong>{" "}Your first engagement is a required
+        minimum of two months paid up front. This includes a full AI Visibility
+        Audit (valued at {money(VISIBILITY_AUDIT)}{" "}on its own){" "}
+        <em>and</em>{" "}two months of visibility work.
       </>
     ),
   },
 
   faqLead:
-    "The questions buyers ask about AI search visibility, answered the way I'd answer them on a call.",
+    "Frequently asked questions about hiring chadworks to start and run an AI search visibility campaign for your brand or business.",
   faqs: [
     {
       q: "What is AI search visibility, exactly?",
-      a: "Being found and recommended by AI assistants like ChatGPT, and by Google's AI answers, instead of just appearing in classic results. The work is real SEO plus structured data, consistent profiles, and pages written so an engine can quote them.",
+      a: "AI search visibility is being found, recommended and linked to by AI assistants like ChatGPT, and by Google's AI answers.",
     },
     {
       q: "Is SEO dead, then?",
-      a: "No. AI assistants lean on the same signals search engines built, so classic SEO is the foundation. What died is doing SEO alone and calling the job finished.",
+      a: "No, SEO is not dead. AI assistants lean on the same signals search engines built, so classic SEO is the foundation.",
     },
     {
       q: "How fast does it show results?",
-      a: "Slower than ads, faster than waiting. Profile and structure fixes can surface in weeks, while new standing for competitive phrases takes months. You see the checklist progress every month, so nothing rides on faith.",
+      a: "Results are based on market competition and your starting point. If you have a great foundation, movement can be seen in a matter of days to a few weeks. If you need a decent amount of work done to get in the running, expect a few weeks to a few months for indicators of improvement. It's not a cut and dry system, so set expectations accordingly.",
     },
     {
       q: "Can you guarantee I'll show up in ChatGPT?",
-      a: "No, and nobody honest can, because engines re-decide constantly and don't publish their rules. What I guarantee is the work: every check run and every change documented, with real precedent that it lands. The law firm now in Google's AI Overview started exactly where you are.",
+      a: "Yes and no. It's a 99% guarantee that you will show up for branded keywords, like your exact business or product name. What is not guaranteed is showing up for anything else. If you're selling insurance, your competition is likely sky high, and this is what the audit will reveal.\n\nSome companies are spending tens of thousands a month on AI visibility and SEO. It would not be wise to compete with them without a matching budget. If this is the case, I will recommend alternative ideas to increase your visibility, like going hyper-niche or hyper-local.",
     },
     {
       q: "I've read that schema markup and llms.txt don't actually get you cited. Is that true?",
-      a: "Largely, yes, and it's worth knowing before you hire anyone. Ahrefs matched 1,885 pages that added schema against 4,000 control pages and found no citation lift on any platform, because most assistants read the visible page and drop the markup first. SE Ranking checked around 300,000 domains for llms.txt and found no correlation either. Both still belong on a site, schema because it earns rich results in classic search and llms.txt because it costs minutes. Neither is the reason you get named. The reason is ranking where the AI looks and writing an answer worth quoting, which is what the retainer actually does.",
+      a: "That is true, but we still do both. Schema is immensely helpful for ranking on Google, which is, ironically, a source that AI assistants use themselves. We also do llms.txt because it takes 5 minutes and adds another layer of clarity for the robots scanning your site.",
     },
     {
       q: "Does the same work pay off on every AI platform?",
-      a: "No, and that's the part most agencies skip. Google's AI answer leans hard on classic ranking, ChatGPT fetches and quotes live pages, and Copilot runs off the Bing index. There are documented cases of one change lifting a site sharply in Google's AI Overviews during the same window its ChatGPT citations fell. So we name the platform your buyers use, aim there, and I tell you which contests you are not entered in.",
+      a: "While broadly similar, each AI assistant platform has its own quirks. This is why we choose which platforms to optimize for before we start. While checking all the boxes on every platform might be theoretically possible, it's unlikely you'll need to show up for red handbags on NotebookLM.\n\nGoogle's AI answer leans hard on classic ranking, ChatGPT fetches and quotes live pages, and Copilot runs off the Bing index. There are documented cases of one change lifting a site sharply in Google's AI Overviews during the same window its ChatGPT citations fell. So we name the platform your buyers use, aim there, and I tell you which contests you are not entered in.",
     },
     {
-      q: "Why a retainer instead of a one-time fix?",
-      a: "Because the answer box is re-decided every time someone asks. A one-time pass exists, and it's the AI Visibility Audit. The retainer is for staying in the answers instead of visiting them once.",
+      q: "Why a retainer and not a one-time or hourly fee?",
+      a: "Because the scope is unpredictable until we get into it. I may spend the first month getting to know the landscape and realize it's way more competitive, which means I need to do more, which means the monthly cost goes up. But I don't do commitments, so you have the choice of paying more or quitting, no hard feelings. The flat rate allows me to give my all (within reason) and for you to know exactly what you're paying, as opposed to a mystery bill at the end of the month.",
     },
   ],
 
@@ -327,10 +326,10 @@ export const aiSearchVisibility: Service = {
   nextSteps: {
     heading: "What happens after you reach out",
     steps: [
-      { title: "You reach out", body: "Tell me your business and market through the form here. I usually reply within a day." },
-      { title: "A straight answer", body: "Where you stand in AI answers and classic search today, and whether a retainer is even the move." },
-      { title: "A scoped retainer", body: "Pages, checks, cadence, and the monthly number, in writing before anything starts." },
-      { title: "The checklist runs", body: "The first full pass lands, then the cycle keeps you in the answers, with progress you can read every month." },
+      { title: "Initial Response", body: "I receive your message and get back to you with an initial response, usually asking to schedule a free phone consultation." },
+      { title: "Free Consultation", body: "We have the consult and decide if I can help, and if so, what I propose." },
+      { title: "Formal Proposal", body: "I provide a proposal tailored to your needs with scope and fees clearly stated." },
+      { title: "Commencement", body: "You accept or request changes, and we get rollin..." },
     ],
   },
 

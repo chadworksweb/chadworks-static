@@ -47,6 +47,9 @@ export type FaqCapsuleProps = {
   // the default 2fr 3fr. Scoped via .svc-faq-section--even so other pages are
   // untouched.
   evenSplit?: boolean;
+  // Opt-in: the braille dot field (the facets section's halftone) pooled behind
+  // the heading + lede. Off everywhere by default.
+  halftone?: boolean;
 };
 
 export function FaqCapsule({
@@ -58,6 +61,7 @@ export function FaqCapsule({
   variant = "single",
   groups = [],
   evenSplit = false,
+  halftone = false,
 }: FaqCapsuleProps) {
   if (variant === "groups") {
     return (
@@ -100,7 +104,10 @@ export function FaqCapsule({
       trailingClassName={dark ? "svc-faq-section--dark" : undefined}
     >
       <div className="svc-faq__layout">
-        <div className="svc-faq__intro">
+        <div
+          className={`svc-faq__intro${halftone ? " svc-faq__intro--halftone" : ""}`}
+        >
+          {halftone && <span className="cw-faq-halftone" aria-hidden="true" />}
           <h2 className="svc-block__heading svc-fill">{resolvedHeading}</h2>
           {faqLead && (
             <p className="svc-faq__lead">

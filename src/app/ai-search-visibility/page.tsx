@@ -13,7 +13,8 @@ import {
   ProcessCapsule,
   PathsCapsule,
   PriceCapsule,
-  CtaCapsule,
+  FaqCapsule,
+  MainContactCapsule,
   NextStepsCapsule,
   SectionShell,
 } from "@/components/capsules";
@@ -123,6 +124,7 @@ export default function AiSearchVisibilityPage() {
         // tinted price band and the qualification block.
         afterPrice: (
           <SectionShell className="svc-block">
+            <p className="eyebrow">IMPORTANT - READ THIS</p>
             <h2 className="svc-block__heading">
               Client Expectations During an AI Search Visibility Campaign
             </h2>
@@ -141,6 +143,19 @@ export default function AiSearchVisibilityPage() {
         // points stay one line away if it comes back. Nothing else reads them:
         // `proof` feeds no JSON-LD.
         proof: null,
+        // Same as the composer default, plus the halftone dot field behind the
+        // heading + lede. scheme/schemeAuto are restated verbatim so the rule-9
+        // pass still demotes this band when the dark CTA follows it.
+        faq: (
+          <FaqCapsule
+            faqs={service.faqs}
+            faqLead={service.faqLead}
+            pageName={service.title}
+            halftone
+            scheme="inverted"
+            schemeAuto
+          />
+        ),
         // "Why it's safe to start" is off this page (Chad, 2026-07-29).
         assurance: null,
         // "What happens after you reach out" moves BELOW the contact section,
@@ -148,8 +163,16 @@ export default function AiSearchVisibilityPage() {
         // nextSteps and cta slots; this CTA carries the form, so the steps take
         // the afterCta tail slot instead and the form stays in place.
         nextSteps: null,
-        // Carries the id the lane above jumps to.
-        cta: <CtaCapsule cta={service.cta} form={service.form} id="contact" scheme="inverted" />,
+        // The global contact block closes the page instead of the service CTA +
+        // its own form. It carries id="contact" itself, so the price button and
+        // the lanes' contact card still land on it. `scheme` is restated for the
+        // rule-9 pass, which reads it off the placed element.
+        cta: (
+          <MainContactCapsule
+            heading="Want to be the answer AI assistants give out?"
+            scheme="inverted"
+          />
+        ),
         afterCta: <NextStepsCapsule nextSteps={service.nextSteps!} />,
       }}
     />

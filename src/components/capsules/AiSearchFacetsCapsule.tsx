@@ -14,6 +14,7 @@
 
 import type { ReactNode } from "react";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { GemstoneCW } from "@/components/GemstoneCW";
 import { GemstoneMark } from "@/components/GemstoneMark";
 import { ScrollFade } from "@/components/ScrollFade";
 
@@ -111,8 +112,16 @@ const GROUPS: Group[] = [
 
 export function AiSearchFacetsCapsule() {
   return (
-    <SectionShell id={SECTION_ID} className="svc-block cw-facets-section">
-      <h2 className="svc-block__heading">{HEADING}</h2>
+    <>
+      {/* MOBILE ONLY (CSS-gated): the homepage CW gemstone above the section
+          title, on the halftone field. Stacked, there is no right-hand half to
+          pin the overlay to, so the gem stops being a lens behind the copy and
+          becomes the section's opening image. It is a sibling section, not a
+          child: .cw-gem__host breaks out on `grid-column: full`, which needs the
+          page grid, and any wrapper here would take that away. */}
+      <GemstoneCW />
+      <SectionShell id={SECTION_ID} className="svc-block cw-facets-section">
+        <h2 className="svc-block__heading">{HEADING}</h2>
       <div className="cw-facets">
         <div className="cw-facets__stack">
           {GROUPS.map((g) => (
@@ -176,7 +185,8 @@ export function AiSearchFacetsCapsule() {
             yChannelSelector="G"
           />
         </filter>
-      </svg>
-    </SectionShell>
+        </svg>
+      </SectionShell>
+    </>
   );
 }
