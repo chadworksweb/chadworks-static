@@ -52,7 +52,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/switch/squarespace-to-static/": "2026-07-23",
   "/switch/wix-to-static/": "2026-07-23",
   "/terms-of-service/": "2026-07-24",
-  "/visibility/": "2026-07-25",
+  "/visibility/": "2026-07-29",
   "/vision-strategy-roadmap/": "2026-07-23",
   "/web-design-for-authors/": "2026-07-23",
   "/web-design-packages/": "2026-07-23",

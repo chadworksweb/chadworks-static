@@ -14,6 +14,7 @@ import { PageMotion } from "@/components/PageMotion";
 import type { LeadFormConfig } from "@/lib/forms";
 import { MainContactCapsule } from "@/components/capsules";
 import { SITE_URL, ORG } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import { ORG_ID, ref } from "@/lib/jsonld";
 
 export interface HubLane {
@@ -107,9 +108,20 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
               const style = {
                 "--lane-color": LANE_COLORS[i % LANE_COLORS.length],
               } as React.CSSProperties;
-              // Lanes 01 + 02 stay live; 03-08 are locked in the coming-soon
-              // style used by the "Development Platform Options" section.
-              const locked = i >= 2;
+              // A lane is locked when its TARGET IS NOT LAUNCHED, read from launch.ts.
+              //
+              // This was `i >= 2` -- "lanes 01 + 02 stay live, 03-08 are locked" -- which
+              // was true of /websites/ when it was written and drifted the moment another
+              // hub had a different number of live lanes. On /visibility/ it linked lane
+              // 02 to /ai-visibility-audit/, which is sealed, while locking 06 and 07
+              // whose pages have been launched and live for weeks (Chad, 2026-07-29:
+              // "disable link / tooltip 02 03 04 and 05").
+              //
+              // Deriving it means a lane lights up the moment its page launches, can
+              // never link to a sealed route, and no hub has to know its own position in
+              // someone else's ordering. /websites/ is unaffected: its first two lanes
+              // are the launched ones either way.
+              const locked = !isLaunched(l.href);
               const inner = (
                 <>
                   <span className="svc-lane__num" aria-hidden="true">
