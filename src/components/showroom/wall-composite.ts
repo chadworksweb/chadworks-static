@@ -9,12 +9,19 @@
 // the preload go out while the chunk is still in flight. The two downloads overlap
 // instead of queueing, which is most of the blank window.
 //
+// PATH MATTERS. These live in public/portfolio/wall/ and NOT public/portfolio/,
+// because .gitignore ignores /public/portfolio/*.jpg and deploy.sh excludes that same
+// glob from the sync -- the portfolio captures there are local source material. A wall
+// image parked beside them would be untracked AND unshipped, and would 404 in
+// production while working perfectly on this machine. The wall/ subdirectory is
+// deliberately exempt from both (see the note in .gitignore).
+//
 // The pick is module state, so it is stable for the life of the page: the preload and
 // the texture can never disagree and fetch two different files.
 
 const COMPOSITE_COUNT = 3;
 
-export const WALL_COMPOSITE_SRC = `/portfolio/wall-${
+export const WALL_COMPOSITE_SRC = `/portfolio/wall/bake-${
   1 + Math.floor(Math.random() * COMPOSITE_COUNT)
 }.jpg`;
 

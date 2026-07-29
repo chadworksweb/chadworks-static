@@ -29,7 +29,7 @@ if (!SRC_DIR) {
   process.exit(1);
 }
 
-const OUT_DIR = path.join(process.cwd(), "public", "portfolio");
+const OUT_DIR = path.join(process.cwd(), "public", "portfolio", "wall");
 // Must match COMPOSITE_W / COMPOSITE_H in TileWall.tsx.
 const W = 2560;
 const H = 1600;
@@ -44,7 +44,7 @@ if (raws.length === 0) {
 let n = 0;
 for (const f of raws) {
   n++;
-  const out = path.join(OUT_DIR, `wall-${n}.jpg`);
+  const out = path.join(OUT_DIR, `bake-${n}.jpg`);
   // fit:"fill" and not "cover": the capture is the same 16:10 box as the output, so
   // this is a straight downscale. Any letterboxing here would show up as a stretched
   // wall on screen.
