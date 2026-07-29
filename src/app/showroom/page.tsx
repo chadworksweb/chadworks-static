@@ -22,6 +22,7 @@ import { ArchiveGrid } from "@/components/portfolio/ArchiveGrid";
 import showroomStyles from "@/components/showroom/showroom.module.css";
 import { captureSrc } from "@/lib/captures";
 import { ShowroomRoute } from "@/components/showroom/ShowroomRoute";
+import { ImmersiveLink } from "@/components/showroom/ImmersiveLink";
 import { SHOWROOM_ITEMS } from "@/components/showroom/showroom-data";
 import { getProjectPageSlugs } from "@/lib/project-pages";
 
@@ -127,10 +128,15 @@ function ShowroomArchive() {
           the archive -- the desktop showroom has nothing to reveal. */}
       <PageMotion />
       <SectionShell reveal={false} className="cw-showroom-archive">
-        <p className="eyebrow">Selected work</p>
+        {/* The "Selected work" eyebrow is gone (Chad, 2026-07-28). The h1 now opens
+            the page on its own. */}
         <h1 className="svc-hero__title">
           <span className="text-gradient">Project Showroom</span>
         </h1>
+        {/* The way back to the room, for a desktop visitor who chose this grid from
+            under ENTER. Hides itself on anything that never gets the showroom, so on
+            a phone this markup is inert rather than a link to nothing. */}
+        <ImmersiveLink />
         {/* Only a phone or a tablet ever reads this, so the last line can point
             at the desktop without ever showing up on the machine it points to. */}
         <p className="svc-lede measure-prose">

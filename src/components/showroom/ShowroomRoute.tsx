@@ -17,13 +17,29 @@
 // only hand us a hydration mismatch against the archive above.
 
 import dynamic from "next/dynamic";
-import type { ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { useShowroomMode } from "./useShowroomMode";
+import { getServerSurface, getSurface, setSurface, subscribeSurface } from "./showroom-surface";
 import styles from "./showroom.module.css";
+
+// THE STAGE IS NEVER ABSENT (Chad, 2026-07-28). There are two windows on a
+// desktop where this route used to have NO content at all -- the header sat
+// directly on the footer and the page collapsed to nothing:
+//
+//   1. `mode === null`, the undecided first paint. The archive is rendered but
+//      the media query hides it on desktop-class devices, so it occupies zero
+//      height.
+//   2. `mode === "webgl"` while the chunk is still in flight. `dynamic()` with no
+//      `loading` renders null, and three.js is ~1MB.
+//
+// Both now render the stage's own box instead: same height, same background, same
+// negative pull under the nav, so the showroom fades up INTO a stage that was
+// already standing rather than pushing the page open when it arrives.
+const StagePlaceholder = () => <div className={styles.stageHold} aria-hidden="true" />;
 
 const PortfolioShowroom = dynamic(
   () => import("./PortfolioShowroom").then((m) => m.PortfolioShowroom),
-  { ssr: false },
+  { ssr: false, loading: () => <StagePlaceholder /> },
 );
 
 // `pageSlugs` is the list of projects that have a page of their own at
@@ -38,13 +54,51 @@ export function ShowroomRoute({
   pageSlugs?: string[];
 }) {
   const { mode } = useShowroomMode();
+  // The visitor's own override: "view simple portfolio grid" under ENTER goes one
+  // way, "view immersive showroom" under the archive's h1 comes back. Held in a
+  // module store rather than state here, because the link that comes BACK is built
+  // into server-rendered archive markup and has no prop path to this component --
+  // see showroom-surface.ts.
+  //
+  // NOT IN THE URL, deliberately. One page, one URL, one canonical: a ?view= or a
+  // #simple would hand search engines a second address for the same work with the
+  // same title and the same content, which is a duplicate to be consolidated rather
+  // than a page to be ranked. The two surfaces are a rendering choice, not two
+  // documents. A reload returns to the default.
+  const surface = useSyncExternalStore(subscribeSurface, getSurface, getServerSurface);
+  const archiveChosen = surface === "simple";
 
   // `null` is the undecided first paint, `static` is a phone or a tablet. Both keep
   // the server's archive, so both are the same branch -- the difference is only that
   // one of them may still change its mind. During the `null` window a desktop is
   // still showing this markup, so the wrapper's media query (not JS) is what keeps
   // the archive from flashing there before the showroom's chunk lands.
-  if (mode === null || mode === "static") return <div className={styles.archive}>{archive}</div>;
+  // The placeholder rides ALONGSIDE the archive, not instead of it: the archive is
+  // still the real content for a phone, and it is what crawlers read. The
+  // placeholder carries the same media query in reverse, so exactly one of the two
+  // ever has height -- the grid on a phone, the stage on a desktop.
+  if (mode === null) {
+    return (
+      <>
+        <div className={styles.archive}>{archive}</div>
+        <StagePlaceholder />
+      </>
+    );
+  }
 
-  return <PortfolioShowroom mode={mode} pageSlugs={pageSlugs} />;
+  if (mode === "static") return <div className={styles.archive}>{archive}</div>;
+
+  // Chosen explicitly, so the media query that hides the archive on desktop has to
+  // be overridden -- that query exists to stop a FLASH of the grid, not to forbid it.
+  if (archiveChosen) {
+    return <div className={`${styles.archive} ${styles.archiveChosen}`}>{archive}</div>;
+  }
+
+  return (
+    <PortfolioShowroom
+      mode={mode}
+      pageSlugs={pageSlugs}
+      onViewArchive={() => setSurface("simple")}
+    />
+  );
 }

@@ -65,12 +65,10 @@ html:has(.route) { scrollbar-gutter: stable; }
   gap: 0.55rem;
   padding: 0.5rem 0.7rem 0.5rem 0.55rem;
   border-radius: 999px;
-  background: rgba(8, 8, 15, 0.62);
+  background: rgba(8, 8, 15, 0.92);
   border: 1px solid rgba(174, 185, 234, 0.42);
   color: #eef0fb;
   cursor: pointer;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   font-family: var(--font-mono, monospace);
   transition: border-color 0.18s, background 0.18s;
 }
@@ -121,90 +119,79 @@ html:has(.route) { scrollbar-gutter: stable; }
   display: block;
 }
 
-/* ---- Stepped blur over the slide ----
-   One big blur would end on a hard line wherever its mask stopped. This is the stacked
-   trick instead: each layer blurs a little more than the last and starts a little lower,
-   and because every layer filters the BACKDROP (which already includes the layers behind
-   it), the blur compounds down the frame -- a ramp, not a step, with no seam.
-   --slide-blur-from is where the first layer starts; the rest divide what is left. It
-   sits under the module (z 12) and over the canvas, so the module stays sharp and only
-   the slide goes soft. */
-.slideBlur {
-  /* The ramp's range. Every band below derives from these two, so re-aiming the blur is
-     these numbers and nothing else -- the alternative is six literals that have to be
-     kept in step by hand. */
-  --slide-blur-from: 55%;
-  --slide-blur-to: 98%;
-  --slide-blur-step: calc((var(--slide-blur-to) - var(--slide-blur-from)) / 5);
-  /* TWO rules keep this element able to blur at all, and BOTH are load-bearing. Break
-     either and the bands blur an empty backdrop: perfect computed values, nothing on
-     screen. That failure is invisible to every measurement, so it can only be caught by
-     eye, in Chrome. Do not "tidy" any of this without looking at the result.
-
-     1. FIXED, not absolute. The canvas is always its own composited layer. Absolutely
-        positioned, this paints into a surface that cannot sample that layer.
-     2. NO animation on THIS element. An opacity animation gives it a render surface,
-        and its children cannot sample outside one. The fade lives on the spans instead
-        (each span's own opacity does not interfere with its own backdrop-filter).
-
-     Rule 2 is why this looked haunted: with fill-mode both, a finished animation is
-     still in effect, and Chrome may keep that surface alive or drop it. Dropped, the
-     blur appeared; kept, it did not. Same code, different luck, load to load.
-
-     Geometry does not change: .canvasWrap is the full viewport and the showroom locks
-     scroll, so inset:0 is the same box either way, and z-index 10 still keeps the
-     module and HUD (z 12) sharp above it. */
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
+/* "View immersive showroom" -- the return trip, under the archive's h1.
+   HIDDEN BY DEFAULT and shown only on desktop-class devices, which is correctness
+   rather than taste: ShowroomRoute never builds the showroom on a phone or tablet
+   and never fetches the three.js chunk there, so this would be a control that leads
+   nowhere. The query is the SAME one .archive and .stageHold use -- if that gate
+   ever moves, move all three together. */
+.immersiveLink {
+  display: none;
 }
-/* Each band fades in across its own slice (--a to --b), which is where the NEXT one
-   picks up, so the layers hand off with no seam. Doubling the blur each step is what
-   makes the ramp read as even: perceived blur grows with the radius, not linearly. */
-.slideBlur span {
-  position: absolute;
-  inset: 0;
-  -webkit-mask-image: linear-gradient(to bottom, transparent var(--a), #000 var(--b));
-  mask-image: linear-gradient(to bottom, transparent var(--a), #000 var(--b));
-  /* The fade rides HERE, not on the parent, and that is not a style choice: see rule 2
-     on .slideBlur. Same keyframes, same clock, same result on screen. */
-  animation: cw-frame-in var(--stage-ms) var(--stage-ease) both;
-}
-.slideBlurOut span {
-  animation: cw-frame-out var(--stage-ms) var(--stage-ease) both;
-}
-.slideBlur span:nth-child(1) {
-  --a: var(--slide-blur-from);
-  --b: calc(var(--slide-blur-from) + var(--slide-blur-step));
-  -webkit-backdrop-filter: blur(1.9px);
-  backdrop-filter: blur(1.9px);
-}
-.slideBlur span:nth-child(2) {
-  --a: calc(var(--slide-blur-from) + var(--slide-blur-step));
-  --b: calc(var(--slide-blur-from) + 2 * var(--slide-blur-step));
-  -webkit-backdrop-filter: blur(3.75px);
-  backdrop-filter: blur(3.75px);
-}
-.slideBlur span:nth-child(3) {
-  --a: calc(var(--slide-blur-from) + 2 * var(--slide-blur-step));
-  --b: calc(var(--slide-blur-from) + 3 * var(--slide-blur-step));
-  -webkit-backdrop-filter: blur(7.5px);
-  backdrop-filter: blur(7.5px);
-}
-.slideBlur span:nth-child(4) {
-  --a: calc(var(--slide-blur-from) + 3 * var(--slide-blur-step));
-  --b: calc(var(--slide-blur-from) + 4 * var(--slide-blur-step));
-  -webkit-backdrop-filter: blur(15px);
-  backdrop-filter: blur(15px);
-}
-.slideBlur span:nth-child(5) {
-  --a: calc(var(--slide-blur-from) + 4 * var(--slide-blur-step));
-  --b: var(--slide-blur-to);
-  -webkit-backdrop-filter: blur(30px);
-  backdrop-filter: blur(30px);
+@media (min-width: 901px) and (pointer: fine) and (hover: hover) {
+  .immersiveLink {
+    display: block;
+    margin: 0.9rem auto 0;
+    padding: 0.4rem 1.1rem;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(120, 100, 160, 0.9);
+    text-decoration: underline;
+    text-underline-offset: 0.35em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(120, 100, 160, 0.4);
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+  .immersiveLink:hover,
+  .immersiveLink:focus-visible {
+    color: #6629bc;
+    text-decoration-color: #6629bc;
+    outline: none;
+  }
 }
 
+/* The stage's placeholder: the box the showroom will occupy, standing before the
+   showroom does. Geometry MUST match .wrap exactly (height, the negative pull under
+   the sticky nav, the background) or the page shifts when the real stage swaps in.
+   Mirrors .archive's query in reverse: hidden wherever the archive is the real
+   content, shown wherever the archive is hidden, so exactly one of the two ever has
+   height and the page is never empty between the header and the footer. */
+.stageHold {
+  display: none;
+}
+@media (min-width: 901px) and (pointer: fine) and (hover: hover) {
+  .stageHold {
+    display: block;
+    width: 100%;
+    min-height: 100dvh;
+    margin-top: calc(-1 * var(--nav-height));
+    background:
+      radial-gradient(120% 90% at 50% 42%, rgba(102, 41, 188, 0.18) 0%, rgba(8, 8, 15, 0) 58%),
+      radial-gradient(90% 70% at 82% 88%, rgba(36, 57, 137, 0.28) 0%, rgba(8, 8, 15, 0) 60%),
+      #08080f;
+  }
+}
+
+/* ---- Stepped blur over the slide: REMOVED 2026-07-28 (Chad) ----
+   Five full-viewport backdrop-filter layers used to live here, serially dependent
+   by design (each filtered a backdrop that already contained the one before it),
+   over a canvas that repaints every frame -- so nothing was ever cacheable.
+
+   WHY IT WENT, with numbers. Profiling the frame in immersive put the ENTIRE 3D
+   scene at 3 draw calls and 0.3-0.4ms of GPU time, while the frame period ran
+   34-49ms. The landing screen, with 56 draw calls, ran at 12.7ms. So the cost was
+   never the 3D -- it was compositing this stack, and it was what made every hover
+   in the room respond ~100ms late: a :hover style recalc is main-thread work and
+   had to queue behind it.
+
+   If the ramp is ever wanted back, draw it INSIDE the canvas, where it costs GPU
+   milliseconds instead of compositor tens-of-milliseconds. Do not reintroduce it
+   as backdrop-filter over a live canvas. */
 /* ---- HUD ---- */
 .hud {
   position: absolute;
@@ -278,6 +265,13 @@ html:has(.route) { scrollbar-gutter: stable; }
   .archive {
     display: none;
   }
+  /* ...unless the visitor asked for it. The query above exists to stop the grid
+     FLASHING before the showroom's chunk lands, not to forbid it on desktop, so
+     an explicit choice outranks it (see ShowroomRoute). Scoped inside the same
+     query so it only ever undoes that one rule. */
+  .archive.archiveChosen {
+    display: block;
+  }
 }
 
 /* ---- Selected state: full-bleed takeover, inset stylized frame ---- */
@@ -287,9 +281,7 @@ html:has(.route) { scrollbar-gutter: stable; }
   z-index: 60;
   display: grid;
   place-items: center;
-  background: rgba(4, 4, 10, 0.74); /* dim the stage behind */
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 4, 10, 0.94); /* dim the stage behind */
   animation: fade 0.45s ease both;
 }
 @keyframes fade {
@@ -414,9 +406,12 @@ html:has(.route) { scrollbar-gutter: stable; }
   --meta-shade: rgba(9, 8, 16, 0.8);
   padding: 1.25rem var(--meta-pad-x) 1.35rem;
   border-radius: 16px;
-  background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  backdrop-filter: blur(14px) saturate(1.15);
+  /* OPAQUE, and the backdrop-filter is gone with it (Chad, 2026-07-28). This was
+     translucent over a blur of the LIVE canvas, so every frame re-sampled and
+     re-blurred the backdrop behind it. Same hues, same gradient direction,
+     alpha 1.0 -- it reads as the same object and asks the compositor for
+     nothing. */
+  background: linear-gradient(160deg, #14141c 0%, #221d34 100%);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     0 2px 8px rgba(150, 110, 230, 0.6),
@@ -652,13 +647,47 @@ html:has(.route) { scrollbar-gutter: stable; }
   color: #fff;
   letter-spacing: 0.02em;
   box-shadow: 0 6px 18px rgba(102, 41, 188, 0.38);
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  /* COMPOSITED HOVER ONLY (2026-07-28). This used to transition box-shadow AND a
+     gradient background. Neither is a composited property, so both forced a
+     REPAINT -- inside .metaBody, which is an overflow:hidden clip over a canvas
+     that redraws every frame. On a main thread already spending 87-179ms per
+     frame in the render loop, that repaint waits its turn, and the button felt
+     dead on approach.
+     Now only `transform` moves here and only `opacity` moves on the glow below,
+     which the COMPOSITOR can do without the main thread at all. That is the one
+     class of change that stays responsive while the loop is busy.
+     `position: relative; z-index: 0` is load-bearing: it makes the stacking
+     context that keeps the ::after glow behind this button's own background but
+     still in front of the panel. Without it, z-index:-1 would drop the glow
+     behind .meta and it would vanish. */
+  position: relative;
+  z-index: 0;
+  will-change: transform;
+  transition: transform 180ms ease;
 }
-.visitPrimary:hover {
-  color: #fff;
-  background: linear-gradient(135deg, #7a35d6 0%, #5a24aa 100%);
+/* The hover glow, as its own layer. Its box hides behind the button; only the
+   shadow it throws is ever seen, which is why .metaBody reserves 44px below (see
+   its padding-bottom note) -- that reserve is still what lets this bleed. */
+.visitPrimary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   box-shadow: 0 10px 26px rgba(102, 41, 188, 0.5);
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+.visitPrimary:hover,
+.visitPrimary:focus-visible {
+  color: #fff;
   transform: translateY(-1px);
+}
+.visitPrimary:hover::after,
+.visitPrimary:focus-visible::after {
+  opacity: 1;
 }
 .metaInvert .visitPrimary {
   color: #fff;
@@ -668,6 +697,10 @@ html:has(.route) { scrollbar-gutter: stable; }
 @media (prefers-reduced-motion: reduce) {
   .visitPrimary { transition: none; }
   .visitPrimary:hover { transform: none; }
+  /* The glow is now a pseudo-element, so it needs its own line here or it would
+     keep fading in while the lift it belongs to is switched off. It still
+     APPEARS on hover -- reduced motion means no animation, not no feedback. */
+  .visitPrimary::after { transition: none; }
 }
 .close {
   position: absolute;
@@ -733,9 +766,12 @@ html:has(.route) { scrollbar-gutter: stable; }
   /* Fixed width so the module never grows to fit a long title -- the title's font
      shrinks to fit this box instead (see .featureTitle / useFitText). */
   width: min(92vw, 820px);
-  background: linear-gradient(160deg, rgba(20, 20, 28, 0.72) 0%, rgba(34, 29, 52, 0.55) 100%);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  backdrop-filter: blur(14px) saturate(1.15);
+  /* OPAQUE, and the backdrop-filter is gone with it (Chad, 2026-07-28). This was
+     translucent over a blur of the LIVE canvas, so every frame re-sampled and
+     re-blurred the backdrop behind it. Same hues, same gradient direction,
+     alpha 1.0 -- it reads as the same object and asks the compositor for
+     nothing. */
+  background: linear-gradient(160deg, #14141c 0%, #221d34 100%);
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
   pointer-events: auto;
@@ -860,6 +896,32 @@ html:has(.route) { scrollbar-gutter: stable; }
   color: #c47bff;
   text-shadow: 0 0 10px rgba(196, 123, 255, 0.5);
   animation: cw-hint-strike 700ms step-end var(--stage-ms) both;
+  /* Own stacking context, so the glow below can sit at z-index -1 and land BEHIND
+     these words without dropping behind the card and disappearing. */
+  z-index: 0;
+}
+/* The glow behind "click to open" (Chad, 2026-07-28). A soft lavender pool, not a
+   box: it has no edge of its own, so it reads as light coming off the words rather
+   than a plate under them. Inherits the strike animation from the parent, so it
+   blinks in with the text instead of arriving separately.
+   A STATIC gradient, deliberately -- no backdrop-filter. The whole reason the room
+   felt slow was compositor work over a live canvas; this must not add any back. */
+.featureHint::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: 22rem;
+  height: 5.5rem;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(196, 123, 255, 0.3) 0%,
+    rgba(196, 123, 255, 0.12) 38%,
+    rgba(196, 123, 255, 0) 72%
+  );
+  pointer-events: none;
 }
 /* The words ride the stem, not the arrow's box. The arrow is turned inside that box, so
    its stroke starts about 7px below the box's centre, and centring the text on the box
@@ -878,7 +940,11 @@ html:has(.route) { scrollbar-gutter: stable; }
 .featureHintArrow {
   width: 34px;
   height: 34px;
-  transform: scale(-1) rotate(110deg);
+  /* translateY comes FIRST so the 1px nudge (Chad, 2026-07-28) is applied in
+     SCREEN space. Put it after scale(-1) and the flip inverts it -- the arrow
+     would move DOWN a pixel instead of up. The scale/rotate pair stays exactly as
+     it was tuned; re-aiming the arrow is still the one rotate number. */
+  transform: translateY(-1px) scale(-1) rotate(110deg);
   filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.5));
 }
 /* Mirrors NEON_STRIKE in CrystalGem.tsx: the SAME sequence, as % of its 700ms. The two
@@ -1076,15 +1142,13 @@ html:has(.route) { scrollbar-gutter: stable; }
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
-  background: rgba(8, 8, 15, 0.72);
+  background: rgba(8, 8, 15, 0.95);
   border: 1px solid rgba(174, 185, 234, 0.35);
   padding: 0.32rem 0.6rem;
   border-radius: 6px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
 }
 .railItem:hover .railTitle,
 .railItem:focus-visible .railTitle {
@@ -1146,6 +1210,43 @@ html:has(.route) { scrollbar-gutter: stable; }
   text-transform: uppercase;
   color: #eae4fb;
   transition: color 0.4s ease;
+}
+
+/* The quieter second option under ENTER: the way to the plain grid for anyone who
+   does not want the room. Deliberately SMALLER and dimmer -- it is an alternative,
+   not a rival, and the gem is still the offer. Rides the same keyframes and the
+   same clock as ENTER so the pair arrive and leave as one, just seated below it
+   (the extra translate is applied on top of the keyframes' own centring). */
+.enterAlt {
+  animation: cw-cta-in var(--stage-ms) var(--stage-ease) both;
+  position: absolute;
+  left: 50%;
+  /* 20px lower than it first sat (Chad, 2026-07-28): the pair reads as ENTER with
+     an option under it, not two controls of equal weight. */
+  top: calc(50% + min(22vh, 200px) + 2.1rem + 20px);
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  padding: 0.4rem 1.1rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(234, 228, 251, 0.55);
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(234, 228, 251, 0.25);
+  transition: color 0.4s ease, text-decoration-color 0.4s ease;
+}
+.enterAlt:hover,
+.enterAlt:focus-visible {
+  color: #fff;
+  text-decoration-color: #cbb4f5;
+  outline: none;
 }
 
 /* Leaves as the room arrives; returns as it goes. Same clock, same curve. */

@@ -42,7 +42,13 @@ const tmpNormalMV = new THREE.Matrix4();
 // Refraction target scale, as a fraction of the viewport. See the sizing block in
 // the frame loop for why this is safe to turn down and what it buys.
 const FBO_SCALE = 0.5;
+
 const BASE = 0.759; // 0.66 * 1.15 (gem sized up 15%)
+// Radius a shard must clear to start off screen, in world units at the gem's depth.
+// Half-height there is ~2.1 and half-width ~3.3 at 16:10; this covers an ultrawide
+// plus the mark's own extent, with room to spare. See the distance note in the
+// per-facet loop below -- it is the target that loop solves for.
+const OFFSCREEN_R = 6;
 const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
 
 // Vertex shader for the showroom gem. Same MVP + varyings as gemstone-core's
@@ -580,7 +586,26 @@ export function CrystalGem({
       sAxis[s * 3] = rx; sAxis[s * 3 + 1] = ry; sAxis[s * 3 + 2] = rz;
       sRnd[s * 3] = Math.min(1, radiusNorm * 0.6 + h1 * 0.4); // delay
       sRnd[s * 3 + 1] = (h5 * 2 + 0.6) * Math.PI * (h6 < 0.5 ? -1 : 1); // spin
-      sRnd[s * 3 + 2] = 2 + h2 * 3.2; // distance
+      // DISTANCE -- every shard starts OFF SCREEN (Chad, 2026-07-28).
+      //
+      // This was `2 + h2 * 3.2`, a flat 2.0-5.2 world units. At the gem's depth the
+      // visible half-width is only ~3.3 (and half-height ~2.1), so the short half of
+      // that range began INSIDE the frame: those shards appeared in place and then
+      // slid home, which read as a blink rather than an arrival.
+      //
+      // Distance is now derived from the shard's own direction instead of drawn
+      // independently of it. A shard flying mostly sideways needs less travel to
+      // clear the edge than one angled steeply into z, so dividing by the XY length
+      // of its unit direction gives each one the distance IT needs. Same jitter on
+      // top, so the cascade keeps its variety.
+      //
+      // OFFSCREEN_R is the radius to clear, in world units at the gem's depth: it
+      // covers half-width on an ultrawide plus the mark's own extent, so no shard is
+      // ever caught on screen at rest, whatever the viewport. The clamp stops a
+      // steeply-angled shard from being flung absurdly far.
+      const xyLen = Math.hypot(dx, dy);
+      const travel = Math.min(12, Math.max(5, OFFSCREEN_R / Math.max(xyLen, 0.4)));
+      sRnd[s * 3 + 2] = travel * (0.95 + h2 * 0.5);
       sLetterC[s * 3] = isC ? lax : wax;
       sLetterC[s * 3 + 1] = isC ? lay : way;
       sLetterC[s * 3 + 2] = isC ? laz : waz;

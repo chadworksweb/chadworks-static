@@ -198,9 +198,13 @@ function StageShift() {
 export function PortfolioShowroom({
   mode,
   pageSlugs = [],
+  onViewArchive,
 }: {
   mode: Exclude<ShowroomMode, "static">;
   pageSlugs?: string[];
+  // Hands the visitor back to the server-rendered archive. Owned by ShowroomRoute,
+  // which is the only thing that can decide to stop rendering this component.
+  onViewArchive?: () => void;
 }) {
   const items = SHOWROOM_ITEMS;
   // Which pieces have a page of their own. Handed down from the server route
@@ -421,22 +425,33 @@ export function PortfolioShowroom({
             </button>
           )}
 
+          {/* The way past the room, for anyone who does not want it: the same
+              archive grid a phone gets, on demand, on a desktop that was handed
+              the showroom instead. Rides the ENTER button's clock and leaves with
+              it, so it is never offered once you are already inside. */}
+          {ctaUp && onViewArchive && (
+            <button
+              type="button"
+              className={`${styles.enterAlt} ${immersive ? styles.enterOut : ""}`}
+              onClick={onViewArchive}
+            >
+              view simple portfolio grid
+            </button>
+          )}
+
           {chromeUp && (
             <>
-              {/* Stepped blur over the slide, under the module: the shots carry their
-                  own headings and buttons, which read as live chrome right where the
-                  module sits. Ramped rather than switched on, so the slide recedes
-                  instead of ending at a line. On the gem's clock like the rest. */}
-              <div
-                className={`${styles.slideBlur} ${immersive ? "" : styles.slideBlurOut}`}
-                aria-hidden="true"
-              >
-                <span />
-                <span />
-                <span />
-                <span />
-                <span />
-              </div>
+              {/* The stepped slide blur USED TO LIVE HERE and is gone (Chad,
+                  2026-07-28). Five full-viewport backdrop-filter layers, serially
+                  dependent by design, over a canvas that repaints every frame, so
+                  nothing was ever cacheable. Profiling put the whole scene at 3 draw
+                  calls and 0.4ms of GPU time while the frame period ran 34-49ms:
+                  the cost was compositing these, not the 3D. Removing them took the
+                  frame back toward the ~13ms the landing screen gets, which is what
+                  made every hover in here feel dead.
+                  If the ramp is ever wanted back, it has to be drawn INSIDE the
+                  canvas, where it costs GPU milliseconds instead of compositor
+                  tens-of-milliseconds. Do not reintroduce it as backdrop-filter. */}
               <div
                 className={`${styles.stageFrame} ${immersive ? "" : styles.stageFrameOut}`}
                 aria-hidden="true"
@@ -619,6 +634,32 @@ function RightRail({
   }, [entering]);
 
   const navRef = useRef<HTMLElement>(null);
+
+  // WHEEL OVER THE RAIL (Chad, 2026-07-28). The reel's wheel listener is bound to
+  // gl.domElement, and the rail is DOM sitting ON TOP of that canvas -- so the
+  // canvas never saw these events and the strip that says "scroll" was the one
+  // place scrolling did nothing.
+  //
+  // Same semantics as the reel's handler on purpose (Reel.tsx): one step per
+  // gesture, a 420ms lock so a trackpad's inertia does not fire a dozen, and
+  // preventDefault so the locked page underneath cannot take the scroll instead.
+  // Routed through onGo so the reel and the rail stay the same one selection.
+  const wheelLock = useRef(0);
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav || exiting) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const now = performance.now();
+      if (now < wheelLock.current) return;
+      wheelLock.current = now + 420;
+      const next = Math.min(items.length - 1, Math.max(0, index + (e.deltaY > 0 ? 1 : -1)));
+      if (next !== index) onGo(next);
+    };
+    nav.addEventListener("wheel", onWheel, { passive: false });
+    return () => nav.removeEventListener("wheel", onWheel);
+  }, [index, items.length, onGo, exiting]);
+
   useLayoutEffect(() => {
     const nav = navRef.current;
     if (!nav) return;

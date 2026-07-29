@@ -8307,6 +8307,17 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    On /showroom/ the archive is not a section of a page, it IS the page (the
    showroom itself is desktop-only), so it carries a centered, larger treatment the
    in-page grids do not want. */
+/* The h1 joins the lede in the centered stack (Chad, 2026-07-28). Scoped to
+   .cw-showroom-archive, so the in-page grids on /portfolio/ and the homepage keep
+   their left-aligned headings.
+   BOTH lines are needed. .svc-hero__title carries `max-width: 16ch`, so text-align
+   alone centers the words inside a box that is still pinned to the left edge -- the
+   same trap the lede below documents. margin-inline centers the BOX; text-align
+   centers the lines within it, which matters the moment the title wraps. */
+.cw-showroom-archive .svc-hero__title {
+  text-align: center;
+  margin-inline: auto;
+}
 .cw-showroom-archive .svc-lede {
   text-align: center;
   /* .measure-prose caps the lede's width; centering the TEXT inside a box still
