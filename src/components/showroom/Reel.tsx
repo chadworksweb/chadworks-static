@@ -23,7 +23,7 @@ import {
   SETTLE_QUIET_MS,
   type WheelScroller,
 } from "./wheel-momentum";
-import { captureSrc } from "@/lib/captures";
+import { reelTextureSrc } from "@/lib/captures";
 
 const ITEM_Z = -1.4;
 // SLIDE PITCH, as a multiple of a slide's own height. 1.0 = the slides TOUCH.
@@ -133,8 +133,10 @@ export function Reel({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // reelTextureSrc, NOT captureSrc: the reel's own smaller copies. The expanded view
+  // and the archive still point at the full-resolution originals -- see captures.ts.
   const urls = useMemo(
-    () => items.map((it) => captureSrc(it.slug)),
+    () => items.map((it) => reelTextureSrc(it.slug)),
     [items]
   );
   // useLoader, NOT drei's useTexture: useTexture calls gl.initTexture() on every
