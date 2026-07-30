@@ -27,7 +27,7 @@ export const showUpOnChatgpt: Service = {
   answer: (
     <>
       To show up on ChatGPT you have to be readable and quotable to AI crawlers.
-      That means letting bots like GPTBot and OAI-SearchBot in, adding structured
+      That means letting bots like OAI-SearchBot and Claude-SearchBot in, adding structured
       data that names your business, and writing content that answers real
       questions. Most sites fail at least one of these, so they stay invisible. A
       {money(AUDIT)} audit tells you which ones are costing you. If you need to be visible
@@ -39,7 +39,7 @@ export const showUpOnChatgpt: Service = {
   keyFactsHeading: "AI visibility, at a glance",
   keyFacts: [
     "When a customer asks ChatGPT, Claude, Gemini, or Perplexity for the best business near them, your name gets cited or someone else's does. A lot of sites never get named because the crawlers cannot even read them.",
-    "The crawlers behind AI answers (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot) are often blocked by accident in a copied robots.txt. If they cannot fetch your pages, you are not in the running.",
+    "The crawlers behind AI answers (OAI-SearchBot, Claude-SearchBot, PerplexityBot, Google-Extended) are often blocked by accident in a copied robots.txt. If they cannot fetch your pages, you are not in the running. Worth knowing: these are not the same bots as GPTBot and ClaudeBot, which collect text to train models and cite nobody. Whether you allow those is a separate decision, and it does not affect whether you get named in an answer.",
     "Structured data is worth having, though not for the reason you have probably been told. Most assistants fetch your page and read the visible HTML, so what earns its keep is classic search: the rich results and rankings that decide whether an AI answer fires for your category at all.",
     "AI answers lift short, clear statements. Direct answers, real FAQs, and plain descriptions of what you do are what get quoted back to the person asking.",
   ],
@@ -49,7 +49,7 @@ export const showUpOnChatgpt: Service = {
       label="Six-point AI visibility check"
       title="Tap the rows that apply."
       items={[
-        { strong: "AI crawlers are allowed in your robots.txt", small: "GPTBot, OAI-SearchBot, ClaudeBot, and PerplexityBot are not blocked, and neither is Google-Extended, which gates Gemini." },
+        { strong: "The crawlers that cite you are allowed in your robots.txt", small: "OAI-SearchBot, Claude-SearchBot, and PerplexityBot fetch a page to answer a live question and name the source. Google-Extended gates Gemini the same way. Those are the ones that earn you a citation, and they are separate from the training crawlers." },
         { strong: "You rank in classic search for a real buying phrase", small: "Google's AI answer is built on the rankings underneath it. Rank nowhere and it will not invent you." },
         { strong: "Your content answers real questions directly", small: "Short, quotable answers an AI can lift, not a wall of marketing copy." },
         { strong: "Your text is in the HTML, not painted by JavaScript", small: "A crawler sees your words without running scripts." },
@@ -161,7 +161,7 @@ export const showUpOnChatgpt: Service = {
   faqs: [
     {
       q: "Why isn't my website showing up on ChatGPT?",
-      a: "Usually because the AI cannot read you. Your robots.txt may block crawlers like GPTBot and OAI-SearchBot, you may have no structured data so the AI cannot tell what you are, or your content may be painted in by JavaScript that crawlers do not run. An audit checks each one and tells you which apply.",
+      a: "Usually because the AI cannot read you. Your robots.txt may block the crawlers that do the citing, like OAI-SearchBot and Claude-SearchBot, you may have no structured data so the AI cannot tell what you are, or your content may be painted in by JavaScript that crawlers do not run. An audit checks each one and tells you which apply.",
     },
     {
       q: "How do I get my business to show up on ChatGPT?",

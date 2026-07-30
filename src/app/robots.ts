@@ -29,15 +29,36 @@
 // robots.txt is the first thing pointed at when a scraping prohibition in the
 // Terms is challenged.
 //
-// DELIBERATELY STILL ALLOWED, and worth revisiting: GPTBot (OpenAI) and
-// ClaudeBot (Anthropic). Both are the TRAINING crawlers for their vendors, so
-// by the rule above they belong on the blocked list. They are allowed anyway
-// because each vendor's retrieval is handled by separate agents that are also
-// allowed (OAI-SearchBot + ChatGPT-User; Claude-SearchBot + Claude-User), which
-// means blocking the two training bots would NOT cost citation in ChatGPT or
-// Claude search. What it would cost is presence in the next training run, which
-// is a live question for a business selling AI visibility. Chad's call, held
-// open on purpose rather than decided here.
+// GPTBot AND CLAUDEBOT: NOW BLOCKED, 2026-07-30 (Chad). They sat on the allowed
+// list with this note recording the decision as held open. It is now made.
+//
+// Both are the TRAINING crawlers for their vendors, so by the rule above they
+// always belonged on the blocked list, and leaving them out made the stated
+// policy fictional: the file blocked CCBot and the smaller collectors while
+// waving through the two largest. Clause 2.3 of the Terms prohibits training
+// use, and a robots.txt that permits the biggest training crawlers is the first
+// thing an opponent points at when that clause is challenged.
+//
+// The cost is presence in the next training run, and it was priced before
+// deciding rather than assumed. It is small: this site is ~23 pages against
+// corpora of trillions of tokens, so chadworks.co was never going to be what
+// teaches a model who chadworks is. Models learn a small entity from OTHER
+// domains discussing it (an editorial feature, a byline, a podcast transcript),
+// and none of those are governed by this file. So the parametric-knowledge play
+// belongs to Part 2 of CHADWORKS-PLACEMENT-MAP.md, not to robots.txt.
+//
+// Citation is UNAFFECTED, which is the whole reason this is safe. Each vendor's
+// retrieval runs on separate agents that remain allowed (OAI-SearchBot +
+// ChatGPT-User; Claude-SearchBot + Claude-User), and retrieval is what
+// /show-up-on-chatgpt/ actually sells.
+//
+// PAIRED COPY FIX, do not undo one without the other: the Scorecard and lane
+// copy on /show-up-on-chatgpt/ used to list GPTBot and ClaudeBot alongside
+// OAI-SearchBot and PerplexityBot as "AI crawlers" that must be unblocked. That
+// conflated training with retrieval, and it would have made this site fail its
+// own published test. Those pages now name the retrieval crawlers only and say
+// out loud that the training bots are a separate decision. If this list ever
+// changes again, check `grep -rn "GPTBot" src/` before shipping.
 
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/service";
@@ -48,6 +69,8 @@ export const dynamic = "force-static";
 // citation. Barred here and by clause 2.3 of the Terms.
 const TRAINING_ONLY_AGENTS = [
   "CCBot",
+  "GPTBot",
+  "ClaudeBot",
   "Applebot-Extended",
   "Meta-ExternalAgent",
   "Bytespider",

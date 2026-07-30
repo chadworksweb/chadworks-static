@@ -66,7 +66,7 @@ export function ChatgptWhyLanes() {
           </h2>
           <div className="cw-art-direct-answer">
             To show up on ChatGPT you have to be readable and quotable to AI
-            crawlers. That means letting bots like GPTBot and OAI-SearchBot in,
+            crawlers. That means letting bots like OAI-SearchBot and Claude-SearchBot in,
             adding structured data that names your business, and writing content
             that answers real questions. Most sites fail at least one of these, so
             they stay invisible. A {money(AUDIT)} audit tells you which ones are costing you.
@@ -96,8 +96,13 @@ export function ChatgptWhyLanes() {
             <p className="cw-art-lane__desc">
               Plenty of sites quietly block the exact bots that feed AI answers,
               usually by accident in a robots.txt copied from somewhere else. If
-              GPTBot, OAI-SearchBot, ClaudeBot, and PerplexityBot cannot fetch your
-              pages, you are not in the running.
+              OAI-SearchBot, Claude-SearchBot, and PerplexityBot cannot fetch your
+              pages, you are not in the running. These are the ones that fetch a
+              page to answer a live question and name the source, so they are the
+              ones worth checking first. GPTBot and ClaudeBot are a different
+              thing: they gather text to train models and cite nobody, and
+              allowing them is a separate call that has no bearing on whether you
+              get named.
             </p>
             <ul className="cw-art-lane__caps">
               <li>robots.txt blocking AI user-agents</li>

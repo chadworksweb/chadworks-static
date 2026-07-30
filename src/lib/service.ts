@@ -23,6 +23,23 @@ export const ORG = {
   url: SITE_URL,
   logo: `${SITE_URL}/logo.png`,
   founder: "Chad Lewine",
+  // Chad, 2026-07-30. This is the founding date of chadworks THE STUDIO, not
+  // the length of Chad's career (which is longer, and belongs on the Person
+  // node if it is ever asserted). Every off-site profile that carries a
+  // founded/since field must say 2021 too -- LinkedIn, Crunchbase, and later
+  // Wikidata all get cross-checked against each other, and a mismatch is the
+  // cheapest way to break the entity resolution this whole pass exists to build.
+  foundingDate: "2021",
+  numberOfEmployees: 1,
+  // The canonical one-paragraph description of the studio. This is the SAME
+  // string used on every off-site placement (LinkedIn, Crunchbase, GitHub,
+  // directory rows) -- see CHADWORKS-PLACEMENT-ASSETS.md blurb 1d. Consistent
+  // wording across surfaces is itself an entity-resolution signal, so change it
+  // in both places or in neither. Sentence one restates the manifesto intro
+  // that renders on / and /about/, which keeps it inside the "schema must
+  // match visible content" rule.
+  description:
+    "chadworks is a one-person web studio run by Chad Lewine. It builds custom coded websites and platforms for motivated individuals and organizations that want to double down on authentic digital presence as a counter measure to social media burnout and AI saturation. Every build is written from scratch. No Squarespace, no Wix, no Divi, no Elementor, no templates, no retainers.",
   // Both are already published in the footer and on /contact/, so the schema
   // only restates what a visitor can see (the toolkit's "schema must match
   // visible content" rule).
@@ -34,12 +51,27 @@ export const ORG = {
   // "US" is the same claim /contact/'s ContactPage already makes and the same
   // one /faqs/ makes in prose ("clients across the USA").
   areaServed: "US",
-  // EMPTY ON PURPOSE, and not a to-do. chadworks the BUSINESS runs no social
-  // profiles (Chad, 2026-07-28). The one profile that exists is Chad's personal
-  // LinkedIn, which belongs on the Person node below, not here. Asserting a
-  // person's profile as an organization's sameAs fuses two entities that are
-  // not the same thing -- the fragmentation jsonld.ts exists to prevent.
-  sameAs: [] as string[],
+  // THE LEDGER. This array is no longer empty (it was, through 2026-07-28, when
+  // the studio ran no profiles of its own). It is now the running record of
+  // every off-site profile that IS chadworks the organization, added one at a
+  // time as each placement in CHADWORKS-PLACEMENT-MAP.md lands. Populating it is
+  // the entire payoff of the Part 1 hygiene pass: a claimed profile nobody has
+  // asserted ownership of is just a page, and a sameAs turns it into evidence.
+  //
+  // THE ONE RULE: a URL goes here only if the profile IS THE ORGANIZATION.
+  // Profiles that are Chad Lewine the person (personal LinkedIn, GitHub user,
+  // MusicBrainz, bylines, speaker pages) go on PERSON.sameAs below. Asserting a
+  // person's profile as an organization's sameAs fuses two entities that are not
+  // the same thing, which is the fragmentation jsonld.ts exists to prevent.
+  sameAs: [
+    // Company Page, created 2026-07-30. Slug was free, so the handle matches the
+    // studio name exactly.
+    "https://www.linkedin.com/company/chadworks",
+    // GitHub ORG (not Chad's personal account, which is `chadlewine` and belongs
+    // on PERSON.sameAs if it is ever asserted). Profile README added 2026-07-30
+    // via the `.github` repo at profile/README.md.
+    "https://github.com/chadworksweb",
+  ] as string[],
 } as const;
 
 // Person identity -- Chad Lewine, the founder. Separate from ORG on purpose:
@@ -50,7 +82,19 @@ export const PERSON = {
   name: "Chad Lewine",
   jobTitle: "Web Designer and Developer",
   // The ONLY social profile anywhere in the entity graph, deliberately.
-  sameAs: ["https://www.linkedin.com/in/chadlewine/"] as string[],
+  // Profiles that ARE Chad Lewine the person. The studio's own profiles go on
+  // ORG.sameAs above -- see the ledger rule there.
+  sameAs: [
+    "https://www.linkedin.com/in/chadlewine/",
+    // Personal GitHub account. Deliberately NOT on ORG.sameAs: the org is
+    // `chadworksweb`, and asserting a person's account as the organization
+    // would fuse two entities that are not the same thing. Note the account
+    // currently hosts no public repos -- the chadlewine.com codebase was moved
+    // to chadworksweb/chadlewine on 2026-07-30 so it could be pinned with the
+    // rest of the portfolio. This stays because sameAs is an identity claim
+    // ("this account IS Chad Lewine"), which is true regardless of contents.
+    "https://github.com/chadlewine",
+  ] as string[],
 } as const;
 
 // Lane 01 websites, Lane 02 visibility, Lane 03 consulting (added 2026-07-16,

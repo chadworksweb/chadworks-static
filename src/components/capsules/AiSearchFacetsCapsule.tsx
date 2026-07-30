@@ -99,7 +99,7 @@ const GROUPS: Group[] = [
       {
         title: "Letting the AI crawlers in",
         body:
-          "Assistants read your site with their own crawlers, and a robots.txt written a few years ago may be quietly turning them away. GPTBot, OAI-SearchBot, Google-Extended and PerplexityBot each have to be allowed on purpose. Another factor, among many others, is ensuring the text exists in the HTML, because a site that builds its content with client-side JavaScript can look blank, and AI assistant bots won't hang around for it to render.",
+          "Assistants read your site with their own crawlers, and a robots.txt written a few years ago may be quietly turning them away. OAI-SearchBot, Claude-SearchBot, Google-Extended and PerplexityBot each have to be allowed on purpose, and those are the ones that fetch a page to answer a live question and name the source. Another factor, among many others, is ensuring the text exists in the HTML, because a site that builds its content with client-side JavaScript can look blank, and AI assistant bots won't hang around for it to render.",
       },
       {
         title: "Measuring AI search visibility",

@@ -52,6 +52,19 @@ export function organizationNode() {
     name: ORG.name,
     legalName: ORG.legalName,
     url: ORG.url,
+    // The entity's self-description, and the string an assistant is most likely
+    // to lift when it names this studio. Kept in agreement with the manifesto
+    // intro rendered on / and /about/, per the "schema must match visible
+    // content" rule. If the manifesto intro changes, change this with it.
+    description: ORG.description,
+    foundingDate: ORG.foundingDate,
+    // QuantitativeValue rather than a bare integer: schema.org types this
+    // property as QuantitativeValue, and the bare form is tolerated rather than
+    // correct.
+    numberOfEmployees: {
+      "@type": "QuantitativeValue",
+      value: ORG.numberOfEmployees,
+    },
     logo: { "@type": "ImageObject", url: ORG.logo },
     image: ORG.logo,
     email: ORG.email,
