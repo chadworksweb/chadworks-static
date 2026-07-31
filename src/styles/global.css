@@ -1232,6 +1232,11 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
      what this is set to. */
   --footer-line-gap: calc(var(--space-2xs) * 0.575);
   gap: var(--footer-line-gap);
+  /* Distance between the contact block and the profile icon row. Declared HERE
+     rather than on the icon row itself because the mobile rule below mirrors it
+     as this column's bottom padding, and custom properties inherit downward
+     only. One value, both sides, so the icons cannot end up unevenly inset. */
+  --footer-icon-gap: 1.1rem;
 }
 .site-footer__gem {
   width: 8.5rem;
@@ -3903,7 +3908,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   --footer-icon: 1.15rem;
   list-style: none;
   padding: 0;
-  margin: 1.1rem 0 0;
+  margin: var(--footer-icon-gap, 1.1rem) 0 0;
   display: flex;
   flex-wrap: wrap;
   gap: 1.05rem;
@@ -4766,6 +4771,11 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md) var(--space-sm);
   }
+  /* Stacked here rather than sitting beside the link grid, so the profile icon
+     row is the column's last child and would otherwise end flush against the
+     grid gap. Mirror its top margin as bottom padding so the row is inset
+     equally above and below. Same variable both sides -- see brandcol. */
+  .site-footer__brandcol { padding-bottom: var(--footer-icon-gap); }
 }
 
 /* =====================================================================
