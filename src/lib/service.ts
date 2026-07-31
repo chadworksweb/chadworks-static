@@ -102,6 +102,22 @@ export const PERSON = {
     // rest of the portfolio. This stays because sameAs is an identity claim
     // ("this account IS Chad Lewine"), which is true regardless of contents.
     "https://github.com/chadlewine",
+    // Contra, created 2026-07-31. Server-rendered, indexable, no noindex, and
+    // Contra's robots.txt declares `ai-train=no, search=yes, ai-input=yes` --
+    // the same training-vs-retrieval split this site adopted in robots.ts, so
+    // the profile is reachable by the retrieval crawlers that matter.
+    //
+    // PERSON, not ORG, and the URL is the reason: Contra separates individual
+    // profiles (`/handle`) from studio profiles (`/studio/handle`). This is the
+    // individual one. The chadworks STUDIO profile at contra.com/studio/chadworks
+    // exists but was still unpublished (404 to a logged-out visitor) as of
+    // 2026-07-31; when it goes public it belongs on ORG.sameAs above, not here.
+    //
+    // The handle was changed from Contra's auto-generated `chad_lewine_ldkphbbg`
+    // BEFORE this URL was asserted anywhere. sameAs is a durable identity claim,
+    // so a handle carrying a random suffix would have rotted the moment it was
+    // cleaned up. The old URL 301s here, verified.
+    "https://contra.com/chadlewine",
   ] as string[],
 } as const;
 
