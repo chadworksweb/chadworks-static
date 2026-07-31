@@ -90,6 +90,10 @@ export const ORG = {
     // the value is entity mention plus months of answering well, not the link.
     // This sameAs is the entity half of that; it does not replace the work.
     "https://www.reddit.com/user/chadworksweb/",
+    // Contra STUDIO profile. This is the organization's Contra presence, which
+    // is why it sits here rather than on PERSON alongside Chad's individual
+    // profile (contra.com/chadlewine, which stays below as a separate identity).
+    "https://contra.com/studio/chadworks",
   ] as string[],
 } as const;
 

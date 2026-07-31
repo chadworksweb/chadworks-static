@@ -47,17 +47,15 @@ type FooterGroup = {
 // also me" assertion, made in HTML instead of JSON-LD. Both are emitted now.
 //
 // Matches are deliberately specific, not bare hostnames: ORG and PERSON each
-// carry a LinkedIn and a GitHub, and the footer wants the STUDIO's (the company
-// page and the org account), not Chad's personal ones. Contra is the exception
-// and comes off PERSON, because Contra's studio profile at
-// contra.com/studio/chadworks still returns HTTP 404 to a logged-out crawler
-// even though it renders for a human (verified 2026-07-31). When that is fixed,
-// add the studio URL to ORG.sameAs and change the match below to "contra.com/studio".
+// carry a LinkedIn, a GitHub and a Contra, and the footer wants the STUDIO's
+// every time (the company page, the org account, the studio profile), never
+// Chad's personal ones. Chad's individual Contra profile stays on PERSON.sameAs
+// as its own identity claim; it just is not what the studio footer points at.
 const PROFILE_LABELS = [
   { match: "linkedin.com/company", label: "LinkedIn" },
   { match: "github.com/chadworksweb", label: "GitHub" },
   { match: "crunchbase.com/organization", label: "Crunchbase" },
-  { match: "contra.com/", label: "Contra" },
+  { match: "contra.com/studio", label: "Contra" },
   { match: "reddit.com/user/", label: "Reddit" },
 ] as const;
 
