@@ -17,9 +17,16 @@ import { PERSON } from "@/lib/service";
 // Reddit), and this block is the human, so it runs the personal accounts. Those
 // two arrays exist precisely so a person's profile is never asserted as the
 // organisation's, and mixing them here would undo that.
+// DISPLAY list, not the identity list. github.com/chadlewine is deliberately
+// absent (Chad, 2026-07-31): the account holds no public repos, since the
+// chadlewine.com codebase moved to chadworksweb/chadlewine on 2026-07-30, so
+// linking it sends a reader to an empty page. It STAYS in PERSON.sameAs, which
+// is a different kind of statement: sameAs asserts "this account is Chad
+// Lewine", which is true no matter what the account contains, while a visible
+// link is an invitation to go and look. The studio's GitHub org is linked from
+// the footer, which is where anyone wanting to read code should land.
 const PERSON_LABELS = [
   { match: "linkedin.com", label: "LinkedIn" },
-  { match: "github.com", label: "GitHub" },
   { match: "contra.com", label: "Contra" },
 ] as const;
 
