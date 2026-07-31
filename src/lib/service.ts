@@ -79,6 +79,17 @@ export const ORG = {
     // file's position that nothing is filed under the name yet -- revisit both
     // when the LLC files (Chad, 2026-07-31).
     "https://www.crunchbase.com/organization/chadworks",
+    // Reddit, added 2026-07-31. ORG rather than PERSON, deliberately: the handle
+    // is `chadworksweb`, which is the STUDIO's fallback handle (it matches the
+    // GitHub org, not Chad's personal `chadlewine` account), so this is the
+    // studio's voice rather than Chad's. Reddit has no organization account
+    // type, only users, so the judgment is about how the account is OPERATED.
+    // Move it to PERSON if it ever becomes Chad posting as himself.
+    //
+    // Note the placement map's read on Reddit: every link there is nofollow, and
+    // the value is entity mention plus months of answering well, not the link.
+    // This sameAs is the entity half of that; it does not replace the work.
+    "https://www.reddit.com/user/chadworksweb/",
   ] as string[],
 } as const;
 

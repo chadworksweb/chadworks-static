@@ -58,6 +58,7 @@ const PROFILE_LABELS = [
   { match: "github.com/chadworksweb", label: "GitHub" },
   { match: "crunchbase.com/organization", label: "Crunchbase" },
   { match: "contra.com/", label: "Contra" },
+  { match: "reddit.com/user/", label: "Reddit" },
 ] as const;
 
 const ALL_PROFILES = [...ORG.sameAs, ...PERSON.sameAs];
