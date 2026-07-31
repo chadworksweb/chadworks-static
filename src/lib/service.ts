@@ -71,6 +71,14 @@ export const ORG = {
     // on PERSON.sameAs if it is ever asserted). Profile README added 2026-07-30
     // via the `.github` repo at profile/README.md.
     "https://github.com/chadworksweb",
+    // Crunchbase, created 2026-07-31 (placement map Part 1, item 7). Nofollow,
+    // but Crunchbase is verifiably cited by ChatGPT and Perplexity for company
+    // queries, which is the whole reason it is here. Filled completely rather
+    // than stubbed: a half-empty row on a DR 90 domain gets cited half-empty.
+    // Its `legalName` field was deliberately left BLANK there, matching this
+    // file's position that nothing is filed under the name yet -- revisit both
+    // when the LLC files (Chad, 2026-07-31).
+    "https://www.crunchbase.com/organization/chadworks",
   ] as string[],
 } as const;
 
