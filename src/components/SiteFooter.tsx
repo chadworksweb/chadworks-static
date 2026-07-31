@@ -3,6 +3,13 @@ import { GemstoneMark } from "@/components/GemstoneMark";
 import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 import { isLaunched } from "@/lib/launch";
 import { ORG, PERSON } from "@/lib/service";
+import {
+  LinkedInIcon,
+  GitHubIcon,
+  CrunchbaseIcon,
+  ContraIcon,
+  RedditIcon,
+} from "@/components/BrandIcons";
 
 // ORG.telephone is stored schema-shaped (+1-215-872-1240). Both the visible
 // number and the dial target are derived from it, so the footer and the schema
@@ -27,7 +34,7 @@ const PHONE_HREF = `tel:${ORG.telephone.replace(/[^\d+]/g, "")}`;
 // A column holds one or more GROUPS, stacked. Company and Tools share the first
 // column (Chad, 2026-07-17): Tools is short and does not earn a column of its
 // own, and it reads as a footnote to the org rather than a service lane.
-type FooterLink = { href: string; label: string; external?: boolean };
+type FooterLink = { href: string; label: string };
 
 type FooterGroup = {
   heading: string;
@@ -52,23 +59,21 @@ type FooterGroup = {
 // Chad's personal ones. Chad's individual Contra profile stays on PERSON.sameAs
 // as its own identity claim; it just is not what the studio footer points at.
 const PROFILE_LABELS = [
-  { match: "linkedin.com/company", label: "LinkedIn" },
-  { match: "github.com/chadworksweb", label: "GitHub" },
-  { match: "crunchbase.com/organization", label: "Crunchbase" },
-  { match: "contra.com/studio", label: "Contra" },
-  { match: "reddit.com/user/", label: "Reddit" },
+  { match: "linkedin.com/company", label: "LinkedIn", Icon: LinkedInIcon },
+  { match: "github.com/chadworksweb", label: "GitHub", Icon: GitHubIcon },
+  { match: "crunchbase.com/organization", label: "Crunchbase", Icon: CrunchbaseIcon },
+  { match: "contra.com/studio", label: "Contra", Icon: ContraIcon },
+  { match: "reddit.com/user/", label: "Reddit", Icon: RedditIcon },
 ] as const;
 
 const ALL_PROFILES = [...ORG.sameAs, ...PERSON.sameAs];
 
 // Order follows PROFILE_LABELS, not the sameAs arrays, so presentation order is
 // controlled here and does not shift when a URL is appended to the ledger.
-const PROFILE_LINKS: FooterLink[] = PROFILE_LABELS.flatMap(
-  ({ match, label }) => {
-    const href = ALL_PROFILES.find((u) => u.includes(match));
-    return href ? [{ href, label, external: true }] : [];
-  }
-);
+const PROFILE_LINKS = PROFILE_LABELS.flatMap(({ match, label, Icon }) => {
+  const href = ALL_PROFILES.find((u) => u.includes(match));
+  return href ? [{ href, label, Icon }] : [];
+});
 
 const COLUMNS: FooterGroup[][] = [
   [
@@ -92,13 +97,6 @@ const COLUMNS: FooterGroup[][] = [
           label: "Website Cost Calculator",
         },
       ],
-    },
-    // Off-site profiles. Third group in the first column (Chad, 2026-07-31),
-    // alongside Company and Tools, because these answer "who is this studio"
-    // rather than "what does it sell".
-    {
-      heading: "Elsewhere",
-      links: PROFILE_LINKS,
     },
   ],
   [
@@ -176,6 +174,28 @@ export default function SiteFooter() {
             <a className="site-footer__contact" href={PHONE_HREF}>
               {PHONE_DISPLAY}
             </a>
+            {/* Off-site profiles as brand marks, under the phone (Chad,
+                2026-07-31). These sit in the BRAND column rather than the link
+                grid on purpose: they identify the studio, they are not part of
+                the sitemap, and a row of icons reads as identity where a text
+                list read as another nav column.
+                rel="me" is the IndieWeb equivalent of schema.org sameAs, so the
+                identity claim is made in HTML as well as JSON-LD. */}
+            <ul className="site-footer__profiles">
+              {PROFILE_LINKS.map(({ href, label, Icon }) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="me noopener"
+                    aria-label={label}
+                    title={label}
+                  >
+                    <Icon />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
           {/* Launch control: launched links are live; unlaunched ones render as
               greyed, non-clickable text (a heading whose hub is unlaunched is a
@@ -195,21 +215,7 @@ export default function SiteFooter() {
                       </p>
                       <ul className="site-footer__list">
                         {col.links.map((l) =>
-                          // External profile links bypass launch.ts entirely:
-                          // isLaunched() resolves internal routes and would
-                          // dim every one of these. They are also plain <a>,
-                          // not next/link, which is for in-app navigation.
-                          l.external ? (
-                            <li key={l.href}>
-                              <a
-                                href={l.href}
-                                target="_blank"
-                                rel="me noopener"
-                              >
-                                {l.label}
-                              </a>
-                            </li>
-                          ) : isLaunched(l.href) ? (
+                          isLaunched(l.href) ? (
                             <li key={l.href}>
                               <Link href={l.href}>{l.label}</Link>
                             </li>

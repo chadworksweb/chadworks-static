@@ -3897,6 +3897,43 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   opacity: 0.78;
   margin-top: 0.25rem;
 }
+/* Off-site profile marks in the footer's brand column, under the phone number.
+   Sized in one place: change --footer-icon and the row rescales. */
+.site-footer__profiles {
+  --footer-icon: 1.15rem;
+  list-style: none;
+  padding: 0;
+  margin: 1.1rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.05rem;
+  align-items: center;
+}
+.site-footer__profiles a {
+  display: block;
+  color: inherit;
+  opacity: 0.62;
+  transition: opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+.site-footer__profiles svg {
+  display: block;
+  width: var(--footer-icon);
+  height: var(--footer-icon);
+}
+.site-footer__profiles a:hover,
+.site-footer__profiles a:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__profiles a { transition: opacity var(--duration-fast) var(--ease-out); }
+  .site-footer__profiles a:hover,
+  .site-footer__profiles a:focus-visible { transform: none; }
+}
+
 /* Chad's personal profile links, directly under the caption card. Rendered only
    where MadeByCapsule is passed `profiles` (currently /about/ alone). Matches
    the caption-sub treatment so it reads as part of the card's footer rather
