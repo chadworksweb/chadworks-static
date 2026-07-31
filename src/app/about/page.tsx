@@ -186,7 +186,9 @@ export default function AboutPage() {
 
       {/* THE HUMAN -- the canonical "the Chad behind chadworks" block, shared
           with the homepage and service pages. */}
-      <AboutChadCapsule />
+      {/* `profiles` is set ONLY here. The same block renders on /, /web-design/
+          and /website-redesign/ without it -- see AboutChadCapsule. */}
+      <AboutChadCapsule profiles />
 
       {/* CONTACT -- the canonical contact block, shared with the homepage. */}
       <MainContactCapsule />

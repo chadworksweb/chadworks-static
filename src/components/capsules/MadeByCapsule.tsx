@@ -14,9 +14,17 @@ export type MadeByCapsuleProps = {
   // Per-instance hook, appended last so one placement can be tuned without
   // touching the block everywhere else it renders.
   className?: string;
+  // OPTIONAL off-site profile links, rendered under the caption card. Passed in
+  // rather than derived here on purpose: this capsule is generic and the links
+  // are an identity claim about whoever the block is about, so the caller owns
+  // them. Absent on every placement except /about/ (Chad, 2026-07-31) -- this
+  // block also renders on the homepage, /web-design/ and /website-redesign/,
+  // and repeating a person's profile links on all four would dilute the claim
+  // rather than strengthen it.
+  profiles?: { href: string; label: string }[];
 };
 
-export function MadeByCapsule({ made, variant = "stacked", className }: MadeByCapsuleProps) {
+export function MadeByCapsule({ made, variant = "stacked", className, profiles }: MadeByCapsuleProps) {
   const split = variant === "split";
   const header = (
     <>
@@ -43,6 +51,20 @@ export function MadeByCapsule({ made, variant = "stacked", className }: MadeByCa
               <span className="svc-made__caption-sub">{made.captionSub}</span>
             )}
           </div>
+          {profiles && profiles.length > 0 && (
+            // rel="me" is the IndieWeb equivalent of schema.org sameAs -- the
+            // same "this profile is also this person" assertion, made in HTML.
+            // The footer emits the same rel for the ORGANISATION's profiles.
+            <ul className="svc-made__profiles">
+              {profiles.map((p) => (
+                <li key={p.href}>
+                  <a href={p.href} target="_blank" rel="me noopener">
+                    {p.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div className="svc-made__copy">
           {split && header}

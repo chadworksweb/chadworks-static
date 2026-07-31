@@ -3897,6 +3897,39 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   opacity: 0.78;
   margin-top: 0.25rem;
 }
+/* Chad's personal profile links, directly under the caption card. Rendered only
+   where MadeByCapsule is passed `profiles` (currently /about/ alone). Matches
+   the caption-sub treatment so it reads as part of the card's footer rather
+   than as a new component: same mono face, size and tracking. */
+.svc-made__profiles {
+  list-style: none;
+  padding: 0;
+  margin: 0.85rem 0 0;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem 1.15rem;
+}
+.svc-made__profiles a {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border-medium);
+  padding-bottom: 2px;
+  transition: color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+.svc-made__profiles a:hover,
+.svc-made__profiles a:focus-visible {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 .svc-made__copy { max-width: 58ch; }
 
 /* Split variant (homepage "the Chad behind chadworks"): heading rides the top of
