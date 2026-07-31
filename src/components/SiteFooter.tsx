@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GemstoneMark } from "@/components/GemstoneMark";
 import { CookiePreferencesButton } from "@/components/consent/CookiePreferencesButton";
 import { isLaunched } from "@/lib/launch";
-import { ORG } from "@/lib/service";
+import { ORG, PERSON } from "@/lib/service";
 
 // ORG.telephone is stored schema-shaped (+1-215-872-1240). Both the visible
 // number and the dial target are derived from it, so the footer and the schema
@@ -27,11 +27,49 @@ const PHONE_HREF = `tel:${ORG.telephone.replace(/[^\d+]/g, "")}`;
 // A column holds one or more GROUPS, stacked. Company and Tools share the first
 // column (Chad, 2026-07-17): Tools is short and does not earn a column of its
 // own, and it reads as a footnote to the org rather than a service lane.
+type FooterLink = { href: string; label: string; external?: boolean };
+
 type FooterGroup = {
   heading: string;
   href?: string;
-  links: { href: string; label: string }[];
+  links: FooterLink[];
 };
+
+// --- OFF-SITE PROFILES ------------------------------------------------
+// The studio's profiles elsewhere, DERIVED from ORG.sameAs and PERSON.sameAs
+// rather than hardcoded. That is deliberate: sameAs is an identity claim, and
+// the style toolkit's rule is that schema must match visible content. Before
+// this block the entity graph asserted profiles no visitor could see anywhere
+// on the site, which is the weakest form of that claim. Add a URL to the sameAs
+// ledger in service.ts and it appears here; there is no second list to update.
+//
+// rel="me" is the IndieWeb equivalent of sameAs -- the same "this profile is
+// also me" assertion, made in HTML instead of JSON-LD. Both are emitted now.
+//
+// Matches are deliberately specific, not bare hostnames: ORG and PERSON each
+// carry a LinkedIn and a GitHub, and the footer wants the STUDIO's (the company
+// page and the org account), not Chad's personal ones. Contra is the exception
+// and comes off PERSON, because Contra's studio profile at
+// contra.com/studio/chadworks still returns HTTP 404 to a logged-out crawler
+// even though it renders for a human (verified 2026-07-31). When that is fixed,
+// add the studio URL to ORG.sameAs and change the match below to "contra.com/studio".
+const PROFILE_LABELS = [
+  { match: "linkedin.com/company", label: "LinkedIn" },
+  { match: "github.com/chadworksweb", label: "GitHub" },
+  { match: "crunchbase.com/organization", label: "Crunchbase" },
+  { match: "contra.com/", label: "Contra" },
+] as const;
+
+const ALL_PROFILES = [...ORG.sameAs, ...PERSON.sameAs];
+
+// Order follows PROFILE_LABELS, not the sameAs arrays, so presentation order is
+// controlled here and does not shift when a URL is appended to the ledger.
+const PROFILE_LINKS: FooterLink[] = PROFILE_LABELS.flatMap(
+  ({ match, label }) => {
+    const href = ALL_PROFILES.find((u) => u.includes(match));
+    return href ? [{ href, label, external: true }] : [];
+  }
+);
 
 const COLUMNS: FooterGroup[][] = [
   [
@@ -55,6 +93,13 @@ const COLUMNS: FooterGroup[][] = [
           label: "Website Cost Calculator",
         },
       ],
+    },
+    // Off-site profiles. Third group in the first column (Chad, 2026-07-31),
+    // alongside Company and Tools, because these answer "who is this studio"
+    // rather than "what does it sell".
+    {
+      heading: "Elsewhere",
+      links: PROFILE_LINKS,
     },
   ],
   [
@@ -151,7 +196,21 @@ export default function SiteFooter() {
                       </p>
                       <ul className="site-footer__list">
                         {col.links.map((l) =>
-                          isLaunched(l.href) ? (
+                          // External profile links bypass launch.ts entirely:
+                          // isLaunched() resolves internal routes and would
+                          // dim every one of these. They are also plain <a>,
+                          // not next/link, which is for in-app navigation.
+                          l.external ? (
+                            <li key={l.href}>
+                              <a
+                                href={l.href}
+                                target="_blank"
+                                rel="me noopener"
+                              >
+                                {l.label}
+                              </a>
+                            </li>
+                          ) : isLaunched(l.href) ? (
                             <li key={l.href}>
                               <Link href={l.href}>{l.label}</Link>
                             </li>
