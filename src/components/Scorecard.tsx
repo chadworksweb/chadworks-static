@@ -8,6 +8,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
+import { WaveText } from "@/components/WaveText";
 
 export interface ScorecardItem {
   strong: string;
@@ -143,7 +144,19 @@ export function Scorecard({
     </div>
   );
 
-  const cta = (
+  // Split keeps ONE label all the way to a perfect score -- the max state is
+  // signalled by the letters rising in a wave instead of by a text swap, which
+  // moved the button's width under the reader. Stacked keeps the swap.
+  const cta = split ? (
+    <Link
+      href={ctaHref}
+      className={`svc-btn cw-score__cta${score === total ? " cw-score__cta--wave" : ""}`}
+    >
+      <span className="svc-btn__label">
+        <WaveText text={ctaDefault} />
+      </span>
+    </Link>
+  ) : (
     <Link href={ctaHref} className="svc-btn cw-score__cta">
       <span className="svc-btn__label">{score === total ? ctaMax : ctaDefault}</span>
     </Link>

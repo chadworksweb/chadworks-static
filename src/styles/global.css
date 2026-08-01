@@ -5807,6 +5807,26 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   margin-top: var(--cw-score-gap);
 }
 .cw-score--split .cw-score__cta-row .cw-score__cta { margin-top: 0; justify-content: center; }
+/* PERFECT SCORE: the label holds still and its letters ride up one after the
+   other instead of the text swapping out. Reuses WaveText's per-letter spans
+   and their --i stagger (the nav shimmer's mechanism, applied to transform).
+   Hovering pauses it, so the wave never fights the button's own hover wipe. */
+.cw-score__cta--wave .nav-wave__letter {
+  /* the shared letter span is `display: inline`, which transforms ignore */
+  display: inline-block;
+  animation: cw-score-letter-rise 1.5s var(--ease-smooth) infinite;
+  animation-delay: calc(var(--i) * 0.055s);
+  animation-fill-mode: backwards;
+}
+.cw-score__cta--wave:hover .nav-wave__letter,
+.cw-score__cta--wave:focus-visible .nav-wave__letter { animation-play-state: paused; }
+@keyframes cw-score-letter-rise {
+  0%, 55%, 100% { transform: translateY(0); }
+  25%           { transform: translateY(-0.32em); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-score__cta--wave .nav-wave__letter { animation: none; }
+}
 /* Ghost peer of the CTA: same pill box and display type, no fill. */
 .cw-score--split .cw-score__cta-row .cw-score__reset {
   display: inline-flex;
