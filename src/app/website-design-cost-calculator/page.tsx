@@ -10,8 +10,16 @@
 // variant, and pages cross-rank both ways, so this reaches the same SERP with
 // a third of the competition. Chad's call.
 //
-// THE PAGE SHAPE. The spike's rule was "the tool IS the page: stage + footer".
-// That rule now holds for the FOLD only. Everything below the stage is the
+// THE PAGE SHAPE. The spike's rule was "the tool IS the page: stage + footer",
+// and the tool did own the fold until 2026-08-01. It does not any more (Chad):
+// the page opened on a control panel with nothing above it naming what the
+// control panel was, and the h1 sat below a full viewport of it. The INTRO owns
+// the fold now -- eyebrow, h1, lede and the table of contents -- and the CTA in
+// it carries you into the stage, which still runs at a full viewport height and
+// still lands in exactly the framing the page used to load in. Entry 01 of the
+// TOC is that same jump, so the map and the button agree.
+//
+// Everything below the stage is the
 // citation layer, and it exists because of one hard finding: AI crawlers do
 // not execute JavaScript (Vercel/MERJ, 1.3B crawler fetches: GPTBot,
 // ClaudeBot and PerplexityBot all fetch js and none run it). A price that
@@ -52,7 +60,7 @@ import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
-import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
+import { PageComposer, MainContactCapsule, PathsCapsule, ArrowRight } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
 import { LaunchLink } from "@/components/LaunchLink";
@@ -171,9 +179,15 @@ const breadcrumbJsonLd = {
 // ask about the calculator each become a headed section, and the old "no form" and
 // "accuracy" answers fold into the "why" and "difference" sections. The rate card,
 // the always-included list and the worked-examples link stay as their own sections.
-// The TOC links to every section, in page order. Purpose leads (it sits right
-// under the hero), then the rate card and the rest.
+// The TOC links to every section, in page order.
+//
+// Entry 01 is the TOOL (Chad, 2026-08-01), because the tool is now something you
+// scroll TO rather than the thing you land on. #calculator is the stage's own
+// wrap (see PackageBuilderStage), and the hero's CTA points at the same target,
+// so the map and the button cannot drift. Purpose follows it, then the rate card
+// and the rest.
 const TOC: { href: string; label: string }[] = [
+  { href: "#calculator", label: "The calculator" },
   { href: "#purpose", label: "What it's for" },
   { href: "#rate-card", label: "The numbers behind it" },
   { href: "#included", label: "What every build includes" },
@@ -485,7 +499,7 @@ const CARD_GROUPS: { param: Param; rows: CardRow[] }[] = PARAMS.map((param) => (
 
 export default function WebsiteDesignCostCalculatorPage() {
   // One template for every "about the calculator" section. Used for the purpose
-  // section (hoisted up under the hero) and the rest (rendered in place below).
+  // section (hoisted up under the tool) and the rest (rendered in place below).
   const renderMetaSection = (s: (typeof META_SECTIONS)[number]) => (
     <SectionShell
       key={s.id}
@@ -535,18 +549,39 @@ export default function WebsiteDesignCostCalculatorPage() {
 
   return (
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
-      {/* The tool owns the fold, and the send-this-scope form sits right under
-          it. Everything below that is the citation layer. */}
-      <ScopeCalculator />
+      {/* The hook, and now the FOLD: an answer-first, keyphrase-led intro
+          (Yoast/GEO -- the phrase in sentence one, the baseline inside the first
+          ~200 words) beside the table of contents, with the way into the tool
+          underneath it.
 
-      {/* The hook: an answer-first, keyphrase-led intro (Yoast/GEO -- the phrase
-          in sentence one, the baseline inside the first ~200 words) beside a
-          static at-a-glance panel a JS-less crawler can still read. */}
-      <SectionShell className="svc-block cw-calc-hero" bg={<ManifestoAmbient />}>
+          reveal={false}, matching every other hero on the site (HeroCapsule does
+          the same). `.reveal` starts an element at opacity 0 and waits on an
+          IntersectionObserver to release it, which is the right contract for a
+          section you scroll down to and the wrong one for the first thing on the
+          page. The entrance cascade on .eyebrow / .svc-lede / .svc-hero__cta is
+          what animates this block in instead. */}
+      <SectionShell
+        className="svc-block cw-calc-hero"
+        reveal={false}
+        // yieldWebgl: this page's OTHER canvas is the calculator's object, and a
+        // phone will not give both of them a WebGL context. See the prop's own
+        // comment -- on the stacked layout this backdrop takes its CSS fallback
+        // so the object gets the context.
+        bg={<ManifestoAmbient yieldWebgl />}
+      >
         <div className="cw-calc-intro">
           <div className="cw-calc-intro__lead">
             <p className="eyebrow">Easy web design budgeting</p>
-            <h1 className="svc-block__heading svc-fill">
+            {/* text-gradient, NOT svc-fill. svc-fill is a SCROLL wipe: PageMotion
+                drives its background-position off how far the heading has
+                travelled up the viewport, so a heading sitting near the top on
+                load paints part-filled and holds its tail in grey until the
+                reader scrolls. That is exactly right for an h2 you scroll into
+                and exactly wrong for the h1 that opens the page, which is why
+                every hero h1 on the site carries the static gradient instead.
+                Both classes are in the site-wide descender fix, so the g in
+                "Design" keeps its tail either way. */}
+            <h1 className="svc-block__heading text-gradient">
               Website Design Cost Calculator
             </h1>
             <div className="svc-prose svc-prose--lead">
@@ -567,6 +602,25 @@ export default function WebsiteDesignCostCalculatorPage() {
                 project. <Link href="/contact/">Contact me here.</Link>
               </p>
             </div>
+            {/* THE WAY IN. A bare fragment link, deliberately: the stage is
+                exactly 100dvh and its content is already inset from the top by
+                --nav-height, so landing the wrap's top edge on the viewport top
+                frames the object precisely the way this page used to load. The
+                root sets no scroll-padding-top and the wrap carries no
+                scroll-margin, so the browser's own jump lands there and there is
+                no offset to keep in sync with the CSS. Whether the sticky header
+                is showing or tucked at that moment does not move the object
+                either, because the stage reserves the nav band regardless.
+
+                Plain <a>, not next/link, because this is a same-page fragment.
+                .svc-btn is the sitewide button and HomeHero uses this same bare
+                anchor form; the arrow points down because the target is below. */}
+            <div className="svc-hero__cta">
+              <a href="#calculator" className="svc-btn">
+                <span className="svc-btn__label">Start scoping your website</span>
+                <ArrowRight down />
+              </a>
+            </div>
           </div>
           {/* Table of contents: an in-page nav to every section below, in page
               order. Replaces the old "at a glance" stat panel. */}
@@ -583,8 +637,14 @@ export default function WebsiteDesignCostCalculatorPage() {
         </div>
       </SectionShell>
 
-      {/* The purpose section leads, right under the hero: the assemble object is
-          the strongest visual on the page, so it opens the citation layer. */}
+      {/* The tool, one full viewport of it, with the send-this-scope form right
+          under it. It carries id="calculator" on its own wrap (in
+          PackageBuilderStage, not here -- the thing being jumped to owns the
+          anchor), which is what both the hero CTA and TOC entry 01 aim at. */}
+      <ScopeCalculator />
+
+      {/* The purpose section leads the citation layer, right under the tool: the
+          assemble object is the strongest visual on the page, so it opens it. */}
       {purposeSection && renderMetaSection(purposeSection)}
 
       {/* The rate card. THE citation layer: static HTML, generated from the
@@ -800,7 +860,7 @@ export default function WebsiteDesignCostCalculatorPage() {
 
       {/* The "about the calculator" cluster: Chad's questions, each its own headed
           section, in his order (2026-07-21). Bodies are the old-FAQ answers,
-          verbatim. Purpose is hoisted above (under the hero); the rest render
+          verbatim. Purpose is hoisted above (under the tool); the rest render
           here. The difference section below closes the cluster. */}
       {META_SECTIONS.filter((s) => s.id !== "purpose").map(renderMetaSection)}
 

@@ -42,10 +42,22 @@
   /* The BACKGROUND bleeds edge to edge; the CONTENT re-anchors to site width
      via .inner. Same contract every full-width band on the site uses: pad
      inside the max-width box, never let content ride the bleed.
-     Header offset is the showroom's: pull the band up UNDER the sticky nav so
-     the wash runs behind it, then hold the height at a full viewport. */
+
+     NO NEGATIVE MARGIN-TOP (2026-08-01). It used to carry the showroom's header
+     offset -- `margin-top: calc(-1 * var(--nav-height))` -- to pull the band up
+     under the sticky nav, which was correct for exactly as long as the stage was
+     the first thing on the page. The intro sits above it now, so that pull would
+     just drag the stage up over the intro's last nav-height and clip it (on the
+     stacked layout, under an OPAQUE sticky object band, which would eat the
+     intro's CTA outright).
+
+     Nothing else depended on it. The stage is still a full viewport tall, and
+     .inner and .canvasLayer still inset themselves by --nav-height, so the band
+     reserves the header strip wherever it lands. That is what makes the jump
+     from the hero CTA (see id="calculator" in PackageBuilderStage) land on the
+     same framing this page used to load in, with the wash running under the nav
+     when the nav is there and filling the strip when it has tucked away. */
   height: 100dvh;
-  margin-top: calc(-1 * var(--nav-height));
   overflow: hidden;
   color: #243989; /* --dark-bg */
   background:
@@ -550,9 +562,13 @@
       cw-nav-off effect in PackageBuilderStage), so the band is the whole frame
       and the object centres in what you actually see.
 
-   The negative margin-top stays, so the band's flow box starts at the very top
-   of the viewport -- the same place its sticky rule pins it to. Flow and stuck
-   positions coincide, which is why no compensating margin is needed underneath.
+   The band's flow box and its stuck position still coincide, which is why no
+   compensating margin is needed underneath it -- but for a different reason as
+   of 2026-08-01. It used to be the negative margin-top holding the flow box at
+   the very top of the document. That margin is gone (see .wrap above: the intro
+   sits over the stage now, and the pull would clip it). What holds instead is
+   the arrival: the hero CTA and TOC entry 01 both land the wrap's top edge on
+   the viewport top, which is where `top: 0` pins the band anyway.
 
    WHO GETS THE STACK: every touch device (`pointer: coarse` -- phones AND
    tablets, either orientation), plus any narrow window under 900px. A desktop
@@ -624,7 +640,20 @@
        [ $18,400     7-9 weeks    ]  [RESET] */
   .readout {
     position: sticky;
-    top: var(--obj-h);
+    /* ONE PIXEL OF OVERLAP, NOT A BUTT JOINT (Chad, 2026-08-01).
+       --obj-h is 40dvh, which is almost never a whole pixel (337.667px on a
+       844-tall screen). The band above and this strip are BOTH sticky, so they
+       are two independently composited layers meeting on that fractional edge,
+       and each rasterises to device pixels on its own. Round them opposite ways
+       -- easy at a fractional DPR -- and a 1px sliver of the wash behind opens
+       between them. The layout gap is exactly 0; the seam is pure rasterisation,
+       which is why it is a hairline that comes and goes with scroll.
+       So the two are made to overlap by 1px instead of meeting: `top` pins this
+       strip 1px higher when stuck, the negative margin does the same in flow,
+       and z-index 6 over the band's 5 means the overlap hides under the strip.
+       The padding gives the 1px back so no ink moves. */
+    top: calc(var(--obj-h) - 1px);
+    margin-top: -1px;
     right: auto;
     z-index: 6;
     /* Same centred column as the rail, so the price sits directly over the rows
@@ -636,7 +665,9 @@
     align-items: baseline;
     column-gap: 0.7rem;
     row-gap: 0.1rem;
-    padding: 0.55rem 0.85rem 0.6rem;
+    /* Top pad carries the 1px the negative margin took, so the strip sits where
+       it always did and only its painted edge moved. */
+    padding: calc(0.55rem + 1px) 0.85rem 0.6rem;
     text-align: left;
     /* OPAQUE, not a frosted plate. The rail scrolls under this strip, and at
        92% white the param row passing behind it ghosted straight through the
@@ -842,7 +873,9 @@
 
   .wrap {
     height: auto;
-    margin-top: 0;
+    /* No `margin-top: 0` here any more (2026-08-01). It existed only to cancel
+       the negative header offset .wrap used to carry, and that offset is gone,
+       so this was overriding nothing. */
     padding-bottom: 0;
     /* The gate carries its own dark; drop the lavender wash under it. */
     background: none;

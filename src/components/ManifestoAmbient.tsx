@@ -54,12 +54,42 @@ attribute vec2 a_pos;
 void main(){ gl_Position = vec4(a_pos, 0.0, 1.0); }
 `;
 
-export default function ManifestoAmbient() {
+// Mirrors the stacked-layout query used by the calculator (MOBILE_Q in
+// PackageBuilderStage, stackMq in PackageScreen, and the @media in
+// package-builder.module.css). Keep the string IDENTICAL to those.
+const STACKED_Q = "(pointer: coarse), (max-width: 900px)";
+
+export default function ManifestoAmbient({
+  // GIVE UP THE WEBGL CONTEXT WHERE ONE IS SCARCE (2026-08-01).
+  //
+  // Set by a page that also renders a WebGL feature which MATTERS more than this
+  // backdrop -- currently the cost calculator, whose object is the whole point of
+  // the page. Browsers cap simultaneous WebGL contexts and mobile Safari's cap is
+  // the tight one; whichever canvas asks second is the one that gets nothing.
+  //
+  // Ordering used to decide that by accident. The calculator was the first thing
+  // on that page, so its object asked first and won, and this cloud was the one
+  // that quietly fell back -- which is invisible, because it has a CSS fallback.
+  // Moving the intro above the tool reversed it: this asked first, and the OBJECT
+  // came back empty (PackageScreen bails silently when getContext returns null).
+  //
+  // So on the stacked layout -- phones and tablets, the devices with the tight cap
+  // -- this takes its documented gradient fallback and never asks for a context at
+  // all. Desktop is unaffected and still gets the real cloud. This is deliberately
+  // opt-in rather than global: every other page that uses this backdrop has no
+  // second WebGL canvas to compete with, so there is nothing to yield to there.
+  yieldWebgl = false,
+}: { yieldWebgl?: boolean } = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    if (yieldWebgl && window.matchMedia(STACKED_Q).matches) {
+      canvas.classList.add("cw-mani-field__cloud--fallback");
+      return;
+    }
 
     const gl = canvas.getContext("webgl", { antialias: false, alpha: false });
     if (!gl) {
@@ -125,7 +155,7 @@ export default function ManifestoAmbient() {
     return () => {
       ro.disconnect();
     };
-  }, []);
+  }, [yieldWebgl]);
 
   return (
     <canvas

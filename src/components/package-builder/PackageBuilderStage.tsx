@@ -271,20 +271,50 @@ export function PackageBuilderStage({
   // scroll-up behaviour everywhere below the stage, and hides again the moment
   // you scroll back up into it.
   //
-  // THE INTRO (Chad, 2026-07-23): the header is NOT hidden from the first frame.
-  // It loads present, holds for a beat so the page reads as chadworks, then
-  // tucks up on its own -- the CSS transform transition animates the tuck --
-  // revealing the stage with the object already in its centre. Any scroll during
-  // the beat hands control straight to the scroll logic, so a reader who moves
-  // first never waits on the timer.
+  // THE INTRO HOLD (Chad, 2026-07-23): the header is NOT hidden from the first
+  // frame. It loads present, holds for a beat so the page reads as chadworks,
+  // then tucks up on its own -- the CSS transform transition animates the tuck.
+  // Any scroll during the beat hands control straight to the scroll logic, so a
+  // reader who moves first never waits on the timer.
+  //
+  // What the hold covers changed on 2026-08-01. The stage no longer loads at the
+  // top of the page (the intro does), so a cold load never has the stage over
+  // the top strip and the hold simply passes with nothing to do. It still earns
+  // its keep on an ARRIVAL that starts inside the stage: a /#calculator deep
+  // link, or a reload the browser restores mid-stage. The beat is the same, and
+  // scrolling in from the intro above is a scroll, so that path reveals at once.
   //
   // Mobile only: the desktop stage starts BELOW the nav rather than under it,
   // so it has nothing to reclaim.
   // ---------------------------------------------------------------------
   const wrapRef = useRef<HTMLDivElement>(null);
 
+  // ---------------------------------------------------------------------
+  // DESKTOP: THE HEADER STANDS *UP* WHILE THE STAGE IS ON SCREEN (2026-08-01).
+  //
+  // The mirror image of the mobile rule below, and it exists because the intro
+  // now owns the fold. The desktop stage is a full viewport tall and insets its
+  // own content from the top by --nav-height, deliberately, so the object
+  // centres in the space the header leaves rather than in the whole band. That
+  // reservation was free while the stage was the first thing on the page: the
+  // header cannot tuck at the top of a document (SiteNav only hides past
+  // y > 200), so the strip was always the header.
+  //
+  // Arrive at the stage from the intro instead and you get there several
+  // hundred pixels down with the header tucked away -- so the stage holds back
+  // 72px for a header that is not there. Measured: the rail then sits 93.6px
+  // from the top of the screen and 21.4px from the bottom, when the whole point
+  // of --stage-inset is that those two are equal.
+  //
+  // So the header is PINNED for as long as any part of the stage is on screen.
+  // Not "restored on arrival": pinning across the whole approach is what stops
+  // it tucking on the way down and popping back in the moment you land. The
+  // class only overrides the transform, so SiteNav keeps its own state and
+  // resumes its normal scroll-up-only behaviour the instant the stage is past.
+  // ---------------------------------------------------------------------
   useEffect(() => {
     const NAV_OFF = "cw-nav-off";
+    const NAV_PIN = "cw-nav-pin";
     const mq = window.matchMedia(MOBILE_Q);
     // The header holds this long before it tucks on load. Long enough to register
     // as present, short enough that "it slid up on its own" is the read.
@@ -300,8 +330,23 @@ export function PackageBuilderStage({
       // The stage covers the top strip when it starts at or above the top edge
       // and has not yet been scrolled clean past it.
       const r = el?.getBoundingClientRect();
-      const covering = !!r && mq.matches && r.top < 1 && r.bottom > 0;
+      // The trigger line is the BOTTOM of the header, not the top of the screen
+      // (2026-08-01). It was `r.top < 1`, which only fired once the stage had
+      // reached the very top -- fine when the stage WAS the top of the document
+      // and could never approach from below it. Coming down from the intro, the
+      // last ~72px of that approach ran the object band under an opaque header
+      // that had not been told to move yet. Firing at the header's own bottom
+      // edge gets it out of the way exactly as the band arrives there.
+      // Measured off the element rather than --nav-height so it cannot drift
+      // from the bar actually on screen; a tucked header still reports its full
+      // offsetHeight, since a transform does not change layout size.
+      const navH = document.querySelector<HTMLElement>(".site-nav")?.offsetHeight ?? 0;
+      const covering = !!r && mq.matches && r.top < navH && r.bottom > 0;
       document.body.classList.toggle(NAV_OFF, revealed && covering);
+      // DESKTOP: the exact opposite instruction, for the exact same reason.
+      // See NAV_PIN's block comment above the effect.
+      const onScreen = !!r && !mq.matches && r.top < window.innerHeight && r.bottom > 0;
+      document.body.classList.toggle(NAV_PIN, onScreen);
     };
 
     // rAF-coalesced: the scroll handler must not measure once per scroll event.
@@ -329,8 +374,10 @@ export function PackageBuilderStage({
       window.removeEventListener("resize", onChange);
       mq.removeEventListener("change", onChange);
       if (raf) cancelAnimationFrame(raf);
-      // Never leave the site without a header because this page unmounted.
+      // Never leave the site without a header because this page unmounted, and
+      // never leave one welded in place either.
       document.body.classList.remove(NAV_OFF);
+      document.body.classList.remove(NAV_PIN);
     };
   }, []);
 
@@ -389,7 +436,16 @@ export function PackageBuilderStage({
   return (
     // `full` breaks the BACKGROUND out to the viewport edges; .inner puts the
     // content back on the site width.
-    <div className={`full ${s.wrap}`} ref={wrapRef}>
+    //
+    // id="calculator" is the JUMP TARGET (2026-08-01). The intro now sits above
+    // the stage, so the tool is something you scroll to: the hero's CTA and
+    // entry 01 of the page's table of contents both aim here. It lives on the
+    // wrap and nowhere else, because the wrap's top edge IS the landing line --
+    // the stage is 100dvh and insets its own content by --nav-height, so putting
+    // that edge on the viewport top reproduces the framing the page used to load
+    // in. Deliberately NO scroll-margin-top: an offset here would push the
+    // stage's bottom off screen by exactly that much.
+    <div className={`full ${s.wrap}`} id="calculator" ref={wrapRef}>
       {/* the object -- the slab AND the mathDev plug both live in here now */}
       <div className={s.canvasLayer}>
         <PackageScreen channels={ch} />

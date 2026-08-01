@@ -127,7 +127,17 @@ export function PackageScreen({
     if (!host || !canvas) return;
 
     const gl = canvas.getContext("webgl2", { antialias: true, alpha: true, preserveDrawingBuffer: !!captureRef.current || !!assemblyRef.current });
-    if (!gl) return; // no WebGL: the ledger beside it still tells the whole story
+    if (!gl) {
+      // No context: the ledger beside it still tells the whole story, so the page
+      // is not broken -- but SAY SO. This used to return in silence, and when a
+      // second WebGL canvas on the page started winning the context on mobile
+      // (see ManifestoAmbient's yieldWebgl), the object simply was not there and
+      // nothing anywhere said why.
+      console.warn(
+        "PackageScreen: no webgl2 context (cap reached or unsupported); object omitted."
+      );
+      return;
+    }
 
     const compile = (type: number, src: string) => {
       const sh = gl.createShader(type)!;
