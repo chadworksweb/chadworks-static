@@ -1,19 +1,25 @@
 // Stack-query audit -- keeps the calculator's stacked-layout breakpoint in sync.
 //
 // WHY THIS EXISTS. The condition that switches the cost calculator from the
-// desktop row to the stacked (phone + tablet) layout is written in THREE places
+// desktop row to the stacked (phone + tablet) layout is written in FOUR places
 // that have to agree, and cannot be a single shared constant: two are CSS
-// `@media` rules (a CSS module and a global sheet) and one is a JS matchMedia
-// string. CSS cannot import the JS value and the two sheets cannot import each
+// `@media` rules (a CSS module and a global sheet) and two are JS matchMedia
+// strings. CSS cannot import the JS value and the two sheets cannot import each
 // other, so DRY is not available here. Edit one and forget the others and the
 // failure is silent and split-brained: the layout stacks at a width where the
 // header no longer tucks, or the pause button no longer hides. tsc and next
-// build pass happily through all of it. This script is what holds the three
+// build pass happily through all of it. This script is what holds them
 // together, the same way price-audit holds the pricing hub together.
 //
-// TO CHANGE THE BREAKPOINT: edit QUERY here AND all three files below to the new
+// The fourth consumer joined on 2026-08-01: ManifestoAmbient gives up its WebGL
+// context on the stacked layout so the calculator's object can have one, since a
+// phone will not hand out both. Miss that file on a breakpoint change and the
+// object goes back to rendering nothing on exactly the devices the yield exists
+// to protect -- silently, because a null context is not an error.
+//
+// TO CHANGE THE BREAKPOINT: edit QUERY here AND all four files below to the new
 // value, together, in one commit. That is the whole point -- this file is the
-// checklist that makes "all three" unforgettable.
+// checklist that makes "all of them" unforgettable.
 //
 // Wired into deploy.sh beside index-audit.mjs and price-audit.mjs.
 
@@ -38,7 +44,11 @@ const CONSUMERS = [
   },
   {
     file: "src/styles/global.css",
-    ctx: ".cw-motion-toggle--hide-mobile @media (pause button hidden on the stack)",
+    ctx: ".cw-motion-toggle--hide-mobile @media (pause button hidden on the stack), and the calculator hero's CTA reorder",
+  },
+  {
+    file: "src/components/ManifestoAmbient.tsx",
+    ctx: "STACKED_Q (yields the WebGL context to the calculator's object)",
   },
 ];
 
@@ -68,10 +78,10 @@ if (problems.length) {
   console.error("stack-query-audit: the stacked-layout breakpoint is out of sync.\n");
   for (const p of problems) console.error("  " + p);
   console.error(
-    `\nThe condition "${QUERY}" must be byte-identical in all three files.` +
-    "\nTo change it, edit QUERY in scripts/stack-query-audit.mjs and all three files together.",
+    `\nThe condition "${QUERY}" must be byte-identical in all four files.` +
+    "\nTo change it, edit QUERY in scripts/stack-query-audit.mjs and all four files together.",
   );
   process.exit(1);
 }
 
-console.log(`stack-query-audit OK -- 3 files agree on "${QUERY}".`);
+console.log(`stack-query-audit OK -- ${CONSUMERS.length} files agree on "${QUERY}".`);
