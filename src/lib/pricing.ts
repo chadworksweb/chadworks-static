@@ -152,7 +152,11 @@ export const BAND_FROM_BASE = `${money(BASE)} - ${HIGH}+`; // "$3,250 - $10,000+
 // The ad SPEND that sits beside ADS_MONTHLY is not here. It is OpenAI's floor,
 // billed to the client's own card, so it lives in section 2.
 // ---------------------------------------------------------------------
-export const AUDIT = 675; // $ flat, one-time. The AI visibility audit, no commitment attached.
+// The audit's figure is VISIBILITY_AUDIT, up in the visibility block. `AUDIT`
+// used to live here as a second 675 for the same product -- two constants meant
+// a price change was two edits, and price-audit passed either way because both
+// were legitimate hub references. Deleted 2026-08-01; every consumer now imports
+// VISIBILITY_AUDIT.
 export const ADS_MONTHLY = 675; // $ per month to manage ChatGPT ads. The management only.
 export const AI_VIZ_MONTHLY = 675; // $ per month, the ongoing AI visibility campaign. The third of the three.
 

@@ -57,7 +57,7 @@ const P = constants("pricing.ts", [
   "WORDPRESS_CARE",
   "TYPICAL_LOW",
   "TYPICAL_HIGH",
-  "AUDIT",
+  "VISIBILITY_AUDIT",
   "ADS_MONTHLY",
   "ADS_MIN_DAILY_SPEND",
   "STATIC_HOSTING",

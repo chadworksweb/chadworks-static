@@ -10,7 +10,7 @@
 import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
-import { AUDIT } from "@/lib/pricing";
+import { VISIBILITY_AUDIT } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 export const showUpOnChatgpt: Service = {
@@ -22,7 +22,7 @@ export const showUpOnChatgpt: Service = {
   title: "Show Up on ChatGPT",
 
   intent:
-    `chadworks makes small-business sites readable and quotable to the AI crawlers behind ChatGPT, Claude, Gemini, and Perplexity, so your business gets named in the answer instead of your competitor. It starts with a ${money(AUDIT)} audit.`,
+    `chadworks makes small-business sites readable and quotable to the AI crawlers behind ChatGPT, Claude, Gemini, and Perplexity, so your business gets named in the answer instead of your competitor. It starts with a ${money(VISIBILITY_AUDIT)} audit.`,
 
   answer: (
     <>
@@ -30,7 +30,7 @@ export const showUpOnChatgpt: Service = {
       That means letting bots like OAI-SearchBot and Claude-SearchBot in, adding structured
       data that names your business, and writing content that answers real
       questions. Most sites fail at least one of these, so they stay invisible. A
-      {money(AUDIT)} audit tells you which ones are costing you. If you need to be visible
+      {money(VISIBILITY_AUDIT)} audit tells you which ones are costing you. If you need to be visible
       tomorrow instead, see{" "}
       <Link href="/advertising-on-chatgpt/">advertising on ChatGPT</Link>.
     </>
@@ -64,7 +64,7 @@ export const showUpOnChatgpt: Service = {
         { max: 6, tier: "max", text: "Six for six. You are built to be cited. The audit confirms it and finds the edge cases." },
       ]}
       ctaHref="/contact/"
-      ctaDefault={`Get the ${money(AUDIT)} audit`}
+      ctaDefault={`Get the ${money(VISIBILITY_AUDIT)} audit`}
       ctaMax="Audit me anyway"
     />
   ),
@@ -150,7 +150,7 @@ export const showUpOnChatgpt: Service = {
 
   price: {
     heading: "Start with the audit. Scale into the campaign.",
-    figure: money(AUDIT),
+    figure: money(VISIBILITY_AUDIT),
     figureSub: "AI Visibility Audit, one-time",
     body:
       "The baseline. I check whether AI crawlers can reach you, whether your structured data is doing its job, whether your content is quotable, and where you stand against the businesses already getting cited. You get a prioritized fix list and a straight answer about what is realistic in your space.",

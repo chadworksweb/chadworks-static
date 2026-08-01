@@ -13,7 +13,7 @@ import { SearchChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
 import { PromptChip } from "@/components/art/AiSearchHeroArt";
 import { ShieldChipDark, GearChip } from "@/components/art/MoreChips";
 import { LaunchLink } from "@/components/LaunchLink";
-import { AUDIT } from "@/lib/pricing";
+import { VISIBILITY_AUDIT } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
@@ -205,12 +205,12 @@ export const aiVisibilityAudit: Service = {
   price: {
     heading: "What does an AI Visibility Audit Cost?",
     // One flat, one-time figure now (Chad, 2026-08-01), not a quote derived from
-    // the hourly rate. `AUDIT` is the same hub constant /faqs/ quotes.
-    figure: money(AUDIT),
+    // the hourly rate. `VISIBILITY_AUDIT` is the same hub constant /faqs/ quotes.
+    figure: money(VISIBILITY_AUDIT),
     // The figure stays an interpolation, never a typed dollar amount --
     // price-audit fails the build on a hand-typed chadworks price, and it
     // reads comments too (this one used to trip it).
-    body: `The AI Search Visibility audit costs a one time fee of ${money(AUDIT)}.`,
+    body: `The AI Search Visibility audit costs a one time fee of ${money(VISIBILITY_AUDIT)}.`,
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}If your site is over 20 pages or you
