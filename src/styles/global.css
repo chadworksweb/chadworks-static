@@ -193,6 +193,9 @@ ul, ol { list-style: none; padding: 0; }
    .svc-qual__more a does (background-image: none; padding-bottom: 0). */
 p a,
 .cw-fit-list a,
+/* The fit / not-fit lines are <li>, not <p>, so an inline link in one of them
+   got no house style at all until it was named here. */
+.svc-qual__list a,
 .rates-ledger__label a,
 .cw-inline-more__btn,
 .essay-prose a {
@@ -213,6 +216,8 @@ p a:focus-visible,
 .rates-ledger__label a:focus-visible,
 .cw-fit-list a:hover,
 .cw-fit-list a:focus-visible,
+.svc-qual__list a:hover,
+.svc-qual__list a:focus-visible,
 .cw-inline-more__btn:hover,
 .cw-inline-more__btn:focus-visible,
 .essay-prose a:hover,
@@ -225,6 +230,7 @@ p a:focus-visible,
     p a,
     .rates-ledger__label a,
     .cw-inline-more__btn,
+    .svc-qual__list a,
     .cw-fit-list a { transition: none; }
   }
 }
@@ -727,6 +733,19 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .scheme-alternate { background: var(--bg-surface); border-block: 1px solid var(--border-subtle); }
 .scheme-inverted  { background: var(--dark-bg); color: var(--dark-text); }
 .scheme-inverted .eyebrow { color: var(--dark-muted); }
+/* Gradient band built on the lavender base. THE global treatment for every
+   "what happens after you reach out" section (NextStepsCapsule's `band`
+   default). Same hairline rules as .scheme-alternate so it seats like a sibling
+   of the flat lavender band rather than a floating panel. */
+.scheme-lavender-grad {
+  background: linear-gradient(
+    165deg,
+    var(--bg-surface) 0%,
+    var(--grad-peak) 48%,
+    color-mix(in srgb, var(--bg-surface) 42%, var(--bg-base)) 100%
+  );
+  border-block: 1px solid var(--border-subtle);
+}
 
 /* =====================================================================
    CAPSULE SECTIONSHELL -- optional background-texture layer.
@@ -4439,7 +4458,8 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   display: grid; place-items: center;
   border-radius: 999px;
   background: var(--bg-surface);
-  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--dark-bg) 35%, transparent);
+  color: var(--dark-bg);
   font-family: var(--font-mono);
   font-size: var(--text-sm);
 }
@@ -4455,25 +4475,9 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   font-size: calc(var(--text-base) * 0.85);
   line-height: calc(var(--leading-body) * 0.8);
 }
-/* arrow-flow: a chevron sits in the gap between steps so the sequence reads as
-   a flow. Shown only on big screens where the steps land in one row; on
-   tablet/mobile (where cards wrap or stack) it would point the wrong way, so
-   it hides. Decorative -- the numbers carry the order for everyone. */
-.svc-nextsteps--flow .svc-nextstep { position: relative; }
-@media (min-width: 1201px) {
-  .svc-nextsteps--flow .svc-nextstep:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 1rem;
-    right: calc(var(--space-lg) * -0.62);
-    width: 0.7rem;
-    height: 0.7rem;
-    border-top: 2px solid var(--accent);
-    border-right: 2px solid var(--accent);
-    transform: translateY(-50%) rotate(45deg);
-    opacity: 0.65;
-  }
-}
+/* The between-step chevrons are GONE sitewide (Chad, 2026-08-01). The numbers
+   carry the order on their own. `.svc-nextsteps--flow` still ships on the
+   markup (it is the capsule's default variant) but now styles nothing. */
 
 /* CTA band */
 .svc-cta__heading { font-size: var(--text-2xl); }
@@ -5978,6 +5982,16 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   .cw-score--split .cw-score__main    { grid-area: list; margin-top: var(--space-md); }
   .cw-score--split .cw-score__tally   { grid-area: tally; }
   .cw-score--split .cw-score__cta-row { grid-area: cta; }
+  /* The three-line verdict reservation exists to stop the STICKY desktop column
+     shifting mid-tap. There is no sticky column here, and at this width the
+     longer verdicts run past three lines -- the clamp would eat the end of the
+     sentence. Let it flow and size to its text. */
+  .cw-score--split .cw-score__verdict {
+    min-height: 0;
+    display: block;
+    -webkit-line-clamp: none;
+    overflow: visible;
+  }
 }
 
 @media (max-width: 600px) {
@@ -5986,6 +6000,18 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   .cw-score__check { width: 24px; height: 24px; }
   .cw-score__check svg { width: 15px; height: 15px; }
   .cw-score__total-num { font-size: 2rem; }
+  /* Phone: score above verdict, and the two buttons stop splitting a ~140px
+     row (the CTA label wraps to three lines at that width). */
+  .cw-score--split .cw-score__total { flex-direction: column; }
+  /* The desktop `flex: 1 1 0` is a WIDTH basis. Once the row turns into a
+     column that same basis applies to HEIGHT, which collapsed the verdict to
+     0px and hid the text entirely. Size it to its content here. */
+  .cw-score--split .cw-score__verdict { flex: 0 0 auto; }
+  /* Same axis flip: `align-self: center` centres the score block vertically in
+     the desktop ROW, but horizontally once this is a column -- the number sat
+     centred over a left-aligned verdict. */
+  .cw-score--split .cw-score__total > div:first-child { align-self: flex-start; }
+  .cw-score--split .cw-score__cta-row { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* =====================================================================
@@ -9973,6 +9999,12 @@ html.cw-motion-paused *::after {
   align-items: start;
   gap: clamp(1.5rem, 3vw, 2.75rem);
 }
+/* `.cw-pricing` halves its top pad for the /rates/ band, which opens on an
+   eyebrow + head block rather than a section h2. The split variant has no such
+   head -- it opens on a plain h2 like every other section -- so the halved top
+   just read as lopsided against the full bottom. Back on the global rhythm,
+   both sides (Chad, 2026-08-01). /rates/ keeps the halved version. */
+.cw-pricing--split { padding-top: var(--section-pad-y); }
 /* The heading is the standard section h2 and brings its own bottom margin, so
    the copy flow does not add a second gap under it. */
 .cw-pricing__copy > .svc-block__heading + * { margin-top: 0; }
@@ -9996,6 +10028,10 @@ html.cw-motion-paused *::after {
 .cw-price-card--cta .cw-price-card__figure {
   margin-top: calc(-1 * var(--space-2xs));
 }
+/* Opt-in centred card (/ai-visibility-audit/): one flat one-time figure with no
+   unit beside it reads better centred than ranged left. Passed through
+   PriceCapsule's panelClassName, so the retainer card stays left-aligned. */
+.cw-price-card--center { text-align: center; }
 /* CTA as the card's bottom edge: it cancels the card padding on three sides so
    it runs full width and sits flush, square on top and carrying the panel's
    radius below. The bottom radius is the panel's LESS its 1px border, which is

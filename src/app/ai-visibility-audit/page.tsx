@@ -2,7 +2,12 @@
 
 import type { Metadata } from "next";
 import ServiceTemplate from "@/components/ServiceTemplate";
-import { CtaCapsule, PriceCapsule } from "@/components/capsules";
+import {
+  MainContactCapsule,
+  NextStepsCapsule,
+  PriceCapsule,
+  ProcessCapsule,
+} from "@/components/capsules";
 import { aiVisibilityAudit as service } from "@/lib/services/ai-visibility-audit";
 import { serviceUrl } from "@/lib/service";
 
@@ -30,6 +35,19 @@ export default function AiVisibilityAuditPage() {
     <ServiceTemplate
       service={service}
       overrides={{
+        // "How the audit runs" moves onto the global bold timeline, the same
+        // treatment /ai-search-visibility/ and /web-design/ use, instead of the
+        // default numbered ApproachCapsule grid. Copy still lives in the
+        // service's `approach`.
+        approach: (
+          <ProcessCapsule
+            pageName="audit"
+            className="cw-process--nested"
+            heading={service.approach.heading}
+            steps={service.approach.steps}
+            scheme="inverted"
+          />
+        ),
         // Same cost module /ai-search-visibility/ runs (PriceCapsule's "rates"
         // variant: argument left, figure in a rates card right, CTA flush in
         // the card's bottom edge). The only difference is the unit -- this one
@@ -42,19 +60,28 @@ export default function AiVisibilityAuditPage() {
             ctaLabel="Inquire"
             variant="rates"
             cardLabel="One time"
+            panelClassName="cw-price-card--center"
           />
         ),
-        // The default CTA slot ships without an anchor, so the price button's
-        // "#contact" had nowhere to land. Same capsule, same form, just carrying
-        // the id (the hook MainContactCapsule provides on pages that use it).
+        // "If you already know you want more" is off this page (Chad,
+        // 2026-08-01). Dropped at the slot, so the copy stays in the service.
+        paths: null,
+        // "Why it's safe to start" is off this page (Chad, 2026-08-01), dropped
+        // at the slot so the copy stays in the service.
+        assurance: null,
+        // The global contact block closes the page instead of the service CTA +
+        // its own form, matching /ai-search-visibility/. It carries id="contact"
+        // itself, which is also what the price card's button lands on.
         cta: (
-          <CtaCapsule
-            cta={service.cta}
-            form={service.form}
-            id="contact"
-            scheme="inverted"
-          />
+          <MainContactCapsule heading={service.cta.heading} scheme="inverted" />
         ),
+        // With the form gone from the CTA slot, "what happens after you reach
+        // out" takes the tail slot BELOW the contact block rather than sitting
+        // above it.
+        nextSteps: null,
+        // The lavender-gradient band is the capsule's own default now, so this
+        // placement carries no styling of its own.
+        afterCta: <NextStepsCapsule nextSteps={service.nextSteps!} />,
       }}
     />
   );

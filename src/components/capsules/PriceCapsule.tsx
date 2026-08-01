@@ -70,7 +70,7 @@ export function PriceCapsule({
           </div>
           {/* Right column: the number, closed by the CTA sitting flush in the
               card's bottom edge (square on top, the panel's radius below). */}
-          <div className="cw-price-card panel cw-price-card--cta">
+          <div className={cx("cw-price-card panel cw-price-card--cta", panelClassName)}>
             <p className="cw-price-card__label">{cardLabel}</p>
             <p className="cw-price-card__figure">
               {price.figure}
