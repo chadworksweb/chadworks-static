@@ -61,6 +61,8 @@ const LAUNCHED = new Set<string>([
   "/website-design-cost-calculator/", // launched 2026-07-20 -- the scope calculator (tool intent)
   "/visibility/", // launched 2026-07-29 -- the visibility hub. AI visibility is the
                   // umbrella; SEO, presence and email are the lanes underneath.
+  "/ai-visibility-audit/", // launched 2026-08-01 -- the one-time audit, the gate into
+                           // the retainer above. Carries its own robots line (below).
   "/ai-search-visibility/", // launched 2026-07-29 -- the service page under the hub above.
                             // Neither of these two carried a robots line before launch,
                             // which is the exact failure the note at the top of this file
