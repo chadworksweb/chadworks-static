@@ -14,14 +14,14 @@ import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "mail", svg: <MailChip />, style: { left: "8%", width: "124px", animationDelay: "0s", animationDuration: "26.6s" } },        // 153/360
-  { key: "shield", svg: <ShieldChipDark />, style: { left: "64%", width: "86px", animationDelay: "3s", animationDuration: "23.4s" } },// 316/360
-  { key: "button", svg: <ButtonChip />, style: { left: "32%", width: "136px", animationDelay: "8s", animationDuration: "28.3s" } },   // 251/360
-  { key: "tag", svg: <TagChip />, style: { left: "58%", width: "84px", animationDelay: "1s", animationDuration: "24.8s" } },          // 293/360
-  { key: "mail2", svg: <MailChip />, style: { left: "46%", width: "96px", animationDelay: "12s", animationDuration: "21.7s" } },      // 262/360
-  { key: "tag2", svg: <TagChip />, style: { left: "18%", width: "64px", animationDelay: "16s", animationDuration: "27.5s" } },        // 129/360
-  { key: "shield2", svg: <ShieldChipDark />, style: { left: "76%", width: "62px", animationDelay: "20s", animationDuration: "22.9s" } }, // 336/360
-  { key: "button2", svg: <ButtonChip />, style: { left: "4%", width: "108px", animationDelay: "23s", animationDuration: "29.5s" } },  // 122/360
+  { key: "mail", svg: <MailChip />, style: { left: "8%", width: "124px", animationDelay: "0s", animationDuration: "22s" } },        // 153/360
+  { key: "shield", svg: <ShieldChipDark />, style: { left: "64%", width: "86px", animationDelay: "2.5s", animationDuration: "19.3s" } },// 316/360
+  { key: "button", svg: <ButtonChip />, style: { left: "32%", width: "136px", animationDelay: "6.6s", animationDuration: "23.4s" } },   // 251/360
+  { key: "tag", svg: <TagChip />, style: { left: "58%", width: "84px", animationDelay: "0.9s", animationDuration: "20.5s" } },          // 293/360
+  { key: "mail2", svg: <MailChip />, style: { left: "46%", width: "96px", animationDelay: "9.9s", animationDuration: "17.9s" } },      // 262/360
+  { key: "tag2", svg: <TagChip />, style: { left: "18%", width: "64px", animationDelay: "13.3s", animationDuration: "22.8s" } },        // 129/360
+  { key: "shield2", svg: <ShieldChipDark />, style: { left: "76%", width: "62px", animationDelay: "16.5s", animationDuration: "18.9s" } }, // 336/360
+  { key: "button2", svg: <ButtonChip />, style: { left: "4%", width: "108px", animationDelay: "19s", animationDuration: "24.4s" } },  // 122/360
 ];
 
 function EmailHeroArt() {

@@ -7,21 +7,25 @@
 import type { ReactNode, CSSProperties } from "react";
 import type { Service } from "@/lib/service";
 import { Scorecard } from "@/components/Scorecard";
-import { SearchChip, RankChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
+import { SearchChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
+// RankChip (the "#1 result" card) is deliberately NOT used here: this audit
+// does not cover Google rankings, so the hero art must not imply it.
+import { PromptChip } from "@/components/art/AiSearchHeroArt";
 import { ShieldChipDark, GearChip } from "@/components/art/MoreChips";
+import { LaunchLink } from "@/components/LaunchLink";
 import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "search", svg: <SearchChip />, style: { left: "6%", width: "160px", animationDelay: "0s", animationDuration: "26.4s" } },     // 182/360
-  { key: "chat", svg: <ChatChipDark />, style: { left: "54%", width: "144px", animationDelay: "4s", animationDuration: "23.5s" } },    // 338/360
-  { key: "rank", svg: <RankChip />, style: { left: "28%", width: "126px", animationDelay: "10s", animationDuration: "28.2s" } },       // 227/360
-  { key: "shield", svg: <ShieldChipDark />, style: { left: "70%", width: "84px", animationDelay: "2s", animationDuration: "24.6s" } }, // 336/360
-  { key: "gear", svg: <GearChip />, style: { left: "16%", width: "92px", animationDelay: "8s", animationDuration: "21.3s" } },         // 150/360
-  { key: "search2", svg: <SearchChip />, style: { left: "40%", width: "118px", animationDelay: "14s", animationDuration: "27.4s" } },  // 262/360
-  { key: "rank2", svg: <RankChip />, style: { left: "62%", width: "98px", animationDelay: "18s", animationDuration: "22.8s" } },       // 321/360
-  { key: "gear2", svg: <GearChip />, style: { left: "10%", width: "70px", animationDelay: "22s", animationDuration: "29.1s" } },       // 106/360
+  { key: "search", svg: <SearchChip />, style: { left: "6%", width: "160px", animationDelay: "0s", animationDuration: "21.8s" } },     // 182/360
+  { key: "chat", svg: <ChatChipDark />, style: { left: "54%", width: "144px", animationDelay: "3.3s", animationDuration: "19.4s" } },    // 338/360
+  { key: "prompt", svg: <PromptChip />, style: { left: "28%", width: "126px", animationDelay: "8.3s", animationDuration: "23.3s" } },       // 227/360
+  { key: "shield", svg: <ShieldChipDark />, style: { left: "70%", width: "84px", animationDelay: "1.6s", animationDuration: "20.3s" } }, // 336/360
+  { key: "gear", svg: <GearChip />, style: { left: "16%", width: "92px", animationDelay: "6.6s", animationDuration: "17.6s" } },         // 150/360
+  { key: "search2", svg: <SearchChip />, style: { left: "40%", width: "118px", animationDelay: "11.5s", animationDuration: "22.6s" } },  // 262/360
+  { key: "prompt2", svg: <PromptChip />, style: { left: "62%", width: "98px", animationDelay: "14.9s", animationDuration: "18.8s" } },       // 321/360
+  { key: "gear2", svg: <GearChip />, style: { left: "10%", width: "70px", animationDelay: "18.1s", animationDuration: "24s" } },       // 106/360
 ];
 
 function AuditHeroArt() {
@@ -43,18 +47,16 @@ export const aiVisibilityAudit: Service = {
   eyebrow: "The one-time measurement",
   title: "AI Visibility Audit",
   intent:
-    "chadworks sells a one-time AI visibility audit: a documented, scored read on where a business stands in AI answers and classic search, plus the profiles engines cross-check.",
+    "chadworks sells a one-time AI visibility audit: a documented, scored read on where a business stands in AI answers, including the mentions, citations, and profiles the assistants cross-check.",
 
   answer: (
     <>
-      The AI Visibility Audit is a one-time, documented read on where your
-      business stands in AI answers and classic search, plus the profiles
-      engines cross-check before they recommend anyone. You get the full
-      checklist run against your site, scored, with the fixes in priority
-      order. It&apos;s yours to act on with anyone, including me. I&apos;m
-      Chad, I&apos;ve spent 20 years building websites that get found, and
-      this is the same first step every retained client gets, sold on its
-      own.
+      The AI Visibility Audit is a one-time deep dive into how your business
+      is showing up on AI platforms like ChatGPT and the signals driving (or
+      not driving) the current level of visibility. This includes measuring
+      mentions and citations across a series of relevant prompts. A formal
+      report with current status and a list of actionable steps is delivered
+      at the end of the audit.
     </>
   ),
 
@@ -62,30 +64,45 @@ export const aiVisibilityAudit: Service = {
 
   keyFactsHeading: "The audit, at a glance",
   keyFacts: [
-    "One-time and self-contained: a documented pass over search standing, AI answers, schema, profiles, and page structure, scored check by check.",
-    "The checklist is the deliverable. It's the same gate every page on this site passes before it ships, run against yours.",
-    "No retainer hides inside it. Act on it with your own developer or with me, on your own time. The audit doesn't expire and doesn't obligate you.",
-    "Run by someone whose client results include a law firm in Google's AI Overview and a psychologist named in AI answers. Same checklist, run on yours.",
+    "One-time and self-contained: a documented pass over AI answers, mentions and citations, schema, social profiles, business directories, and page structure, scored check by check.",
+    "The parts of the audit service are 1) a process I perform, mostly autonomously, and 2) a formal document I deliver.",
+    <>
+      There is no commitment beyond the audit itself. You are not required to
+      have me execute the actions suggested in the audit, but if you&apos;d
+      like me to, please check out my{" "}
+      <LaunchLink href="/ai-search-visibility/">
+        AI Search Visibility
+      </LaunchLink>{" "}
+      service.
+    </>,
+    "In 2026 alone I've had several clients go from not being found to being surfaced on the first results of a non-branded prompt.",
   ],
 
   problemArt: (
     <Scorecard
-      label="The quick version"
-      title="Six checks, sixty seconds"
+      layout="split"
+      label="quick check"
+      title="AI Visibility Preliminary Audit"
+      blurb="Use this checklist to get a loose idea of where you actually stand right now when it comes to your brand's AI search visibility."
       items={[
         { strong: "AI assistants mention you", small: "Ask ChatGPT who does what you do in your area. Are you in the answer?" },
-        { strong: "Page one for a buying phrase", small: "Not your business name. A phrase a stranger would actually type." },
+        { strong: "Something outside your site names you", small: "A directory, a forum thread, a press mention. Assistants lean on sources you don't own." },
         { strong: "Your Google Business Profile is current", small: "Hours, photos, services, reviews answered." },
         { strong: "Your pages answer questions directly", small: "An engine can lift a clean answer from your copy." },
         { strong: "Your site carries valid schema", small: "The structured data engines read before your prose." },
         { strong: "Your social presence looks alive", small: "Alive, not viral: recent activity that matches your business." },
+        { strong: "Your details match everywhere they appear", small: "Same name, same services, same address. Assistants cross-check before they recommend." },
+        { strong: "Your industry's directories list you", small: "Trade lists, association pages, and local directories get cited constantly." },
       ]}
       verdicts={[
-        { max: 0, tier: "0", text: "Tap what's true today. Most businesses can honestly check two." },
-        { max: 2, tier: "low", text: "You're close to invisible where buyers now ask. The full audit shows exactly where the gaps are and which ones matter first." },
-        { max: 4, tier: "mid", text: "A real base. The unchecked rows are usually the ones standing between you and AI answers." },
-        { max: 5, tier: "high", text: "Strong. One gap left, and at this level it's usually schema or answer-shaped copy." },
-        { max: 6, tier: "max", text: "All six? You're ahead of nearly every competitor. The audit becomes proof, and maintenance." },
+        // Empty on purpose: no verdict shows until something is tapped.
+        { max: 0, tier: "0", text: "" },
+        // Every string is written to land inside the three-line box the split
+        // layout reserves. Keep new ones under ~110 characters.
+        { max: 3, tier: "low", text: "You're close to invisible where buyers now ask. The audit shows the gaps and which ones matter first." },
+        { max: 5, tier: "mid", text: "A real base. The unchecked rows are usually what stands between you and the AI answers." },
+        { max: 7, tier: "high", text: "Strong. The last gaps at this level are usually schema or answer-shaped copy." },
+        { max: 8, tier: "max", text: "All eight? You're ahead of nearly every competitor. The audit becomes proof, and maintenance." },
       ]}
       ctaHref="/contact/"
       ctaDefault="Get the full audit"
@@ -94,16 +111,17 @@ export const aiVisibilityAudit: Service = {
   ),
   problem: {
     heading: "Most businesses are guessing about their visibility",
-    subheading: "The six checks below take sixty seconds.",
+    subheading: "Don't leave it up to chance.",
     body:
       "Owners hear that AI is answering their buyers now and feel behind, but nobody has shown them where they actually stand. The fix starts with a measurement, not a subscription.",
     more: {
       trigger: "What the audit actually measures",
       paragraphs: [
         <>
-          <strong>Your standing.</strong>{" "}Where you appear today: classic
-          rankings for real buying phrases, AI answers for the questions
-          your market asks, and the map results local buyers see first.
+          <strong>Your standing.</strong>{" "}Where you appear today across a
+          series of prompts your market would actually ask: which assistants
+          name you, which name a competitor instead, and what they cite when
+          they do.
         </>,
         <>
           <strong>The structure underneath.</strong>{" "}Whether an engine can
@@ -127,12 +145,12 @@ export const aiVisibilityAudit: Service = {
       {
         title: "You tell me your market",
         body:
-          "The area you serve and the phrases you think buyers type. An hour of your time, none of your passwords.",
+          "The area you serve and the questions you think buyers ask. An hour of your time, none of your passwords.",
       },
       {
         title: "I run the full checklist",
         body:
-          "Search standing, AI answers, schema, profiles, page structure, and performance, documented as I go.",
+          "AI answers, mentions and citations, schema, profiles, page structure, and performance, documented as I go.",
       },
       {
         title: "You get the scored audit",
@@ -159,7 +177,7 @@ export const aiVisibilityAudit: Service = {
       },
       {
         label: "SEO",
-        detail: "When the audit shows the gap is classic rankings, this is the discipline that closes it.",
+        detail: "Ranking in Google is its own discipline, and a foundation the AI assistants read from. The audit doesn't cover it; this is where it gets handled.",
         href: "/seo/",
       },
     ],
@@ -233,6 +251,9 @@ export const aiVisibilityAudit: Service = {
     href: "/contact/",
   },
 
+  // The hero hands off DOWN the page instead of out to the contact form.
+  heroCta: { href: "#key-facts", buttonLabel: "Explore the Audit", arrow: "down" },
+
   form: {
     source: "ai-visibility-audit page",
     subject: "New AI Visibility Audit Inquiry (chadworks)",
@@ -262,7 +283,7 @@ export const aiVisibilityAudit: Service = {
         label: "What's your market?",
         required: true,
         rows: 4,
-        placeholder: "What you do, the area you serve, and what happens today when you search for it.",
+        placeholder: "What you do, the area you serve, and what happens today when you ask ChatGPT about it.",
       },
       { kind: "text", name: "referral_source", label: "How did you find chadworks?", placeholder: "e.g. Google, ChatGPT, a referral" },
     ],
@@ -301,8 +322,8 @@ export const aiVisibilityAudit: Service = {
   },
 
   meta: {
-    title: "AI Visibility Audit: A Scored Read on Your Search and AI Standing | chadworks",
+    title: "AI Visibility Audit by chadworks™",
     description:
-      "A one-time, documented AI visibility audit: where your business stands in ChatGPT answers, Google's AI Overview, classic rankings, schema, and profiles, scored with fixes in priority order. Flat quote up front, yours to act on with anyone. No retainer hidden inside.",
+      "The chadworks™ AI Visibility Audit will tell you what's working, what's not and what you need to improve your AI citations and mentions.",
   },
 };

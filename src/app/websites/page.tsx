@@ -29,15 +29,15 @@ import {
 // Mixed design + development chip set for the lane that contains both.
 // Scatter constraint: left% x 360 + width <= 360 for every chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "26.5s" } },   // 190/360
-  { key: "palette", svg: <PaletteChip />, style: { left: "56%", width: "126px", animationDelay: "5s", animationDuration: "21.9s" } },  // 328/360
-  { key: "layout", svg: <LayoutChip />, style: { left: "24%", width: "150px", animationDelay: "11s", animationDuration: "28.8s" } },   // 236/360
-  { key: "terminal", svg: <TerminalChip />, style: { left: "68%", width: "104px", animationDelay: "2s", animationDuration: "24.2s" } }, // 349/360
-  { key: "code", svg: <CodeChip />, style: { left: "14%", width: "118px", animationDelay: "8s", animationDuration: "19.6s" } },        // 168/360
-  { key: "button", svg: <ButtonChip />, style: { left: "46%", width: "110px", animationDelay: "15s", animationDuration: "25.3s" } },   // 276/360
-  { key: "typedark", svg: <TypeChipDark />, style: { left: "60%", width: "94px", animationDelay: "13s", animationDuration: "29.9s" } }, // 310/360
-  { key: "wheel", svg: <WheelChip />, style: { left: "36%", width: "70px", animationDelay: "18s", animationDuration: "20.7s" } },      // 200/360
-  { key: "server", svg: <ServerChip />, style: { left: "6%", width: "130px", animationDelay: "21s", animationDuration: "23s" } },      // 152/360
+  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "21.9s" } },   // 190/360
+  { key: "palette", svg: <PaletteChip />, style: { left: "56%", width: "126px", animationDelay: "4.1s", animationDuration: "18.1s" } },  // 328/360
+  { key: "layout", svg: <LayoutChip />, style: { left: "24%", width: "150px", animationDelay: "9.1s", animationDuration: "23.8s" } },   // 236/360
+  { key: "terminal", svg: <TerminalChip />, style: { left: "68%", width: "104px", animationDelay: "1.6s", animationDuration: "20s" } }, // 349/360
+  { key: "code", svg: <CodeChip />, style: { left: "14%", width: "118px", animationDelay: "6.6s", animationDuration: "16.1s" } },        // 168/360
+  { key: "button", svg: <ButtonChip />, style: { left: "46%", width: "110px", animationDelay: "12.4s", animationDuration: "20.9s" } },   // 276/360
+  { key: "typedark", svg: <TypeChipDark />, style: { left: "60%", width: "94px", animationDelay: "10.8s", animationDuration: "24.6s" } }, // 310/360
+  { key: "wheel", svg: <WheelChip />, style: { left: "36%", width: "70px", animationDelay: "14.9s", animationDuration: "17.1s" } },      // 200/360
+  { key: "server", svg: <ServerChip />, style: { left: "6%", width: "130px", animationDelay: "17.4s", animationDuration: "19s" } },      // 152/360
 ];
 
 function WebsitesHubArt() {

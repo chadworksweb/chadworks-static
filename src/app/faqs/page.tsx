@@ -292,7 +292,7 @@ const GROUPS: FaqGroup[] = [
           </>
         ),
         aText:
-          `A one-time, documented read on where a business stands in AI answers, classic search, structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of ${money(AUDIT)} with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.`,
+          `A one-time, documented read on where a business stands in AI answers, including the mentions and citations behind them, its structured data, and its profiles, scored so you can see exactly what is working and what is not. It's charged as a flat rate of ${money(AUDIT)} with no strings attached, no commitment to hire me for anything further. Check out the AI visibility audit page for more info.`,
       },
       {
         q: "Do you do advertising on ChatGPT?",

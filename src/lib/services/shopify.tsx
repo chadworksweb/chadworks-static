@@ -12,14 +12,14 @@ import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "store", svg: <StoreChipDark />, style: { left: "5%", width: "138px", animationDelay: "0s", animationDuration: "26.6s" } },  // 156/360
-  { key: "bag", svg: <BagChip />, style: { left: "64%", width: "88px", animationDelay: "3s", animationDuration: "22.9s" } },          // 318/360
-  { key: "cart", svg: <CartChip />, style: { left: "34%", width: "98px", animationDelay: "9s", animationDuration: "28.5s" } },        // 220/360
-  { key: "tag", svg: <TagChip />, style: { left: "52%", width: "82px", animationDelay: "1s", animationDuration: "24.9s" } },          // 269/360
-  { key: "bag2", svg: <BagChip />, style: { left: "16%", width: "66px", animationDelay: "13s", animationDuration: "20.5s" } },        // 124/360
-  { key: "store2", svg: <StoreChipDark />, style: { left: "42%", width: "112px", animationDelay: "17s", animationDuration: "27.8s" } }, // 263/360
-  { key: "cart2", svg: <CartChip />, style: { left: "72%", width: "72px", animationDelay: "21s", animationDuration: "23.7s" } },      // 331/360
-  { key: "tag2", svg: <TagChip />, style: { left: "26%", width: "64px", animationDelay: "24s", animationDuration: "29.6s" } },        // 158/360
+  { key: "store", svg: <StoreChipDark />, style: { left: "5%", width: "138px", animationDelay: "0s", animationDuration: "22s" } },  // 156/360
+  { key: "bag", svg: <BagChip />, style: { left: "64%", width: "88px", animationDelay: "2.5s", animationDuration: "18.9s" } },          // 318/360
+  { key: "cart", svg: <CartChip />, style: { left: "34%", width: "98px", animationDelay: "7.4s", animationDuration: "23.5s" } },        // 220/360
+  { key: "tag", svg: <TagChip />, style: { left: "52%", width: "82px", animationDelay: "0.9s", animationDuration: "20.5s" } },          // 269/360
+  { key: "bag2", svg: <BagChip />, style: { left: "16%", width: "66px", animationDelay: "10.8s", animationDuration: "16.9s" } },        // 124/360
+  { key: "store2", svg: <StoreChipDark />, style: { left: "42%", width: "112px", animationDelay: "14s", animationDuration: "22.9s" } }, // 263/360
+  { key: "cart2", svg: <CartChip />, style: { left: "72%", width: "72px", animationDelay: "17.4s", animationDuration: "19.5s" } },      // 331/360
+  { key: "tag2", svg: <TagChip />, style: { left: "26%", width: "64px", animationDelay: "19.8s", animationDuration: "24.4s" } },        // 158/360
 ];
 
 function ShopifyHeroArt() {

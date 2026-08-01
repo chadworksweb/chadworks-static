@@ -16,14 +16,14 @@ import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "rank", svg: <RankChip />, style: { left: "8%", width: "132px", animationDelay: "0s", animationDuration: "27.2s" } },        // 161/360
-  { key: "pin", svg: <PinChipDark />, style: { left: "66%", width: "74px", animationDelay: "3s", animationDuration: "23.3s" } },      // 312/360
-  { key: "search", svg: <SearchChip />, style: { left: "30%", width: "156px", animationDelay: "8s", animationDuration: "28.8s" } },   // 264/360
-  { key: "chart", svg: <ChartChip />, style: { left: "58%", width: "104px", animationDelay: "1s", animationDuration: "24.1s" } },     // 313/360
-  { key: "rank2", svg: <RankChip />, style: { left: "44%", width: "108px", animationDelay: "13s", animationDuration: "21.9s" } },     // 266/360
-  { key: "pin2", svg: <PinChipDark />, style: { left: "20%", width: "62px", animationDelay: "17s", animationDuration: "25.7s" } },    // 134/360
-  { key: "chart2", svg: <ChartChip />, style: { left: "72%", width: "90px", animationDelay: "21s", animationDuration: "29.4s" } },    // 349/360
-  { key: "search2", svg: <SearchChip />, style: { left: "4%", width: "118px", animationDelay: "24s", animationDuration: "22.6s" } },  // 132/360
+  { key: "rank", svg: <RankChip />, style: { left: "8%", width: "132px", animationDelay: "0s", animationDuration: "22.5s" } },        // 161/360
+  { key: "pin", svg: <PinChipDark />, style: { left: "66%", width: "74px", animationDelay: "2.5s", animationDuration: "19.3s" } },      // 312/360
+  { key: "search", svg: <SearchChip />, style: { left: "30%", width: "156px", animationDelay: "6.6s", animationDuration: "23.8s" } },   // 264/360
+  { key: "chart", svg: <ChartChip />, style: { left: "58%", width: "104px", animationDelay: "0.9s", animationDuration: "19.9s" } },     // 313/360
+  { key: "rank2", svg: <RankChip />, style: { left: "44%", width: "108px", animationDelay: "10.8s", animationDuration: "18.1s" } },     // 266/360
+  { key: "pin2", svg: <PinChipDark />, style: { left: "20%", width: "62px", animationDelay: "14s", animationDuration: "21.3s" } },    // 134/360
+  { key: "chart2", svg: <ChartChip />, style: { left: "72%", width: "90px", animationDelay: "17.4s", animationDuration: "24.3s" } },    // 349/360
+  { key: "search2", svg: <SearchChip />, style: { left: "4%", width: "118px", animationDelay: "19.8s", animationDuration: "18.6s" } },  // 132/360
 ];
 
 function SeoHeroArt() {
@@ -142,7 +142,7 @@ export const seo: Service = {
       },
       {
         label: "AI Visibility Audit",
-        detail: "Not sure where you stand? Measure first. The audit scores your rankings too.",
+        detail: "Not sure where you stand? Measure first. The audit scores your standing in the AI answers, not your Google rankings.",
         href: "/ai-visibility-audit/",
       },
     ],

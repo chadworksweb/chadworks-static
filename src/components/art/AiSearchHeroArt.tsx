@@ -146,14 +146,14 @@ export function ChatUiChip() {
 
 // Scatter (constraint check in comments: left% x 360 + width <= 360).
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "chatui", svg: <ChatUiChip />, style: { left: "50%", width: "164px", animationDelay: "0s", animationDuration: "25.4s" } },      // 344/360
-  { key: "prompt", svg: <PromptChip />, style: { left: "4%", width: "168px", animationDelay: "6s", animationDuration: "27.3s" } },       // 182/360
-  { key: "cite", svg: <CitationChipDark />, style: { left: "26%", width: "158px", animationDelay: "12s", animationDuration: "23.6s" } }, // 252/360
-  { key: "search", svg: <SearchChip />, style: { left: "40%", width: "120px", animationDelay: "3s", animationDuration: "21.8s" } },      // 264/360
-  { key: "rank", svg: <RankChip />, style: { left: "10%", width: "112px", animationDelay: "17s", animationDuration: "28.9s" } },         // 148/360
-  { key: "chart", svg: <ChartChip />, style: { left: "68%", width: "100px", animationDelay: "9s", animationDuration: "24.1s" } },        // 345/360
-  { key: "prompt2", svg: <PromptChip />, style: { left: "30%", width: "128px", animationDelay: "21s", animationDuration: "29.7s" } },    // 236/360
-  { key: "cite2", svg: <CitationChipDark />, style: { left: "62%", width: "112px", animationDelay: "15s", animationDuration: "22.5s" } },// 335/360
+  { key: "chatui", svg: <ChatUiChip />, style: { left: "50%", width: "164px", animationDelay: "0s", animationDuration: "21s" } },      // 344/360
+  { key: "prompt", svg: <PromptChip />, style: { left: "4%", width: "168px", animationDelay: "5s", animationDuration: "22.5s" } },       // 182/360
+  { key: "cite", svg: <CitationChipDark />, style: { left: "26%", width: "158px", animationDelay: "9.9s", animationDuration: "19.5s" } }, // 252/360
+  { key: "search", svg: <SearchChip />, style: { left: "40%", width: "120px", animationDelay: "2.5s", animationDuration: "18s" } },      // 264/360
+  { key: "rank", svg: <RankChip />, style: { left: "10%", width: "112px", animationDelay: "14s", animationDuration: "23.9s" } },         // 148/360
+  { key: "chart", svg: <ChartChip />, style: { left: "68%", width: "100px", animationDelay: "7.4s", animationDuration: "19.9s" } },        // 345/360
+  { key: "prompt2", svg: <PromptChip />, style: { left: "30%", width: "128px", animationDelay: "17.4s", animationDuration: "24.5s" } },    // 236/360
+  { key: "cite2", svg: <CitationChipDark />, style: { left: "62%", width: "112px", animationDelay: "12.4s", animationDuration: "18.6s" } },// 335/360
 ];
 
 export function AiSearchHeroArt() {

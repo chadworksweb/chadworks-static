@@ -12,14 +12,14 @@ import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "w", svg: <WChip />, style: { left: "6%", width: "86px", animationDelay: "0s", animationDuration: "25.9s" } },              // 108/360
-  { key: "post", svg: <PostChipDark />, style: { left: "44%", width: "140px", animationDelay: "4s", animationDuration: "22.2s" } },   // 298/360
-  { key: "browser", svg: <BrowserChip />, style: { left: "20%", width: "158px", animationDelay: "10s", animationDuration: "28.4s" } }, // 230/360
-  { key: "gear", svg: <GearChip />, style: { left: "72%", width: "80px", animationDelay: "2s", animationDuration: "24.1s" } },        // 339/360
-  { key: "server", svg: <ServerChip />, style: { left: "12%", width: "136px", animationDelay: "14s", animationDuration: "20.6s" } },  // 179/360
-  { key: "database", svg: <DatabaseChip />, style: { left: "58%", width: "74px", animationDelay: "8s", animationDuration: "26.8s" } }, // 283/360
-  { key: "w2", svg: <WChip />, style: { left: "36%", width: "64px", animationDelay: "18s", animationDuration: "23.2s" } },            // 194/360
-  { key: "post2", svg: <PostChipDark />, style: { left: "62%", width: "108px", animationDelay: "21s", animationDuration: "29.1s" } }, // 331/360
+  { key: "w", svg: <WChip />, style: { left: "6%", width: "86px", animationDelay: "0s", animationDuration: "21.4s" } },              // 108/360
+  { key: "post", svg: <PostChipDark />, style: { left: "44%", width: "140px", animationDelay: "3.3s", animationDuration: "18.4s" } },   // 298/360
+  { key: "browser", svg: <BrowserChip />, style: { left: "20%", width: "158px", animationDelay: "8.3s", animationDuration: "23.4s" } }, // 230/360
+  { key: "gear", svg: <GearChip />, style: { left: "72%", width: "80px", animationDelay: "1.6s", animationDuration: "19.9s" } },        // 339/360
+  { key: "server", svg: <ServerChip />, style: { left: "12%", width: "136px", animationDelay: "11.5s", animationDuration: "17s" } },  // 179/360
+  { key: "database", svg: <DatabaseChip />, style: { left: "58%", width: "74px", animationDelay: "6.6s", animationDuration: "22.1s" } }, // 283/360
+  { key: "w2", svg: <WChip />, style: { left: "36%", width: "64px", animationDelay: "14.9s", animationDuration: "19.1s" } },            // 194/360
+  { key: "post2", svg: <PostChipDark />, style: { left: "62%", width: "108px", animationDelay: "17.4s", animationDuration: "24s" } }, // 331/360
 ];
 
 function WordPressHeroArt() {

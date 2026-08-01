@@ -110,15 +110,15 @@ export function TerminalChip() {
 // it across the area so it never bunches into one cramped cluster. lefts span
 // the full width (incl. the far right) so chips reach the site-content edge.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "26.5s" } },
-  { key: "code", svg: <CodeChip />, style: { left: "58%", width: "132px", animationDelay: "5s", animationDuration: "21.9s" } },
-  { key: "server", svg: <ServerChip />, style: { left: "28%", width: "168px", animationDelay: "11s", animationDuration: "28.8s" } },
-  { key: "terminal", svg: <TerminalChip />, style: { left: "70%", width: "104px", animationDelay: "2s", animationDuration: "24.2s" } },
-  { key: "brackets", svg: <BracketsChip />, style: { left: "16%", width: "72px", animationDelay: "8s", animationDuration: "19.6s" } },
-  { key: "database", svg: <DatabaseChip />, style: { left: "50%", width: "80px", animationDelay: "15s", animationDuration: "25.3s" } },
-  { key: "code2", svg: <CodeChip />, style: { left: "70%", width: "112px", animationDelay: "13s", animationDuration: "29.9s" } },
-  { key: "brackets2", svg: <BracketsChip />, style: { left: "40%", width: "62px", animationDelay: "18s", animationDuration: "20.7s" } },
-  { key: "database2", svg: <DatabaseChip />, style: { left: "80%", width: "66px", animationDelay: "21s", animationDuration: "23s" } },
+  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "21.9s" } },
+  { key: "code", svg: <CodeChip />, style: { left: "58%", width: "132px", animationDelay: "4.1s", animationDuration: "18.1s" } },
+  { key: "server", svg: <ServerChip />, style: { left: "28%", width: "168px", animationDelay: "9.1s", animationDuration: "23.8s" } },
+  { key: "terminal", svg: <TerminalChip />, style: { left: "70%", width: "104px", animationDelay: "1.6s", animationDuration: "20s" } },
+  { key: "brackets", svg: <BracketsChip />, style: { left: "16%", width: "72px", animationDelay: "6.6s", animationDuration: "16.1s" } },
+  { key: "database", svg: <DatabaseChip />, style: { left: "50%", width: "80px", animationDelay: "12.4s", animationDuration: "20.9s" } },
+  { key: "code2", svg: <CodeChip />, style: { left: "70%", width: "112px", animationDelay: "10.8s", animationDuration: "24.6s" } },
+  { key: "brackets2", svg: <BracketsChip />, style: { left: "40%", width: "62px", animationDelay: "14.9s", animationDuration: "17.1s" } },
+  { key: "database2", svg: <DatabaseChip />, style: { left: "80%", width: "66px", animationDelay: "17.4s", animationDuration: "19s" } },
 ];
 
 export function WebDevHeroArt() {

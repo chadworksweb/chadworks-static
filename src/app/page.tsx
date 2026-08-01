@@ -68,24 +68,24 @@ import { HIGH, LOW } from "@/lib/pricing";
 // chips drift up more gently on the one-pager.
 const ALL_CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
   // Websites set
-  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "31.8s" } },
-  { key: "palette", svg: <PaletteChip />, style: { left: "56%", width: "126px", animationDelay: "5s", animationDuration: "26.3s" } },
-  { key: "layout", svg: <LayoutChip />, style: { left: "24%", width: "150px", animationDelay: "11s", animationDuration: "34.6s" } },
-  { key: "terminal", svg: <TerminalChip />, style: { left: "68%", width: "104px", animationDelay: "2s", animationDuration: "29s" } },
-  { key: "code", svg: <CodeChip />, style: { left: "14%", width: "118px", animationDelay: "8s", animationDuration: "23.5s" } },
-  { key: "button", svg: <ButtonChip />, style: { left: "46%", width: "110px", animationDelay: "15s", animationDuration: "30.4s" } },
-  { key: "typedark", svg: <TypeChipDark />, style: { left: "60%", width: "94px", animationDelay: "13s", animationDuration: "35.9s" } },
-  { key: "wheel", svg: <WheelChip />, style: { left: "36%", width: "70px", animationDelay: "18s", animationDuration: "24.8s" } },
-  { key: "server", svg: <ServerChip />, style: { left: "6%", width: "130px", animationDelay: "21s", animationDuration: "27.6s" } },
+  { key: "browser", svg: <BrowserChip />, style: { left: "4%", width: "176px", animationDelay: "0s", animationDuration: "26.3s" } },
+  { key: "palette", svg: <PaletteChip />, style: { left: "56%", width: "126px", animationDelay: "4.1s", animationDuration: "21.8s" } },
+  { key: "layout", svg: <LayoutChip />, style: { left: "24%", width: "150px", animationDelay: "9.1s", animationDuration: "28.5s" } },
+  { key: "terminal", svg: <TerminalChip />, style: { left: "68%", width: "104px", animationDelay: "1.6s", animationDuration: "23.9s" } },
+  { key: "code", svg: <CodeChip />, style: { left: "14%", width: "118px", animationDelay: "6.6s", animationDuration: "19.4s" } },
+  { key: "button", svg: <ButtonChip />, style: { left: "46%", width: "110px", animationDelay: "12.4s", animationDuration: "25.1s" } },
+  { key: "typedark", svg: <TypeChipDark />, style: { left: "60%", width: "94px", animationDelay: "10.8s", animationDuration: "29.6s" } },
+  { key: "wheel", svg: <WheelChip />, style: { left: "36%", width: "70px", animationDelay: "14.9s", animationDuration: "20.5s" } },
+  { key: "server", svg: <ServerChip />, style: { left: "6%", width: "130px", animationDelay: "17.4s", animationDuration: "22.8s" } },
   // Visibility set
-  { key: "search", svg: <SearchChip />, style: { left: "4%", width: "170px", animationDelay: "3.5s", animationDuration: "32.2s" } },
-  { key: "chat", svg: <ChatChipDark />, style: { left: "52%", width: "150px", animationDelay: "9s", animationDuration: "27.7s" } },
-  { key: "rank", svg: <RankChip />, style: { left: "26%", width: "128px", animationDelay: "16s", animationDuration: "34.3s" } },
-  { key: "chart", svg: <ChartChip />, style: { left: "64%", width: "112px", animationDelay: "6.5s", animationDuration: "29.3s" } },
-  { key: "mail", svg: <MailChip />, style: { left: "14%", width: "98px", animationDelay: "12.5s", animationDuration: "25.1s" } },
-  { key: "pin", svg: <PinChipDark />, style: { left: "46%", width: "70px", animationDelay: "19.5s", animationDuration: "30.2s" } },
-  { key: "chart2", svg: <ChartChip />, style: { left: "70%", width: "96px", animationDelay: "17s", animationDuration: "35.2s" } },
-  { key: "rank2", svg: <RankChip />, style: { left: "8%", width: "104px", animationDelay: "24s", animationDuration: "28.6s" } },
+  { key: "search", svg: <SearchChip />, style: { left: "4%", width: "170px", animationDelay: "2.9s", animationDuration: "26.6s" } },
+  { key: "chat", svg: <ChatChipDark />, style: { left: "52%", width: "150px", animationDelay: "7.4s", animationDuration: "22.9s" } },
+  { key: "rank", svg: <RankChip />, style: { left: "26%", width: "128px", animationDelay: "13.3s", animationDuration: "28.3s" } },
+  { key: "chart", svg: <ChartChip />, style: { left: "64%", width: "112px", animationDelay: "5.4s", animationDuration: "24.1s" } },
+  { key: "mail", svg: <MailChip />, style: { left: "14%", width: "98px", animationDelay: "10.4s", animationDuration: "20.8s" } },
+  { key: "pin", svg: <PinChipDark />, style: { left: "46%", width: "70px", animationDelay: "16.1s", animationDuration: "24.9s" } },
+  { key: "chart2", svg: <ChartChip />, style: { left: "70%", width: "96px", animationDelay: "14s", animationDuration: "29s" } },
+  { key: "rank2", svg: <RankChip />, style: { left: "8%", width: "104px", animationDelay: "19.8s", animationDuration: "23.6s" } },
 ];
 
 // Top-level info for each sub-service under the two lanes (the one-line summaries

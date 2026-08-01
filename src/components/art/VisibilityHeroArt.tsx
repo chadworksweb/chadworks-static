@@ -103,15 +103,15 @@ export function PinChipDark() {
 
 // Scatter (constraint check in comments: left% x 360 + width <= 360).
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "search", svg: <SearchChip />, style: { left: "4%", width: "170px", animationDelay: "0s", animationDuration: "26.8s" } },   // 184/360
-  { key: "chat", svg: <ChatChipDark />, style: { left: "52%", width: "150px", animationDelay: "5s", animationDuration: "23.1s" } },  // 337/360
-  { key: "rank", svg: <RankChip />, style: { left: "26%", width: "128px", animationDelay: "11s", animationDuration: "28.6s" } },     // 222/360
-  { key: "chart", svg: <ChartChip />, style: { left: "64%", width: "112px", animationDelay: "2s", animationDuration: "24.4s" } },    // 342/360
-  { key: "mail", svg: <MailChip />, style: { left: "14%", width: "98px", animationDelay: "8s", animationDuration: "20.9s" } },       // 148/360
-  { key: "pin", svg: <PinChipDark />, style: { left: "46%", width: "70px", animationDelay: "15s", animationDuration: "25.2s" } },    // 236/360
-  { key: "search2", svg: <SearchChip />, style: { left: "38%", width: "120px", animationDelay: "19s", animationDuration: "21.7s" } }, // 257/360
-  { key: "chart2", svg: <ChartChip />, style: { left: "70%", width: "96px", animationDelay: "13s", animationDuration: "29.3s" } },   // 348/360
-  { key: "rank2", svg: <RankChip />, style: { left: "8%", width: "104px", animationDelay: "22s", animationDuration: "23.8s" } },     // 133/360
+  { key: "search", svg: <SearchChip />, style: { left: "4%", width: "170px", animationDelay: "0s", animationDuration: "22.1s" } },   // 184/360
+  { key: "chat", svg: <ChatChipDark />, style: { left: "52%", width: "150px", animationDelay: "4.1s", animationDuration: "19s" } },  // 337/360
+  { key: "rank", svg: <RankChip />, style: { left: "26%", width: "128px", animationDelay: "9.1s", animationDuration: "23.6s" } },     // 222/360
+  { key: "chart", svg: <ChartChip />, style: { left: "64%", width: "112px", animationDelay: "1.6s", animationDuration: "20.1s" } },    // 342/360
+  { key: "mail", svg: <MailChip />, style: { left: "14%", width: "98px", animationDelay: "6.6s", animationDuration: "17.3s" } },       // 148/360
+  { key: "pin", svg: <PinChipDark />, style: { left: "46%", width: "70px", animationDelay: "12.4s", animationDuration: "20.8s" } },    // 236/360
+  { key: "search2", svg: <SearchChip />, style: { left: "38%", width: "120px", animationDelay: "15.6s", animationDuration: "17.9s" } }, // 257/360
+  { key: "chart2", svg: <ChartChip />, style: { left: "70%", width: "96px", animationDelay: "10.8s", animationDuration: "24.1s" } },   // 348/360
+  { key: "rank2", svg: <RankChip />, style: { left: "8%", width: "104px", animationDelay: "18.1s", animationDuration: "19.6s" } },     // 133/360
 ];
 
 export function VisibilityHeroArt() {

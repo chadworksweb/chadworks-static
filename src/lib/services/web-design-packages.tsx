@@ -13,14 +13,14 @@ import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "scope", svg: <ScopeChip />, style: { left: "5%", width: "132px", animationDelay: "0s", animationDuration: "26.2s" } },     // 150/360
-  { key: "browser", svg: <BrowserChip />, style: { left: "40%", width: "160px", animationDelay: "5s", animationDuration: "22.4s" } }, // 304/360
-  { key: "tag", svg: <TagChip />, style: { left: "70%", width: "92px", animationDelay: "2s", animationDuration: "24.7s" } },         // 344/360
-  { key: "box", svg: <BoxChipDark />, style: { left: "22%", width: "90px", animationDelay: "9s", animationDuration: "28.1s" } },     // 169/360
-  { key: "layout", svg: <LayoutChip />, style: { left: "52%", width: "140px", animationDelay: "13s", animationDuration: "20.8s" } }, // 327/360
-  { key: "button", svg: <ButtonChip />, style: { left: "12%", width: "108px", animationDelay: "17s", animationDuration: "25.6s" } }, // 151/360
-  { key: "typedark", svg: <TypeChipDark />, style: { left: "62%", width: "92px", animationDelay: "20s", animationDuration: "23.4s" } }, // 315/360
-  { key: "tag2", svg: <TagChip />, style: { left: "32%", width: "76px", animationDelay: "23s", animationDuration: "27.7s" } },       // 191/360
+  { key: "scope", svg: <ScopeChip />, style: { left: "5%", width: "132px", animationDelay: "0s", animationDuration: "21.6s" } },     // 150/360
+  { key: "browser", svg: <BrowserChip />, style: { left: "40%", width: "160px", animationDelay: "4.1s", animationDuration: "18.5s" } }, // 304/360
+  { key: "tag", svg: <TagChip />, style: { left: "70%", width: "92px", animationDelay: "1.6s", animationDuration: "20.4s" } },         // 344/360
+  { key: "box", svg: <BoxChipDark />, style: { left: "22%", width: "90px", animationDelay: "7.4s", animationDuration: "23.1s" } },     // 169/360
+  { key: "layout", svg: <LayoutChip />, style: { left: "52%", width: "140px", animationDelay: "10.8s", animationDuration: "17.1s" } }, // 327/360
+  { key: "button", svg: <ButtonChip />, style: { left: "12%", width: "108px", animationDelay: "14s", animationDuration: "21.1s" } }, // 151/360
+  { key: "typedark", svg: <TypeChipDark />, style: { left: "62%", width: "92px", animationDelay: "16.5s", animationDuration: "19.3s" } }, // 315/360
+  { key: "tag2", svg: <TagChip />, style: { left: "32%", width: "76px", animationDelay: "19s", animationDuration: "22.9s" } },       // 191/360
 ];
 
 function PackagesHeroArt() {

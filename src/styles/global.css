@@ -1532,15 +1532,23 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
   height: auto;
   filter: drop-shadow(0 4px 11px rgba(36, 57, 137, 0.10));
 }
-/* pop in at the bottom (scale), ride up, fade out under the header by ~45%,
-   then stay off-screen the rest of the cycle so chips don't pile up. */
+/* pop in at the bottom (scale), ride up, fade out under the header.
+   The flight fills the WHOLE cycle on purpose. It used to land at 66% and then
+   idle off-screen for the last third; with every chip idle at once the art went
+   completely empty for several seconds and then restarted (Chad, 2026-08-01).
+   No dead tail means a chip is always in flight, so the field is perpetual.
+   Because the same duration now covers the whole rise instead of two thirds
+   of it, every inline chip duration AND delay was scaled in the same pass
+   (0.66 to hold the original pace, then 1.25 for the 20% slow-down Chad
+   asked for). Phase spread is preserved because delays scale with duration.
+   Any NEW chip set should be timed against these values, not the
+   pre-2026-08-01 ones. */
 @keyframes hero-rise {
   0%   { top: 100%; transform: scale(0.55); opacity: 0; }
-  3%   { opacity: 1; }
-  6%   { transform: scale(1.1); }
-  10%  { transform: scale(1); }
-  58%  { opacity: 1; }
-  66%  { top: -34%; opacity: 0; }
+  4%   { opacity: 1; }
+  9%   { transform: scale(1.1); }
+  15%  { transform: scale(1); }
+  88%  { opacity: 1; }
   100% { top: -34%; transform: scale(1); opacity: 0; }
 }
 @media (max-width: 900px) {
@@ -5740,7 +5748,23 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   letter-spacing: -0.02em;
   transition: transform 0.3s var(--ease-anticipate);
 }
-.cw-score__total-num.cw-score__pop { transform: scale(1.08); }
+/* The pop was a TRANSITION to scale(1.08) with a class that is never removed,
+   so the first tap enlarged the tally by 8% and left it there -- permanently
+   off its own metrics, and 3.5px wider than the untapped state. As a keyframe
+   it pulses and lands back on scale(1), and the reflow retrigger in toggle()
+   still re-fires it. Origin is the left edge so the number grows rightward
+   instead of drifting out of the column. */
+@keyframes cw-score-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.cw-score__total-num {
+  transform-origin: left center;
+}
+.cw-score__total-num.cw-score__pop {
+  animation: cw-score-pop 0.3s var(--ease-anticipate);
+}
 .cw-score__verdict {
   font-family: var(--font-display);
   font-weight: 500;
@@ -5757,6 +5781,177 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .cw-score__verdict[data-tier="max"]  { color: var(--win-green); font-weight: 600; }
 
 .cw-score__cta { margin-top: 1.6rem; }
+
+/* SPLIT layout (opt-in, <Scorecard layout="split">): label + title + blurb +
+   running tally + CTA hold the left column, the checklist sits beside them on
+   the right. The card gets wider than the stacked 820px because it now carries
+   two columns; under 900px it collapses back to the stacked order, which is
+   why the aside is a flex column rather than absolutely placed. */
+.cw-score--split {
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  column-gap: var(--space-lg);
+  align-items: start;
+}
+/* Left column rides along while the checklist scrolls past it. */
+.cw-score--split .cw-score__aside {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--space-sm));
+}
+/* Reset (ghost) and the full-audit CTA share the row, half each. */
+.cw-score--split .cw-score__cta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  margin-top: var(--cw-score-gap);
+}
+.cw-score--split .cw-score__cta-row .cw-score__cta { margin-top: 0; justify-content: center; }
+/* Ghost peer of the CTA: same pill box and display type, no fill. */
+.cw-score--split .cw-score__cta-row .cw-score__reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-secondary);
+}
+.cw-score--split .cw-score__cta-row .cw-score__reset:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+/* The tally's top rule reads as a divider under the title block here, and the
+   list has its own visual weight, so the aside keeps tighter vertical rhythm. */
+/* ONE rhythm down the left column: title -> blurb -> rule -> score -> rule ->
+   verdict -> buttons all sit --cw-score-gap apart, measured edge to edge. The
+   card was mixing 1rem, 1.2rem, and 1.4rem, which reads as drift (Chad, ss23). */
+.cw-score--split { --cw-score-gap: 1.2rem; }
+.cw-score--split .cw-score__header { margin-bottom: var(--cw-score-gap); }
+.cw-score--split .cw-score__title { font-size: 2.4rem; line-height: 1.1; }
+/* The score row must NOT resize as the verdict changes -- the sticky column
+   would shift under the reader mid-tap. Three lines of verdict is the fixed
+   budget: reserved here, and every verdict string is written to fit it. */
+.cw-score--split .cw-score__verdict {
+  min-height: calc(3 * 1.4em);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+/* The score row is fenced top AND bottom here (the stacked card only rules the
+   top, because nothing follows it inside the same column). */
+.cw-score--split .cw-score__total {
+  margin-top: var(--cw-score-gap);
+  padding-top: var(--cw-score-gap);
+  /* Score and verdict share ONE row, fenced top and bottom. Alignment is
+     flex-START, not the stacked card's baseline: the verdict box reserves
+     three lines and holds no text at score 0, and a baseline-aligned empty box
+     pushed the number down, reading as ghost space above it (Chad, ss22). */
+  align-items: flex-start;
+  gap: var(--cw-score-gap);
+  padding-bottom: var(--cw-score-gap);
+  border-bottom: 1px solid var(--border-subtle);
+}
+/* Share the row instead of demanding a 280px basis, which forced a wrap in a
+   column this narrow. */
+.cw-score--split .cw-score__verdict { flex: 1 1 0; min-width: 0; }
+/* The score block is shorter than the three-line verdict box beside it, so
+   flex-start left it hugging the top rule with a bigger gap under it than over
+   it. Centering it in the row evens both sides. */
+.cw-score--split .cw-score__total > div:first-child { align-self: center; }
+/* Pull the digits in toward the slash: the display face plus the literal
+   spaces around "/" left the tally reading as three separate characters. */
+.cw-score--split .cw-score__total-num {
+  word-spacing: -0.22em;
+  letter-spacing: -0.03em;
+  /* The display face ships PROPORTIONAL figures and no tnum table, so "1 / 8"
+     measured ~5px narrower than "0 / 8" and the slash walked on every tap.
+     tabular-nums is requested anyway (free if the face ever gains it); the
+     guarantee comes from the fixed slot below. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+/* 1ch is the advance of "0", the widest numeral in this face, but `ch` does not
+   include the tracking applied above -- at exactly 1ch the zero overflowed its
+   own slot by ~1.4px and only the 0 state drifted. 1.1ch clears the tracking,
+   so the slot width, the slash, and the total are identical for 0 through 8. */
+.cw-score__total-score {
+  display: inline-block;
+  min-width: 1.1ch;
+  text-align: right;
+}
+.cw-score__blurb {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+/* INVERTED right column: the checklist sits on the dark panel so the two halves
+   read as separate instruments. Every token the rows inherit from the light
+   card (row fill, check box, criterion text) is re-stated here rather than
+   filtered, so hover/checked states keep their own contrast. */
+.cw-score--split .cw-score__main {
+  background: var(--dark-bg);
+  border: 1px solid rgba(229, 210, 244, 0.16);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+}
+.cw-score--split .cw-score__main .cw-score__item {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(229, 210, 244, 0.18);
+  color: var(--dark-text);
+  box-shadow: none;
+}
+.cw-score--split .cw-score__main .cw-score__item:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(128, 84, 188, 0.75);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+.cw-score--split .cw-score__main .cw-score__item[data-on="1"] {
+  background: rgba(128, 84, 188, 0.28);
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.cw-score--split .cw-score__main .cw-score__check {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(229, 210, 244, 0.4);
+  box-shadow: none;
+}
+/* Checked = the box INVERTS against its dark panel: light fill, dark tick
+   (the glyph is stroke="currentColor", so `color` is the checkmark). */
+.cw-score--split .cw-score__main .cw-score__item[data-on="1"] .cw-score__check {
+  background: var(--dark-muted);
+  border-color: var(--dark-muted);
+  color: var(--dark-bg);
+  box-shadow: none;
+}
+.cw-score--split .cw-score__main .cw-score__criterion strong { color: var(--dark-text); }
+.cw-score--split .cw-score__main .cw-score__criterion small { color: var(--dark-muted); }
+@media (max-width: 900px) {
+  .cw-score--split {
+    width: min(820px, 100%);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "list"
+      "tally"
+      "cta";
+  }
+  /* Wrapper dissolves so its three children become grid items of the card and
+     the checklist can sit BETWEEN the title and the score. */
+  .cw-score--split .cw-score__aside { display: contents; }
+  .cw-score--split .cw-score__head    { grid-area: head; }
+  .cw-score--split .cw-score__main    { grid-area: list; margin-top: var(--space-md); }
+  .cw-score--split .cw-score__tally   { grid-area: tally; }
+  .cw-score--split .cw-score__cta-row { grid-area: cta; }
+}
 
 @media (max-width: 600px) {
   .cw-score { padding: 1.5rem 1.2rem; }

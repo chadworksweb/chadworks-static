@@ -21,14 +21,14 @@ import { TYPICAL_BAND, TYPICAL_BAND_DASH } from "@/lib/pricing";
 // septic web design: layout / speed / local / brand, with two inverted chips
 // (PinChipDark for the local-area play, PenChipDark for the craft).
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "layout", svg: <LayoutChip />, style: { left: "8%", width: "150px", animationDelay: "0s", animationDuration: "25.6s" } },
-  { key: "pin", svg: <PinChipDark />, style: { left: "50%", width: "150px", animationDelay: "5s", animationDuration: "23.8s" } },
-  { key: "bolt", svg: <BoltChip />, style: { left: "30%", width: "104px", animationDelay: "11s", animationDuration: "28.4s" } },
-  { key: "palette", svg: <PaletteChip />, style: { left: "70%", width: "92px", animationDelay: "2s", animationDuration: "24.2s" } },
-  { key: "pen", svg: <PenChipDark />, style: { left: "15%", width: "96px", animationDelay: "9s", animationDuration: "21.7s" } },
-  { key: "wheel", svg: <WheelChip />, style: { left: "44%", width: "104px", animationDelay: "15s", animationDuration: "27.1s" } },
-  { key: "layout2", svg: <LayoutChip />, style: { left: "62%", width: "100px", animationDelay: "19s", animationDuration: "22.5s" } },
-  { key: "bolt2", svg: <BoltChip />, style: { left: "10%", width: "72px", animationDelay: "23s", animationDuration: "29.4s" } },
+  { key: "layout", svg: <LayoutChip />, style: { left: "8%", width: "150px", animationDelay: "0s", animationDuration: "21.1s" } },
+  { key: "pin", svg: <PinChipDark />, style: { left: "50%", width: "150px", animationDelay: "4.1s", animationDuration: "19.6s" } },
+  { key: "bolt", svg: <BoltChip />, style: { left: "30%", width: "104px", animationDelay: "9.1s", animationDuration: "23.4s" } },
+  { key: "palette", svg: <PaletteChip />, style: { left: "70%", width: "92px", animationDelay: "1.6s", animationDuration: "20s" } },
+  { key: "pen", svg: <PenChipDark />, style: { left: "15%", width: "96px", animationDelay: "7.4s", animationDuration: "17.9s" } },
+  { key: "wheel", svg: <WheelChip />, style: { left: "44%", width: "104px", animationDelay: "12.4s", animationDuration: "22.4s" } },
+  { key: "layout2", svg: <LayoutChip />, style: { left: "62%", width: "100px", animationDelay: "15.6s", animationDuration: "18.6s" } },
+  { key: "bolt2", svg: <BoltChip />, style: { left: "10%", width: "72px", animationDelay: "19s", animationDuration: "24.3s" } },
 ];
 
 function SepticHeroArt() {

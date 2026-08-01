@@ -12,14 +12,14 @@ import { BASE, money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "terminal", svg: <TerminalChip />, style: { left: "5%", width: "120px", animationDelay: "0s", animationDuration: "26.4s" } }, // 138/360
-  { key: "bolt", svg: <BoltChip />, style: { left: "66%", width: "84px", animationDelay: "3s", animationDuration: "22.8s" } },        // 322/360
-  { key: "code", svg: <CodeChip />, style: { left: "30%", width: "132px", animationDelay: "9s", animationDuration: "28.3s" } },        // 240/360
-  { key: "shield", svg: <ShieldChipDark />, style: { left: "54%", width: "86px", animationDelay: "1s", animationDuration: "24.6s" } }, // 280/360
-  { key: "brackets", svg: <BracketsChip />, style: { left: "16%", width: "70px", animationDelay: "13s", animationDuration: "20.4s" } }, // 128/360
-  { key: "browser", svg: <BrowserChip />, style: { left: "40%", width: "150px", animationDelay: "16s", animationDuration: "27.2s" } }, // 294/360
-  { key: "bolt2", svg: <BoltChip />, style: { left: "76%", width: "64px", animationDelay: "20s", animationDuration: "23.6s" } },       // 338/360
-  { key: "terminal2", svg: <TerminalChip />, style: { left: "24%", width: "92px", animationDelay: "23s", animationDuration: "29.4s" } }, // 178/360
+  { key: "terminal", svg: <TerminalChip />, style: { left: "5%", width: "120px", animationDelay: "0s", animationDuration: "21.8s" } }, // 138/360
+  { key: "bolt", svg: <BoltChip />, style: { left: "66%", width: "84px", animationDelay: "2.5s", animationDuration: "18.8s" } },        // 322/360
+  { key: "code", svg: <CodeChip />, style: { left: "30%", width: "132px", animationDelay: "7.4s", animationDuration: "23.4s" } },        // 240/360
+  { key: "shield", svg: <ShieldChipDark />, style: { left: "54%", width: "86px", animationDelay: "0.9s", animationDuration: "20.3s" } }, // 280/360
+  { key: "brackets", svg: <BracketsChip />, style: { left: "16%", width: "70px", animationDelay: "10.8s", animationDuration: "16.9s" } }, // 128/360
+  { key: "browser", svg: <BrowserChip />, style: { left: "40%", width: "150px", animationDelay: "13.3s", animationDuration: "22.5s" } }, // 294/360
+  { key: "bolt2", svg: <BoltChip />, style: { left: "76%", width: "64px", animationDelay: "16.5s", animationDuration: "19.5s" } },       // 338/360
+  { key: "terminal2", svg: <TerminalChip />, style: { left: "24%", width: "92px", animationDelay: "19s", animationDuration: "24.3s" } }, // 178/360
 ];
 
 function StaticHeroArt() {

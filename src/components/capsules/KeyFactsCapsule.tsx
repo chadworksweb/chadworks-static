@@ -29,6 +29,9 @@ export function KeyFactsCapsule({
     <>
       <SectionShell
         full
+        // Anchor target for a hero CTA that moves the reader DOWN the page
+        // (heroCta with `arrow: "down"`) instead of out to the contact form.
+        id="key-facts"
         className={`svc-statements-intro${introClassName ? ` ${introClassName}` : ""}`}
       >
         <h2 className="svc-statements__heading">{heading ?? "At a glance"}</h2>

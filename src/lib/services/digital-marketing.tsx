@@ -13,14 +13,14 @@ import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
 const CHIPS: { key: string; svg: ReactNode; style: CSSProperties }[] = [
-  { key: "chart", svg: <ChartChip />, style: { left: "6%", width: "128px", animationDelay: "0s", animationDuration: "26.9s" } },     // 150/360
-  { key: "post", svg: <PostChipDark />, style: { left: "56%", width: "120px", animationDelay: "4s", animationDuration: "23.6s" } },  // 322/360
-  { key: "search", svg: <SearchChip />, style: { left: "28%", width: "150px", animationDelay: "9s", animationDuration: "28.4s" } },  // 251/360
-  { key: "mail", svg: <MailChip />, style: { left: "68%", width: "92px", animationDelay: "2s", animationDuration: "24.7s" } },       // 337/360
-  { key: "bolt", svg: <BoltChip />, style: { left: "18%", width: "72px", animationDelay: "13s", animationDuration: "21.5s" } },      // 137/360
-  { key: "chart2", svg: <ChartChip />, style: { left: "44%", width: "104px", animationDelay: "16s", animationDuration: "27.7s" } },  // 262/360
-  { key: "post2", svg: <PostChipDark />, style: { left: "10%", width: "88px", animationDelay: "20s", animationDuration: "22.4s" } }, // 124/360
-  { key: "mail2", svg: <MailChip />, style: { left: "74%", width: "70px", animationDelay: "23s", animationDuration: "29.2s" } },     // 336/360
+  { key: "chart", svg: <ChartChip />, style: { left: "6%", width: "128px", animationDelay: "0s", animationDuration: "22.3s" } },     // 150/360
+  { key: "post", svg: <PostChipDark />, style: { left: "56%", width: "120px", animationDelay: "3.3s", animationDuration: "19.5s" } },  // 322/360
+  { key: "search", svg: <SearchChip />, style: { left: "28%", width: "150px", animationDelay: "7.4s", animationDuration: "23.4s" } },  // 251/360
+  { key: "mail", svg: <MailChip />, style: { left: "68%", width: "92px", animationDelay: "1.6s", animationDuration: "20.4s" } },       // 337/360
+  { key: "bolt", svg: <BoltChip />, style: { left: "18%", width: "72px", animationDelay: "10.8s", animationDuration: "17.8s" } },      // 137/360
+  { key: "chart2", svg: <ChartChip />, style: { left: "44%", width: "104px", animationDelay: "13.3s", animationDuration: "22.9s" } },  // 262/360
+  { key: "post2", svg: <PostChipDark />, style: { left: "10%", width: "88px", animationDelay: "16.5s", animationDuration: "18.5s" } }, // 124/360
+  { key: "mail2", svg: <MailChip />, style: { left: "74%", width: "70px", animationDelay: "19s", animationDuration: "24.1s" } },     // 336/360
 ];
 
 function MarketingHeroArt() {
