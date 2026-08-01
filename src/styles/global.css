@@ -4255,6 +4255,13 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .svc-problem-art-section {
   background: var(--bg-base);
 }
+/* The split scorecard opens with its own heading, so the full section pad above
+   it doubled the air under the band before it. 15% of --section-pad-y (Chad,
+   2026-08-01). Scoped by :has() so the stacked problem-art pages (septic,
+   foundation, show-up-on-chatgpt) keep the standard rhythm. */
+.svc-problem-art-section:has(.cw-score--split) {
+  padding-top: calc(var(--section-pad-y) * 0.15);
+}
 .svc-problem-art { position: relative; }
 
 /* Testimonials -- social proof band (lavender) */

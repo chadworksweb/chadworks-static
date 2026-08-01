@@ -13,7 +13,7 @@ import { SearchChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
 import { PromptChip } from "@/components/art/AiSearchHeroArt";
 import { ShieldChipDark, GearChip } from "@/components/art/MoreChips";
 import { LaunchLink } from "@/components/LaunchLink";
-import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { AUDIT } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
@@ -204,10 +204,11 @@ export const aiVisibilityAudit: Service = {
 
   price: {
     heading: "What it costs, plainly",
-    figure: "One flat number",
-    figureSub: `Priced from ${HOURLY_RATE}, in writing before you commit`,
+    // One flat, one-time figure now (Chad, 2026-08-01), not a quote derived from
+    // the hourly rate. `AUDIT` is the same hub constant /faqs/ quotes.
+    figure: money(AUDIT),
     body:
-      `The audit is a fixed piece of work priced from my ${money(HOURLY)} hourly rate and quoted as one flat number before you commit. The number depends on the size of your site and your market, and it goes in writing first. No subscription hides inside it, and nothing renews.`,
+      "The audit is one flat fee, paid once. No subscription hides inside it, nothing renews, and the document is yours whether you ever hire me for the fixes or not.",
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}the audit might tell you things are
