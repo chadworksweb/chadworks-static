@@ -101,7 +101,8 @@ export default function VisionStrategyRoadmapPage() {
         // Real client sentences, verbatim and anonymized. The proof that the
         // method extracts rather than imposes.
         tiers: <VerbatimCapsule {...vsrVerbatim} scheme="inverted" />,
-        // proof: default ProofCapsule (it has been run, and delivered).
+        // proof: OFF sitewide since 2026-08-01 (see compose.tsx). The copy is
+        // still in this service's file if the section ever comes back.
         portfolio: <DeliverableCapsule {...vsrDeliverable} />,
         testimonials: null,
         made: null,

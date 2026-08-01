@@ -13,7 +13,7 @@ import { SearchChip, ChatChipDark } from "@/components/art/VisibilityHeroArt";
 import { PromptChip } from "@/components/art/AiSearchHeroArt";
 import { ShieldChipDark, GearChip } from "@/components/art/MoreChips";
 import { LaunchLink } from "@/components/LaunchLink";
-import { HOURLY, HOURLY_RATE } from "@/lib/pricing";
+import { AUDIT } from "@/lib/pricing";
 import { money } from "@/lib/package-builder";
 
 // Scatter constraint: left% x 360 + width <= 360 per chip.
@@ -113,7 +113,7 @@ export const aiVisibilityAudit: Service = {
     heading: "Most businesses are guessing about their visibility",
     subheading: "Don't leave it up to chance.",
     body:
-      "Owners hear that AI is answering their buyers now and feel behind, but nobody has shown them where they actually stand. The fix starts with a measurement, not a subscription.",
+      "Website owners of all kinds are hearing that their audience is now using AI to search and buy. Many are lost or oblivious to the severity of this reality. It's imperative that you know where you stand before you get too far behind.",
     more: {
       trigger: "What the audit actually measures",
       paragraphs: [
@@ -203,43 +203,57 @@ export const aiVisibilityAudit: Service = {
   // service yet (CWS-SERVICE-PAGE-CHECKLIST base 7; never invent quotes).
 
   price: {
-    heading: "What it costs, plainly",
-    figure: "One flat number",
-    figureSub: `Priced from ${HOURLY_RATE}, in writing before you commit`,
-    body:
-      `The audit is a fixed piece of work priced from my ${money(HOURLY)} hourly rate and quoted as one flat number before you commit. The number depends on the size of your site and your market, and it goes in writing first. No subscription hides inside it, and nothing renews.`,
+    heading: "What does an AI Visibility Audit Cost?",
+    // One flat, one-time figure now (Chad, 2026-08-01), not a quote derived from
+    // the hourly rate. `AUDIT` is the same hub constant /faqs/ quotes.
+    figure: money(AUDIT),
+    // The figure stays an interpolation, never a typed dollar amount --
+    // price-audit fails the build on a hand-typed chadworks price, and it
+    // reads comments too (this one used to trip it).
+    body: `The AI Search Visibility audit costs a one time fee of ${money(AUDIT)}.`,
     disclaimer: (
       <>
-        <strong>Straight up:</strong>{" "}the audit might tell you things are
-        mostly fine. When that happens you&apos;ll know exactly which two or
-        three fixes matter, and you won&apos;t need a retainer. That outcome
-        counts as a win, and it does happen.
+        <strong>Straight up:</strong>{" "}If your site is over 20 pages or you
+        are an already visible, highly exposed brand, this cost may increase.
       </>
     ),
   },
 
-  faqLead:
-    "The questions buyers ask about the audit, answered the way I'd answer them on a call.",
+  faqLead: "Frequently asked questions about my AI Visibility Audit",
   faqs: [
     {
       q: "What do I actually receive?",
-      a: "A scored, documented checklist: every check pass or fail with the why in plain English, and the fixes in order. It reads like a punch list, not a research paper.",
+      a: "You receive a PDF that details what was audited and where each audited element stands. Most are pass/fail. Some elements of the audit are nuanced.",
     },
     {
       q: "Is this an automated report?",
-      a: "No. Tools are involved, but every check gets read and judged against your actual market by me. Automated reports are the reason owners stopped trusting audits.",
+      a: "The process and report are not automated, but I use third-party and AI tools to assist.",
     },
     {
       q: "Do I have to hire you for the fixes?",
-      a: "No. The audit is yours, and it's written so any competent developer can act on it. Taking it in-house is the design, not a loophole.",
+      a: (
+        <>
+          No. The audit is yours, and it&apos;s written so any competent
+          developer can act on it. If you do want me to act on it, I will
+          develop a bespoke plan to address what you need at a flat rate, or
+          you can hire me on a monthly basis via my{" "}
+          <LaunchLink href="/ai-search-visibility/">
+            AI Search Visibility
+          </LaunchLink>{" "}
+          service.
+        </>
+      ),
+      // Schema mirror of the JSX above (see ServiceFaq.aText).
+      aText:
+        "No. The audit is yours, and it's written so any competent developer can act on it. If you do want me to act on it, I will develop a bespoke plan to address what you need at a flat rate, or you can hire me on a monthly basis via my AI Search Visibility service.",
     },
     {
-      q: "How is this different from a free SEO audit?",
-      a: "Free audits are lead magnets: automated and built to scare you toward a retainer. This one is paid and stands alone, so it doesn't expire when you say no thanks.",
+      q: "How is this different from a free audit?",
+      a: "Free audits are generally automated, which means no human ever looks at them and the scope of the audit itself is limited and generic. Some companies offer actual free audits, but chadworks does not.",
     },
     {
-      q: "How long does it take?",
-      a: "The timeline comes with the flat quote, and it's measured in days, not months. You'll know both numbers before you commit.",
+      q: "How long does the AI visibility audit take?",
+      a: "Your audit document will be delivered within 7 calendar days.",
     },
   ],
 
@@ -296,7 +310,13 @@ export const aiVisibilityAudit: Service = {
       "You'd rather pay for a measurement than guess with a subscription.",
     ],
     notFit: [
-      "You already know you want ongoing work. Start at AI Visibility and the audit comes with it.",
+      <>
+        You already know you want ongoing work. Hire me for{" "}
+        <LaunchLink href="/ai-search-visibility/">
+          AI Search Visibility
+        </LaunchLink>{" "}
+        and the audit comes with it.
+      </>,
       "You're after a free automated scan. Those exist, and they're worth what they cost.",
     ],
   },

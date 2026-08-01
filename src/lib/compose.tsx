@@ -129,7 +129,13 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     explainer: null,
     paths: s.paths ? <PathsCapsule paths={s.paths} /> : null,
     tiers: s.tiers ? <TiersCapsule tiers={s.tiers} /> : null,
-    proof: s.proof ? <ProofCapsule proof={s.proof} /> : null,
+    // "Proof, not promises" is OFF SITEWIDE (Chad, 2026-08-01). Killed at the
+    // slot, the same way /ai-search-visibility/ dropped it individually, so the
+    // 25 services keep their `proof` copy in their own files and turning the
+    // section back on is a one-line change here. A page that wants a proof
+    // block anyway passes `overrides.proof` (nothing does today); /about/ still
+    // renders ProofCapsule directly for its own "Notable Achievements".
+    proof: null,
     portfolio: s.portfolio ? (
       <PortfolioCapsule portfolio={s.portfolio} slug={s.slug} />
     ) : null,

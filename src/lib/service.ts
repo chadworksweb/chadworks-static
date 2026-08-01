@@ -194,7 +194,13 @@ export type ServiceProof = {
 export type ServiceFaq = {
   // Real question + self-contained answer (the chad-site FAQ method).
   q: string;
-  a: Writable;
+  // A plain string in almost every case. JSX is allowed for an answer that
+  // needs an inline link, and THEN `aText` is required: the FAQPage schema
+  // lifts this value into acceptedAnswer.text, and a JSX node would serialize
+  // an object into the structured data. Same split /faqs/ already runs.
+  a: Writable | ReactNode;
+  // Plain-text mirror of a JSX answer, for the schema only.
+  aText?: string;
 };
 
 export type ServicePath = {
@@ -387,9 +393,12 @@ export type Service = {
   qualification?: {                                                   // who it's for / not
     heading: string;
     fitLabel?: string;
-    fit: Writable[];
+    // Strings, or JSX for a line that carries an inline link. The capsule
+    // renders these through <W/>, which already takes a ReactNode; nothing
+    // lifts them into structured data, unlike the FAQ answers.
+    fit: (Writable | ReactNode)[];
     notLabel?: string;
-    notFit: Writable[];
+    notFit: (Writable | ReactNode)[];
   };
   assurance?: { heading: string; items: Writable[] };                 // risk reversal
   nextSteps?: { heading: string; steps: ServiceStep[] };              // what happens next
@@ -442,7 +451,14 @@ export function buildServiceJsonLd(s: Service) {
 // Only WRITTEN answers go into FAQPage schema. Returns null if none are
 // written yet (the template then skips emitting the FAQ JSON-LD entirely).
 export function buildFaqJsonLd(s: Service) {
-  const written = s.faqs.filter((f) => !isPrompt(f.a));
+  // Schema text is the string answer, or `aText` when the rendered answer is
+  // JSX. An answer that is neither (a Prompt, or JSX with no aText) is left OUT
+  // rather than stringified -- "[object Object]" in acceptedAnswer is exactly
+  // the kind of thing an assistant would quote back.
+  const written = s.faqs
+    .filter((f) => !isPrompt(f.a))
+    .map((f) => ({ q: f.q, text: typeof f.a === "string" ? f.a : f.aText }))
+    .filter((f): f is { q: string; text: string } => typeof f.text === "string");
   if (written.length === 0) return null;
   return {
     "@context": "https://schema.org",
@@ -450,7 +466,7 @@ export function buildFaqJsonLd(s: Service) {
     mainEntity: written.map((f) => ({
       "@type": "Question",
       name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a as string },
+      acceptedAnswer: { "@type": "Answer", text: f.text },
     })),
   };
 }
