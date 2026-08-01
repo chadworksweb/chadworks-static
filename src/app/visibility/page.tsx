@@ -24,65 +24,73 @@ const hub: HubConfig = {
   ),
   heroArt: <VisibilityHeroArt />,
   thesis: {
-    heading: "Want to be visible in this day and age?",
+    heading: "Want to be visible online in the AI era?",
     subheading: "Then you have to do it all.",
     paragraphs: [
       <>
-        The industry calls those SEO (search engine optimization) and GEO
-        (generative engine optimization), along with a few other acronyms for
-        the emerging work of getting a business shown on AI platforms.
-        I&apos;m skipping the jargon and collapsing all of it into one service.
+        Before AI, you could put in the work to show up on Google Search and
+        get somewhere. You could also build a following on social media and
+        convert from there. You could get lots of reviews on Google Maps and
+        show up there. Now, with AI assistants like ChatGPT taking over how
+        consumers find what they&apos;re looking for, you have to do it all.
       </>,
+      { heading: 'What does "do it all" mean?' },
       <>
-        Buyers don&apos;t just search anymore. They ask ChatGPT who to hire,
-        skim a Google page that now answers questions itself, and check that
-        your business looks alive before they reach out. Showing up in one
-        of those places and missing the others reads as not showing up.
+        Clients, customers and consumers don&apos;t just search Google anymore.
+        In fact, many are ditching Google&apos;s traditional search results
+        entirely in favor of the AI answers and leading AI assistants like
+        ChatGPT and Perplexity. These AI assistants use more rigorous methods
+        of ranking than Google search did, placing more weight on external
+        sources and consistency across platforms like social media, Reddit,
+        YouTube, press and directories.
       </>,
+      { heading: 'How can I "do it all?"' },
       <>
-        That&apos;s why AI visibility is the umbrella here, not an add-on.
-        Being quoted by AI assistants requires real SEO underneath. It
-        requires a social presence that exists and matches your business,
-        though not follower-chasing, which I don&apos;t sell. Each layer
-        pulls in the next, so the honest offer is the whole stack, retained
-        and maintained, by the same person who builds the sites it points to.
+        Well, it&apos;s not easy! Or fast. Or obvious. But it can be done,
+        especially with my help. The services on this page all contribute to
+        your overall visibility. The first step is having me complete an AI
+        Visibility Audit. From there, we&apos;ll be able to pinpoint exactly
+        where to start to increase your overall visibility online, leading to
+        more leads, sales or sign ups, depending on what your goals are.{" "}
+        <a href="#contact">Contact me</a> to start a conversation about your
+        online visibility.
       </>,
     ],
   },
   lanes: [
     {
       label: "AI Search Visibility",
-      detail: "The umbrella, sold as an ongoing service: be found and quoted by the AI assistants people now ask, with the SEO and presence work that requires.",
+      detail: "A package of services that help you get found on AI search assistants like ChatGPT and Perplexity for a flat monthly rate.",
       href: "/ai-search-visibility/",
     },
     {
       label: "AI Visibility Audit",
-      detail: "The one-time version: where you show up today, where you don't, and exactly what it would take. Yours to act on with anyone.",
+      detail: "A one-time deep dive into the state of your brand's visibility, including on-site content and technical issues, and off-site signals. Delivered as an actionable report document.",
       href: "/ai-visibility-audit/",
     },
     {
       label: "SEO",
-      detail: "The classic discipline, still real: ranking in search for the phrases your buyers actually type.",
+      detail: "Traditional search engine optimization service that helps you rank higher on Google. Separate from but a foundation of AI search visibility.",
       href: "/seo/",
     },
     {
       label: "Digital Marketing",
-      detail: "The broad sweep: the channels, the strategy, and the straight answer on which ones your business actually needs.",
+      detail: "Consulting service to determine what marketing channels you actually need to meet your brand or business goals online. May be followed up with bespoke execution.",
       href: "/digital-marketing/",
     },
     {
       label: "Email Marketing",
-      detail: "The channel you own: the list, the sends, and the setup that doesn't land in spam.",
+      detail: "The long-running champ of digital marketing channels with the highest ROI. I'll help you build your email list and market directly to them.",
       href: "/email-marketing/",
     },
     {
       label: "Show Up on ChatGPT",
-      detail: "The specific question everyone suddenly has, answered: how a business gets recommended by AI assistants.",
+      detail: "Detailed and interactive explainer page of what goes into showing up on ChatGPT.",
       href: "/show-up-on-chatgpt/",
     },
     {
       label: "Advertising on ChatGPT",
-      detail: "The other half of that question: what paid placement in AI assistants is, and what's actually worth buying.",
+      detail: "Informative and interactive page about paid advertising on ChatGPT.",
       href: "/advertising-on-chatgpt/",
     },
   ],

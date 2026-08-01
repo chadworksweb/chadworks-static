@@ -788,6 +788,15 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* non-fill headings on dark stay solid + light */
 .svc-dark .svc-block__heading:not(.svc-fill) { color: var(--dark-text); }
 .svc-dark .svc-block__subheading { color: var(--dark-muted); }
+/* Prose links on a dark band: the standard purple sinks into the navy, so the
+   text goes lavender and the hover wipe comes in white. Same swap the dark FAQ
+   band makes -- see .svc-faq-section--dark .svc-prose p a. */
+.svc-dark .svc-block__body a {
+  color: var(--dark-muted);
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(rgba(229, 210, 244, 0.35), rgba(229, 210, 244, 0.35));
+}
 /* scroll-fill heading -- light fill variant for dark backgrounds */
 .svc-dark .svc-fill {
   background-image: linear-gradient(90deg,
@@ -1912,6 +1921,17 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
   max-width: var(--measure-prose);
   margin-top: calc(var(--space-md) * -0.5);   /* pull up toward the h2 */
   margin-bottom: var(--space-sm);
+}
+/* Same heading used as a BREAK inside a body stack (HubTemplate thesis), where
+   the pull-up above lands it on the last line of the paragraph before it. */
+.svc-block__subheading--break { margin-top: var(--space-md); }
+/* Rule under the heading that the descenders cut through (skip-ink). */
+.svc-block__subheading--rule {
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
 }
 /* Opt-in scroll-fill wipe. Default 0% = filled/readable for no-JS + reduced motion. */
 .svc-fill {

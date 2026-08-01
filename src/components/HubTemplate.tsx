@@ -8,7 +8,7 @@
 // =====================================================================
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { isValidElement, type ReactNode } from "react";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
 import type { LeadFormConfig } from "@/lib/forms";
@@ -33,9 +33,23 @@ export interface HubConfig {
   lanesHeading?: string;
   lanesIntro?: string;
   lanes: HubLane[];
-  thesis?: { heading: string; subheading?: string; paragraphs: ReactNode[] };
+  // A thesis body is paragraphs, with an optional mid-section h3 written as
+  // { heading: "..." } wherever a break is wanted.
+  thesis?: {
+    heading: string;
+    subheading?: string;
+    paragraphs: ThesisBlock[];
+  };
   cta: { heading: string; body: string };
   form: LeadFormConfig;
+}
+
+export type ThesisBlock = ReactNode | { heading: string };
+
+function isThesisHeading(b: ThesisBlock): b is { heading: string } {
+  return (
+    typeof b === "object" && b !== null && !isValidElement(b) && "heading" in b
+  );
 }
 
 const LANE_COLORS = ["#243989", "#8054bc", "#4a6b6e", "#d4a574"];
@@ -179,11 +193,22 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
         <section className="section full svc-block svc-dark reveal">
           <h2 className="svc-block__heading">{hub.thesis.heading}</h2>
           {hub.thesis.subheading && (
-            <h3 className="svc-block__subheading">{hub.thesis.subheading}</h3>
+            <h3 className="svc-block__subheading svc-block__subheading--rule">
+              {hub.thesis.subheading}
+            </h3>
           )}
-          {hub.thesis.paragraphs.map((p, i) => (
-            <p key={i} className="svc-block__body measure-prose">{p}</p>
-          ))}
+          {hub.thesis.paragraphs.map((p, i) =>
+            isThesisHeading(p) ? (
+              <h3
+                key={i}
+                className="svc-block__subheading svc-block__subheading--break svc-block__subheading--rule"
+              >
+                {p.heading}
+              </h3>
+            ) : (
+              <p key={i} className="svc-block__body measure-prose">{p}</p>
+            )
+          )}
         </section>
       )}
 
