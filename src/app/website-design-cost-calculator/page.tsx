@@ -900,10 +900,19 @@ export default function WebsiteDesignCostCalculatorPage() {
                   `data-mark` lets CSS size a thin glyph up to match the ink of
                   a heavy one without special-casing the markup. */}
               <dt className="rates-ledger__label">
-                <a href={row.href} rel="nofollow noopener" target="_blank">
-                  {row.who}
-                </a>
-                . <span className="rates-ledger__label-note">{row.note}</span>
+                {/* The name and its full stop are wrapped together so the phone
+                    breakpoint can promote them to their own line. The period was
+                    a bare text node before, and going block on the anchor alone
+                    would have stranded it at the head of the note (Chad,
+                    2026-08-05). The span is inline by default, so the desktop
+                    reading is byte-for-byte what it was. */}
+                <span className="rates-ledger__label-who">
+                  <a href={row.href} rel="nofollow noopener" target="_blank">
+                    {row.who}
+                  </a>
+                  .
+                </span>{" "}
+                <span className="rates-ledger__label-note">{row.note}</span>
               </dt>
               <dd className="rates-ledger__num">
                 <span

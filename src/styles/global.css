@@ -7005,6 +7005,22 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    answering a line of text, so it centers instead. Scoped: every other ledger
    on the site still wants the baseline. */
 #difference .rates-ledger__row { align-items: center; }
+/* A SHARED BREAK COLUMN for the five notes (Chad, ss9, 2026-08-05).
+   BALANCE IS THE WRONG ALGORITHM HERE and that is the whole point of this rule.
+   Every label is a `dt`, so rule 12 at line 250 hands it `text-wrap: balance`,
+   which EVENS the lines by minimising the longest one. That is right for a
+   heading and wrong for a column of notes: each note balances against its own
+   length, so a short note breaks early, a long one breaks late, and the right
+   edges never agree. Capping the measure does not fix it either. Once balance
+   spills to a third line it shortens every line to do it, so the cap can push
+   the text in but can never push it back out.
+   `pretty` fills the measure instead and only guards the last line against a
+   single orphaned word, which is what rule 12 asks for in its own wording. All
+   five notes now break at the same column and the ragged edge reads as one. */
+#difference .rates-ledger__label {
+  max-width: 53ch;
+  text-wrap: pretty;
+}
 
 .rates-ledger__num {
   margin: 0;
@@ -7127,6 +7143,29 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
      its own thing (Chad, 2026-07-22). */
   .rates-ledger__row { grid-template-columns: 1fr; row-gap: 25px; }
   .rates-ledger__num { justify-self: start; }
+  /* Stacked, the row's own bottom padding is doing a different job than it does
+     side by side. In two columns the note and the tag sit apart horizontally and
+     1.4rem is enough to part one row from the next. Stacked, the tag is the LAST
+     thing in the row and the next row's note follows directly under it, so at
+     the same padding the tag reads as though it belongs to what comes after it.
+     The extra bottom padding is what keeps each tag attached to the note above
+     it (Chad, 2026-08-05). */
+  .rates-ledger__row { padding-bottom: 2.6rem; }
+  /* The name gets its own line on a phone (Chad, 2026-08-05). At this width the
+     note runs several lines whatever we do, so a name sitting inline just reads
+     as the first few words of the sentence and stops being the thing you scan.
+     Block promotes it back to a label. `text-wrap` is left alone: this span is
+     one short phrase and has nothing to balance. */
+  #difference .rates-ledger__label-who { display: block; }
+  /* The tag has to sit UNDER the label on a phone (Chad, 2026-08-05). Both
+     clamps bottom out at 1.25rem by this width, so the two are the same computed
+     size, but the tag is 600-weight mono against a 500-weight display face and
+     mono sets wide, so it reads as the biggest thing in the cell and outranks
+     the name it is describing. Dropping it restores the order. Scoped to this
+     section: the rate explainer's ledger carries real figures in that slot and
+     wants them loud. The watermark is sized in `em`, so it follows this down on
+     its own and the tag keeps sitting in the middle of its glyph. */
+  #difference .rates-ledger__num { font-size: 1rem; }
 }
 
 /* Minutely-rate explainer -- repurposes the FAQ inverted band. The left sticky
