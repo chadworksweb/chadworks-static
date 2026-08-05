@@ -539,6 +539,23 @@ export const COMPONENTS: ComponentRow[] = [
 // criticism is the inaccurate one. Re-read the BEHAVIOUR here, not just the
 // figures. websitecostcalculator.app (still 2018 averages) and Pronto (still
 // "$2,000 - $10,000" on a 1-6 page brochure site) both re-confirmed unchanged.
+//
+// Re-verified 2026-08-05 during the calc backlink run. All four existing rows
+// re-confirmed. Brantley Sites ADDED, and it is a different KIND of row from the
+// other four, which is the reason it earns a slot. The others all fail by
+// refusing to give a real number. Brantley gives one, ungated, and still cannot
+// answer, because the figure is pre-baked per business type and never touches
+// your scope. That makes it the foil for this page's PRIMARY argument (a scope
+// you build and watch priced in real time) rather than for the secondary
+// no-gate argument, which Brantley actually matches us on. Naming it costs us a
+// little of the ungated claim and buys a much sharper contrast. Chad's call.
+//
+// DELIBERATELY LEFT OUT: websitecostcalculator.io (a Softeko product, low/high
+// columns, no methodology, every price renders $0.00 in the static HTML). It is
+// a duplicate of the averaged/opaque failure mode the .app row already covers,
+// so it would add a row without adding an argument. This list is an ARGUMENT,
+// not a census of competitors. Fourteen more were logged in the quest doc's
+// skip list on 2026-08-05 and none of them belong here either.
 // ---------------------------------------------------------------------
 // `mark` is the oversized glyph the page paints BEHIND the tag as a watermark:
 // a drawn shorthand for the failure mode (X blocked, ~ approximate, [ ] a gap
@@ -580,5 +597,12 @@ export const CALCULATORS: CalculatorRow[] = [
     mark: "[ ]",
     note: "Quotes a range so wide, $2,000 to $10,000 on a brochure site, that it defers the real answer to a phone call.",
     href: "https://www.prontomarketing.com/website-cost-calculator/",
+  },
+  {
+    who: "Brantley Sites",
+    tag: "Pre-baked",
+    mark: "[ ]",
+    note: "Assumes all websites in the same industry share the same baseline. Range is bucketed by business type rather than built from your scope.",
+    href: "https://brantleysites.com/website-cost-calculator/",
   },
 ];
