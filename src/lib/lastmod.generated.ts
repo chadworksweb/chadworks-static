@@ -9,7 +9,7 @@
 // it without pulling filesystem access into the Next build graph -- see the
 // header of scripts/build-lastmod.mjs for what that cost the first time.
 
-export const BUILD_DATE = "2026-08-01";
+export const BUILD_DATE = "2026-08-05";
 
 export const ROUTE_DATES: Record<string, string> = {
   "/": "2026-08-01",
@@ -25,6 +25,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/ecommerce/": "2026-08-01",
   "/email-marketing/": "2026-08-01",
   "/essays/": "2026-07-24",
+  "/essays/ai-gen-sites-making-ui-ux-a-premium/": "2026-08-05",
   "/essays/chad-lewine-worlds-combine/": "2026-07-27",
   "/essays/is-your-agency-ripping-you-off/": "2026-07-27",
   "/essays/rebirth-of-chadworks-wondrous-internet/": "2026-07-27",
@@ -37,7 +38,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/seo/": "2026-08-01",
   "/shapecap/": "2026-07-20",
   "/shopify/": "2026-08-01",
-  "/show-up-on-chatgpt/": "2026-07-30",
+  "/show-up-on-chatgpt/": "2026-08-01",
   "/showroom/": "2026-07-28",
   "/showroom/rising-compass/": "2026-07-28",
   "/switch/gmail-to-workspace/": "2026-07-23",
@@ -59,7 +60,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/web-design/": "2026-07-24",
   "/web-development/": "2026-07-24",
   "/web-hosting/": "2026-07-11",
-  "/website-design-cost-calculator/": "2026-07-28",
+  "/website-design-cost-calculator/": "2026-08-01",
   "/website-design-for-bands-musicians/": "2026-07-23",
   "/website-design-for-foundation-repair/": "2026-07-24",
   "/website-design-for-septic-services/": "2026-08-01",
