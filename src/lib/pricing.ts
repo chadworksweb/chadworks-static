@@ -551,7 +551,7 @@ export const COMPONENTS: ComponentRow[] = [
 // little of the ungated claim and buys a much sharper contrast. Chad's call.
 //
 // DELIBERATELY LEFT OUT: websitecostcalculator.io (a Softeko product, low/high
-// columns, no methodology, every price renders $0.00 in the static HTML). It is
+// columns, no methodology, every price renders as zero in the static HTML). It is
 // a duplicate of the averaged/opaque failure mode the .app row already covers,
 // so it would add a row without adding an argument. This list is an ARGUMENT,
 // not a census of competitors. Fourteen more were logged in the quest doc's
