@@ -1466,6 +1466,21 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
 /* Same glyph, quarter turn: a CTA that jumps to the next section on the page
    rather than navigating away. */
 .svc-btn__arrow--down { transform: rotate(90deg); }
+/* GHOST -- the secondary button. Same pill, same diagonal wipe, same arrow
+   mechanics; only the resting surface changes, from the filled lavender to an
+   outline. It exists so a hero can carry two CTAs without them competing: the
+   filled one is the page's own next step, the ghost one leaves the page.
+   Inherits ::before untouched, so on hover it fills exactly like the primary
+   and the two read as one family. */
+.svc-btn--ghost {
+  background: transparent;
+  border-color: var(--btn-bg);
+  color: var(--btn-text);
+}
+/* The border would otherwise stay lavender under the filled wipe and ring the
+   button in a lighter edge mid-hover. */
+.svc-btn--ghost:hover { border-color: transparent; }
+
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     .svc-btn::before { transition: none; }
@@ -1627,7 +1642,17 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    margins, so the gap between stacked lede paragraphs is set here. */
 .svc-lede > p + p { margin-top: var(--space-sm); }
 
-.svc-hero__cta { margin-top: var(--space-lg); }
+/* Holds one or two buttons. Flex + gap so a hero carrying a primary and a ghost
+   spaces them properly instead of relying on inline whitespace; wraps to a
+   stack on narrow screens rather than shrinking the pills. A single-button hero
+   is unchanged, an inline-flex pill sitting at the start of the row. */
+.svc-hero__cta {
+  margin-top: var(--space-lg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
 
 /* Key facts band (lavender full-width) */
 /* Key facts -- luxury statement panels (each fact its own full-width band). */
@@ -2087,6 +2112,15 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    lede. `--lead` keeps the first paragraph at lead size and drops the rest to
    plain body copy; `--plain` sets the whole block to body size. */
 .svc-prose--lead > p + p { font-size: var(--text-base); }
+/* LEDE LEADING, matched sitewide (Chad, 2026-08-06). The hero lede runs at
+   --leading-snug and every other lede ran at --leading-body, so the same
+   sentence set looser the moment it left the hero. A lede is a short display
+   statement, not reading copy, and it wants the tighter leading. This is the
+   lede ROLE only: the paragraph that keeps lede size in a --lead block, plus
+   the two hand-named __lede classes below. Body copy at lede size
+   (.svc-prose, .svc-block__body) is deliberately NOT touched -- those are
+   paragraphs to read, and tightening them would restyle every page. */
+.svc-prose--lead > p:first-child { line-height: var(--leading-snug); }
 .svc-prose--plain > * { font-size: var(--text-base); }
 
 /* --- Section kicker: the mono .eyebrow used as a per-section label. The reset
@@ -7307,6 +7341,103 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 .svc-faq-section--dark .cw-rate-explainer__note a:hover { color: #fff; }
 
 /* =====================================================================
+   COST GUIDE (/how-much-does-a-website-cost/) -- scoped adjustments only.
+   ===================================================================== */
+
+/* The answer section sits directly beneath the hero, so the hero's bottom
+   padding and this section's top padding stack into one oversized gap and the
+   lede loses its connection to the answer that continues it. Top padding cut to
+   15% of the section rhythm (Chad, 2026-08-06). TOP ONLY: the bottom keeps the
+   standard rhythm, because the section below it is a normal sibling and needs
+   the usual separation. Scoped to the class so `.section` stays untouched. */
+.cost-guide-answer {
+  padding-top: calc(var(--section-pad-y) * 0.15);
+}
+
+/* Jump targets on this page. The header is fixed, so an anchor without
+   scroll-margin lands with its heading tucked underneath it. #worked-examples
+   is included because it had the same bug and is the same one-line fix. */
+#what-goes-into-the-cost,
+#worked-examples {
+  scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+}
+
+/* Copy left, portrait right, bottom-aligned. A FLEX ROW rather than a float,
+   because a float can only align to the top of its line box and the portrait
+   has to sit on the CTA regardless of how tall the copy runs. */
+.cost-guide-answer .svc-prose {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+.cost-guide-answer .svc-prose > p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+/* The negative bottom margin is the whole trick: it equals the CTA's own
+   margin-top, so the portrait reaches down through that gap and its bottom edge
+   lands exactly on the box. The copy keeps its breathing room above the box;
+   only the picture crosses into it. Change one of these two values and the
+   other has to move with it. */
+.cost-guide-portrait {
+  flex: 0 0 auto;
+  width: clamp(190px, 32%, 340px);
+  height: auto;
+  margin: 0 0 calc(var(--space-lg) * -1);
+  align-self: flex-end;
+}
+
+/* Under 700px a third of the column is too narrow to read a person in, and the
+   copy beside it wraps to two or three words a line. Stack instead, copy first,
+   and drop the overlap so nothing collides with the box. */
+@media (max-width: 700px) {
+  .cost-guide-answer .svc-prose {
+    display: block;
+  }
+  .cost-guide-portrait {
+    display: block;
+    width: min(62%, 260px);
+    margin: var(--space-md) 0 0;
+  }
+}
+
+/* Boxed handoff to the calculator, on its own full-width row under the opening
+   answer. INVERTED: the deep indigo card rather than the light .panel glass, so
+   it reads as a band break in a light section instead of one more card. Same
+   inversion the hero chip sets use (design-system rule 13), and the same indigo
+   as the dark FAQ bands, so it is not a new colour.
+
+   The standard lavender pill already sits on dark bands elsewhere with no
+   override, so the button needs no dark variant. */
+.cost-guide-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-lg);
+  margin-top: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--dark-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 14px 40px rgba(36, 57, 137, 0.18);
+}
+.cost-guide-cta__text {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: #ffffff;
+  margin: 0;
+  text-wrap: pretty;
+}
+@media (max-width: 620px) {
+  .cost-guide-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* =====================================================================
    FAQS PAGE -- scoped adjustments only. The four groups reuse the
    svc-faq layout (sticky theme column + accordion) and the
    svc-faq-section / --dark bands; the only new piece is the numbered
@@ -7518,7 +7649,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   margin-bottom: var(--space-xs);
 }
 .cw-wfcam-intro__heading { font-size: var(--text-2xl); margin: 0 0 var(--space-sm); }
-.cw-wfcam-intro__lede { font-size: var(--text-lg); line-height: var(--leading-body); color: var(--text-secondary); margin: 0; }
+.cw-wfcam-intro__lede { font-size: var(--text-lg); line-height: var(--leading-snug); color: var(--text-secondary); margin: 0; }
 
 .cw-wfcam {
   position: relative;
@@ -9012,7 +9143,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 }
 .cw-port-feat__lede {
   font-size: var(--text-lg);
-  line-height: var(--leading-body);
+  line-height: var(--leading-snug);
   color: var(--text-secondary);
   max-width: 46ch;
 }

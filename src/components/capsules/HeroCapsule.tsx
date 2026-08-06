@@ -34,6 +34,9 @@ export type HeroCapsuleProps = {
   answer?: ReactNode | Prompted;
   heroArt?: ReactNode;
   cta?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
+  // Optional SECOND cta, rendered as the ghost/outline button beside the first.
+  // For heroes that need both an on-page jump and a link off the page.
+  ctaSecondary?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
   // standalone overrides
   crumbs?: Crumb[];
   lede?: ReactNode;
@@ -51,6 +54,7 @@ export function HeroCapsule({
   answer,
   heroArt,
   cta,
+  ctaSecondary,
   crumbs,
   lede,
   titleReveal,
@@ -107,6 +111,14 @@ export function HeroCapsule({
       {cta && (
         <div className="svc-hero__cta">
           <CtaButton href={cta.href} label={cta.buttonLabel} arrow={cta.arrow} />
+          {ctaSecondary && (
+            <CtaButton
+              href={ctaSecondary.href}
+              label={ctaSecondary.buttonLabel}
+              arrow={ctaSecondary.arrow}
+              variant="ghost"
+            />
+          )}
         </div>
       )}
     </SectionShell>

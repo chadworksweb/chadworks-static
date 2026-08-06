@@ -60,7 +60,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/web-design/": "2026-07-24",
   "/web-development/": "2026-07-24",
   "/web-hosting/": "2026-07-11",
-  "/website-design-cost-calculator/": "2026-08-01",
+  "/website-design-cost-calculator/": "2026-08-05",
   "/website-design-for-bands-musicians/": "2026-07-23",
   "/website-design-for-foundation-repair/": "2026-07-24",
   "/website-design-for-septic-services/": "2026-08-01",

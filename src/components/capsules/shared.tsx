@@ -63,13 +63,19 @@ export function CtaButton({
   href,
   label,
   arrow = "right",
+  variant = "solid",
 }: {
   href: string;
   label: string;
   arrow?: "right" | "down";
+  // "ghost" is the secondary/outline treatment; same pill and hover wipe.
+  variant?: "solid" | "ghost";
 }) {
   return (
-    <Link href={href} className="svc-btn">
+    <Link
+      href={href}
+      className={variant === "ghost" ? "svc-btn svc-btn--ghost" : "svc-btn"}
+    >
       <span className="svc-btn__label">{label}</span>
       <ArrowRight down={arrow === "down"} />
     </Link>

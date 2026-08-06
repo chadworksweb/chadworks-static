@@ -34,7 +34,9 @@ import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { HeroCapsule } from "@/components/capsules/HeroCapsule";
+import { CostHeroArt } from "@/components/art/CostHeroArt";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { CtaButton } from "@/components/capsules/shared";
 import {
   BASE,
   PARAMS,
@@ -54,6 +56,8 @@ import {
   DOMAIN_YEARLY_LOW,
   COMPONENTS,
   EXAMPLES,
+  HIGH,
+  LOW,
   MARKET,
   MINUTELY,
   WORDPRESS_CARE,
@@ -345,10 +349,11 @@ export default function HowMuchDoesAWebsiteCostPage() {
     <PageComposer jsonLd={[breadcrumbJsonLd, webPageJsonLd]}>
       {/* Standard hero: breadcrumb + eyebrow + gradient H1 + answer-first lede
           + CTA to the tool, matching /rates/ and /faqs/. The lede is the page's
-          verbatim opening sentence; the rest of the opener runs in the content
-          section right below. */}
+          opening statement (Chad's copy, verbatim); the rest of the opener runs
+          in the content section right below. */}
       <HeroCapsule
         className="cost-guide-hero"
+        heroArt={<CostHeroArt />}
         crumbs={[
           { label: "Home", href: "/" },
           { label: "Websites", href: "/websites/" },
@@ -356,38 +361,60 @@ export default function HowMuchDoesAWebsiteCostPage() {
         ]}
         eyebrow="Real prices, not averages"
         title="How much does a website cost?"
-        lede="A website in 2026 costs anywhere from nothing to six figures, and that spread is the honest answer rather than a dodge."
-        cta={{ href: "/website-design-cost-calculator/", buttonLabel: "Price your project" }}
+        lede="The cost of a website in 2026 can be literally zero dollars plus a Claude subscription. But what you get for that might not be enough. This page outlines what a website costs for a professional to design and develop it for you."
+        cta={{
+          href: "#what-goes-into-the-cost",
+          buttonLabel: "Skip to the hard numbers",
+          arrow: "down",
+        }}
+        ctaSecondary={{
+          href: "/website-design-cost-calculator/",
+          buttonLabel: "Price your project",
+        }}
       />
 
       {/* The direct answer continues, number-first, because the query is a question. */}
-      <SectionShell className="svc-block">
-        <div className="svc-prose">
+      <SectionShell className="svc-block cost-guide-answer">
+        <div className="svc-prose svc-prose--lead">
+          {/* Chad's copy, verbatim. The floor reads through money(BASE) rather
+              than a typed figure so it cannot drift from the pricing hub the
+              rest of the page computes from. The two reach figures come from
+              the hub for the same reason. */}
           <p>
-            What you actually pay comes down to one question the guides tend to
-            bury: who builds it, and how much of it belongs to you when they are
-            done. Build it yourself on a template and you are paying little more
-            than a monthly subscription. Hire someone to design and code a site
-            you actually own and you are into the thousands, sometimes the tens
-            of thousands once an agency with a sales team and an office adds its
-            overhead on top. The common routes, and what each really runs, are
-            broken out just below.
+            <strong>Here&apos;s what a website costs:</strong> When chadworks
+            builds a website, it costs a minimum of {money(BASE)}{" "}
+            but easily reaches past {LOW} and often past {HIGH}. The price of a
+            website is also not entirely monetary. You pay with your time and the
+            type of experience you want to have as a client. Cheaper rates tend to
+            be more of a headache for you (the client) and might take longer or
+            have limitations. Higher rates typically reflect more flexibility in
+            the build, faster and/or smoother production processes and
+            concierge-level client experiences.
           </p>
-          <p>
-            So here is a real floor to stand on, not an average. These are my own
-            published numbers, computed by the same model behind my calculator. A
-            focused three page site is {money(BASE)}. A five page small business
-            site with a logo already in hand is {money(price(SMALL_BUSINESS))}. A
-            real store carrying a catalog and a payment path lands near{" "}
-            {money(price(STORE))}. Those are prices at one working studio, and the
-            rest of this page is what they are made of.
-          </p>
+          {/* Right column, bottom-aligned so the cutout stands ON the CTA box.
+              It comes AFTER the copy in the DOM so a screen reader and a phone
+              both get the answer before the picture. */}
+          <img
+            className="cost-guide-portrait"
+            src="/people/chad-cutout.webp"
+            alt="Chad Lewine, the person behind chadworks"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
-        <p className="svc-prose">
-          <Link href="/website-design-cost-calculator/">
-            Skip the reading and price your own project on the calculator.
-          </Link>
-        </p>
+        {/* Boxed handoff to the tool, replacing the plain text link that used to
+            sit here. Chad's copy. INVERTED: dark indigo card, so it does NOT
+            take the shared .panel glass, which is a light surface. Its own
+            row, full content width, under the opening answer. */}
+        <aside className="cost-guide-cta">
+          <p className="cost-guide-cta__text">
+            Want to know exactly what your website will cost?
+          </p>
+          <CtaButton
+            href="/website-design-cost-calculator/"
+            label="Try my Website Design Cost Calculator"
+          />
+        </aside>
       </SectionShell>
 
       {/* Cost by build method: the biggest single lever on the number. */}
@@ -499,8 +526,9 @@ export default function HowMuchDoesAWebsiteCostPage() {
         </div>
       </SectionShell>
 
-      {/* The component breakdown: a website is a few purchases, not one. */}
-      <SectionShell className="svc-block">
+      {/* The component breakdown: a website is a few purchases, not one.
+          Also the hero CTA's jump target ("Skip to the hard numbers"). */}
+      <SectionShell className="svc-block" id="what-goes-into-the-cost">
         <h2 className="svc-block__heading svc-fill">
           What actually goes into the cost
         </h2>
