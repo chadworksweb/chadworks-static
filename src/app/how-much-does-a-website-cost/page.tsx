@@ -361,7 +361,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
         ]}
         eyebrow="Real prices, not averages"
         title="How much does a website cost?"
-        lede="The cost of a website in 2026 can be literally zero dollars plus a Claude subscription. But what you get for that might not be enough. This page outlines what a website costs for a professional to design and develop it for you."
+        lede="The cost of a website in 2026 can be literally zero dollars plus a Claude subscription. However, what you get for that might not be enough. This page outlines what it costs to have a website professionally designed and developed for you."
         cta={{
           href: "#what-goes-into-the-cost",
           buttonLabel: "Skip to the hard numbers",
@@ -375,25 +375,32 @@ export default function HowMuchDoesAWebsiteCostPage() {
 
       {/* The direct answer continues, number-first, because the query is a question. */}
       <SectionShell className="svc-block cost-guide-answer">
-        <div className="svc-prose svc-prose--lead">
-          {/* Chad's copy, verbatim. The floor reads through money(BASE) rather
-              than a typed figure so it cannot drift from the pricing hub the
-              rest of the page computes from. The two reach figures come from
-              the hub for the same reason. */}
-          <p>
-            <strong>Here&apos;s what a website costs:</strong> When chadworks
-            builds a website, it costs a minimum of {money(BASE)}{" "}
-            but easily reaches past {LOW} and often past {HIGH}. The price of a
-            website is also not entirely monetary. You pay with your time and the
-            type of experience you want to have as a client. Cheaper rates tend to
-            be more of a headache for you (the client) and might take longer or
-            have limitations. Higher rates typically reflect more flexibility in
-            the build, faster and/or smoother production processes and
-            concierge-level client experiences.
-          </p>
-          {/* Right column, bottom-aligned so the cutout stands ON the CTA box.
-              It comes AFTER the copy in the DOM so a screen reader and a phone
-              both get the answer before the picture. */}
+        {/* Copy left, portrait right. The row is a plain wrapper so .svc-prose
+            keeps its own paragraph rhythm and its --lead sizing rule, both of
+            which only reach DIRECT children. */}
+        <div className="cost-guide-answer__row">
+          <div className="svc-prose svc-prose--lead">
+            {/* Chad's copy, verbatim. The floor reads through money(BASE) rather
+                than a typed figure so it cannot drift from the pricing hub the
+                rest of the page computes from. The two reach figures come from
+                the hub for the same reason. */}
+            <p>
+              <strong>Here&apos;s what a website costs:</strong> When chadworks
+              builds a website, it costs a minimum of {money(BASE)}{" "}
+              but easily reaches past {LOW} and often past {HIGH}. The price of a
+              website is also not entirely monetary. You pay with your time and
+              the type of experience you want to have as a client.
+            </p>
+            <p>
+              Cheaper rates tend to be more of a headache for you (the client)
+              and might take longer or have limitations. Higher rates typically
+              reflect more flexibility in the build, faster and/or smoother
+              production processes and concierge-level client experiences.
+            </p>
+          </div>
+          {/* Bottom-aligned so the cutout stands ON the CTA box. It comes AFTER
+              the copy in the DOM so a screen reader and a phone both get the
+              answer before the picture. */}
           <img
             className="cost-guide-portrait"
             src="/people/chad-cutout.webp"

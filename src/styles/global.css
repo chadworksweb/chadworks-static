@@ -7354,6 +7354,14 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding-top: calc(var(--section-pad-y) * 0.15);
 }
 
+/* The hero lede's frosted panel, trimmed 100px off the shared prose measure so
+   the first line breaks after "subscription." rather than carrying "However,"
+   up with it (Chad, 2026-08-06). Scoped to this hero: --measure-prose is a
+   sitewide token and every other lede still reads at the full measure. */
+.cost-guide-hero .svc-lede {
+  max-width: calc(var(--measure-prose) - 100px);
+}
+
 /* Jump targets on this page. The header is fixed, so an anchor without
    scroll-margin lands with its heading tucked underneath it. #worked-examples
    is included because it had the same bug and is the same one-line fix. */
@@ -7364,16 +7372,18 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
 
 /* Copy left, portrait right, bottom-aligned. A FLEX ROW rather than a float,
    because a float can only align to the top of its line box and the portrait
-   has to sit on the CTA regardless of how tall the copy runs. */
-.cost-guide-answer .svc-prose {
+   has to sit on the CTA regardless of how tall the copy runs.
+   The flex lives on this ROW, not on .svc-prose: the prose block's paragraph
+   rhythm and its --lead sizing both select direct children, so making it the
+   flex container would turn every paragraph into its own column. */
+.cost-guide-answer__row {
   display: flex;
   align-items: flex-end;
   gap: var(--space-lg);
 }
-.cost-guide-answer .svc-prose > p {
+.cost-guide-answer__row > .svc-prose {
   flex: 1;
   min-width: 0;
-  margin: 0;
 }
 
 /* The negative bottom margin is the whole trick: it equals the CTA's own
@@ -7393,7 +7403,7 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    copy beside it wraps to two or three words a line. Stack instead, copy first,
    and drop the overlap so nothing collides with the box. */
 @media (max-width: 700px) {
-  .cost-guide-answer .svc-prose {
+  .cost-guide-answer__row {
     display: block;
   }
   .cost-guide-portrait {
