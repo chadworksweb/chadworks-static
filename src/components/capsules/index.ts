@@ -45,3 +45,8 @@ export { RuleCapsule } from "./RuleCapsule";
 export { SplitChecklistCapsule } from "./SplitChecklistCapsule";
 export { VerbatimCapsule } from "./VerbatimCapsule";
 export { DeliverableCapsule } from "./DeliverableCapsule";
+
+// The /about/ worldview block ("why nothing here looks like anything else").
+// Owns its own copy, like TenetsCapsule; page-specific by intent, exported here
+// so /about/ imports from one place with the rest of its capsules.
+export { WorldviewCapsule } from "./WorldviewCapsule";

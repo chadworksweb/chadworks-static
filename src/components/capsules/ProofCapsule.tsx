@@ -7,6 +7,7 @@ import type { Service } from "@/lib/service";
 import { stepColumns } from "@/lib/capsule";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
+import { AwardGlyph } from "@/components/AwardGlyph";
 
 export type ProofCapsuleProps = {
   proof: NonNullable<Service["proof"]>;
@@ -15,11 +16,15 @@ export type ProofCapsuleProps = {
   variant?: "achievements";
 };
 
+
 export function ProofCapsule({ proof, variant }: ProofCapsuleProps) {
   const isAch = variant === "achievements";
   return (
     <SectionShell className={"svc-block" + (isAch ? " cw-ach" : "")}>
-      <h2 className="svc-block__heading svc-fill">{proof.heading}</h2>
+      <h2 className="svc-block__heading svc-fill">
+        {proof.heading}
+        {isAch && <AwardGlyph />}
+      </h2>
       <ul
         className="svc-proof"
         style={

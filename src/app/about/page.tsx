@@ -17,10 +17,12 @@ import {
   ProofCapsule,
   AboutChadCapsule,
   TenetsCapsule,
+  WorldviewCapsule,
   FitCapsule,
   MainContactCapsule,
 } from "@/components/capsules";
 import ManifestoSection from "@/components/ManifestoSection";
+import { PixelDivider } from "@/components/PixelDivider";
 import { AboutHeroArt } from "@/components/art/AboutHeroArt";
 
 const PAGE_PATH = "/about/";
@@ -171,8 +173,22 @@ export default function AboutPage() {
       {/* THE STORY -- era timeline on the build-time band arc. */}
       <EraTimelineCapsule heading="chadworks historical timeline" eras={ERAS} />
 
+      {/* THE WORLDVIEW -- why THIS person is the one (Chad, 2026-08-06). Sits
+          between the timeline and the achievements: here is where I came from,
+          here is how I see it, and here is what that produced. The claim lands
+          before the evidence for it rather than after. Dark band by design.
+          NOTE it opts out of the scroll reveal -- see WorldviewCapsule.tsx, the
+          fixed layer behind its cutout depends on it. */}
+      <WorldviewCapsule />
+
       {/* PROOF -- concrete, linked, anonymized per the permission flags. */}
       <ProofCapsule proof={{ heading: "Notable Achievements", items: PROOF }} variant="achievements" />
+
+      {/* PIXEL DIVIDER -- the tall page-transition wipe as a scroll-digitized
+          band (Chad, 2026-08-06), same component the homepage and /web-design/
+          run. Must stay a DIRECT child of the page-shell grid: it bleeds via
+          `grid-column: full`, and wrapping it in anything loses that. */}
+      <PixelDivider />
 
       {/* THE TENETS -- moved here from /web-design/ (Chad, 2026-07-17): they
           describe how chadworks operates, not how a website gets designed.

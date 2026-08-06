@@ -94,6 +94,14 @@
   --win-green: #1f9d57;       /* the pinned win color (niche compare tables, rank checks) */
   --alert-red: #c0392b;       /* low-score verdict red (septic rubric)   */
 
+  /* Palest tint ramp, darkest (01) to lightest (04). Four steps walking the
+     lavender down to almost-white, for stepping a short run of sibling cards.
+     Kept at the very light end on purpose: this is shading, not colour. */
+  --tint-01: #e5d2f4;
+  --tint-02: #ece1f7;
+  --tint-03: #f3edfb;
+  --tint-04: #faf7fe;
+
   --border-subtle: rgba(36, 57, 137, 0.10);  /* hairline                 */
   --border-medium: rgba(36, 57, 137, 0.18);
 
@@ -3655,10 +3663,63 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   padding: clamp(var(--space-md), 2.4vw, var(--space-xl));
   border-radius: var(--radius);
   border: 1px solid var(--border-subtle);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.30));
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px -24px rgba(91, 57, 140, 0.45);
+}
+/* Stepped shading, card 01 darkest through card 04 lightest (Chad,
+   2026-08-06). The frosted translucent-white fill these carried is gone: it
+   read as one material behind four cards, and the point of the step is that the
+   run has a direction. Solid tints, so the backdrop-filter is dropped too --
+   there is nothing left to see through, and keeping it would cost a blur pass
+   per card for no visible result. */
+.cw-ach .svc-proof__item:nth-child(1) { background: var(--tint-01); }
+.cw-ach .svc-proof__item:nth-child(2) { background: var(--tint-02); }
+.cw-ach .svc-proof__item:nth-child(3) { background: var(--tint-03); }
+.cw-ach .svc-proof__item:nth-child(4) { background: var(--tint-04); }
+/* Any card past the fourth keeps the lightest step rather than falling back to
+   the bare panel colour, so an added item cannot break the ramp. */
+.cw-ach .svc-proof__item:nth-child(n + 5) { background: var(--tint-04); }
+
+/* Centred heading with the award ribbon beside it. Left as text-align rather
+   than a flex row on purpose: the heading carries `svc-fill`, whose gradient is
+   clipped to the text, and turning it into a flex container changes what that
+   background paints against. */
+.cw-ach .svc-block__heading {
+  text-align: center;
+}
+/* Sits to the RIGHT of the heading, optically centred on the text rather than
+   on the line box: an inline SVG sits on the baseline by default, which leaves
+   it hanging low against cap-height type. Shifting it up by half the gap
+   between the baseline and the middle of the glyphs lines its centre up with
+   the centre of the words. */
+/* THE AWARD RIBBON -- a masked box, not an icon element, so the heading's
+   scroll-fill gradient can paint through the ribbon shape and read as one
+   continuous wipe across the words and the glyph together.
+   DELIBERATELY has no `svc-fill` class and no background-size/position here:
+   both are written in pixels by AwardGlyph.tsx, which mirrors the heading's
+   gradient geometry so the ribbon is a continuation of the same sweep rather
+   than a second one running in parallel. Read that file before changing this.
+   The transition matches svc-fill's so the two stay in step frame to frame. */
+.cw-ach__award {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-left: 0.35em;
+  vertical-align: -0.08em;
+  background-repeat: no-repeat;
+  transition: background-position 0.12s linear;
+  -webkit-mask-image: var(--cw-award-mask);
+  mask-image: var(--cw-award-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+}
+:root {
+  /* Ribbon: a medal disc over crossed tails. Stroked, so the mask is the line
+     art itself and the gradient shows only along the strokes. */
+  --cw-award-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='9' r='6'/%3E%3Cpath d='M8.6 14.2 7 22l5-2.4L17 22l-1.6-7.8'/%3E%3C/svg%3E");
 }
 /* The shimmer IS the entrance -- no rise, no blur. Neutralize the shared
    .reveal motion; the card develops purely from the light sweeping across it. */
@@ -4454,18 +4515,21 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
   text-align: center;
   font-family: var(--font-display);
 }
-/* Opts OUT of the global `p a` treatment: this link sits on the periwinkle band,
-   where the global's purple text and teal trace would both be wrong against the
-   background. Keeps its own white underline instead. */
+/* KEEPS the global `p a` treatment and only recolours it (Chad, 2026-08-06).
+   It used to opt out entirely and draw its own static underline, which meant
+   this one link had different hover and focus behaviour from every other link
+   on the site. It sits inside a <p>, so it already matches the canonical
+   selector; all it ever needed was colour. The band is periwinkle, so the two
+   gradient layers go white instead of teal-on-purple, and everything else --
+   the trace growing from the left, the retract, the timing, the reduced-motion
+   opt-out, focus-visible -- comes from the house rule. Do NOT add
+   `text-decoration` here; the global draws the line as a background. */
 .svc-qual__more a {
   color: #fff;
-  background-image: none;
-  padding-bottom: 0;
-  text-decoration: underline;
-  text-underline-offset: 0.28em;
-  text-decoration-thickness: 1px;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.45));
 }
-.svc-qual__more a:hover { text-decoration-thickness: 2px; }
 .svc-qual__label {
   font-family: var(--font-mono);
   font-size: calc(var(--text-xs) * 1.5);
@@ -10873,6 +10937,249 @@ html.cw-motion-paused *::after {
 .cw-split__cta { margin-top: var(--space-lg); }
 @media (max-width: 900px) {
   .cw-split__row { grid-template-columns: 1fr; gap: var(--space-lg); }
+}
+
+/* ---- WORLDVIEW -- the /about/ "why nothing looks like anything else" --- */
+/* Runs on a dark band directly under the manifesto's pale frosted cloud, so
+   everything here is tuned for the inverted surface. The opening line borrows
+   the cw-rule treatment (large, left accent rule, never centered) but takes the
+   lavender used for accents on dark, because var(--accent) purple sinks into
+   the navy -- the same swap .svc-dark makes for prose links. It is the HINGE
+   between the worldview and the method, so it gets air on both sides and does
+   the job the old hairline above the method block used to do. */
+/* THE APERTURE. A hole the size the h3 used to fill, cut through the section to
+   a viewport-fixed layer of the repeated line. `clip-path` is doing the cutting
+   because it is the only thing here that clips a `position: fixed` child;
+   `overflow: hidden` would let the layer paint straight over the page. The
+   capsule sets reveal={false} for the same family of reasons -- see
+   WorldviewCapsule.tsx. */
+/* NOT a block quote (Chad, 2026-08-06). The left accent bar and the inset that
+   went with it framed this as a pull quote sitting on the page, which is the
+   opposite of the read: it is a hole, and a hole has no rule down its edge. The
+   whole rectangle is now cut through, edge to edge, with the type starting flush
+   on the same rail as the body copy. */
+.cw-worldview__aperture {
+  position: relative;
+  clip-path: inset(0);
+  /* EXACTLY the box the h3 filled: TWO lines of --text-2xl at --leading-tight,
+     which is how the sentence always set. Slivers of the neighbouring repeats
+     catch at the top and bottom edges, which is what tells the reader the line
+     continues behind the page rather than being a single quote in a frame. */
+  /* ONE size drives both the window and the type inside it. The marquee reads
+     the same variable, so the box is always exactly two of its own lines tall
+     and the mobile override below only has to change this one value. */
+  --cw-quote-size: var(--text-2xl);
+  height: calc(var(--cw-quote-size) * var(--leading-tight, 1.15) * 2 + 15px);
+  max-width: var(--measure-narrow);
+  margin-block: var(--space-xl);
+  /* THE SEAM FIX, and it is a backstop rather than a decoration. The layer
+     inside is composited on its own raster surface, and its edges land on whole
+     device pixels while this element's height is a calc off a clamp and lands
+     on a fractional one. Where the two disagree, Chrome leaves a sub-pixel
+     sliver at the top and left and the band's navy shows through it as a
+     hairline. Blink and Gecko round that differently, which is why it appears
+     in Chrome and not in Nightly. Painting the same lavender underneath means
+     the sliver, if it happens at all, is lavender on lavender and invisible. */
+  background: var(--grad-peak, #e5d2f4);
+}
+/* The inner shadow that makes it read as a hole with depth rather than a flat
+   lavender rectangle: the page edge casting onto the surface behind it, heavier
+   from the top the way the rest of the site lights things.
+
+   It has to be a pseudo-element, not `box-shadow: inset` on the aperture
+   itself. An inset shadow paints during the background step, and the layer is a
+   NEGATIVE z-index child, which paints after backgrounds -- so the shadow would
+   go straight under the type and never be seen. This overlay sits above the
+   layer instead, and is clipped by the same clip-path. */
+.cw-worldview__aperture::after {
+  content: "";
+  position: absolute;
+  /* OVERSIZED ON PURPOSE, and this is the whole fix for the Chrome seam.
+     Every previous attempt tried to make the shadow's edge land exactly on the
+     cut's edge, which cannot be done here: the lavender inside is on its own
+     composited layer (it is fixed and promoted), so its raster edges snap to
+     whole device pixels, while this overlay is painted in the section's layer
+     at a fractional position on a fractional DPR. Those two edges will always
+     disagree by a fraction of a pixel somewhere, and that disagreement is the
+     line -- a strip of bare lavender the shadow never reached.
+
+     So stop aligning and start overlapping. The overlay now extends 3px PAST
+     the cut on every side, and the aperture's clip-path trims it flush. The
+     shadow's own edge is off-screen and what shows at the boundary is shadow
+     that has already ramped up, so there is a 3px budget for any rounding
+     either engine wants to do and nothing to leave a gap. */
+  inset: -3px;
+  z-index: 1;
+  pointer-events: none;
+  /* Tight to the edge, in the band's own dark blue rather than a black. Spread
+     stays at 0 on every one of these: a negative spread shrinks the shadow's
+     rectangle, which pulls it off the edge and leaves a bright line inside the
+     cut. The alpha is deliberately low -- at high alpha the boundary pixel sits
+     at full strength and the shadow stops reading as a shadow, drawing a crisp
+     dark hairline along the top and right instead. Low alpha and a slightly
+     wider blur keeps the falloff continuous from the very first pixel. */
+  /* rgb(31, 23, 39) is --dark-card, written out because these need an alpha. */
+  box-shadow:
+    inset 0 5px 7px rgba(31, 23, 39, 0.62),
+    inset 0 -4px 6px rgba(31, 23, 39, 0.48),
+    inset 5px 0 7px rgba(31, 23, 39, 0.52),
+    inset -5px 0 7px rgba(31, 23, 39, 0.52);
+}
+/* The layer itself: fixed to the viewport, so it holds still while the hole
+   travels across it and the quote slides through the gap. INVERTED against the
+   band it is cut into -- the section is dark ground with light type, so the
+   layer is light ground with dark type, and the window reads as a punched hole
+   onto something behind the page rather than a tinted panel on top of it. */
+.cw-worldview__marquee {
+  /* Fixed VERTICALLY only. `top`/`height` pin it to the viewport, but `left`
+     and `right` are deliberately left at `auto` so the layer keeps its STATIC
+     horizontal position, which is the aperture's own content box. Setting
+     `inset: 0` instead pins it to the viewport's left edge, and the first few
+     characters of every line end up outside the hole and get clipped off. */
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  /* `lvh` (largest viewport height) on top of the vh fallback, because the
+     repeats are CENTRED in this layer: on a phone, `vh` changes as the address
+     bar hides and shows, which re-centres the stack and makes the quote jump
+     mid-scroll. `lvh` is fixed to the largest state and never changes, so the
+     layer holds still through the toolbar transition. */
+  height: 100lvh;
+  width: 100vw;
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Nearly touching, plus the 20% of a line Chad asked for: enough that one
+     repeat separates from the next, not enough to read as a list of quotes. */
+  gap: 0.6em;
+  pointer-events: none;
+  background: var(--grad-peak, #e5d2f4);
+  font-family: var(--font-display);
+  font-size: var(--cw-quote-size, var(--text-2xl));
+  font-weight: 700;
+  /* Solid 1. The two lines of a repeat sit right on top of each other with no
+     leading at all, which is what stops the window reading as a quote set in a
+     box. Deliberately NOT --leading-tight; this layer is a texture, not copy. */
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--dark-bg, #243989);
+  white-space: nowrap;
+  /* SMOOTHNESS. Without this the layer lives on the page's main paint surface,
+     so every scroll frame has to re-rasterise the type inside the moving hole
+     and the reveal stutters. Promoting it to its own compositor layer means the
+     text is rasterised once and only the clip window travels, which the
+     compositor can do without touching the main thread. `translateZ(0)` is the
+     promotion; `will-change` keeps the layer alive rather than letting it be
+     torn down and rebuilt each time the section leaves and re-enters view. Safe
+     on this element specifically: it has no fixed or absolute descendants to
+     re-parent, which is the usual reason not to put a transform on a fixed
+     element. */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  /* The cut now runs to the aperture's left edge, but the TYPE stays on the
+     line it was already sitting on, so the indent the old border and padding
+     used to provide moves here, onto the layer. */
+  padding-left: calc(var(--space-md) + 3px);
+}
+/* No parallax when the reader has asked for less motion: the window stops being
+   a window and the line simply sits in it, which is the same information. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-worldview__marquee {
+    position: absolute;
+    inset: 0;
+    justify-content: flex-start;
+  }
+}
+/* The declarations: one breath per line, tighter than body prose. They are
+   four short statements in a row, so the stack IS the rhythm -- paragraph
+   spacing between them would turn a run of punches into a list of claims. */
+/* Argument left, portrait right, at a true 2:1. The cutout is the proof of the
+   claim (one head, one pair of hands), so it holds a real column rather than
+   floating as decoration, and it drops beneath the copy once a second column
+   would squeeze the declarations into two words a line. */
+.cw-worldview__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--space-xl);
+  /* TOP-ALIGNED, not centred. The section's own padding is already symmetric,
+     but the portrait is much taller than the copy, so centring the copy against
+     it pushed the heading a long way down and the band read as heavily
+     top-padded even though the padding was even. Aligning to the start puts the
+     heading level with the top of the portrait, which is where the eye measures
+     the padding from. */
+  align-items: start;
+  /* No top margin. It was here when the h2 sat ABOVE this grid and needed
+     separating from it; now the h2 is inside the left column, so the margin was
+     pure extra space stacked on top of the section's own padding, which is what
+     made the top read 40px deeper than the bottom. */
+}
+.cw-worldview__figure { margin: 0; }
+.cw-worldview__figure img {
+  display: block;
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  margin-inline: auto;
+  filter: drop-shadow(0 18px 40px rgba(31, 23, 39, 0.45));
+}
+@media (max-width: 900px) {
+  .cw-worldview__layout { grid-template-columns: 1fr; gap: var(--space-lg); }
+  .cw-worldview__figure img { max-width: 240px; }
+}
+
+.cw-worldview__beats { max-width: var(--measure-prose); }
+.cw-worldview__beats p {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug, 1.4);
+  color: var(--dark-text);
+  font-weight: 500;
+}
+.cw-worldview__beats p + p { margin-top: var(--space-2xs, 0.5rem); }
+/* The last declaration is the one that lands. It gets the accent so the eye
+   stops there before the method block. */
+.cw-worldview__beats p:last-child { color: var(--grad-peak, #e5d2f4); }
+
+/* The method: how the work actually happens. No hairline above it -- the
+   governing line now sits between the two blocks and separates them on its
+   own, and a rule as well would fence off a section that is already fenced. */
+.cw-worldview__method {
+  max-width: var(--measure-prose);
+}
+.cw-worldview__label {
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dark-muted);
+  margin-bottom: var(--space-sm);
+}
+/* Same type as the declarations above the window (Chad, 2026-08-06): the two
+   blocks are one argument split by the aperture, so dropping the second half to
+   muted body size made it read as a footnote to the first. */
+.cw-worldview__methodline {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug, 1.4);
+  color: var(--dark-text);
+  font-weight: 500;
+}
+.cw-worldview__methodline + .cw-worldview__methodline { margin-top: var(--space-sm); }
+@media (max-width: 700px) {
+  .cw-worldview__beats p { font-size: var(--text-base); }
+  /* SMALL PHONES. The quote is set at a fixed two-line break and never wraps,
+     so below roughly 360px the longest line runs past the right edge of the cut
+     and loses its tail -- the window shows "like anything els". --text-2xl
+     cannot help: it has already bottomed out at its 2rem clamp floor by 360 and
+     stops shrinking. So the quote gets its own size below here, the largest
+     that still fits the line inside the cut at a given width, capped so it
+     never exceeds the desktop size. Driving --cw-quote-size rather than
+     font-size directly keeps the window's HEIGHT (two lines of the same value)
+     in step with the type; setting font-size alone would leave a box sized for
+     32px type wrapped around 26px type. */
+  .cw-worldview__aperture {
+    --cw-quote-size: min(var(--text-2xl), calc(10.5vw - 7px));
+  }
+  .cw-worldview__marquee { padding-left: var(--space-sm); }
 }
 
 /* ---- VERBATIM -- real client sentences, quoted exactly ---------------- */
