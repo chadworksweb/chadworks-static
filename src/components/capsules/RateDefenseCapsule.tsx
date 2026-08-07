@@ -21,8 +21,8 @@ import { SectionShell } from "@/components/capsules/SectionShell";
 import { HOURLY_RATE } from "@/lib/pricing";
 
 // The eyebrow says the number out loud before the reader can. HOURLY_RATE is
-// read from the pricing hub ("$315/hr") rather than typed, like every other
-// figure on this page -- if the minutely rate ever moves, this moves with it.
+// read from the pricing hub rather than typed, like every other figure on this
+// page -- if the minutely rate ever moves, this eyebrow moves with it.
 const EYEBROW = `Yes, my rate works out to ${HOURLY_RATE}.`;
 
 // The lead, verbatim. It ends mid-sentence on purpose: the aperture finishes it.
