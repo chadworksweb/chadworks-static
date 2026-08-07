@@ -10958,7 +10958,11 @@ html.cw-motion-paused *::after {
    opposite of the read: it is a hole, and a hole has no rule down its edge. The
    whole rectangle is now cut through, edge to edge, with the type starting flush
    on the same rail as the body copy. */
-.cw-worldview__aperture {
+/* SHARED WITH /rates/ (Chad, 2026-08-07): the "in defense of the rate" block
+   cuts the same window, so the aperture and the layer inside it are one set of
+   rules with two payloads. cw-defense adds only its own sizing below. */
+.cw-worldview__aperture,
+.cw-defense__aperture {
   position: relative;
   clip-path: inset(0);
   /* EXACTLY the box the h3 filled: TWO lines of --text-2xl at --leading-tight,
@@ -10991,7 +10995,8 @@ html.cw-motion-paused *::after {
    NEGATIVE z-index child, which paints after backgrounds -- so the shadow would
    go straight under the type and never be seen. This overlay sits above the
    layer instead, and is clipped by the same clip-path. */
-.cw-worldview__aperture::after {
+.cw-worldview__aperture::after,
+.cw-defense__aperture::after {
   content: "";
   position: absolute;
   /* OVERSIZED ON PURPOSE, and this is the whole fix for the Chrome seam.
@@ -11030,7 +11035,8 @@ html.cw-motion-paused *::after {
    band it is cut into -- the section is dark ground with light type, so the
    layer is light ground with dark type, and the window reads as a punched hole
    onto something behind the page rather than a tinted panel on top of it. */
-.cw-worldview__marquee {
+.cw-worldview__marquee,
+.cw-defense__marquee {
   /* Fixed VERTICALLY only. `top`/`height` pin it to the viewport, but `left`
      and `right` are deliberately left at `auto` so the layer keeps its STATIC
      horizontal position, which is the aperture's own content box. Setting
@@ -11086,7 +11092,8 @@ html.cw-motion-paused *::after {
 /* No parallax when the reader has asked for less motion: the window stops being
    a window and the line simply sits in it, which is the same information. */
 @media (prefers-reduced-motion: reduce) {
-  html:not(.cw-force-motion) .cw-worldview__marquee {
+  html:not(.cw-force-motion) .cw-worldview__marquee,
+  html:not(.cw-force-motion) .cw-defense__marquee {
     position: absolute;
     inset: 0;
     justify-content: flex-start;
@@ -11180,6 +11187,260 @@ html.cw-motion-paused *::after {
     --cw-quote-size: min(var(--text-2xl), calc(10.5vw - 7px));
   }
   .cw-worldview__marquee { padding-left: var(--space-sm); }
+}
+
+/* ---- RATE DEFENSE -- the /rates/ "in defense of the rate" -------------- */
+/* Same dark band and same aperture as the /about/ worldview (the shared rules
+   are up in the WORLDVIEW block). Everything here is the difference: the layer
+   carries a LIST rather than one repeated sentence, so each repeat is a single
+   line instead of two, and the window is sized to hold two whole roles with the
+   next one already breaking the bottom edge. That sliver is what says the list
+   keeps going behind the page. No portrait column -- the argument here is about
+   the roles, not the face, and the copy holds the section on its own. */
+/* GREEN, and scoped (Chad, 2026-08-07). The section keeps `.svc-dark` for its
+   structure -- the band, the aurora layer, the on-dark type rules -- and swaps
+   the PALETTE underneath it by redefining the tokens those rules already read.
+   Nothing global moves: --grad-peak and --dark-* are redeclared on this section
+   only, so the shared aperture rules (which resolve them at use time, on their
+   own elements inside this subtree) paint green here and lavender on /about/
+   with no second copy of the mechanism.
+   The green is the point: this section follows the navy FAQ band, and the block
+   arguing that the work does not come out of the same head as everyone else's
+   should not come out of the same colour as the section above it either. */
+.cw-defense {
+  --grad-peak: #cfe9d5;                        /* the layer ground + the kicker */
+  --dark-bg: #0e2a1e;                          /* the type ON the layer         */
+  --dark-text: #e8f5ec;                        /* body copy on the band         */
+  --dark-muted: #a9d8bd;
+  --dark-border: rgba(159, 227, 189, 0.22);
+  background: linear-gradient(135deg, #0e2a1e 0%, #14543a 100%);
+}
+/* The aurora blooms, re-aimed. Same three-glow structure and the same drift
+   animation as .svc-dark; only the hues change. */
+.cw-defense::before {
+  background:
+    radial-gradient(45% 55% at 12% 8%, rgba(31, 157, 87, 0.42), transparent 62%),
+    radial-gradient(50% 60% at 92% 88%, rgba(207, 233, 213, 0.20), transparent 60%),
+    radial-gradient(40% 45% at 70% 20%, rgba(74, 107, 110, 0.34), transparent 65%);
+}
+/* THE PHOTO. Chad in the field, held to the far right of the band and masked so
+   it never becomes a picture with a caption -- it emerges out of the green at
+   the right edge and is gone by the time it reaches the copy rail. Two masks
+   intersected: one across (nothing at the left, full strength at the right) and
+   one down (soft top and bottom), so there is no cut edge anywhere on it.
+   A background layer rather than an <img>: it is atmosphere for the argument,
+   not evidence in it, and the section already carries the portrait's job in the
+   words. `.svc-dark` is `overflow: hidden`, which trims it to the band.
+   z-index 0 puts it above the aurora (::before, same level, painted earlier)
+   and below the copy (`.svc-dark > *` is z-index 1). */
+.cw-defense::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  /* 15% wider than the first pass (Chad, 2026-08-07), with the mask ramps
+     moved left to match -- widening the layer alone would only have stretched
+     the fade, not revealed more of the photograph. */
+  width: min(71%, 1035px);
+  z-index: 0;
+  pointer-events: none;
+  /* The tint rides ON the image, knocking the brightness down at the left so the
+     forest never fights the type for attention, and reaching TRUE ZERO by 60%
+     across so the subject keeps his own light (Chad, 2026-08-07). Two things it
+     must not do, both learned the hard way: it must not bottom out above zero
+     (the first version held 18% green to the right edge and filmed over the
+     face at every width), and it must not START opaque (the band is a 135deg
+     ramp, so a solid stop here paints a darker column and turns the layer's
+     edge into a vertical seam -- the mask is already at zero there anyway).
+     ONE ramp for every width above the tablet breakpoint; an extra breakpoint
+     in here only puts a seam between two desktop sizes.
+     BOTH RAMPS FINISH INSIDE THE COPY'S HALF OF THE BAND (Chad, 2026-08-07).
+     The tint is at zero by 45% and the mask is at full opacity by 50%, which
+     lands around the right edge of the copy rail -- so everything from there to
+     the right edge of the section is the photograph at full strength, with no
+     veil left on it. Ramps that finished at 60/65% were still lifting across the
+     subject himself, which is what kept reading as "too dark". */
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(14, 42, 30, 0.5) 0%,
+      rgba(14, 42, 30, 0.24) 15%,
+      rgba(14, 42, 30, 0.05) 32%,
+      rgba(14, 42, 30, 0) 45%
+    ),
+    url("/people/chad-outside.webp");
+  background-size: cover, cover;
+  background-position: center right, center right;
+  background-repeat: no-repeat, no-repeat;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.45) 18%, #000 50%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  mask-image:
+    linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.45) 18%, #000 50%),
+    linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+/* Narrower windows: the copy rail runs nearly the full band, so the photo is
+   pushed RIGHT rather than shrunk in place -- the mask ramps move with it so the
+   fade still finishes before the sentences start, and the copy keeps the same
+   run of clear space it has at desktop. Dimming alone would have left it under
+   the type, just fainter. */
+@media (max-width: 1100px) {
+  .cw-defense::after {
+    width: 40%;
+    opacity: 0.9;
+    /* Re-aim the crop with the layer. At `center right` the strip is narrow
+       enough that the subject falls on the faded left edge of it and all that
+       shows is an arm; 77% walks the frame back until he is inside the part of
+       the mask that is actually at full strength. */
+    background-position: 77% 32%, 77% 32%;
+    /* THE TINT, re-ramped for the narrow strip (Chad, 2026-08-07). The desktop
+       gradient spends its whole run inside 40% of the band here, so the green
+       never lifts and the photograph flattens into a dull panel with a man
+       faintly inside it. This clears much sooner: solid at the left edge where
+       it has to meet the band, and effectively gone by two thirds across, so
+       the subject keeps his own light. */
+    background-image:
+      /* NO OPAQUE START. The band is a 135deg ramp from #0e2a1e to #14543a, so
+         by the time it reaches this layer's left edge it is well up that ramp --
+         painting solid #0e2a1e there drops a darker COLUMN against a lighter
+         band and the layer's edge becomes a visible vertical seam. The mask is
+         already at zero on that edge, so the tint has nothing to hide and only
+         needs to knock the brightness down through the middle. */
+      linear-gradient(
+        to right,
+        rgba(14, 42, 30, 0.5) 0%,
+        rgba(14, 42, 30, 0.22) 15%,
+        rgba(14, 42, 30, 0.04) 32%,
+        rgba(14, 42, 30, 0) 45%
+      ),
+      url("/people/chad-outside.webp");
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 25%, #000 55%),
+      linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+    mask-image:
+      linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.4) 25%, #000 55%),
+      linear-gradient(to bottom, transparent 0%, #000 16%, #000 84%, transparent 100%);
+  }
+}
+/* PHONES -- the photo stops hiding behind the copy and becomes a full-width
+   band at the foot of the section (Chad, 2026-08-07). There is no room beside
+   the text at this width, so it stacks under it instead of being dropped.
+   Still the same absolutely-positioned layer rather than an <img>: pinning it to
+   the bottom edge keeps it out of the grid (a static pseudo-element would become
+   a grid item and land in whatever track auto-placement chose), and the section
+   pads its own bottom by exactly the photo's height so nothing overlaps. One
+   height variable drives both, so they cannot drift apart.
+   The masks swap axis with the layout: the sides run full strength now and the
+   fade is at the TOP, where the photo meets the green. */
+@media (max-width: 900px) {
+  .cw-defense {
+    --cw-photo-h: min(58vw, 340px);
+    padding-bottom: calc(var(--section-pad-y) + var(--cw-photo-h));
+  }
+  .cw-defense::after {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: var(--cw-photo-h);
+    opacity: 1;
+    /* Off-centre on purpose: the subject sits right of centre in the source, so
+       a centred cover crop would cut him in half at this aspect. */
+    background-position: 70% 30%, 70% 30%;
+    /* Same shape as the desktop ramp, turned on its side: no opaque stop at the
+       edge where it meets the band, true zero early, and both ramps done in the
+       TOP THIRD so most of the band is the photograph at full strength rather
+       than a green wash with a man behind it. */
+    background-image:
+      linear-gradient(
+        to bottom,
+        rgba(14, 42, 30, 0.5) 0%,
+        rgba(14, 42, 30, 0.22) 15%,
+        rgba(14, 42, 30, 0.04) 30%,
+        rgba(14, 42, 30, 0) 42%
+      ),
+      url("/people/chad-outside.webp");
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 18%);
+    -webkit-mask-composite: source-over;
+    mask-composite: add;
+  }
+}
+
+/* The eyebrow colour is hardcoded lavender on .svc-dark, so it is the one thing
+   the token swap cannot reach. Same specificity, later in the file. */
+.cw-defense .eyebrow { color: #9fe3bd; }
+/* The hole's inner shadow is the page edge casting onto the surface behind it,
+   so it has to be the band's own dark green rather than the plum the /about/
+   window uses. Structure identical -- see the shared rule for why it is an
+   oversized overlay and not `box-shadow: inset`. */
+.cw-defense__aperture::after {
+  box-shadow:
+    inset 0 5px 7px rgba(6, 24, 15, 0.62),
+    inset 0 -4px 6px rgba(6, 24, 15, 0.48),
+    inset 5px 0 7px rgba(6, 24, 15, 0.52),
+    inset -5px 0 7px rgba(6, 24, 15, 0.52);
+}
+
+.cw-defense__copy { max-width: var(--measure-narrow); }
+/* The copy stops short of the photo instead of running under it, which is what
+   the 720px rail does for free on a wide screen. ONLY in the tablet band: below
+   900 the photo stacks under the copy and the text takes the full width again.
+   It lives here, after the base rule, because both are one class deep -- inside
+   the earlier media block it lost to the unqualified declaration below it. */
+@media (max-width: 1100px) and (min-width: 901px) {
+  .cw-defense__copy { max-width: 60%; }
+}
+/* The lead ends mid-sentence and the window finishes it, so it sets like the
+   worldview declarations: a spoken line, not body prose. No bottom margin worth
+   speaking of -- the aperture's own margin carries the gap. */
+.cw-defense__lead {
+  max-width: var(--measure-prose);
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug, 1.4);
+  color: var(--dark-text);
+  font-weight: 500;
+}
+.cw-defense__aperture {
+  /* One step down from the /about/ window. The layer is `white-space: nowrap`
+     and never wraps, so the longest role has to clear the cut on its own at
+     every width; at --text-2xl the longer titles ran past the right edge and
+     lost their tails. --text-xl holds the whole list inside --measure-narrow. */
+  --cw-quote-size: var(--text-xl);
+  /* THREE lines, not two. The roles are one line each with a 0.6em gap, so a
+     two-line box would show one role and two half-roles; three shows two whole
+     ones and the edge of the next. */
+  height: calc(var(--cw-quote-size) * var(--leading-tight, 1.15) * 3 + 15px);
+}
+.cw-defense__close { max-width: var(--measure-prose); }
+.cw-defense__label {
+  font-size: var(--text-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--grad-peak, #e5d2f4);
+  margin-bottom: var(--space-2xs, 0.5rem);
+}
+/* Same weight as the lead above the window: the two halves are one argument
+   split by the aperture, and dropping the second half to muted body size would
+   read as a footnote to the first. */
+.cw-defense__closeline {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug, 1.4);
+  color: var(--dark-text);
+  font-weight: 500;
+}
+.cw-defense__closeline + .cw-defense__closeline { margin-top: var(--space-sm); }
+@media (max-width: 700px) {
+  .cw-defense__lead,
+  .cw-defense__closeline { font-size: var(--text-base); }
+  /* PHONES. --text-xl clamps at 1.5rem and stops shrinking, but a longer role
+     needs roughly 8 times the font size in width, so on the narrowest handsets
+     it runs out of the cut. Driving the variable off the viewport keeps the type
+     inside the window, and because the height is a calc off the same value the
+     box follows it down instead of leaving a gap around smaller type. */
+  .cw-defense__aperture {
+    --cw-quote-size: min(var(--text-xl), calc(5.4vw + 2px));
+  }
+  .cw-defense__marquee { padding-left: var(--space-sm); }
 }
 
 /* ---- VERBATIM -- real client sentences, quoted exactly ---------------- */

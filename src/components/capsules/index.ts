@@ -50,3 +50,7 @@ export { DeliverableCapsule } from "./DeliverableCapsule";
 // Owns its own copy, like TenetsCapsule; page-specific by intent, exported here
 // so /about/ imports from one place with the rest of its capsules.
 export { WorldviewCapsule } from "./WorldviewCapsule";
+
+// The /rates/ "in defense of the rate" block. Reuses the worldview aperture,
+// owns its own copy, page-specific by intent.
+export { RateDefenseCapsule } from "./RateDefenseCapsule";

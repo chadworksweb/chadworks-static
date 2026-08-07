@@ -10,7 +10,13 @@ import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
-import { PageComposer, RatesCapsule, MainContactCapsule, PathsCapsule } from "@/components/capsules";
+import {
+  PageComposer,
+  RatesCapsule,
+  MainContactCapsule,
+  PathsCapsule,
+  RateDefenseCapsule,
+} from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { BASE, money } from "@/lib/package-builder";
 import { HIGH, HOURLY, LOW, MINUTELY, WORDPRESS_CARE } from "@/lib/pricing";
@@ -146,10 +152,14 @@ export default function RatesPage() {
           </div>
         </div>
       </SectionShell>
+      {/* IN DEFENSE OF THE RATE -- the argument the ledger does not make. Sits
+          after the math on purpose: how long the work takes, then who is doing
+          it. Runs the /about/ aperture with the role list as its payload. */}
+      <RateDefenseCapsule />
       {/* Standard lane modules out to the service lanes + about. */}
       <PathsCapsule
         paths={{
-          heading: "Explore what you get for these rates:",
+          heading: "Explore chadworks™",
           items: [
             {
               label: "Websites",
