@@ -11337,11 +11337,24 @@ html.cw-motion-paused *::after {
   .cw-defense {
     --cw-photo-h: min(58vw, 340px);
     padding-bottom: calc(var(--section-pad-y) + var(--cw-photo-h));
+    /* `.svc-dark` puts a hairline on both edges of the band. At the bottom the
+       photo IS the edge here, so the rule has nothing to separate.
+       WIDTH, not colour: `overflow: hidden` clips the photo at the PADDING box
+       while the section's background paints out to the BORDER box, so a
+       transparent border still leaves a strip of band showing under the photo.
+       Only removing the border outright closes it. */
+    border-bottom-width: 0;
   }
   .cw-defense::after {
-    inset: auto 0 0 0;
+    /* OVERSHOOT THE BOTTOM by 2px, clipped back by the section's own
+       `overflow: hidden` (Chad, 2026-08-07). Pinned flush at `bottom: 0` the
+       layer's edge lands on a fractional device pixel -- the section's height is
+       a calc off a clamp -- and the band's dark green showed through the
+       rounding gap as a dark strip under the grass. The height grows by the same
+       2px so the top edge, where the fade starts, does not move. */
+    inset: auto 0 -2px 0;
     width: 100%;
-    height: var(--cw-photo-h);
+    height: calc(var(--cw-photo-h) + 2px);
     opacity: 1;
     /* Off-centre on purpose: the subject sits right of centre in the source, so
        a centred cover crop would cut him in half at this aspect. */
