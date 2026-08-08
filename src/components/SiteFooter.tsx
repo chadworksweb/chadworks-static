@@ -107,6 +107,10 @@ const COLUMNS: FooterGroup[][] = [
         { href: "/web-design/", label: "Web Design" },
         { href: "/web-development/", label: "Web Development" },
         { href: "/website-redesign/", label: "Website Redesign" },
+        {
+          href: "/ai-generated-website-audit/",
+          label: "AI Generated Website Audit",
+        },
         { href: "/web-design-packages/", label: "Web Design Packages" },
         { href: "/web-hosting/", label: "Web Hosting" },
         { href: "/wordpress/", label: "WordPress" },

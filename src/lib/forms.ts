@@ -40,6 +40,24 @@ export type FormField =
       span?: FormFieldSpan;
     }
   | {
+      // A single on/off box, label to the RIGHT of the control (not above it
+      // like every other field). Added 2026-08-08 for the audit page's "Request
+      // 24hr turnaround" opt-in.
+      //
+      // WHAT REACHES THE PAYLOAD. A checkbox is the one input whose `value` is
+      // meaningless on its own: an unchecked box still reports "on", so reading
+      // .value the way the other kinds do would submit the opt-in every time.
+      // LeadForm reads `checked` for this kind instead, and sends `checkedValue`
+      // (default "Yes") only when it is actually ticked -- an unticked box sends
+      // nothing at all, matching how empty text fields are dropped.
+      kind: "checkbox";
+      name: string;
+      label: string;
+      required?: boolean;
+      checkedValue?: string;
+      span?: FormFieldSpan;
+    }
+  | {
       // A section divider label inside the form (rslgo rsl-form-section-label).
       kind: "section";
       label: string;

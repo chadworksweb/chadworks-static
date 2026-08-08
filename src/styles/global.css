@@ -2468,11 +2468,20 @@ main:has(.cw-calc-hero) .svc-prose--lead > p:first-child {
    send-this-scope form instead -- a DARK band with its own hard edge. Zeroing
    the top there put the eyebrow flush against that edge with nothing between
    them, so purpose takes the standard --section-pad-y like any other section
-   opening after a band. */
-#rate-card { padding-top: 0; }
-#who { padding-top: 0; }
-#why { padding-top: 0; }
-#other-calculators { padding-top: 0; }
+   opening after a band.
+
+   SCOPED TO THE CALCULATOR PAGE (2026-08-08). These were four BARE ID
+   selectors, and an id is global: any other page that happened to name a
+   section #who or #why silently inherited the calculator's spacing hack. That
+   is not hypothetical -- /ai-generated-website-audit/ has a #why section and
+   shipped with padding-top:0 against padding-bottom:112px, reading as a dark
+   band whose heading sat flush on its own top edge (Chad spotted it).
+   `main:has(.cw-calc-hero)` is the page's own scope selector, already used for
+   its prose rhythm further up. Nothing on the calculator changes. */
+main:has(.cw-calc-hero) #rate-card { padding-top: 0; }
+main:has(.cw-calc-hero) #who { padding-top: 0; }
+main:has(.cw-calc-hero) #why { padding-top: 0; }
+main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 
 /* The heading already carries margin-bottom: var(--space-md) and .svc-lede adds
    its own margin-top on top of that, so a lede sitting directly under a heading
@@ -12680,3 +12689,387 @@ html.cw-motion-paused *::after {
   padding-bottom: 0;
 }
 .cw-port-card__story:hover { text-decoration: underline; }
+
+/* =====================================================================
+   /ai-generated-website-audit/ -- the Website Transformation Audit.
+   Calculator-shaped page (see the route comment): a two-column hero with the
+   LEAD form in the right slot, then symptom cards, a coverage ledger and a
+   plain Q&A run.
+
+   Reuses rather than clones wherever a shape already exists: .cw-calc-intro
+   for the hero grid (including its phone reorder, which is keyed to
+   .cw-calc-intro__lead), .panel for every card, .cw-split / .cw-split__frost
+   for the who-it's-for row, and .svc-faq-section--dark for the why band. Only
+   what is genuinely new to this page is defined below.
+   ===================================================================== */
+
+.cw-fix-hero { padding-block: var(--hero-pad-y); }
+
+/* THE H1'S BOTTOM SPACE (Chad, 2026-08-08: "remove the bottom padding on the
+   hero h1", and the same cause as "spacing not perfectly equal" in the lede).
+
+   The h1 carries .text-gradient, which adds `padding-bottom: 0.15em` as the
+   SITE-WIDE DESCENDER FIX: background-clip:text paints only inside the line
+   box, so without it the tails of the y in "Unhappy" and the g in "Generated"
+   get sliced off. That padding stacks on the heading's own margin-bottom, so
+   the real gap under this h1 was ~34px while the gap under the lede paragraph
+   was 24px. Measured line-box to line-box the two read 29px and 29px, which is
+   why this looked like a spacing bug that wasn't in the spacing.
+
+   So the padding STAYS (deleting it clips his headline) and the margin gives
+   back exactly what the padding took. 0.15em resolves against the h1's own
+   font-size in both properties, so the cancellation is exact at every clamp
+   step rather than tuned for one viewport. Net visible gap: --space-md, the
+   same value the lede uses below it. */
+.cw-fix-hero h1.text-gradient {
+  margin-bottom: calc(var(--space-md) - 0.15em);
+}
+
+/* THE ACTUAL FULL-BLEED FIX (Chad, 2026-08-08, twice -- `full` on the section
+   alone did nothing visible and this is why).
+
+   `.cw-shell__bg` is a DIRECT CHILD of the section, so the page-shell rule
+   `:where(main, .shell, .section) > * { grid-column: content }` puts it in the
+   content rail. It is also `position: absolute; inset: 0`, which looks like it
+   should escape that -- and would, against any ordinary positioned ancestor.
+   It does not here: per CSS Grid, an absolutely positioned child of a grid
+   container IS its grid area's containing block, so `inset: 0` resolves against
+   the CONTENT TRACK rather than the section box. Measured: section x0/w1792,
+   cloud x296/w1200.
+
+   So the bleed has to be granted on the grid axis, not the position axis. With
+   the bg layer moved to the full track its grid area becomes the whole section
+   and inset:0 finally means the viewport.
+
+   Scoped to this hero deliberately. The calculator's hero is NOT `full` and
+   wants its cloud boxed in the rail (it has its own masked-fade rules a few
+   thousand lines up), so this must not become a global `.cw-shell__bg` rule. */
+.cw-fix-hero > .cw-shell__bg { grid-column: full; }
+
+/* The hero grid runs closer to even than the calculator's 1.6fr 1fr: a form
+   needs real width for its two-up name/email row to stay legible, where a table
+   of contents is happy narrow. Below the shared 820px stack point the parent
+   rule takes over at a single column and this override stops applying. */
+.cw-fix-intro { grid-template-columns: 1.15fr 1fr; }
+@media (max-width: 820px) { .cw-fix-intro { grid-template-columns: 1fr; } }
+
+/* THE FORM CARD -- a DARK panel sitting on the light hero.
+   Same padding as the calculator's TOC panel so the two pages' right columns
+   share a rhythm, but the surface is inverted, for a reason that is structural
+   rather than aesthetic: the LeadForm engine (.cw-form-field, ~line 4817) is
+   styled for dark bands ONLY. Its inputs are white type on white-alpha fills
+   with white-alpha borders, because every other form on the site sits on the
+   dark contact band. Dropped on a light panel, the whole form renders as grey
+   ghost labels over invisible boxes, which is exactly how this shipped the
+   first time.
+
+   Two ways out: restyle the engine for light surfaces, or give this card the
+   surface the engine already expects. The second is correct. Restyling the
+   engine per-page is how a form system grows two of everything, and a dark
+   card is also the better design call here: it is the one thing on the page
+   being asked for, and the inversion makes it the focal point of the hero
+   rather than a second light box beside the copy. */
+.cw-fix-formcard {
+  /* ONE control height for the card, so the rush toggle and the text inputs
+     match BY CONSTRUCTION rather than by a derived guess (Chad, 2026-08-08:
+     "make the pseudo button match field height"). Deriving it from the input's
+     padding + font-size was tried and came out 42px against the input's real
+     48px, because the input inherits the body line-height rather than a tight
+     one. Both now read this instead, so they cannot drift apart. */
+  --cw-field-h: 3rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  background: linear-gradient(160deg, #2b3f93 0%, var(--dark-bg) 55%, #1d2f75 100%);
+  border-color: var(--dark-border);
+  box-shadow: 0 24px 60px rgba(20, 28, 70, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  color: var(--dark-text);
+}
+/* The card's heading reads as a REAL h3, not a mono eyebrow (Chad,
+   2026-08-08). It was the eyebrow treatment (mono, --text-xs, 0.18em tracking,
+   uppercased) because it started life as a kicker <p>; once it became the
+   card's h3 that styling undersold it and it read as a label above the form
+   rather than the form's title.
+
+   These are the site's h3 metrics, lifted from `.svc-prose h3` (display face,
+   --text-lg, 700, --leading-snug) so the card's heading matches every other h3
+   on the site instead of inventing a third heading size. Only the colour
+   differs, because this one sits on the dark card. */
+.cw-fix-formcard__title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: #fff;
+  margin-bottom: var(--space-xs);
+}
+.cw-fix-formcard__blurb {
+  color: rgba(237, 231, 246, 0.78);
+  font-size: var(--text-base);
+  /* Chad, 2026-08-08. Set flush against the h3 above it rather than on the
+     site's body leading: this is a two-line standfirst inside a card, not
+     running prose, so the tighter set reads as one unit with the heading. */
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+/* The form's own first field group sits directly under the blurb, so the
+   engine's default leading margin would double the gap. */
+.cw-fix-formcard .cw-form { margin-top: 0; }
+
+/* EQUIDISTANT FIELDS (Chad, 2026-08-08, twice: "spacing still not equidistant").
+   ONE gap, from ONE source. The engine stacks spacing from two places at once:
+   every `.cw-form-field` carries `margin-bottom`, AND `.cw-form-grid` (the
+   two-up name/email row) carries its own `margin-bottom: 1rem` on top of the
+   margin its children already have. So the gap under a PAIRED row was the sum
+   of both and the gap under a lone full-width field was just one of them, which
+   is why name/email sat further from the url field than the url field sat from
+   phone.
+
+   Adding to the field margin could never fix that -- it feeds both sides of the
+   imbalance. So the margins are zeroed inside this card and the form becomes a
+   grid whose single `gap` owns every vertical rhythm. Now nothing can drift
+   apart, including rows added later.
+
+   The honeypot is `position: absolute`, so it is out of flow and claims no grid
+   track. The hidden inputs are `display: none` for the same reason. Neither
+   opens a phantom gap. */
+.cw-fix-formcard .cw-form {
+  display: grid;
+  gap: var(--space-sm);
+}
+.cw-fix-formcard .cw-form-field,
+.cw-fix-formcard .cw-form-grid {
+  margin-bottom: 0;
+}
+.cw-fix-formcard .cw-form-grid { gap: var(--space-sm); }
+/* The other side of the shared control height: the text inputs read the same
+   token the rush toggle does. Without this the token would only describe the
+   button and the two could still diverge. */
+.cw-fix-formcard .cw-form-field input { min-height: var(--cw-field-h); }
+
+/* THE LAST ROW: 24hr-turnaround checkbox LEFT, submit button RIGHT (Chad,
+   2026-08-08). The checkbox is declared last in the field list, so it and the
+   button are already adjacent grid items; giving the form a second track and
+   pinning just those two puts them on one line with no wrapper element and no
+   change to the engine's markup.
+
+   Everything else in the form still spans both tracks, so the earlier fields
+   keep the full card width they had when this grid was single-column.
+
+   The button no longer spans the card. It cannot: Chad asked for the checkbox
+   beside it, which means the row is shared. It sizes to its label on the right
+   and keeps its own 1.5rem top margin off, since the grid gap now separates
+   the row. */
+/* THE SHARED ROW: phone 3/4 LEFT, 24hr checkbox 1/4 RIGHT (Chad, 2026-08-08).
+   Pairing the checkbox with the SUBMIT was tried first and abandoned: at 1/6 the
+   label had ~75px to wrap in and the row read as broken.
+
+   Everything in the form spans both tracks by default; only these two are
+   pinned. The phone field's grid item is a bare, class-less <div> -- LeadForm
+   wraps every full-span group in one, and that wrapper, not the
+   .cw-form-field inside it, is what the grid places. It is selected here as
+   "the div immediately BEFORE the checkbox row", which is why the field order in
+   AUDIT_FORM is load-bearing.
+
+   The checkbox row itself is unwrapped and therefore a direct grid item -- see
+   the lone-checkbox branch in LeadForm, which exists for exactly this. */
+.cw-fix-formcard .cw-form { grid-template-columns: 3fr 1fr; }
+.cw-fix-formcard .cw-form > * { grid-column: 1 / -1; }
+.cw-fix-formcard .cw-form > div:has(+ .cw-form-field--check) { grid-column: 1; }
+/* The rush toggle has no label above it, so its cell is pushed to the BOTTOM of
+   the shared row. That lands the button level with the phone INPUT rather than
+   level with the phone LABEL, and is why the two controls line up despite one
+   having a caption and the other not. */
+.cw-fix-formcard .cw-form-field--check {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+/* Full width again, on its own row under the pair. */
+.cw-fix-formcard .cw-form__submit {
+  grid-column: 1 / -1;
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-2xs);
+}
+/* Too narrow to share: the pair unstacks and each takes the full card. */
+@media (max-width: 560px) {
+  .cw-fix-formcard .cw-form-field--check,
+  .cw-fix-formcard .cw-form-field--check + div { grid-column: 1 / -1; }
+  .cw-fix-formcard .cw-form-field--check {
+    align-self: auto;
+    padding-bottom: 0;
+  }
+}
+
+/* THE RUSH TOGGLE. A full-width button carrying its own label, which reads as
+   pressed once it is on (Chad, 2026-08-08). It replaced a tick-box: a lone
+   opt-in in a form row is easier to hit and easier to read as a state when it
+   is a button than when it is a 22px square with a caption.
+
+   Underneath it is still a real <input type="checkbox">, clipped rather than
+   removed so it keeps native keyboard behaviour and stays in the tab order.
+   `appearance: none` with zero dimensions drops an input out of the
+   accessibility tree in some engines; clipping does not.
+
+   CURSOR ONLY ON THE BUTTON (Chad). The <label> is display:block and sized by
+   the button inside it, so the pointer never appears over the empty part of the
+   grid cell around it. Nothing on the field wrapper sets a cursor. */
+.cw-form-check {
+  display: block;
+  cursor: pointer;
+}
+.cw-form-check input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  margin: 0;
+  pointer-events: none;
+}
+.cw-form-check__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* Falls back to the engine's own input height when the card sets no token. */
+  min-height: var(--cw-field-h, 3rem);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* background-COLOR, not the `background` shorthand, on both this and the
+     :checked rule below. A shorthand carrying a var() is stored for late
+     substitution, and the checked state then failed to repaint the fill while
+     its other declarations applied -- a state that looked half-broken and read
+     as a cascade bug. Longhands sidestep it entirely. */
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(237, 231, 246, 0.82);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  text-wrap: balance;
+  transition:
+    background 0.2s var(--ease-smooth),
+    border-color 0.2s var(--ease-smooth),
+    color 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth),
+    transform 0.12s var(--ease-smooth);
+}
+.cw-form-check:hover .cw-form-check__btn {
+  border-color: var(--dark-muted);
+  color: #fff;
+}
+/* SELECTED = DEPRESSED. Inset shadow plus a 1px nudge down, so it reads as a
+   button being held in rather than merely recoloured. */
+.cw-form-check input:checked + .cw-form-check__btn {
+  background-color: var(--dark-muted);
+  border-color: var(--dark-muted);
+  color: var(--dark-bg);
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 6px rgba(20, 28, 70, 0.45),
+    inset 0 1px 0 rgba(20, 28, 70, 0.25);
+}
+/* The press is a state, not an animation: honour reduced motion by dropping the
+   movement and keeping the colour + shadow, which carry the same information. */
+@media (prefers-reduced-motion: reduce) {
+  .cw-form-check__btn { transition: none; }
+  .cw-form-check input:checked + .cw-form-check__btn { transform: none; }
+}
+/* Focus ring lands on the visible button, since the real input is clipped. */
+.cw-form-check input:focus-visible + .cw-form-check__btn {
+  outline: 2px solid var(--dark-muted);
+  outline-offset: 2px;
+}
+
+/* THE SYMPTOM GRID. Auto-fit rather than a fixed column count: six cards read
+   as 3x2 on a desktop, 2x3 on a tablet and a single column on a phone without
+   three separate breakpoints. */
+.cw-fix-symptoms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(15rem, 26vw, 20rem), 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+.cw-fix-symptom { padding: clamp(1.2rem, 2.4vw, 1.6rem); }
+/* The question carries the weight; it is the line the reader is scanning for.
+   Text-wrap balance keeps a two-line question from stranding one word. */
+.cw-fix-symptom__q {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-wrap: balance;
+  margin-bottom: var(--space-xs);
+}
+.cw-fix-symptom__a {
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* THE COVERAGE LEDGER. A dl, so what is audited and why stay bound together
+   for anything lifting the block. Label left, detail right, stacking under the
+   same 820px the hero uses. */
+.cw-fix-coverage { margin-top: var(--space-lg); display: grid; }
+.cw-fix-coverage__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: clamp(var(--space-sm), 3vw, var(--space-lg));
+  align-items: start;
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.cw-fix-coverage__row:first-child { border-top: none; padding-top: 0; }
+.cw-fix-coverage__label {
+  margin: 0;
+  font-weight: 700;
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+.cw-fix-coverage__detail {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: var(--leading-body);
+}
+@media (max-width: 820px) {
+  .cw-fix-coverage__row { grid-template-columns: 1fr; gap: var(--space-xs); }
+}
+
+/* THE PRICE CARD, WIDENED FOR A BAND (Chad, 2026-08-08: "width of the price
+   column").
+
+   .cw-pricing__grid--split sizes its card column at minmax(14rem, 18rem),
+   which is correct for what every other page puts in it: ONE figure, four or
+   five glyphs wide ("$675"). This page prices a RANGE, and a range is three
+   times the string. At the shared width the figure wrapped into three lines
+   with the hyphen stranded alone on the middle one, reading as a broken card
+   rather than a price.
+
+   Fixed at the SECTION rather than by shrinking the type, because the figure is
+   the thing the section exists to show. `:has()` scopes both rules to the card
+   carrying --band, so no other price band on the site moves: PriceCapsule has
+   no prop that reaches the section, and adding one for a single page would put
+   a page's layout problem into a global component's API. `main:has()` is
+   already the site's idiom for exactly this (see the calculator's prose
+   rhythm). The figure still steps down a rung, because a range set at the
+   single-figure size wants a card wide enough to unbalance the grid.
+
+   nowrap is the actual guarantee. The widths above make the one-line reading
+   fit; this makes it non-negotiable if the string ever grows a digit. */
+.cw-pricing--split:has(.cw-price-card--band) .cw-pricing__grid--split {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+}
+.cw-price-card--band .cw-price-card__figure {
+  font-size: var(--text-2xl);
+  white-space: nowrap;
+}
+
+/* The hand-rolled Q&A run that used to live here is gone (Chad, 2026-08-08):
+   the questions render through the global FaqCapsule now, and the who-it's-for
+   split renders through the global QualificationCapsule. Both bring their own
+   CSS, so this page defines none for either. */

@@ -33,7 +33,66 @@ function buildMailtoHref(subject: string, data: Record<string, string>) {
   return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-function fieldControl(f: Exclude<FormField, { kind: "section" }>, idBase: string) {
+// A checkbox field is shaped like EVERY OTHER FIELD: its label sits above the
+// control, in the same place and the same type as the label over a text input.
+// The control is then just the box.
+//
+// NO INLINE LABEL BESIDE THE BOX (Chad, 2026-08-08). A checkbox conventionally
+// captions itself on the right because a form usually holds SEVERAL in a group
+// and each needs its own name. A lone checkbox in a field slot does not: the
+// field label already names it, so an inline caption says the same words twice.
+//
+// The visible control is the Scorecard's box + tick (.cw-score__check), reused
+// rather than redrawn, so a form checkbox and the quiz on /ai-visibility-audit/
+// stay one visual language. The real <input> is clipped rather than removed, so
+// it keeps native keyboard behaviour and stays in the tab order.
+//
+// TWO labels point at the input: the visible one above, and the wrapper that
+// makes the box itself clickable. The wrapper carries no text of its own, so the
+// accessible name is exactly the field label.
+function checkboxRow(
+  f: Extract<FormField, { kind: "checkbox" }>,
+  idBase: string
+) {
+  const id = `${idBase}-${f.name}`;
+  return (
+    <div className="cw-form-field cw-form-field--check" key={f.name}>
+      {/* The whole control is ONE toggle button carrying its own text. No label
+          above it and no caption beside it: the button says what it does, so a
+          second copy of those words would just be repetition.
+
+          The <label> is the button surface and the clipped <input> inside it is
+          still the real control, which is what keeps the native checkbox
+          behaviour: space toggles it, it lands in the tab order, and it submits
+          through the same collectFormData path as every other field. The
+          accessible name comes from this label's own text. */}
+      {/* NO htmlFor. The input is NESTED inside this label, which already
+          associates the two; adding `for` pointing at the same input makes the
+          pair double-fire (label activation forwards to the control, which the
+          control's own activation then undoes), so a single click could land on
+          the state it started in. Nesting alone is the spec-safe form. */}
+      <label className="cw-form-check">
+        <input
+          type="checkbox"
+          id={id}
+          name={f.name}
+          required={f.required}
+          // The submitted string when ticked. collectFormData reads `checked`
+          // for this kind, so an unticked box sends nothing at all.
+          value={f.checkedValue ?? "Yes"}
+        />
+        <span className="cw-form-check__btn">
+          {f.label} {f.required && <span className="cw-required">*</span>}
+        </span>
+      </label>
+    </div>
+  );
+}
+
+function fieldControl(
+  f: Exclude<FormField, { kind: "section" } | { kind: "checkbox" }>,
+  idBase: string
+) {
   const id = `${idBase}-${f.name}`;
   if (f.kind === "textarea") {
     return (
@@ -120,6 +179,11 @@ export function LeadForm({
   function isComplete(form: HTMLFormElement) {
     let ok = true;
     form.querySelectorAll<HTMLInputElement>("[required]").forEach((field) => {
+      // Same checkbox carve-out as validateForm: ticked, not filled.
+      if (field.type === "checkbox") {
+        if (!field.checked) ok = false;
+        return;
+      }
       const v = (field.value || "").trim();
       if (!v) ok = false;
       else if (field.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) ok = false;
@@ -143,6 +207,14 @@ export function LeadForm({
     form.querySelectorAll(".has-error").forEach((el) => el.classList.remove("has-error"));
     form.querySelectorAll<HTMLInputElement>("[required]").forEach((field) => {
       const group = field.closest(".cw-form-field");
+      // A required checkbox is satisfied by being ticked, not by holding text.
+      if (field.type === "checkbox") {
+        if (!field.checked) {
+          valid = false;
+          if (group) group.classList.add("has-error");
+        }
+        return;
+      }
       const val = (field.value || "").trim();
       if (!val) {
         valid = false;
@@ -162,6 +234,14 @@ export function LeadForm({
     const data: Record<string, string> = {};
     form.querySelectorAll<HTMLInputElement>("input, select, textarea").forEach((field) => {
       if (!field.name) return;
+      // A checkbox reports value="Yes" whether or not it is ticked, so reading
+      // .value like the other kinds would send the opt-in on every submission.
+      // Send it only when checked, and send nothing when not -- the same way an
+      // empty text field is dropped below.
+      if (field.type === "checkbox") {
+        if (field.checked) data[field.name] = (field.value || "Yes").trim();
+        return;
+      }
       const v = (field.value || "").trim();
       if (v) data[field.name] = v;
     });
@@ -247,8 +327,25 @@ export function LeadForm({
             <div key={gi} className="cw-form-section-label">{f.label}</div>
           );
         }
+        // A LONE CHECKBOX RENDERS UNWRAPPED. Every other full-span group goes
+        // out inside a bare <div>, and that wrapper is the form's grid item --
+        // so a checkbox inside one cannot be placed by the form's own grid, and
+        // a rule aiming at .cw-form-field--check silently lands on a non-item.
+        // That is what put the audit card's checkbox on its own row above the
+        // button instead of beside it. Returning the row directly keeps it a
+        // DIRECT child of <form>, so `grid-column` on it means something.
+        //
+        // Narrow on purpose (full span, single item, checkbox). Dropping the
+        // wrapper for every full-span group would change the DOM of every form
+        // on the site.
+        if (g.span === "full" && g.items.length === 1 && g.items[0].kind === "checkbox") {
+          return checkboxRow(g.items[0], idBase);
+        }
         const inner = g.items.map((f) => {
           if (f.kind === "section") return null;
+          // The checkbox owns its whole row: label to the RIGHT of the control,
+          // so it cannot use the label-above-control shape every other kind has.
+          if (f.kind === "checkbox") return checkboxRow(f, idBase);
           return (
             <div key={f.name} className="cw-form-field">
               <label htmlFor={`${idBase}-${f.name}`}>

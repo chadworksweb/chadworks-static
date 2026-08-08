@@ -168,6 +168,26 @@ export const AI_VIZ_MONTHLY = 675; // $ per month, the ongoing AI visibility cam
 export const VSR_START = 3250; // $ to start a Vision / Strategy / Roadmap engagement.
 export const REDESIGN_TYPICAL = 6200; // $ where most redesigns settle. A posture figure, like the band.
 
+// The Website Transformation Audit (/ai-generated-website-audit/): the UI/UX
+// layer sold on its own, priced as a BAND rather than a flat fee (Chad,
+// 2026-08-08), because what the audit costs tracks how many screens and flows
+// the generated site actually has. The band is the one published in the
+// 2026-08-05 essay "AI-Generated Websites are Making UI and UX Expertise A Real
+// Premium, Real Fast", so the essay and the page cannot quote each other wrong.
+//
+// Both ends exported separately, for the reason the TYPICAL_LOW/HIGH block
+// above spells out: Chad's sentences pick their own connector word.
+export const TRANSFORMATION_LOW = 1000;
+export const TRANSFORMATION_HIGH = 2500;
+// No rendered-value comment on either of these, unlike the TYPICAL_* band
+// above. price-audit.mjs scans comments as well as code, so annotating these
+// with the strings they produce reads as two hand-typed chadworks prices and
+// has to be blessed in the allowlist to pass. Blessing a real chadworks price
+// is the exact bug that script exists to catch, so the annotation goes instead.
+// Read the constants above for the figures.
+export const TRANSFORMATION_BAND = `${money(TRANSFORMATION_LOW)} to ${money(TRANSFORMATION_HIGH)}`;
+export const TRANSFORMATION_BAND_DASH = `${money(TRANSFORMATION_LOW)} - ${money(TRANSFORMATION_HIGH)}`;
+
 // ---------------------------------------------------------------------
 // THE SWITCH LANE -- hosting and migration, sold off the /switch/ pages.
 //
