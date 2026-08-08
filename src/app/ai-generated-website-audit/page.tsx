@@ -409,9 +409,9 @@ export default function AiGeneratedWebsiteAuditPage() {
       {/* THE SYMPTOMS. The reader's own sentence, in a grid, so they land on
           the one that is theirs instead of reading past a paragraph. */}
       <SectionShell className="svc-block" id="symptoms">
-        <p className="eyebrow">Sound familiar?</p>
+        {/* No eyebrow (Chad, 2026-08-08). Heading is his copy, verbatim. */}
         <h2 className="svc-block__heading svc-fill">
-          Six versions of the same complaint
+          Does your AI generated website suck? Get the audit.
         </h2>
         <div className="svc-prose svc-prose--lead">
           <p>

@@ -718,7 +718,11 @@ p, li, dd, figcaption { text-wrap: pretty; }
 .chroma-letter,
 .dr-a__h1 em,
 .cw-art-hero__h1 em,
-.cw-art-copysample__h1 em {
+.cw-art-copysample__h1 em,
+/* The audit card's heading, which runs the green wave through clipped text.
+   "Apply" alone has two descenders, so it needs this as much as any of the
+   above. Added per this block's own instruction. */
+.cw-fix-formcard__title {
   padding-bottom: 0.15em;
 }
 
@@ -12802,6 +12806,98 @@ html.cw-motion-paused *::after {
   text-transform: none;
   color: #fff;
   margin-bottom: var(--space-xs);
+
+  /* A SLOW GREEN WAVE THROUGH THE HEADING (Chad, 2026-08-08). The greens are
+     lifted from the /rates/ "in defense of the rate" band (.cw-defense):
+     #9fe3bd is the brightest, limiest green in that scheme (it is the colour
+     behind its --dark-border). Taken as a literal rather than by reading that
+     section's tokens, because they are declared ON that section and do not
+     exist in this subtree -- var(--dark-muted) here would resolve to the
+     site-wide lavender instead.
+
+     The band is mostly white with a green swell in the middle, so the type
+     never dims: it reads as light moving across the words rather than the
+     heading changing colour. Sweeping background-position (not the gradient
+     itself) keeps the whole thing on the compositor.
+
+     No `color: transparent` fallback risk worth guarding: background-clip:text
+     is supported everywhere this site targets, and `color: #fff` above stays
+     the painted value anywhere it is not. */
+  /* ONE band, sitting in the MIDDLE of the image, and its placement is what
+     makes the resting state clean.
+
+     The image is 320% of the text and the visible window is 100%, so at
+     position 100% the window shows image-units [220..320] and at position 0%
+     it shows [0..100]. Put the band anywhere in (100..220) -- here 47-53%,
+     which is units 150-170 -- and it is off-window at BOTH ends of the sweep.
+     That is why the heading rests as plain white type and the green only
+     exists while the wipe is crossing.
+
+     One band, not two. Two bands meant the second was still mid-sweep when the
+     cycle looped, so it visibly stopped short and snapped back to the start. */
+  background-image: linear-gradient(
+    100deg,
+    #fff 0%,
+    #fff 46.5%,
+    #9fe3bd 48.6%,
+    #9fe3bd 51.4%,
+    #fff 53.5%,
+    #fff 100%
+  );
+  background-size: 320% 100%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* THE SWEEP IS LONGER THAN THE VISIBLE WIPE, and the gap has to be costed
+     accordingly. The band sits at 46.5-53.5% of a 320%-wide image, so it is
+     only ON the text for about 45% of the slide; the rest of the sweep is the
+     band travelling off-screen. Measured: a 4.5s sweep shows ~2.05s of green
+     and hides for ~2.45s.
+
+     So the perceived gap = that hidden travel + the hold. Holding 4s on top of
+     a 4.5s sweep read as ~6.5s between wipes, not 4. The hold is 1.85s instead,
+     which lands the gap back at ~4.3s with the wipe at its original speed. */
+  animation: cw-rush-wave 6.35s linear infinite;
+}
+/* POSITION STAYS INSIDE 0%..100%, AND THAT IS THE WHOLE BUG THIS FIXES.
+   background-position percentages align the IMAGE box to the CONTAINER box: 0%
+   is left-edge-to-left-edge, 100% is right-edge-to-right-edge. Because the
+   image is wider than the text (320%), every value in between still covers the
+   text completely, and 0 -> 100 slides it by the 220% difference, which is the
+   sweep.
+
+   Any value OUTSIDE that range pushes the image off the box and leaves bare,
+   unpainted area. With `-webkit-text-fill-color: transparent` the glyphs are
+   painted BY that background, so bare area means INVISIBLE WORDS. The first
+   version animated 125% -> -25% and the heading disappeared for most of every
+   cycle. Do not reintroduce out-of-range values here.
+
+   THE REST IS BUILT INTO THE KEYFRAMES, not into a delay. The wipe runs front
+   to back in the first 20% of the cycle (1s of 5s) and then HOLDS at the end
+   position for the remaining 4s. `animation-delay` cannot do this: it delays
+   only the first run, so every later repeat would come back-to-back. */
+@keyframes cw-rush-wave {
+  0% { background-position: 100% 0; }
+  /* 4.5s of the 6.35s cycle. Keep this equal to sweep / total. */
+  70.9% { background-position: 0% 0; }
+  100% { background-position: 0% 0; }
+}
+/* Reduced motion: hold the wave still with the green off the words, so the
+   heading reads as plain white type rather than frozen mid-swell. The global
+   `html.cw-motion-paused` rule already freezes this for the motion toggle. */
+/* Reduced motion: drop the gradient entirely and paint plain white type. Parking
+   the sweep at a fixed position was the earlier approach and it is not safe --
+   the same out-of-range value that broke the animation left the heading
+   permanently invisible here. Removing the image and restoring the fill colour
+   cannot fail that way. The global `html.cw-motion-paused` rule freezes the
+   animation for the motion toggle, and a frozen frame always covers the text. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.cw-force-motion) .cw-fix-formcard__title {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: #fff;
+  }
 }
 .cw-fix-formcard__blurb {
   color: rgba(237, 231, 246, 0.78);
