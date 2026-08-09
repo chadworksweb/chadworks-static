@@ -71,7 +71,6 @@ import { LeadForm } from "@/components/forms/LeadForm";
 import { FormLandingFlash } from "@/components/forms/FormLandingFlash";
 import type { LeadFormConfig } from "@/lib/forms";
 import {
-  TRANSFORMATION_BAND,
   TRANSFORMATION_BAND_DASH,
   TRANSFORMATION_LOW,
   TRANSFORMATION_HIGH,
@@ -103,13 +102,21 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: PAGE_URL,
     type: "website",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "chadworks" }],
+    // The page's own card (Chad, 2026-08-09), not the site default.
+    images: [
+      {
+        url: "/ai-gen-website-audit-og.webp",
+        width: 1200,
+        height: 630,
+        alt: "chadworks AI-Generated Website Audit",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "AI Generated Website Audit | chadworks",
     description: DESCRIPTION,
-    images: ["/og-default.png"],
+    images: ["/ai-gen-website-audit-og.webp"],
   },
 };
 
@@ -298,56 +305,90 @@ const SYMPTOMS: { q: string; body: ReactNode }[] = [
 const COVERAGE: { label: string; detail: string }[] = [
   {
     label: "The first five seconds",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "What your visitor understands, and what they can do about it, before they have scrolled anything. Generated sites are reliably weakest here because a model optimizes the page it was asked for, not the arrival.",
+      "Within five seconds a visitor needs to know, without question, what the product/service is, what it does for them, and what they can click next.",
   },
   {
-    label: "The flows that matter",
+    label: "User flow testing",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "Signup, checkout, booking, contact, whatever your one important path is. Walked step by step, with every place it asks too much or explains too little written down.",
+      "User flows like account creation/sign up, checkout, booking, and contact get audited for intuitive use and mechanical logic.",
   },
   {
-    label: "Features that should not be there",
+    label: "Features",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "The lockouts, gates, popups and settings the model added on its own initiative. Removal is a deliverable here, not an afterthought.",
+      "Pop ups, scroll jacking, flashy visuals, animations and more. Everything is sorted into should/should not be there.",
   },
   {
-    label: "The interface itself",
+    label: "Interface (UI)",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "Type, spacing, hierarchy, color, motion. The layer that decides whether the same content reads as considered or as generated.",
+      "Type, spacing, hierarchy, menu, color, micro-interactions, and images are audited for correctness and merit. Underwhelming areas and gaudy areas are both noted.",
   },
   {
     label: "The generated-site tells",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "The specific patterns that mark a site as machine-made to a 2026 visitor, named individually, with what to replace each one with.",
+      "Specific patterns, choices or visual elements that are dead-giveaways that the site was generated and never customized from there.",
   },
   {
-    label: "What it costs you today",
+    label: "Priorities",
+    // Chad's copy, verbatim (2026-08-09).
     detail:
-      "Ranked. Not a list of everything wrong, a list of what to fix first and what you can safely leave alone.",
+      "All the above (and whatever else was clocked) listed in order from most important to not that important.",
+  },
+  {
+    label: "Estimate",
+    // Chad's copy, verbatim (2026-08-09).
+    detail:
+      "I'll provide an estimate for what it would take me to implement all the shortcomings discovered and change recommended by the audit.",
   },
 ];
 
 const PROCESS_STEPS = [
   {
-    title: "You send me the link",
-    body: "The form above. Your site or app, and your name. No passwords, no repo access, no call to book first.",
+    // Chad's copy, verbatim (2026-08-09). "give it a shot" is the anchor back
+    // to the hero form, so the link is inline JSX rather than a plain string.
+    title: "Apply for the audit",
+    body: (
+      <>
+        I don&apos;t audit every site that comes through my inbox.
+        <br />
+        Most are approved, but sites in certain industries, of a certain size or certain
+        configurations might not be approved. The application is free, so{" "}
+        <a href="#audit-form">give it a shot</a>!
+      </>
+    ),
   },
   {
-    title: "I use it like your visitor does",
-    body: "On a phone and on a desktop, cold, without you explaining it to me. Where I get confused is where they get confused, and confusion is the finding.",
+    // Chad's copy, verbatim (2026-08-09).
+    title: "Approval & Payment",
+    body: "Once approved, I reply with an exact quote via invoice and a brief summary of what I'll focus on during the audit. You pay the invoice upfront to secure your spot.",
   },
   {
-    title: "I audit the interface and the flows",
-    body: "Every screen and every path, documented as I go, with what is wrong and what it should be instead.",
+    // Chad's copy, verbatim (2026-08-09).
+    title: "The Actual Audit",
+    body: "This is the part you are paying for. I'll take an un-capped amount of time to pore over your site, pixel by pixel, line by line, click by click, uncovering all the hidden gems or black holes hiding in plain sight.",
   },
   {
-    title: "You get the transformation document",
-    body: "The findings ranked by what changes the most, written so you can hand it to whoever is doing the work, including your AI assistant.",
+    // Chad's copy, verbatim (2026-08-09).
+    title: "Audit Document Delivery",
+    body: "I'll compile my findings into an easy to read, well-structured PDF including a TL;DR section, a priority list and granular list of every infraction discovered.",
   },
   {
-    title: "You decide who executes it",
-    body: "Run it yourself, feed it to your coding agent, or have me build it. The document stands on its own either way.",
+    // Chad's copy, verbatim (2026-08-09). "Apply today" anchors back to the
+    // hero form, same as step one's link.
+    title: "Implementation",
+    body: (
+      <>
+        Once the audit is in your hands, you decide who makes the changes. You
+        could simply feed it to your AI coding assistant, or hire someone to
+        make the changes for you. That someone could be me! What are you waiting
+        for? <a href="#audit-form">Apply today</a>.
+      </>
+    ),
   },
 ];
 
@@ -371,10 +412,16 @@ export default function AiGeneratedWebsiteAuditPage() {
           `full` the section spans all three grid tracks, the cloud bleeds to
           both viewport edges, and .cw-calc-intro re-anchors itself back to the
           site-width rail because a `.full` child is itself a shell. */}
+      {/* #audit-form is on the SECTION, not the form card (Chad, 2026-08-09):
+          every CTA jump lands on the top of the hero, so the reader arrives at
+          the whole ask -- headline, argument and form together -- rather than
+          at a card floating mid-viewport with its own section cut off above
+          it. */}
       <SectionShell
         full
         className="svc-block cw-fix-hero"
         reveal={false}
+        id="audit-form"
         bg={<ManifestoAmbient />}
       >
         <div className="cw-calc-intro cw-fix-intro">
@@ -443,9 +490,9 @@ export default function AiGeneratedWebsiteAuditPage() {
             </div>
           </div>
 
-          {/* THE ASK. id lives on the panel, which is what the CTA above and
-              the price card below both jump to. */}
-          <div className="panel cw-fix-formcard" id="audit-form">
+          {/* THE ASK. The jump target is the section (see above); this id is
+              only the handle the landing flash lights up. */}
+          <div className="panel cw-fix-formcard" id="audit-form-card">
             {/* Chad's label (2026-08-08). An h3, not the <p> this was, so the
                 form card announces itself as a real heading in the document
                 outline and to a screen reader. .cw-fix-formcard__title carries
@@ -465,7 +512,7 @@ export default function AiGeneratedWebsiteAuditPage() {
           {/* Renders nothing. Every CTA on this page jumps to the card above,
               and this is what makes the card flash once the scroll has actually
               landed rather than the moment the link is pressed. */}
-          <FormLandingFlash targetId="audit-form" />
+          <FormLandingFlash targetId="audit-form" flashId="audit-form-card" />
         </div>
       </SectionShell>
 
@@ -632,7 +679,7 @@ export default function AiGeneratedWebsiteAuditPage() {
         </div>
       </SectionShell>
 
-      {/* WHAT THE AUDIT COVERS. Static HTML, six rows, liftable in one piece by
+      {/* WHAT THE AUDIT COVERS. Static HTML, seven rows, liftable in one piece by
           an engine that will never scroll this page. */}
       <SectionShell className="svc-block cw-fix-coverage-top" id="coverage">
         <p className="eyebrow">What gets audited</p>
@@ -640,9 +687,10 @@ export default function AiGeneratedWebsiteAuditPage() {
           What the AI-Gen Website Audit Covers
         </h2>
         <div className="svc-prose svc-prose--lead">
+          {/* Chad's copy, verbatim (2026-08-09). Plain ASCII apostrophe. */}
           <p>
-            Every one of these is something a model does not decide for you, and
-            will not raise its hand about.
+            Here are some general points of interest I&apos;ll look at during my
+            audit of your AI-generated website or SaaS.
           </p>
         </div>
         <dl className="cw-fix-coverage">
@@ -659,8 +707,9 @@ export default function AiGeneratedWebsiteAuditPage() {
           /ai-visibility-audit/ and /web-design/ give their process. */}
       <ProcessCapsule
         pageName="audit"
-        className="cw-process--nested"
-        heading="How the transformation audit runs"
+        className="cw-process--nested cw-fix-process"
+        // Chad's copy, verbatim (2026-08-09).
+        heading="The AI-Gen Website Clean Audit Process"
         steps={PROCESS_STEPS}
         scheme="inverted"
       />
@@ -671,9 +720,16 @@ export default function AiGeneratedWebsiteAuditPage() {
           deploy. */}
       <PriceCapsule
         price={{
-          heading: "What does a Website Transformation Audit cost?",
+          // Chad's copy, verbatim (2026-08-09), heading and the term in the
+          // lede with it.
+          heading: "What does an AI-Gen Website Audit Cost?",
           figure: TRANSFORMATION_BAND_DASH,
-          body: `A Website Transformation Audit runs ${TRANSFORMATION_BAND}, quoted flat in writing before anything starts. Where yours lands depends on how many screens and flows there are to walk, not on how long it takes me.`,
+          // Chad's copy, verbatim (2026-08-09), except the two figures, which
+          // are hub interpolations rather than the amounts he typed: a literal
+          // dollar figure in this file fails price-audit at deploy, and the
+          // audit scans comments too, so it cannot be quoted here either.
+          // money() supplies the high end's thousands comma.
+          body: `The chadworks™ AI-Generated Website Audit costs between ${money(TRANSFORMATION_LOW)} and ${money(TRANSFORMATION_HIGH)}, depending on the size and scope of the site or platform in question. It's important to know that the fee covers the audit only, and making the changes outlined in the audit will incur additional labor time on top of it, should you choose me to do the work.`,
           disclaimer: (
             <>
               <strong>Straight up:</strong>{" "}A large multi-screen SaaS, or an
@@ -683,8 +739,11 @@ export default function AiGeneratedWebsiteAuditPage() {
           ),
         }}
         ctaHref="#audit-form"
-        ctaLabel="Send me your link"
+        ctaLabel="Apply Now"
         variant="rates"
+        // The "Straight up" fine print rides with the card, not the argument
+        // (Chad, 2026-08-09).
+        disclaimerUnderCard
         cardLabel="One time"
         // --band is the hook the widened card column keys off (see global.css).
         // The shared split grid sizes its card for a single figure, which a
@@ -706,16 +765,22 @@ export default function AiGeneratedWebsiteAuditPage() {
           the page's. */}
       <QualificationCapsule
         qualification={{
-          heading: "Are we a good fit?",
+          // Chad's copy, verbatim (2026-08-09).
+          heading: "Is the audit a good choice for you?",
           fitLabel: "The audit is for you if:",
           notLabel: "Probably not if:",
           fit: [
-            "You built it with Claude Code, Cursor, Lovable, v0, Replit or anything like them, and it shipped.",
-            "It functions. Your problem is not a stack trace, it is the feeling you get looking at it.",
-            "People land on it and leave, and your analytics will not tell you which decision lost them.",
-            "You want to keep building it yourself and just need to know what to build.",
-            "Someone told you it looks AI generated, and they were not wrong.",
-            "You are about to spend real money promoting something that is not ready for the traffic.",
+            "You built your project with Claude Code, Cursor, Lovable, v0, Replit or anything like them.",
+            // Chad's copy, verbatim (2026-08-09). Single-quoted so the inner
+            // quotation marks stay plain ASCII, the way every other copy string
+            // in this file does its punctuation.
+            'Someone told you it looks generic or "obviously AI."',
+            // Chad's copy, verbatim (2026-08-09).
+            "It loads and functions, meaning there are no technology bugs preventing it from being used, in whatever state that may be.",
+            // Chad's copy, verbatim (2026-08-09).
+            "It's live and people are landing and leaving (bouncing), or visiting but not converting.",
+            // Chad's copy, verbatim (2026-08-09).
+            "You are about to spend real money on marketing.",
           ],
           notFit: [
             <>
@@ -725,8 +790,14 @@ export default function AiGeneratedWebsiteAuditPage() {
               </Link>
               , which scopes and prices a full custom build in about a minute.
             </>,
-            "You want me to rebuild it from scratch rather than tell you what is wrong. That is a web design project, and a different conversation.",
-            "You are looking for a free automated scan. Those exist, and they measure the things that are easy to measure.",
+            <>
+              You want me to rebuild it from scratch rather than tell you what
+              is wrong. That is a{" "}
+              <Link href="/web-design/">web design</Link> project, and a
+              different conversation.
+            </>,
+            // Chad's copy, verbatim (2026-08-09).
+            "You are looking for a free automated scan. Those exist, but this isn't one of them.",
           ],
         }}
       />
@@ -744,14 +815,23 @@ export default function AiGeneratedWebsiteAuditPage() {
           HTML regardless of open state, so an engine reads all of it. */}
       <FaqCapsule
         pageName="Website Transformation Audit"
-        heading="Questions about the transformation audit"
-        faqLead="What people ask before they send me a link."
+        // Chad's copy, verbatim (2026-08-09), heading and lede both.
+        // "AI-Gen" is held on one line (Chad, 2026-08-09). A hyphen is a break
+        // opportunity, so the heading was free to wrap it as "AI-" / "Gen".
+        heading={
+          <>
+            Common questions about the{" "}
+            <span className="cw-fix-nowrap">AI-Gen</span> Website Audit
+          </>
+        }
+        faqLead="Frequently asked questions about the chadworks AI Generated Website audit."
         scheme="inverted"
         schemeAuto
         faqs={[
           {
             q: "Do you rebuild my site, or just tell me what is wrong?",
-            a: "The audit is the document. Building from it is separate work, and you are never required to buy it from me. Plenty of people take the document straight back to their own AI assistant and execute it themselves, which is a completely legitimate way to use it.",
+            // Chad's copy, verbatim (2026-08-09).
+            a: "The audit is not a web design or building service. It is a process that delivers a checklist of what could or should be done to the site/platform. It does not include implementing the suggestions.",
           },
           {
             // "vibe-coded" until 2026-08-08, when Chad tested the term on
@@ -759,7 +839,8 @@ export default function AiGeneratedWebsiteAuditPage() {
             // builder vocabulary, and this page is read by people who are not
             // builders, so it is out everywhere on the page.
             q: "Will you make fun of my AI generated site?",
-            a: "No. I build with Claude Code every day and I have shipped things I later found embarrassing. The audit is written to be useful, not to be clever at your expense.",
+            // Chad's copy, verbatim (2026-08-09).
+            a: "Of course not. I've been where you are: discovering the limitations of what AI models put out on their own. I approach each audit with compassion, empathy and understanding of where you are and where you want to go.",
           },
           {
             q: "Does this work on a SaaS app, not just a marketing site?",
@@ -776,11 +857,24 @@ export default function AiGeneratedWebsiteAuditPage() {
             // that quotes two different turnarounds is a page that gets one of
             // them quoted back at it. One number, stated the same way in both
             // places.
-            a: "Your document lands within 3 business days of the quote being accepted. Smaller sites are often faster than that.",
+            // Chad's copy, verbatim (2026-08-09).
+            a: "Your audit document will be delivered within 3 business days of invoice payment. Rush is available for an additional case-by-case fee.",
           },
           {
             q: "What if you look at it and it is actually fine?",
-            a: "Then I tell you that before you pay me, and you go spend the money on something that will move your business instead. That has happened and I would rather it keep happening.",
+            // Chad's copy, verbatim (2026-08-09), replacing the closing line,
+            // with the service name linked on his say-so.
+            a: (
+              <>
+                Then I tell you that before you pay me, and you go spend the
+                money on something that will move your business instead. For
+                example, my{" "}
+                <Link href="/ai-search-visibility/">
+                  AI Search Visibility service
+                </Link>
+                , which helps your website show up on ChatGPT and the like.
+              </>
+            ),
           },
         ]}
       />
@@ -796,6 +890,7 @@ export default function AiGeneratedWebsiteAuditPage() {
       />
 
       <PathsCapsule
+        className="cw-fix-paths"
         paths={{
           heading: "Explore chadworks™",
           items: [
@@ -818,6 +913,21 @@ export default function AiGeneratedWebsiteAuditPage() {
               href: "/website-design-cost-calculator/",
             },
             {
+              // Detail lifted from /visibility/'s own lane for this service,
+              // so the same offer is described the same way in both places.
+              label: "AI Search Visibility",
+              detail:
+                "A package of services that help you get found on AI search assistants like ChatGPT and Perplexity for a flat monthly rate.",
+              href: "/ai-search-visibility/",
+            },
+            {
+              // Same detail /rates/ uses for this lane.
+              label: "About",
+              detail:
+                "chadworks is one person: Chad Lewine. Designing, developing and marketing for clients since 2011.",
+              href: "/about/",
+            },
+            {
               label: "Essays",
               detail:
                 "The longer argument behind this page, and the rest of what I think about this market.",
@@ -827,7 +937,8 @@ export default function AiGeneratedWebsiteAuditPage() {
         }}
       />
 
-      <MainContactCapsule heading="Rather explain it than link it?" />
+      {/* Chad's copy, verbatim (2026-08-09). */}
+      <MainContactCapsule heading="Want to discuss something before applying for an audit?" />
     </PageComposer>
   );
 }

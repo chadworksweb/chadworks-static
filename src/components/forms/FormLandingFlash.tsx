@@ -44,9 +44,20 @@ const MAX_WAIT_MS = 1600;
 // short would cut the flash off.
 const FLASH_MS = 1500;
 
-export function FormLandingFlash({ targetId }: { targetId: string }) {
+// `targetId` is the ANCHOR the CTAs point at; `flashId` is the element that
+// lights up when the scroll lands. They were one id until the anchor moved up
+// to the hero section (Chad, 2026-08-09: the scroll "needs to land at top: 0
+// for the section, not just the form"), which is a scroll-position decision --
+// the thing worth flashing is still the form card inside it.
+export function FormLandingFlash({
+  targetId,
+  flashId = targetId,
+}: {
+  targetId: string;
+  flashId?: string;
+}) {
   useEffect(() => {
-    const el = document.getElementById(targetId);
+    const el = document.getElementById(flashId);
     if (!el) return;
 
     let moveTimer: number | undefined;
@@ -119,7 +130,17 @@ export function FormLandingFlash({ targetId }: { targetId: string }) {
     const onClick = (e: MouseEvent) => {
       // Same-page hash links only, and only the ones aimed at this card. Modified
       // clicks are the browser's business (new tab, download), not ours.
-      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+      //
+      // defaultPrevented is deliberately NOT a bail-out (Chad, 2026-08-09: "put
+      // the damn highlight on the cta scroll"). Every capsule CTA renders
+      // through CtaButton, which is a next/link -- Link preventDefaults the
+      // anchor and performs the same-page jump itself, so this listener saw
+      // defaultPrevented on the bubble and armed nothing. The scroll still
+      // happens, and it is the scroll this flash answers. It also fires no
+      // hashchange, which is why the click is the only signal there is. The
+      // hand-written <a> CTAs were flashing the whole time, which is what made
+      // the failure look random.
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
         return;
       }
       const a = (e.target as Element | null)?.closest?.<HTMLAnchorElement>("a[href]");
@@ -146,7 +167,7 @@ export function FormLandingFlash({ targetId }: { targetId: string }) {
       window.clearTimeout(clearTimer);
       clearAll();
     };
-  }, [targetId]);
+  }, [targetId, flashId]);
 
   return null;
 }

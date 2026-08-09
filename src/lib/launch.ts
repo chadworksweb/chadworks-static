@@ -68,6 +68,10 @@ const LAUNCHED = new Set<string>([
                             // which is the exact failure the note at the top of this file
                             // describes: in the sitemap, serving noindex. Both gained one
                             // in the same commit as this edit.
+  "/ai-generated-website-audit/", // launched 2026-08-09 -- the AI-Gen Website Audit,
+                                  // the audit lane for sites that already exist and
+                                  // were generated. Its robots line was already
+                                  // isLaunched-gated, so this one edit lights it.
   // "/how-much-does-a-website-cost/" -- SEALED 2026-07-24. Pulled back from launch
   // (was launched 2026-07-20). robots line gates on isLaunched, so it follows.
 ]);

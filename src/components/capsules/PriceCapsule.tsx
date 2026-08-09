@@ -29,6 +29,15 @@ export type PriceCapsuleProps = {
   // it ("/ month"). The figure itself stays price.figure.
   cardLabel?: string;
   unit?: string;
+  // "rates" only: render the fine print in the CARD column, tucked under the
+  // card, instead of in the copy column under the argument (Chad, 2026-08-09).
+  // Opt-in rather than a straight move, because /ai-search-visibility/ and
+  // /ai-visibility-audit/ run this variant too and keep the fine print with the
+  // copy. It is a DOM change and not a CSS one on purpose: with the paragraph
+  // living inside the copy column, no amount of grid placement puts it against
+  // the bottom of the card -- its row is sized by the argument beside it, so it
+  // lands wherever that text ends.
+  disclaimerUnderCard?: boolean;
 };
 
 export function PriceCapsule({
@@ -42,6 +51,7 @@ export function PriceCapsule({
   heading,
   cardLabel = "Flat monthly rate",
   unit,
+  disclaimerUnderCard,
 }: PriceCapsuleProps) {
   // RATES variant -- the global rates band's design language (cw-pricing head,
   // panel card, centred disclaimer + CTA), split so the argument holds the left
@@ -62,24 +72,41 @@ export function PriceCapsule({
             <p>
               <W value={price.body} />
             </p>
-            {price.disclaimer && (
+            {price.disclaimer && !disclaimerUnderCard && (
               <p className="cw-pricing__disclaimer cw-pricing__disclaimer--inline">
                 {price.disclaimer}
               </p>
             )}
           </div>
           {/* Right column: the number, closed by the CTA sitting flush in the
-              card's bottom edge (square on top, the panel's radius below). */}
-          <div className={cx("cw-price-card panel cw-price-card--cta", panelClassName)}>
-            <p className="cw-price-card__label">{cardLabel}</p>
-            <p className="cw-price-card__figure">
-              {price.figure}
-              {unit && <span className="cw-price-card__unit">{unit}</span>}
-            </p>
-            <div className="cw-price-card__cta">
-              <CtaButton href={ctaHref} label={ctaLabel} />
-            </div>
-          </div>
+              card's bottom edge (square on top, the panel's radius below).
+
+              The wrapper only exists when the fine print joins the card here,
+              so every other page's grid keeps the card as its own direct grid
+              item and nothing about their layout moves. */}
+          {(() => {
+            const card = (
+              <div className={cx("cw-price-card panel cw-price-card--cta", panelClassName)}>
+                <p className="cw-price-card__label">{cardLabel}</p>
+                <p className="cw-price-card__figure">
+                  {price.figure}
+                  {unit && <span className="cw-price-card__unit">{unit}</span>}
+                </p>
+                <div className="cw-price-card__cta">
+                  <CtaButton href={ctaHref} label={ctaLabel} />
+                </div>
+              </div>
+            );
+            if (!price.disclaimer || !disclaimerUnderCard) return card;
+            return (
+              <div className="cw-pricing__aside">
+                {card}
+                <p className="cw-pricing__disclaimer cw-pricing__disclaimer--under-card">
+                  {price.disclaimer}
+                </p>
+              </div>
+            );
+          })()}
         </div>
       </SectionShell>
     );

@@ -10366,6 +10366,21 @@ html.cw-motion-paused *::after {
   text-align: left;
   margin-top: var(--space-md);
 }
+/* THE CARD COLUMN WITH ITS FINE PRINT (Chad, 2026-08-09: the disclaimer "needs
+   to be IN the card col, nestled just under the card itself"). Only rendered
+   when a page opts in via PriceCapsule's disclaimerUnderCard; the card is a
+   bare grid item everywhere else. align-content: start so the pair keeps its
+   own height instead of stretching down the argument beside it. */
+.cw-pricing__aside {
+  display: grid;
+  gap: var(--space-sm);
+  align-content: start;
+}
+.cw-pricing__disclaimer--under-card {
+  text-align: left;
+  margin-top: 0;
+}
+
 /* The figure sits straight under its label: the card is a flex column with a
    gap, so the one gap above the price is cancelled here rather than dropped
    from the card (the rates band's own cards keep it). */
@@ -12917,9 +12932,17 @@ html.cw-motion-paused *::after {
    bare anchor jump parks the card's top edge at y=0 with its heading behind the
    nav -- measured, not guessed. scroll-margin-top makes the browser stop that
    much further up the document, which is the same value the essay and calculator
-   anchors on this site already use. */
-.cw-fix-formcard {
-  scroll-margin-top: calc(var(--nav-height) + var(--space-md));
+   anchors on this site already use.
+
+   MOVED TO THE SECTION (Chad, 2026-08-09: land "at top: 0 for the section, not
+   just the form"). #audit-form is the hero section now, so the offset has to
+   travel with the anchor -- left on the card it would do nothing, since
+   nothing jumps to the card any more. Still --nav-height rather than a literal
+   0: the nav is sticky and opaque, so a true top of 0 parks the section's
+   first 72px underneath it. This is the top of the section as the reader sees
+   it. */
+.cw-fix-hero {
+  scroll-margin-top: var(--nav-height);
 }
 /* AND A FLASH ON ARRIVAL, fired by FormLandingFlash rather than by `:target`.
    :target was the first cut and it fires on the CLICK, while the smooth scroll
@@ -13087,6 +13110,27 @@ html.cw-motion-paused *::after {
   margin: 0;
   padding: 0 0 0 var(--space-sm);
   border-left: 1px solid rgba(255, 255, 255, 0.16);
+}
+/* ON A PHONE THE ROW BREAKS (Chad, 2026-08-09: "make the phone number field
+   full width on mobile"). A 2.3fr / 1fr split of a ~330px card leaves the
+   phone input around 200px, narrower than the fields above it, so the form
+   steps in and out at its second-to-last row. Both cells span the full width
+   and stack, which is what every other field in the card does at this size.
+
+   The divider goes with the split: it exists to separate two controls sitting
+   side by side, and there is no side by side left. align-self returns to the
+   default for the same reason -- the toggle no longer has a phone input beside
+   it to line its bottom edge up with. */
+@media (max-width: 767px) {
+  .cw-fix-formcard .cw-form > div:has(+ .cw-form-field--check) {
+    grid-column: 1 / -1;
+  }
+  .cw-fix-formcard .cw-form-field--check {
+    grid-column: 1 / -1;
+    align-self: auto;
+    padding-left: 0;
+    border-left: none;
+  }
 }
 /* HEIGHT, not min-height, and read from the same token the inputs use. The
    input resolves to exactly the token (its content is shorter, so min-height
@@ -13342,6 +13386,72 @@ html.cw-motion-paused *::after {
   line-height: var(--leading-body);
 }
 
+/* THE EXPLORE HEADING, CENTERED (Chad, 2026-08-09). Page-scoped for the same
+   reason .cw-fix-process is: PathsCapsule closes five other pages and they
+   keep the left-aligned heading. The lane grid underneath is untouched. */
+.cw-fix-paths > .svc-block__heading { text-align: center; }
+
+/* HOLDS A HYPHENATED TERM TOGETHER (Chad, 2026-08-09: "AI-Gen should fit on
+   one line"). A hyphen is a line-break opportunity, so a heading is entitled
+   to split "AI-Gen" across two lines and did. Applied per term rather than to
+   the whole heading, which would take away the wrapping the heading needs. */
+.cw-fix-nowrap { white-space: nowrap; }
+
+/* AN INLINE CTA INSIDE A PROCESS STEP (Chad, 2026-08-09). `p a` already gives
+   the step body the house prose link, but the timeline sits on the dark band,
+   where the resting purple sinks into the navy. Same lavender-text /
+   white-wipe swap .svc-dark .svc-block__body a makes, applied to the step
+   body so the two dark-band link treatments stay identical. */
+.svc-dark .cw-process__body a {
+  color: var(--dark-muted);
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(rgba(229, 210, 244, 0.35), rgba(229, 210, 244, 0.35));
+}
+
+/* THE PROCESS HEADING, CENTERED (Chad, 2026-08-09). Page-scoped modifier, not
+   a change to .cw-process: the same capsule runs left-aligned on
+   /ai-search-visibility/ and /ai-visibility-audit/, and cw-process--nested is
+   shared with both. Only the heading moves; the numbered timeline below it
+   keeps its left rail. */
+.cw-fix-process > .svc-block__heading { text-align: center; }
+
+/* THE COVERAGE SECTION'S MEASURE (Chad, 2026-08-09: "match the width of the
+   frosted panel from the above section").
+
+   Same max-width expression as .cw-fix-quote__card, not a copied pixel value,
+   so the two stay locked if --measure-prose ever moves. Both sit in the shell
+   grid's `content` column, so an identical max-width plus auto side margins
+   puts their left and right edges on the same two lines down the page.
+
+   Applied to the eyebrow, heading, lede and ledger alike -- the whole block
+   shares the panel's measure, or the heading would overhang the rows it
+   introduces. The lede's own .svc-prose measure is deliberately overridden
+   here; it is the narrower prose measure and would break the alignment.
+
+   THE MEASURE IS FROZEN ON THE SECTION, not read on each child (Chad,
+   2026-08-09: "the lede is breaking out"). --measure-prose is 68ch, and ch
+   resolves against the font of whatever element uses it -- so the lede, set a
+   full step larger at --text-lg, drew a box ~25% wider than the same
+   expression did on the ledger below it and hung past the panel's right edge.
+   Registering the length with @property makes it compute where it is
+   DECLARED, on the section, whose font-size is the one the frosted card
+   inherits too. Every child then inherits one already-computed pixel width
+   regardless of its own type size. */
+@property --cw-fix-measure {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+.cw-fix-coverage-top { --cw-fix-measure: calc(var(--measure-prose) * 1.2); }
+.cw-fix-coverage-top > .eyebrow,
+.cw-fix-coverage-top > .svc-block__heading,
+.cw-fix-coverage-top > .svc-prose,
+.cw-fix-coverage-top > .cw-fix-coverage {
+  max-width: min(var(--cw-fix-measure), 100%);
+  margin-inline: auto;
+}
+
 /* THE COVERAGE LEDGER. A dl, so what is audited and why stay bound together
    for anything lifting the block. Label left, detail right, stacking under the
    same 820px the hero uses. */
@@ -13393,12 +13503,165 @@ html.cw-motion-paused *::after {
 
    nowrap is the actual guarantee. The widths above make the one-line reading
    fit; this makes it non-negotiable if the string ever grows a digit. */
-.cw-pricing--split:has(.cw-price-card--band) .cw-pricing__grid--split {
-  grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+/* GATED TO DESKTOP (Chad, 2026-08-09: on mobile the price band "is now jacked
+   up"). Unqualified, this rule applied at EVERY width, and being three classes
+   deep it outranked both the global one-column stack at 860 and the page's own
+   overrides -- so a phone got a two-column grid with an 18rem minimum on the
+   card, which cannot fit, and the copy column was crushed to nothing (measured
+   at 390px: tracks of 0px and 334px, the card 49px wide). It reads as today's
+   damage and is not: this rule has been widening the grid at all widths since
+   it was written, and the fine print moving into the card column is only what
+   made it visible. Below this the global stack and the tablet band take
+   over. */
+@media (min-width: 1025px) {
+  .cw-pricing--split:has(.cw-price-card--band) .cw-pricing__grid--split {
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 24rem);
+  }
 }
+/* STEPPED DOWN AGAIN (Chad, 2026-08-09: "reduce the size of the price so it
+   fits centered in its box"). At --text-2xl the nowrap range still ran the
+   full inside width of the card, so it read as pinned edge to edge rather than
+   centred in it. One more rung leaves air on both sides, which is what makes
+   the centring visible. */
 .cw-price-card--band .cw-price-card__figure {
-  font-size: var(--text-2xl);
+  font-size: var(--text-xl);
   white-space: nowrap;
+}
+
+/* PORTRAIT TABLET KEEPS ITS COLUMNS (Chad, 2026-08-09, testing on a tablet in
+   portrait). Every band on this page collapsed to one column somewhere between
+   820 and 1024, which is the right call on a phone and wrong on a tablet: at
+   768-1024 there is room for two, and a single column strands each module in a
+   ribbon of white space it does not need.
+
+   SCOPED TO THIS PAGE, not fixed at the source, because all five of these
+   breakpoints are global and carry other pages behind them -- .cw-contact__
+   layout's 1024 stack in particular is a measured fix for a cramped form, and
+   moving it would change /contact/ and every page that closes on that band.
+   `main:has(.cw-fix-hero)` is the file's existing idiom for a page-local
+   override (see the calculator's prose rhythm); .cw-fix-hero is unique to this
+   page.
+
+   THE BAND STARTS AT 768 (Chad, 2026-08-09: "this was just for tablet portrait
+   only"), which is the narrowest portrait tablet. The first cut opened at 701
+   and caught large phones in landscape with it, where two columns of anything
+   are too narrow to read. Every phone keeps the single-column stack it
+   collapses to today. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  /* The hero: argument left, form right, the desktop ratio. */
+  main:has(.cw-fix-hero) .cw-fix-intro { grid-template-columns: 1.15fr 1fr; }
+
+  /* The symptom checkerboard. Explicit two-up rather than letting auto-fit
+     decide: its 15rem minimum fits three across a tablet, which is what put
+     three cramped cards in a row here. */
+  main:has(.cw-fix-hero) .cw-fix-symptoms {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* The coverage ledger, label left and detail right the way the desktop
+     reads it. */
+  main:has(.cw-fix-hero) .cw-fix-coverage__row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: clamp(var(--space-sm), 3vw, var(--space-lg));
+  }
+
+  /* The price band: argument left, card right. The fine print already travels
+     with the card in the markup (see .cw-pricing__aside), so the columns are
+     the only thing this has to restore. */
+  main:has(.cw-fix-hero) .cw-pricing__grid--split {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+  }
+
+  /* The contact band: reach-direct copy left, form right. */
+  main:has(.cw-fix-hero) .cw-contact__layout { grid-template-columns: 1fr 1fr; }
+
+  /* THE PROCESS TIMELINE, back on its center rail with the cards alternating
+     across it. Restated rather than un-set: the 900px collapse rewrites the
+     rail position, the item widths, the text alignment and both marker sides,
+     so every one of those has to be answered here.
+
+     The one desktop rule NOT restored is the nested fixed pitch. That height
+     is what makes the cards interleave instead of clearing each other, and it
+     is measured against a desktop card's width -- at half a tablet the same
+     copy runs taller and overruns it. Natural height plus a gap keeps the two
+     columns without clipping any card. */
+  main:has(.cw-fix-hero) .cw-process__line::before {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  main:has(.cw-fix-hero) .cw-process--nested .cw-process__item,
+  main:has(.cw-fix-hero) .cw-process--nested .cw-process__item:last-child {
+    height: auto;
+  }
+  main:has(.cw-fix-hero) .cw-process__item {
+    width: 50%;
+    padding-bottom: var(--space-lg);
+  }
+  main:has(.cw-fix-hero) .cw-process__item:last-child { padding-bottom: 0; }
+  main:has(.cw-fix-hero) .cw-process__item:nth-child(odd) {
+    margin-left: 0;
+    padding-left: 0;
+    padding-right: calc(var(--space-lg) + 1.4rem);
+    text-align: right;
+  }
+  main:has(.cw-fix-hero) .cw-process__item:nth-child(even) {
+    margin-left: 50%;
+    padding-left: calc(var(--space-lg) + 1.4rem);
+    padding-right: 0;
+    text-align: left;
+  }
+  main:has(.cw-fix-hero) .cw-process__item:nth-child(odd) .cw-process__marker {
+    left: auto;
+    right: -1.2rem;
+    transform: none;
+  }
+  main:has(.cw-fix-hero) .cw-process__item:nth-child(even) .cw-process__marker {
+    left: -1.2rem;
+    right: auto;
+    transform: none;
+  }
+}
+
+/* THE PRICE BAND EVERYWHERE ELSE: EXACTLY AS IT WAS (Chad, 2026-08-09: "put
+   the pricing back how it was for desktop and laptop sizes... these changes
+   were all just for portrait tablet").
+
+   The fine print now travels with the card in the MARKUP, which is the only
+   way it can tuck under the card on a tablet -- inside the copy column its row
+   is sized by the argument beside it, so it lands wherever that text ends, not
+   where the card ends. That markup is global to the page, so desktop and
+   mobile have to put it back themselves.
+
+   `display: contents` on the wrapper is what makes that possible: the card and
+   the fine print become grid items of the band directly, and from there they
+   can be placed anywhere the original layout had them. Nothing is duplicated
+   and nothing is hidden -- one paragraph, in one place in the document, read
+   in the same order by an engine and a screen reader at every width.
+
+   DESKTOP AND LAPTOP: card top-right, fine print back under the argument in
+   the left column, which is where it sat before any of this. */
+@media (min-width: 1025px) {
+  main:has(.cw-fix-hero) .cw-pricing__aside { display: contents; }
+  main:has(.cw-fix-hero) .cw-pricing__copy { grid-column: 1; grid-row: 1; }
+  main:has(.cw-fix-hero) .cw-price-card { grid-column: 2; grid-row: 1; }
+  main:has(.cw-fix-hero) .cw-pricing__disclaimer--under-card {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 0;
+  }
+}
+
+/* MOBILE: the single-column stack in its original reading order -- argument,
+   then the fine print that qualifies it, then the card. */
+@media (max-width: 767px) {
+  main:has(.cw-fix-hero) .cw-pricing__grid--split { grid-template-columns: 1fr; }
+  main:has(.cw-fix-hero) .cw-pricing__aside { display: contents; }
+  main:has(.cw-fix-hero) .cw-pricing__copy { grid-row: 1; }
+  main:has(.cw-fix-hero) .cw-pricing__disclaimer--under-card {
+    grid-row: 2;
+    margin-top: 0;
+  }
+  main:has(.cw-fix-hero) .cw-price-card { grid-row: 3; }
 }
 
 /* The hand-rolled Q&A run that used to live here is gone (Chad, 2026-08-08):
