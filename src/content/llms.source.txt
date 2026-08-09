@@ -13,6 +13,7 @@
 - [Websites](https://chadworks.co/websites/)
 - [Web Development](https://chadworks.co/web-development/)
 - [Web Design](https://chadworks.co/web-design/)
+- [AI-Generated Website Audit](https://chadworks.co/ai-generated-website-audit/)
 - [Web Design Packages](https://chadworks.co/web-design-packages/)
 - [WordPress](https://chadworks.co/wordpress/)
 - [Custom-Coded Static](https://chadworks.co/custom-coded-static/)
