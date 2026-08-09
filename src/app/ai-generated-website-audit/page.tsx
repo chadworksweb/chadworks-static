@@ -42,6 +42,7 @@
 // and sealed, awaiting Chad's go.
 
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { ORG_ID, ref } from "@/lib/jsonld";
@@ -59,6 +60,7 @@ import {
   ArrowRight,
 } from "@/components/capsules";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
+import { Ribbon } from "@/components/Ribbon";
 // BEFORE/AFTER SLIDER -- PARKED (Chad, 2026-08-08). Built and working, held out
 // of the page until there is a real comparison to put in it. Three pieces are
 // commented out together and must be restored together: this import, the
@@ -66,6 +68,7 @@ import ManifestoAmbient from "@/components/ManifestoAmbient";
 // in the render. Nothing else was changed to park it.
 // import { DesignReveal, type RevealPage } from "@/components/art/DesignReveal";
 import { LeadForm } from "@/components/forms/LeadForm";
+import { FormLandingFlash } from "@/components/forms/FormLandingFlash";
 import type { LeadFormConfig } from "@/lib/forms";
 import {
   TRANSFORMATION_BAND,
@@ -241,7 +244,9 @@ const AUDIT_FORM: LeadFormConfig = {
 // "yes, so what is actually wrong". Six cards, so the reader finds their own
 // sentence in the grid rather than reading a paragraph about someone else.
 // ---------------------------------------------------------------------
-const SYMPTOMS: { q: string; body: string }[] = [
+// `body` is a ReactNode, not a string: the last card closes on a link to the
+// hero form, and every other card passes a plain string through unchanged.
+const SYMPTOMS: { q: string; body: ReactNode }[] = [
   {
     q: "Does your AI generated website suck?",
     // Chad's copy, verbatim (2026-08-08). Apostrophes are plain ASCII here on
@@ -251,23 +256,40 @@ const SYMPTOMS: { q: string; body: string }[] = [
   },
   {
     q: "Are you unhappy with your Claude generated website?",
-    body: "Claude Code, Cursor, Lovable, v0, Replit, take your pick. They all produce the same shape of result: structurally correct, generically styled, and confidently wrong about what your visitor is there to do.",
+    // Chad's edit, verbatim (2026-08-08): "the same shape of result:
+    // structurally correct, generically styled" became "a similar result:
+    // structurally correct, generic but usable interface".
+    body: "Claude Code, Cursor, Lovable, v0, Replit, take your pick. They all produce a similar result: structurally correct, generic but usable interface, and confidently wrong about what your visitor is there to do.",
   },
   {
     q: "Is your AI generated SaaS only kinda-sorta working?",
-    body: "Usually it is not broken in the way you are looking for. The build runs, the tests pass, and users still fall out of the flow at the same step every time. Finding that step is a different skill than writing the step.",
+    // Chad's copy, verbatim (2026-08-08). Plain ASCII apostrophes on purpose:
+    // this is a STRING rendered through {s.body}, so React escapes it.
+    body: "Your tool might work for you. It might work for a few, but users are still falling out of the flow in a clear pattern. Finding what makes them drop is what's missing, and Claude ain't gonna find it for you unless you know what to ask for.",
   },
   {
     q: "Does your website do things you don't want it to?",
-    body: "The account wall thirty seconds in. The modal on arrival. The feature you never asked for that the model added because it looked professional. Somebody has to decide what comes back out, and that decision is worth more than the code that put it in.",
+    // Chad's copy, verbatim (2026-08-08).
+    body: "Maybe something pops up when it shouldn't, or an animation isn't cycling properly. Maybe a feature you never asked for persists and you can't remove it. Time to let a pro look under the hood and rip out some cables.",
   },
   {
     q: "Does your AI generated website look bad?",
-    body: "Or worse, it looks like every other one. Visitors can now recognize a generated site on sight, and what they do with that recognition costs you something it did not cost a year ago.",
+    // Chad's copy, verbatim (2026-08-08), "vibe coded" included: he wrote it
+    // into this card the same day he ruled the term out of the copy WRITTEN
+    // here. His words stand as given.
+    body: "Or worse, look like everyone else's vibe coded site? A growing majority of everyday people can now recognize an AI generated product on sight. What they do with that recognition (bouncing) might be costing you.",
   },
   {
     q: "Do you want to improve your AI generated website?",
-    body: "Then you are already past the hard part. You built the thing. What is left is the layer that was never in the prompt: how it reads, how it moves, and what it asks of the person using it.",
+    // Chad's copy, verbatim (2026-08-08), closing on the page's ask. JSX rather
+    // than a string for the link, which is why `body` is a ReactNode above.
+    body: (
+      <>
+        Then you&apos;re already thinking like a pro. You built it, now let me
+        bring it home.{" "}
+        <a href="#audit-form">Apply for my AI generated website audit now.</a>
+      </>
+    ),
   },
 ];
 
@@ -440,6 +462,10 @@ export default function AiGeneratedWebsiteAuditPage() {
             </p>
             <LeadForm config={AUDIT_FORM} />
           </div>
+          {/* Renders nothing. Every CTA on this page jumps to the card above,
+              and this is what makes the card flash once the scroll has actually
+              landed rather than the moment the link is pressed. */}
+          <FormLandingFlash targetId="audit-form" />
         </div>
       </SectionShell>
 
@@ -510,52 +536,108 @@ export default function AiGeneratedWebsiteAuditPage() {
       >
         <div className="svc-faq__layout">
           <div className="svc-faq__intro">
-            <p className="eyebrow">Why this keeps happening</p>
+            <p className="eyebrow">Why This Happens</p>
+            {/* Chad's copy, verbatim (2026-08-08). */}
             <h2 className="svc-block__heading svc-fill">
-              The model wrote the code. Nobody made the calls.
+              Claude wrote the right code, but no one made the right calls.
             </h2>
-            <p className="svc-faq__lead">
-              Design and development used to arrive bundled with human judgment,
-              because the person writing the code was making those decisions
-              while they wrote it. AI took the production half and left the
-              judgment half sitting there unbought.
-            </p>
+            {/* NO LEAD PARAGRAPH HERE (Chad, 2026-08-08). The intro column is
+                the eyebrow and the heading only; his copy that briefly sat here
+                moved to the top of the right column, where it opens the
+                argument instead of pre-empting it. */}
           </div>
           {/* Plain .svc-prose: the dark band already recolors it
               (.svc-faq-section--dark .svc-prose), so no on-dark modifier is
               needed or exists. */}
           <div className="svc-prose cw-fix-why">
+            {/* Chad's copy, verbatim (2026-08-08). Do not restructure it. */}
             <p>
-              A generated site can be structurally correct and still fail. The
-              account wall that fires thirty seconds in, the feature added
-              because it reads as professional, the layout that resembles every
-              other site launched that week: none of those are bugs. Every one
-              of them is a decision, and the model made it on your behalf
-              without telling you it had a choice.
+              The design and development portions of a website used to come
+              bundled together by nature. That is because humans were overseeing
+              literally every character of code and every pixel of design.
             </p>
             <p>
-              That is the whole job now. Not writing the site, deciding what the
-              site should be. I wrote this out at length in{" "}
+              These micro decisions weren&apos;t part of a checklist or a phase,
+              they just happened. AI models aren&apos;t yet able to make these
+              micro decisions. That&apos;s why your AI generated site misses the
+              mark.
+            </p>
+            {/* Chad's copy, verbatim (2026-08-08), heading and paragraph both. */}
+            <h3>Good intentions gone bad.</h3>
+            <p>
+              AI generated websites can be structurally sound and still fail to
+              meet expectations. Misplaced elements, missing tags, weak copy and
+              haphazardly implemented features are all telltale signs of an AI
+              design job gone off the rails. All of those missteps are not
+              mistakes, per se, but the result of decisions gone undecided.
+            </p>
+            {/* Chad's copy, verbatim (2026-08-08). No period, unlike the h3
+                above it: his string, his call. */}
+            <h3>Changing of the guardrails</h3>
+            {/* Chad's copy, verbatim (2026-08-08). The essay title stays a link
+                to /essays/, as it was before this replacement: the sentence is
+                his, the anchor is the page's. */}
+            <p>
+              The guardrails of good UI and UX were built into the process when
+              humans ran the entire show. With unskilled users prompting AI
+              models to build, those guardrails are missing entirely.
+            </p>
+            <p>
+              This is creating a new demand for the guardrail as a service, the
+              UI/UX expertise required to bring an AI-gen site across the finish
+              line. I wrote this out at length in{" "}
               <Link href={ESSAY_URL}>
                 AI-Generated Websites are Making UI and UX Expertise A Real
                 Premium, Real Fast
               </Link>
               , which is the argument this service came out of.
             </p>
-            <p>
-              With AI, anyone can build a Red Lobster. Most businesses did not
-              want a chain restaurant.
-            </p>
           </div>
+        </div>
+      </SectionShell>
+
+      {/* THE QUOTE BAND (Chad, 2026-08-08). Full bleed, the sitewide RIBBON
+          treatment, with the line on frosted glass over it.
+
+          Reuses .svc-problem rather than inventing a band: that class already
+          owns the ribbon rail's height token, the solid base the ribbons need
+          under them, and the centered dark-blue type. What it does NOT get is
+          the knockout overlay, and that is the point of the frosted card --
+          the knockout exists so copy sitting DIRECTLY on the ribbons stays
+          legible where one passes behind it, and a glass plate solves the same
+          problem by lifting the copy off them instead. Running both would be
+          two answers to one question.
+
+          rotate={2} moves the triad one more step than /ai-search-visibility/
+          takes, so the two ribbon bands on the site are not the same picture. */}
+      <SectionShell full className="svc-block svc-problem cw-fix-quote">
+        <div className="svc-gradient-pin">
+          <Ribbon className="svc-gradient" rotate={2} />
+        </div>
+        <div className="cw-fix-quote__card">
+          {/* Chad's copy, verbatim (2026-08-08), heading and lede both. The
+              lede opens lowercase on purpose: it finishes the sentence the
+              heading starts, so it is one thought set at two sizes. */}
+          <h2 className="cw-fix-quote__text">
+            In 2026, anyone can prompt their way to a working website,
+          </h2>
+          <p className="cw-fix-quote__lede">
+            but if it doesn&apos;t make you happy or bring in business, is it
+            really working?
+          </p>
+          <a href="#audit-form" className="svc-btn cw-fix-quote__cta">
+            <span className="svc-btn__label">Apply for the Audit</span>
+            <ArrowRight />
+          </a>
         </div>
       </SectionShell>
 
       {/* WHAT THE AUDIT COVERS. Static HTML, six rows, liftable in one piece by
           an engine that will never scroll this page. */}
-      <SectionShell className="svc-block" id="coverage">
+      <SectionShell className="svc-block cw-fix-coverage-top" id="coverage">
         <p className="eyebrow">What gets audited</p>
         <h2 className="svc-block__heading svc-fill">
-          What the Website Transformation Audit covers
+          What the AI-Gen Website Audit Covers
         </h2>
         <div className="svc-prose svc-prose--lead">
           <p>
@@ -672,7 +754,11 @@ export default function AiGeneratedWebsiteAuditPage() {
             a: "The audit is the document. Building from it is separate work, and you are never required to buy it from me. Plenty of people take the document straight back to their own AI assistant and execute it themselves, which is a completely legitimate way to use it.",
           },
           {
-            q: "Will you make fun of my vibe-coded site?",
+            // "vibe-coded" until 2026-08-08, when Chad tested the term on
+            // someone who uses AI daily and got a blank look. The phrase is
+            // builder vocabulary, and this page is read by people who are not
+            // builders, so it is out everywhere on the page.
+            q: "Will you make fun of my AI generated site?",
             a: "No. I build with Claude Code every day and I have shipped things I later found embarrassing. The audit is written to be useful, not to be clever at your expense.",
           },
           {
