@@ -13090,6 +13090,35 @@ html.cw-motion-paused *::after {
   margin-top: var(--space-lg);
 }
 .cw-fix-symptom { padding: clamp(1.2rem, 2.4vw, 1.6rem); }
+
+/* ALTERNATING CARD GROUND (Chad, 2026-08-08). Every other card swaps the
+   panel's pale lavender for a desaturated light blue.
+
+   The GRADIENT IS KEPT INTACT: same 160deg angle, same two stops at the same
+   positions as `.panel` above. Border and shadow are untouched too, so the two
+   card types read as one set in two colours rather than two components.
+
+   THE ALT CARD LEADS WITH LAVENDER AND LANDS ON BLUE, which is the default
+   card's pairing read in the other direction (Chad, 2026-08-08). That is the
+   whole differentiator, and it took two passes to get there: tinting only the
+   bottom stop left the top-left corner white, identical to its neighbour in
+   exactly the spot the eye hits first. The colour that has to change is the one
+   at 0%.
+
+   0% is --grad-peak, the same lavender the default card fades INTO at 100%. So
+   the two cards share a palette and swap its ends, rather than introducing a
+   third colour to the section.
+
+   nth-child, not nth-of-type: the grid is auto-fit, so on a desktop three-up
+   this lands as a checkerboard (2 in row one, 4 and 6 in row two) and on a
+   phone single-column it is a clean every-other. Both are intentional. */
+.cw-fix-symptom:nth-child(even) {
+  background: linear-gradient(
+    160deg,
+    rgba(229, 210, 244, 0.92) 0%,
+    rgba(214, 226, 242, 0.62) 100%
+  );
+}
 /* The question carries the weight; it is the line the reader is scanning for.
    Text-wrap balance keeps a two-line question from stranding one word. */
 .cw-fix-symptom__q {

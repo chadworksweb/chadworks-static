@@ -59,6 +59,12 @@ import {
   ArrowRight,
 } from "@/components/capsules";
 import ManifestoAmbient from "@/components/ManifestoAmbient";
+// BEFORE/AFTER SLIDER -- PARKED (Chad, 2026-08-08). Built and working, held out
+// of the page until there is a real comparison to put in it. Three pieces are
+// commented out together and must be restored together: this import, the
+// PLACEHOLDER_PAGES array below, and the <SectionShell id="before-after"> block
+// in the render. Nothing else was changed to park it.
+// import { DesignReveal, type RevealPage } from "@/components/art/DesignReveal";
 import { LeadForm } from "@/components/forms/LeadForm";
 import type { LeadFormConfig } from "@/lib/forms";
 import {
@@ -203,6 +209,34 @@ const AUDIT_FORM: LeadFormConfig = {
 };
 
 // ---------------------------------------------------------------------
+// BEFORE/AFTER SLIDER -- PLACEHOLDER PAIRS.
+//
+// Dummy content, standing in until the real AI-generated-site comparison exists
+// (Chad, 2026-08-08: "just fill it with dummy for now"). The images are the only
+// before/after assets on disk; everything a reader can actually READ is generic,
+// so the placeholder cannot be mistaken for a claim about a real client.
+// ---------------------------------------------------------------------
+// PARKED with the slider (see the import note at the top of the file).
+// const PLACEHOLDER_PAGES: RevealPage[] = [
+//   {
+//     label: "Homepage",
+//     url: "example.com",
+//     before: "/design-reveal/rt-law_before.webp",
+//     after: "/design-reveal/rt-law_after.webp",
+//     beforeAlt: "Placeholder: a homepage before the transformation audit",
+//     afterAlt: "Placeholder: the same homepage after the transformation audit",
+//   },
+//   {
+//     label: "Interior page",
+//     url: "example.com/about",
+//     before: "/design-reveal/rt-law-person-before.webp",
+//     after: "/design-reveal/rt-law-person-after.webp",
+//     beforeAlt: "Placeholder: an interior page before the transformation audit",
+//     afterAlt: "Placeholder: the same interior page after the transformation audit",
+//   },
+// ];
+
+// ---------------------------------------------------------------------
 // THE SYMPTOMS. Chad's six questions, verbatim, each with the answer to
 // "yes, so what is actually wrong". Six cards, so the reader finds their own
 // sentence in the grid rather than reading a paragraph about someone else.
@@ -210,14 +244,17 @@ const AUDIT_FORM: LeadFormConfig = {
 const SYMPTOMS: { q: string; body: string }[] = [
   {
     q: "Does your AI generated website suck?",
-    body: "It works, it deployed, and it still lands wrong. That gap is almost never the code. It is the hundred small judgment calls underneath the code that nobody made, because a model does not make them and it does not tell you it skipped them.",
+    // Chad's copy, verbatim (2026-08-08). Apostrophes are plain ASCII here on
+    // purpose: this is a STRING rendered through {s.body}, not literal JSX text,
+    // so React escapes it and the &apos; form would print as itself.
+    body: "It works, it deployed and it loads, but it still feels wrong. What's missing is usually dozens of micro judgement calls that nobody made during the process of design and development. Models don't know what you want unless you tell them. If you don't tell them, they'll just make it up 'til you say it's done.",
   },
   {
     q: "Are you unhappy with your Claude generated website?",
     body: "Claude Code, Cursor, Lovable, v0, Replit, take your pick. They all produce the same shape of result: structurally correct, generically styled, and confidently wrong about what your visitor is there to do.",
   },
   {
-    q: "Is your custom AI generated SaaS broken and you can't figure out why?",
+    q: "Is your AI generated SaaS only kinda-sorta working?",
     body: "Usually it is not broken in the way you are looking for. The build runs, the tests pass, and users still fall out of the flow at the same step every time. Finding that step is a different skill than writing the step.",
   },
   {
@@ -406,6 +443,31 @@ export default function AiGeneratedWebsiteAuditPage() {
         </div>
       </SectionShell>
 
+      {/* THE BEFORE/AFTER SLIDER, second on the page (Chad, 2026-08-08). Same
+          DesignReveal component /web-design/ and /website-redesign/ run, with
+          its header copy overridden for this page.
+
+          PLACEHOLDER CONTENT. The shots are the Rozario Touma pair, the only
+          before/after assets on disk, reused so the mechanism can be seen
+          working. The tab label, address and alt text are deliberately generic
+          rather than naming that client: on THIS page a real firm's name beside
+          "before" would read as a claim that their site was AI-generated and
+          needed cleaning up, which is not true and is not ours to imply. Swap
+          the whole PLACEHOLDER_PAGES array when the real pair exists; nothing
+          else here needs to change. */}
+      {/* PARKED with the slider (see the import note at the top of the file).
+          Restore this block, the import and PLACEHOLDER_PAGES together.
+
+          <SectionShell className="svc-block" id="before-after">
+            <DesignReveal
+              pages={PLACEHOLDER_PAGES}
+              eyebrow="Drag to compare"
+              heading="What the transformation actually looks like"
+              lead="Placeholder shots for now. Grab the divider and drag."
+            />
+          </SectionShell>
+      */}
+
       {/* THE SYMPTOMS. The reader's own sentence, in a grid, so they land on
           the one that is theirs instead of reading past a paragraph. */}
       <SectionShell className="svc-block" id="symptoms">
@@ -413,10 +475,13 @@ export default function AiGeneratedWebsiteAuditPage() {
         <h2 className="svc-block__heading svc-fill">
           Does your AI generated website suck? Get the audit.
         </h2>
+        {/* Chad's copy, verbatim (2026-08-08). */}
         <div className="svc-prose svc-prose--lead">
           <p>
-            These come in almost word for word, from founders who built
-            something real and cannot work out why it does not land.
+            If you find yourself relating to these situations, you might be
+            suffering from a case of{" "}
+            <strong>Generalized Generative Gloom</strong>. If so, you&apos;re
+            not alone. I can help you go from gloom to bloom.
           </p>
         </div>
         <div className="cw-fix-symptoms">

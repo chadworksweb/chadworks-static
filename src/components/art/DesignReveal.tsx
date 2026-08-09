@@ -46,7 +46,21 @@ const DEFAULT_PAGES: RevealPage[] = [
   },
 ];
 
-export function DesignReveal({ pages = DEFAULT_PAGES }: { pages?: RevealPage[] }) {
+// The header copy is overridable so a second page can run the same demo saying
+// something appropriate to it, rather than the component being forked or the
+// copy being asserted twice. Defaults are the /web-design/ wording, so that page
+// and /website-redesign/ are untouched.
+export function DesignReveal({
+  pages = DEFAULT_PAGES,
+  eyebrow = "Try it yourself",
+  heading = "Same business, two first impressions",
+  lead = "Grab the divider and drag. Everything that changes is design.",
+}: {
+  pages?: RevealPage[];
+  eyebrow?: string;
+  heading?: string;
+  lead?: string;
+}) {
   const [active, setActive] = useState(0);
   const page = pages[active] ?? pages[0];
 
@@ -161,11 +175,9 @@ export function DesignReveal({ pages = DEFAULT_PAGES }: { pages?: RevealPage[] }
   return (
     <div className="design-reveal">
       <div className="design-reveal__header">
-        <p className="eyebrow">Try it yourself</p>
-        <h2 className="design-reveal__heading">Same business, two first impressions</h2>
-        <p className="design-reveal__lead">
-          Grab the divider and drag. Everything that changes is design.
-        </p>
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="design-reveal__heading">{heading}</h2>
+        <p className="design-reveal__lead">{lead}</p>
       </div>
 
       {/* Page switcher: each tab swaps in a different before/after pair. */}
