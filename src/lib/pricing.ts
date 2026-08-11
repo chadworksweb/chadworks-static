@@ -205,6 +205,35 @@ export const WORKSPACE_SETUP = 300; // $ one-time to chadworks: setup, training,
 export const WORKSPACE_EXTRA_MAILBOX = 25; // $ per additional mailbox set up at the same time.
 
 // ---------------------------------------------------------------------
+// THE 5K RACE LANE -- flat-rate packages sold off /website-design-for-5k-races/.
+//
+// FLAT RATES, not posture figures (Chad, 2026-08-11). These are the first
+// numbers on the site that get published INSIDE the JSON-LD Offer rather than
+// shown on the page over a price-free Offer, which means an assistant can quote
+// them back at a race director. Treat every figure here as a public commitment.
+//
+// THE FLOOR HOLDS. Chad's ruling 2026-08-11: nothing chadworks builds starts
+// below the baseline, so the entry package sits AT it rather than under it. The
+// packages lane does not get to undercut the number /rates/ publishes.
+//
+// Deliberately NOT wired to BASE, for the reason VSR_START spells out above: a
+// build baseline and a race package are separate products, and moving one must
+// not silently move the other. They happen to be equal today.
+export const RACE_STARTING_LINE = 3250; // $ flat. One page, phone-first, registration handoff.
+export const RACE_FULL_COURSE = 5500;   // $ flat. The multi-page race site.
+
+// ADD-ONS. Each is priced as realistic build hours against HOURLY rather than
+// picked as a round number, so a client who does the division gets an answer
+// that holds up. The hour estimate is in each comment; re-derive if HOURLY moves.
+export const RACE_ADDON_REGISTRATION = 650;  // ~2h: wiring + testing the handoff to RunSignup, Eventbrite or Race Roster.
+export const RACE_ADDON_SELF_EDIT = 1850;    // ~6h: the CMS layer, so the committee can change the schedule in race week.
+export const RACE_ADDON_SPONSORS = 650;      // ~2h: the tiered sponsor wall.
+export const RACE_ADDON_RESULTS = 950;       // ~3h: results plus the past-year archive.
+export const RACE_ADDON_FUNDRAISING = 650;   // ~2h: donation and fundraising integration, for the charity races.
+export const RACE_ADDON_COURSE_MAP = 650;    // ~2h: the course map and elevation.
+export const RACE_ROLLOVER = 950;            // $ per year: roll the site to next year's date and archive the last one.
+
+// ---------------------------------------------------------------------
 // WORKED-EXAMPLE USE CASES -- real scopes, priced by the model at render.
 //
 // Every figure is computed by price(ex.scope), never typed, so an example is

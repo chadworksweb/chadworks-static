@@ -26,6 +26,11 @@ const INDUSTRIES: IndexItem[] = [
   { name: "Bands & Musicians", desc: "Tours, EPK, merch", href: "/website-design-for-bands-musicians/" },
   { name: "Authors", desc: "Launches, mailing list", href: "/web-design-for-authors/" },
   { name: "Music Industry", desc: "Labels, studios, managers", href: "/music-industry-web-design/" },
+  // Real-world experiences (added 2026-08-11): three siblings that share one
+  // composition. Each sells a date rather than a service call.
+  { name: "5K Races", desc: "Flat-rate race sites", href: "/website-design-for-5k-races/" },
+  { name: "Conferences", desc: "Industry cons to comic cons", href: "/website-design-for-conferences/" },
+  { name: "Retreats", desc: "Cohorts, deposits, travel", href: "/website-design-for-retreats/" },
   // Trades
   { name: "Chimney Sweep", desc: "Cleaning, repair", href: "/website-design-for-chimney-sweep/" },
   { name: "Excavation", desc: "Land clearing", href: "/website-design-for-excavation/" },
