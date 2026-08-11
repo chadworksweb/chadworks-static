@@ -5,7 +5,7 @@
 
 import type { ReactNode } from "react";
 import type { Service } from "@/lib/service";
-import { Ribbon } from "@/components/Ribbon";
+import { Ribbon, type RibbonPalette } from "@/components/Ribbon";
 import { ProblemMore } from "@/components/ProblemMore";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { W } from "@/components/capsules/shared";
@@ -15,16 +15,23 @@ export type ProblemCapsuleProps = {
   // Rotate the ribbon triad for this page (see Ribbon). Both passes take the
   // same value or the knockout coverage stops matching the colour band.
   ribbonRotate?: 0 | 1 | 2;
+  // Swap the ribbon HUES for this page (see Ribbon's RACE_TRIAD). Same rule as
+  // ribbonRotate: it is forwarded to both passes below, never one.
+  ribbonPalette?: RibbonPalette;
 };
 
-export function ProblemCapsule({ problem, ribbonRotate = 0 }: ProblemCapsuleProps) {
+export function ProblemCapsule({
+  problem,
+  ribbonRotate = 0,
+  ribbonPalette = "brand",
+}: ProblemCapsuleProps) {
   return (
     <SectionShell full className="svc-block svc-problem">
       {/* visible colored ribbons (behind) -- sticky band inside a full-height
           rail: stays half-visible at the viewport top while the opened
           pop-down glides over it, until the section is scrolled through. */}
       <div className="svc-gradient-pin">
-        <Ribbon className="svc-gradient" rotate={ribbonRotate} />
+        <Ribbon className="svc-gradient" rotate={ribbonRotate} palette={ribbonPalette} />
       </div>
 
       {/* real, accessible text -- dark blue over the page */}
@@ -59,7 +66,12 @@ export function ProblemCapsule({ problem, ribbonRotate = 0 }: ProblemCapsuleProp
           it. The duplicate is presentational; the heading above is the only
           real one in the DOM. */}
       <div className="svc-knockout" aria-hidden="true">
-        <Ribbon className="svc-knockout__cov" mask rotate={ribbonRotate} />
+        <Ribbon
+          className="svc-knockout__cov"
+          mask
+          rotate={ribbonRotate}
+          palette={ribbonPalette}
+        />
         <div className="svc-knockout__text">
           <div className="svc-block__heading">{problem.heading}</div>
           {problem.subheading && (

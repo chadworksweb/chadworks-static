@@ -34,6 +34,34 @@ const RIBBON_C = {
   light: [1.0, 0.671, 0.278] as RGB, // #ffab47 bright neon orange
 };
 
+// ---------------------------------------------------------------------
+// THE RACE PALETTE (Chad, 2026-08-11) -- opt-in, for /website-design-for-5k-races/.
+//
+// `rotate` could not do this: it shuffles which of the three brand pairs lands
+// on which path, so the band can be recoloured only within hues the site
+// already owns. A road race reads in high-visibility colours the brand triad
+// does not contain, so this is a second palette rather than a fourth rotation.
+//
+// THE PHASES ARE IDENTICAL to the brand triad on purpose. Phase drives the
+// ribbon PATH, the mask pass reuses it, and the knockout only lines up while
+// the two passes share geometry. Change a hue freely; changing a phase here
+// desynchronises the coverage pass from the colour band.
+const RACE_A = {
+  phase: 0.0,
+  dark: [0.56, 0.75, 0.0] as RGB, //  #8fbf00 high-vis yellow-green (the marshal vest)
+  light: [0.831, 0.961, 0.259] as RGB, // #d4f542 bright course-marking chartreuse
+};
+const RACE_B = {
+  phase: 2.2,
+  dark: [1.0, 0.384, 0.0] as RGB, //  #ff6200 safety orange -- the one hue both palettes share
+  light: [1.0, 0.671, 0.278] as RGB, // #ffab47 bright neon orange
+};
+const RACE_C = {
+  phase: 4.1,
+  dark: [0.0, 0.565, 0.784] as RGB, //  #0090c8 electric blue (timing-chip / finish-clock blue)
+  light: [0.31, 0.82, 0.961] as RGB, // #4fd1f5 bright cyan
+};
+
 const VERT = /* glsl */ `
   uniform float uTime;
   uniform float uPhase;
@@ -152,15 +180,27 @@ function clockRelease() {
 // triad. 0 is the sitewide default; a page can pass 1 or 2 to recolour the band
 // without inventing new hues or forking the component.
 const TRIAD = [RIBBON_A, RIBBON_B, RIBBON_C];
+const RACE_TRIAD = [RACE_A, RACE_B, RACE_C];
+
+// `brand` is the sitewide default and every existing caller keeps it by saying
+// nothing. A page opts into `race` explicitly; both passes on a page MUST be
+// given the same value, exactly like `rotate`.
+export type RibbonPalette = "brand" | "race";
+const PALETTES: Record<RibbonPalette, typeof TRIAD> = {
+  brand: TRIAD,
+  race: RACE_TRIAD,
+};
 
 export function Ribbon({
   className,
   mask = false,
   rotate = 0,
+  palette = "brand",
 }: {
   className?: string;
   mask?: boolean;
   rotate?: 0 | 1 | 2;
+  palette?: RibbonPalette;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -213,9 +253,12 @@ export function Ribbon({
       // Path (phase) stays with its slot; the colour comes from the rotated
       // position in the triad.
       const slot = (i: number) => ({
+        // Phase from the BRAND triad always: it drives the path, both passes
+        // share it, and the knockout only aligns while they match. Only the
+        // hues come from the selected palette.
         phase: TRIAD[i].phase,
-        dark: TRIAD[(i + rotate) % 3].dark,
-        light: TRIAD[(i + rotate) % 3].light,
+        dark: PALETTES[palette][(i + rotate) % 3].dark,
+        light: PALETTES[palette][(i + rotate) % 3].light,
       });
       const matA = makeMat(slot(0));
       const matB = makeMat(slot(1));
@@ -303,7 +346,7 @@ export function Ribbon({
       disposed = true;
       cleanup();
     };
-  }, [mask, rotate]);
+  }, [mask, rotate, palette]);
 
   return <div ref={hostRef} className={className} aria-hidden="true" />;
 }
