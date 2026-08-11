@@ -101,6 +101,17 @@ node scripts/price-audit.mjs || {
   exit 1
 }
 
+# Repo-weight gate. Nothing over 1 MB goes to GitHub (Chad, 2026-08-11): heavy
+# media lives on disk and rides out in the tar-sync below, which copies from the
+# built out/ rather than from git. A binary committed once cannot be removed
+# later without rewriting history, so this catches it before it lands.
+# Checks what git TRACKS, so an ignored clip in public/video/ passes.
+echo "Checking tracked file sizes ..."
+node scripts/check-file-size.mjs || {
+  echo "Deploy aborted: a tracked file is over the 1 MB limit."
+  exit 1
+}
+
 # Layout safety net. The calculator's stacked-layout breakpoint lives in three
 # files that must agree (CSS module, global CSS, and MOBILE_Q in JS) and cannot
 # be a shared constant. Blocks a deploy where they have drifted apart.

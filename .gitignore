@@ -39,3 +39,19 @@ next-env.d.ts
 # src/content/llms.source.txt (the hand-authored source). Never edit the
 # generated copy: the next build overwrites it.
 public/llms.txt
+
+# ---------------------------------------------------------------------
+# NOTHING OVER 1 MB GOES TO GITHUB (Chad, 2026-08-11).
+#
+# Video and other heavy media live on disk and ship through deploy.sh, which
+# tar-syncs the built `out/` directory rather than pulling from git. Keeping
+# them untracked is why a 6 MB clip does not sit in the history forever.
+#
+# A fresh clone therefore has no video. Restore it with:
+#   node scripts/fetch-media.mjs
+# which re-pulls every clip listed in CWS-PEXELS-CLIP-LOG.md from the Pexels
+# API. Add any new clip to that log in the same edit that references it, or the
+# next clone silently builds a page pointing at a missing file.
+#
+# scripts/check-file-size.mjs enforces the limit; deploy.sh runs it.
+/public/video/
