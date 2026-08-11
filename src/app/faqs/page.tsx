@@ -135,13 +135,19 @@ const GROUPS: FaqGroup[] = [
                 If your website needs work, not a redesign, I charge by the minute
                 at {money(MINUTELY)}/min, which adds up to {HOURLY_LONG}.
                 Read more about my fees on my{" "}
-                <LaunchLink href="/rates/">rates page</LaunchLink>.
+                <LaunchLink href="/rates/">rates page</LaunchLink>, or put a
+                number on your own scope with the{" "}
+                <LaunchLink href="/website-design-cost-calculator/">
+                  website design cost calculator
+                </LaunchLink>.
               </>,
             ]}
           />
         ),
+        // aText is the FAQPage JSON-LD twin of the visible answer above. Keep the
+        // two in sync sentence for sentence, or an assistant quotes the old one.
         aText:
-          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${HOURLY_LONG}. Read more about my fees on my rates page.`,
+          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${HOURLY_LONG}. Read more about my fees on my rates page, or put a number on your own scope with the website design cost calculator.`,
       },
       {
         q: "Do you have a lower rate for special cases?",

@@ -2527,6 +2527,217 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    top margin so it starts level with the object's title in the right column. */
 .cw-purpose-text > :first-child { margin-top: 0; }
 
+/* --- Calculator CTA capsule (CalcCtaCapsule) -------------------------------
+   Reuses .cw-purpose-grid above, so only the left column's own bits are set
+   here: the points list and the button under it. The right column is the
+   assemble object and is already handled by .cw-purpose-aside / .cw-assemble. */
+/* --- Calculator CTA (CalcCtaCapsule) --------------------------------------
+   ONE card carrying both halves: words left, portfolio clip right, small gap
+   between. The card owns the border and shadow; the clip inside it carries
+   neither, so the pair reads as a single object rather than two tiles. */
+.cw-calc-cta__card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Row 1 is the copy, row 2 is the button; the clip spans both. The button is
+     a card-level child so it can be re-placed under the clip when stacked. */
+  grid-template-rows: auto auto;
+  /* "Small gap" (Chad): deliberately tighter than the section-level gaps
+     elsewhere, because both halves live inside one border. */
+  column-gap: clamp(1rem, 2vw, 1.75rem);
+  row-gap: 0;
+  /* stretch, not center: the film column has to fill the row height before the
+     clip inside it can reach the card's top and bottom edges. */
+  align-items: stretch;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(237, 231, 246, 0.55) 100%
+  );
+  /* Offset 0 0 so the glow rings the card on ALL sides rather than pooling
+     under it (Chad). Colour is --win-green (#1f9d57), the vibrant green in the
+     scheme; --accent-teal (#4a6b6e) is the muted one and reads as grey at this
+     spread. Written as rgba literals because a box-shadow cannot take a hex
+     token and an alpha together. */
+  box-shadow:
+    0 0 60px rgba(31, 157, 87, 0.30),
+    0 0 18px rgba(31, 157, 87, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  /* Held in a var so .cw-calc-cta__film can cancel it exactly. Retype the
+     value in one place only, or the clip stops meeting the edge. */
+  --calc-cta-pad: clamp(1.5rem, 3.5vw, 2.5rem);
+  padding: var(--calc-cta-pad);
+}
+@media (max-width: 900px) {
+  /* Words first, clip under them, button last: the copy is the point, the clip
+     is support, and the button closes it (Chad). 900 rather than 760 -- see the
+     note on the clip's media query below. Rows are placed explicitly because
+     the button's DOM position is between the two, and only the desktop layout
+     wants it there. */
+  .cw-calc-cta__card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  /* The per-item row placements are NOT here. They live in the second 900px
+     block at the end of this section, after the base .cw-calc-cta__text/
+     __btn/__film rules. A media query adds no specificity, so placed here they
+     would be overridden by those later base rules and the stack order would
+     silently stay in the desktop arrangement. */
+}
+
+/* The words half. min-width 0 so long headings cannot blow out the track. */
+.cw-calc-cta__text {
+  min-width: 0;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+}
+/* The heading's own top margin would fight the card padding. */
+.cw-calc-cta__text > :first-child { margin-top: 0; }
+/* And its bottom margin doubled up with .svc-lede's margin-top, so the gap
+   under the h2 was two --space-md stacked. The lede's own top margin is the
+   one that survives. */
+.cw-calc-cta__text .svc-block__heading { margin-bottom: 0; }
+/* No measure cap here: the grid track is already narrower than a reading
+   measure, so capping again would only shorten the lines twice.
+   margin-top 0 because the h2 above it now sets the gap on its own: .svc-lede
+   ships margin-top --space-md, and with the heading's margin-bottom already
+   zeroed there is nothing left for this to clear. */
+.cw-calc-cta__lede { max-width: none; margin-top: 0; }
+.cw-calc-cta__btn {
+  grid-column: 1;
+  grid-row: 2;
+  /* Natural width, hugging the left edge of the copy above it, rather than
+     stretching to the grid track. */
+  justify-self: start;
+  margin-top: var(--space-md);
+}
+
+/* The clip half, which is also a link. min-width 0 so the video cannot blow out
+   the grid track. The negative margins cancel the card's padding on the three
+   edges the clip meets, so it TOUCHES the card top, bottom and right (Chad)
+   instead of floating inside the padding box. The LEFT margin stays 0: that
+   side faces the gap and the copy, not a card edge. */
+.cw-calc-cta__film {
+  position: relative; /* containing block for the frost overlay */
+  display: flex;
+  min-width: 0;
+  grid-column: 2;
+  grid-row: 1 / -1; /* spans the copy AND the button */
+  margin: calc(var(--calc-cta-pad) * -1) calc(var(--calc-cta-pad) * -1)
+    calc(var(--calc-cta-pad) * -1) 0;
+  /* Square where it meets the gap, rounded where it meets the card's own
+     corners. -1px accounts for the card's 1px border, so the curves nest. */
+  border-radius: 0 calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0;
+  overflow: hidden; /* clips the frost to the same corners as the clip */
+}
+.cw-calc-cta__video {
+  width: 100%;
+  /* Fills the row the text column sets. No aspect-ratio: holding 16:9 is what
+     letterboxed it inside the card and kept it off the edges. object-fit keeps
+     the 1920x1080 source from distorting at whatever height it lands on, and
+     the calculator UI sits centred in frame so the crop takes empty margin. */
+  height: 100%;
+  object-fit: cover;
+  background: rgba(237, 231, 246, 0.55);
+}
+
+/* HOVER STATE: hold, frost, and say what the click does. The clip is paused in
+   JS (SiteVideo pauseOnHover); everything here is the visual half. */
+.cw-calc-cta__frost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  /* pointer-events off so the pointer keeps reaching the video underneath and
+     the hold does not flicker as the cursor crosses the text. */
+  pointer-events: none;
+  opacity: 0;
+  /* Slower than the site's --duration-base (250ms) on purpose: this frost
+     covers a moving clip, and at base speed it snapped on hard enough to read
+     as a flash rather than a settle. Stated as a literal because it is a
+     one-off, not a new token. */
+  transition: opacity 520ms var(--ease-out);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: inherit;
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .cw-calc-cta__frost {
+    /* Lighter than .cw-gempanel__card's blur(24px) (Chad): that card frosts a
+       STILL gemstone, where heavy blur reads as glass. Over the clip it erased
+       the calculator UI entirely, so the frame behind the text stopped being
+       recognisable as the thing you are about to click. */
+    -webkit-backdrop-filter: blur(12px) saturate(1.25);
+    backdrop-filter: blur(12px) saturate(1.25);
+  }
+}
+/* No backdrop-filter (older Firefox): lean opaque instead, or the text lands on
+   a moving frame and is unreadable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cw-calc-cta__frost { background: rgba(255, 255, 255, 0.9); }
+}
+.cw-calc-cta__film:hover .cw-calc-cta__frost,
+.cw-calc-cta__film:focus-visible .cw-calc-cta__frost {
+  opacity: 1;
+}
+.cw-calc-cta__frost-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  text-align: center;
+  text-wrap: balance;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* The clip never plays under reduced motion, so the frost has nothing to
+     reveal and should not fade either. */
+  .cw-calc-cta__frost { transition: none; }
+}
+
+/* STACK AT 900, NOT 760. Measured 2026-08-11 across the range: the clip fills
+   the card height that the TEXT column sets, so as the viewport narrows the
+   text wraps more (card taller) while the clip's track gets narrower, and
+   object-fit: cover eats the difference horizontally. At 1024 the clip renders
+   1.22:1 against a 1.78:1 source, which crops 31% of the frame; at 768 it is
+   0.85:1 and crops 52%, with the chadworks wordmark and the price both sliced
+   off. Portrait tablets (768-834) were the worst case on the whole page.
+   Stacking at 900 hands them the full card width at a true 16:9 instead. */
+@media (max-width: 900px) {
+  /* Stack order: copy, then clip, then button (Chad). Placed HERE rather than
+     in the earlier 900px block because these three override base rules that
+     appear further up, and a media query carries no extra specificity. */
+  .cw-calc-cta__text { grid-column: 1; grid-row: 1; }
+  .cw-calc-cta__film { grid-column: 1; grid-row: 2; }
+  /* Full span when stacked (Chad): the clip above it is full width, so a
+     natural-width pill left-aligned under it read as an afterthought. svc-btn
+     is inline-flex, so stretch alone would not centre the label -- the
+     justify-content is what puts it in the middle of the wider box. */
+  .cw-calc-cta__btn {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: stretch;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Stacked: the clip is a row of its own, so the bleed would drag it onto the
+     copy above and off the bottom edge. Give it a real ratio back instead. */
+  .cw-calc-cta__film {
+    margin: 0;
+    border-radius: calc(var(--radius) - 1px);
+  }
+  .cw-calc-cta__video { height: auto; aspect-ratio: 16 / 9; }
+  /* The frost is gone here, not just hidden-until-hover: there is no hover on
+     a touch screen, so it either sat over the clip permanently or (as measured
+     2026-08-11) stalled mid-fade at ~0.42 and washed the label out. The button
+     under the clip is the affordance at this size. */
+  .cw-calc-cta__frost { display: none; }
+}
+
 /* The deconstruct/reassemble object: the WebGL canvas fills the whole right
    column (matching the prose height) and is itself the click target. The prose
    drives the row height; the canvas flex-grows into it. */
@@ -10320,6 +10531,10 @@ html.cw-motion-paused *::after {
 /* Standalone /rates/ heading: the standard hero H1 (svc-hero__title) sitting
    under the pricing eyebrow. */
 .cw-pricing__heading--hero { margin-top: var(--space-2xs); }
+/* The /rates/ hero lede, under the H1 and above the price cards. Capped to a
+   reading measure so the two sentences do not stretch the full band; the band
+   itself stays full width. */
+.cw-pricing__lede { max-width: var(--measure-prose); }
 .cw-pricing__grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

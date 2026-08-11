@@ -30,7 +30,7 @@ const LINKS: NavLink[] = [
     children: [
       { href: "/web-design/", label: "Web Design" },
       { href: "/web-development/", label: "Web Development" },
-      { href: "/website-design-cost-calculator/", label: "Website Cost Calculator" },
+      { href: "/website-design-cost-calculator/", label: "Website Design Cost Calculator" },
     ],
   },
   { href: "/visibility/", label: "Visibility" },

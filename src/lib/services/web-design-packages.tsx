@@ -4,6 +4,7 @@
 // Copy in Chad's public voice.
 
 import type { ReactNode, CSSProperties } from "react";
+import Link from "next/link";
 import type { Service } from "@/lib/service";
 import { ScopeChip, TagChip, BoxChipDark } from "@/components/art/MoreChips";
 import { ButtonChip, LayoutChip, TypeChipDark } from "@/components/art/WebDesignHeroArt";
@@ -164,8 +165,22 @@ export const webDesignPackages: Service = {
     heading: "The three postures",
     figure: `${money(BASE)} / ${TYPICAL_BAND} / beyond`,
     figureSub: "The baseline build / the typical build / the big vision",
-    body:
-      `The baseline gets a focused site that does one job well. The typical build is where most businesses land: full design, development, and the launch handled. Past that, the number tracks the vision, and we scope it together. Hourly work bills at ${money(HOURLY)} when a defined package isn't the right shape.`,
+    // JSX rather than a template string so the closing line can link into the
+    // calculator. Same prose as before, plus the last sentence.
+    body: (
+      <>
+        The baseline gets a focused site that does one job well. The typical build
+        is where most businesses land: full design, development, and the launch
+        handled. Past that, the number tracks the vision, and we scope it
+        together. Hourly work bills at {money(HOURLY)} when a defined package
+        isn&apos;t the right shape. A package is a shape rather than a quote, so
+        if you already know what you need, the{" "}
+        <Link href="/website-design-cost-calculator/">
+          website design cost calculator
+        </Link>{" "}
+        prices that exact scope instead.
+      </>
+    ),
     disclaimer: (
       <>
         <strong>Straight up:</strong>{" "}these are postures, not a menu. The real

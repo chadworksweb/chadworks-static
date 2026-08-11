@@ -54,3 +54,7 @@ export { WorldviewCapsule } from "./WorldviewCapsule";
 // The /rates/ "in defense of the rate" block. Reuses the worldview aperture,
 // owns its own copy, page-specific by intent.
 export { RateDefenseCapsule } from "./RateDefenseCapsule";
+
+// The calculator hand-off: PackageAssemble beside the pitch + button. On
+// /rates/ today, but written page-agnostic so any pricing surface can render it.
+export { CalcCtaCapsule } from "./CalcCtaCapsule";

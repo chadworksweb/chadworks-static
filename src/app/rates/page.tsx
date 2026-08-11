@@ -16,6 +16,7 @@ import {
   MainContactCapsule,
   PathsCapsule,
   RateDefenseCapsule,
+  CalcCtaCapsule,
 } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { BASE, money } from "@/lib/package-builder";
@@ -155,6 +156,11 @@ export default function RatesPage() {
       {/* IN DEFENSE OF THE RATE -- the argument the ledger does not make. Sits
           after the math on purpose: how long the work takes, then who is doing
           it. Runs the /about/ aperture with the role list as its payload. */}
+      {/* The calculator hand-off, directly after the minutely-rate explainer
+          (Chad). The explainer prices a REQUEST; the calculator prices a BUILD,
+          so the two sit together as the page's two costing tools before the
+          argument for the rate follows them. */}
+      <CalcCtaCapsule />
       <RateDefenseCapsule />
       {/* Standard lane modules out to the service lanes + about. */}
       <PathsCapsule

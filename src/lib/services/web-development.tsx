@@ -163,6 +163,10 @@ export const webDevelopment: Service = {
 
   price: {
     heading: "What it costs, plainly",
+    // NOTE: this field does not render on /web-development/. The page sets
+    // `price: null` (see app/web-development/page.tsx:72), so anything written
+    // here is dead on the only route that reads this file. Put page-visible
+    // price copy in the FAQ list below instead.
     body:
       `I price on the value of the work, not on how small a number I can promise you. Time bills at ${money(HOURLY)} an hour, and projects start at a ${money(BASE)} baseline. Most builds settle between ${LOW} and ${HIGH}, depending on scope and which route you take. I'm honest that this puts me above the cheapest option you'll find, and that is deliberate, because the cheap option is usually the one you pay to rebuild in two years. If a strict fixed budget matters to you more than the result, I'll tell you straight that we probably aren't a match, and I would rather say so now than after you've spent the money.`,
   },
@@ -178,7 +182,29 @@ export const webDevelopment: Service = {
     },
     {
       q: "Which build option should I pick?",
-      a: "That depends on your project's overall technical needs. If you aren't selling anything, you wouldn't want to use Shopify. Or even if you are selling one or two items, still, Shopify might be overkill. If you aren't writing blogs regularly, you probably don't need WordPress, and a traditional, custom coded static site would be the way to go. You don't have to know before you contact me. That is part of what I help you determine.",
+      // Chad's answer verbatim, converted to JSX so the closing line can link
+      // into the calculator. Only the final sentence is new.
+      a: (
+        <>
+          That depends on your project&apos;s overall technical needs. If you
+          aren&apos;t selling anything, you wouldn&apos;t want to use Shopify. Or
+          even if you are selling one or two items, still, Shopify might be
+          overkill. If you aren&apos;t writing blogs regularly, you probably
+          don&apos;t need WordPress, and a traditional, custom coded static site
+          would be the way to go. You don&apos;t have to know before you contact
+          me. That is part of what I help you determine. The{" "}
+          <Link href="/website-design-cost-calculator/">
+            website design cost calculator
+          </Link>{" "}
+          also prices each option side by side, if seeing the numbers helps you
+          decide.
+        </>
+      ),
+      // REQUIRED because `a` above is JSX: buildFaqJsonLd drops any JSX answer
+      // that has no aText, so without this the question vanishes from the
+      // FAQPage schema. Keep the two in sync sentence for sentence.
+      aText:
+        "That depends on your project's overall technical needs. If you aren't selling anything, you wouldn't want to use Shopify. Or even if you are selling one or two items, still, Shopify might be overkill. If you aren't writing blogs regularly, you probably don't need WordPress, and a traditional, custom coded static site would be the way to go. You don't have to know before you contact me. That is part of what I help you determine. The website design cost calculator also prices each option side by side, if seeing the numbers helps you decide.",
     },
     {
       q: "How long does a build take?",

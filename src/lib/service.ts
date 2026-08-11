@@ -364,7 +364,11 @@ export type Service = {
     heading: string;
     figure?: string;
     figureSub?: string;
-    body: Writable;
+    // ReactNode as well as Writable, matching `hero.body` and `faqs.a`, so a
+    // price paragraph can carry an inline link. Nothing reads this field for
+    // JSON-LD (buildServiceJsonLd emits a price-free Offer), so widening it
+    // cannot leak markup into structured data.
+    body: Writable | ReactNode;
     disclaimer?: ReactNode;
   };
 

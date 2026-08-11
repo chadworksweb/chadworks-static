@@ -786,7 +786,7 @@ export default function AiGeneratedWebsiteAuditPage() {
             <>
               You do not have a site yet. Start with the{" "}
               <Link href="/website-design-cost-calculator/">
-                website cost calculator
+                website design cost calculator
               </Link>
               , which scopes and prices a full custom build in about a minute.
             </>,
@@ -907,7 +907,7 @@ export default function AiGeneratedWebsiteAuditPage() {
               href: "/web-development/",
             },
             {
-              label: "Website Cost Calculator",
+              label: "Website Design Cost Calculator",
               detail:
                 "Starting over instead? Scope and price a full custom build yourself.",
               href: "/website-design-cost-calculator/",

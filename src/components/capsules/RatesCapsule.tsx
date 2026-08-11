@@ -24,10 +24,24 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
           </nav>
         )}
         <p className="eyebrow">What it costs</p>
+        {/* Heading + lede are STANDALONE-ONLY (Chad asked for the rates page).
+            This capsule also renders on the homepage, /web-design/ and
+            /web-development/, and those keep "Transparent rates." -- on them it
+            is a supporting h2 in someone else's page, where a possessive brand
+            title would read as a second page title. */}
         {standalone ? (
-          <h1 className="svc-hero__title cw-pricing__heading--hero">
-            <span className="text-gradient">Transparent rates.</span>
-          </h1>
+          <>
+            <h1 className="svc-hero__title cw-pricing__heading--hero">
+              <span className="text-gradient">chadworks&apos; Rates</span>
+            </h1>
+            {/* Chad's copy, verbatim. */}
+            <div className="svc-lede cw-pricing__lede">
+              <p>
+                I&apos;m not big on waiting to talk money. Here&apos;s what I
+                charge and why.
+              </p>
+            </div>
+          </>
         ) : (
           <h2 className="cw-pricing__heading">Transparent rates.</h2>
         )}
@@ -56,6 +70,10 @@ export function RatesCapsule({ standalone = false }: { standalone?: boolean } = 
         for information only, not a formal quote or binding offer. Your actual
         price is set in a written proposal before any work begins.
       </p>
+      {/* A second fine-print line pointing at the calculator used to sit here.
+          Removed 2026-08-11 (Chad) once CalcCtaCapsule landed on /rates/: the
+          card says the same thing with the clip beside it, so the fine print
+          was a duplicate link a few hundred pixels above it. */}
       {!standalone && isLaunched("/rates/") && (
         <div className="cw-pricing__cta">
           <Link href="/rates/" className="svc-btn cw-pricing__cta-btn">

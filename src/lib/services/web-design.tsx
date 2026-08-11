@@ -162,6 +162,10 @@ export const webDesign: Service = {
 
   price: {
     heading: "What design costs, plainly",
+    // NOTE: this field does not render on /web-design/. The page overrides the
+    // `price` slot with <FitCapsule /> (see app/web-design/page.tsx:108), so
+    // anything written here is dead on the only route that reads this file.
+    // Put page-visible price copy in the FAQ list below instead.
     body:
       `I price on the value of the work, not on how small a number I can promise you. Time bills at ${money(HOURLY)} an hour, and projects start at a ${money(BASE)} baseline. Most builds settle between ${LOW} and ${HIGH}, depending on scope and which route you choose. Design and development are the same job to me, so that number covers both halves, not a mockup you then pay someone else to build. This puts me above the cheapest option you'll find, and that is on purpose, because the cheap option is usually the one you pay to rebuild in two years. If a fixed budget matters to you more than the result, I'd rather tell you now than after you've spent the money.`,
   },
@@ -186,7 +190,26 @@ export const webDesign: Service = {
     },
     {
       q: "Can you redesign my current site without rebuilding it?",
-      a: "Sometimes, and I'll tell you honestly which case you are. If the bones are healthy, a redesign can ride on them. If the site is held together by page-builder duct tape, redesigning on top of it just paints over the problem, and you'd be paying twice. I look first, then recommend.",
+      // Chad's answer verbatim, converted to JSX so the closing line can link
+      // into the calculator. Only the final sentence is new.
+      a: (
+        <>
+          Sometimes, and I&apos;ll tell you honestly which case you are. If the
+          bones are healthy, a redesign can ride on them. If the site is held
+          together by page-builder duct tape, redesigning on top of it just paints
+          over the problem, and you&apos;d be paying twice. I look first, then
+          recommend. If you want a number in the meantime, the{" "}
+          <Link href="/website-design-cost-calculator/">
+            website design cost calculator
+          </Link>{" "}
+          prices a redesign the same way it prices a new build.
+        </>
+      ),
+      // REQUIRED because `a` above is JSX: buildFaqJsonLd drops any JSX answer
+      // that has no aText, so without this the question vanishes from the
+      // FAQPage schema. Keep the two in sync sentence for sentence.
+      aText:
+        "Sometimes, and I'll tell you honestly which case you are. If the bones are healthy, a redesign can ride on them. If the site is held together by page-builder duct tape, redesigning on top of it just paints over the problem, and you'd be paying twice. I look first, then recommend. If you want a number in the meantime, the website design cost calculator prices a redesign the same way it prices a new build.",
     },
     {
       q: "How much say do I get in the design?",

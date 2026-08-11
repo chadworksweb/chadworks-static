@@ -31,7 +31,9 @@ export interface HubConfig {
   answer: ReactNode;
   heroArt?: ReactNode;
   lanesHeading?: string;
-  lanesIntro?: string;
+  // ReactNode so a hub's lane intro can carry an inline link. Rendered as a
+  // single <p> above the lane grid.
+  lanesIntro?: ReactNode;
   lanes: HubLane[];
   // A thesis body is paragraphs, with an optional mid-section h3 written as
   // { heading: "..." } wherever a break is wanted.

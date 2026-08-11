@@ -600,7 +600,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
             The store and the small business figures are exact, not rounded, and
             you can reproduce them by moving the scope on the{" "}
             <Link href="/website-design-cost-calculator/">
-              website cost calculator
+              website design cost calculator
             </Link>{" "}
             until it matches your project. The web application number is the one I
             will not pin down here, because software is priced by what it has to
@@ -669,7 +669,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
             Every figure here is computed at build time by the same model behind
             the{" "}
             <Link href="/website-design-cost-calculator/">
-              website cost calculator
+              website design cost calculator
             </Link>
             . These are prices I would quote you today.
           </p>
@@ -773,7 +773,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
           heading: "Ready to price your own:",
           items: [
             {
-              label: "Website Cost Calculator",
+              label: "Website Design Cost Calculator",
               detail:
                 "Move the scope and watch the number move. The same model behind every figure on this page, running one real rate card with no email gate.",
               href: "/website-design-cost-calculator/",

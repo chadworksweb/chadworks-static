@@ -139,12 +139,15 @@ export default function GoodFitPage() {
           YouTube&mdash;off any centralized platform carries weight, and financial
           requirements. The starting price for any chadworks project is {money(BASE)} but
           easily cracks {LOW} and {HIGH}. See my{" "}
-          {/* LaunchLink, not Link: the calculator lives on the claude/chadworks-work
-              branch and is not merged, so /build-your-website-package/ does not
-              exist here yet. This renders as plain TEXT until that route ships and
-              is added to launch.ts, then becomes a live link on its own. */}
-          <LaunchLink href="/build-your-website-package/">
-            website package calculator
+          {/* Points at the live route. The href was /build-your-website-package/,
+              the slug the calculator shipped under before the 2026-07-17 rename.
+              That route is not in launch.ts and never will be, so LaunchLink was
+              rendering this anchor as dead "coming soon" TEXT on a launched page:
+              the best-placed contextual link to the calculator on the whole site
+              pointed nowhere. Still LaunchLink rather than Link, so the seal keeps
+              following launch.ts if the calculator is ever pulled back. */}
+          <LaunchLink href="/website-design-cost-calculator/">
+            website design cost calculator
           </LaunchLink>{" "}
           for more info on scoping your project.
         </p>

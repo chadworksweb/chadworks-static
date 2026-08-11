@@ -94,7 +94,7 @@ const COLUMNS: FooterGroup[][] = [
       links: [
         {
           href: "/website-design-cost-calculator/",
-          label: "Website Cost Calculator",
+          label: "Website Design Cost Calculator",
         },
       ],
     },

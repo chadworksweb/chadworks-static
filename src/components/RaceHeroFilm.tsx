@@ -1,5 +1,3 @@
-"use client";
-
 // RACE HERO FILM -- the slow-motion marathon clip in the right half of the
 // /website-design-for-5k-races/ hero, blended into the manifesto cloud behind
 // it. Replaced the rising chip stream there (Chad, 2026-08-11).
@@ -16,12 +14,14 @@
 // 24-30fps, where half speed judders and there is no fixing it without
 // interpolating frames that were never shot.
 //
-// FIRST VIDEO ON THE SITE. If a second one lands, factor this into a shared
-// component rather than copying it; the motion and reduced-motion plumbing
-// below is the part worth reusing.
+// The motion + reduced-motion plumbing that used to live here moved into
+// <SiteVideo> when the calculator clip became the second video on the site,
+// which is what the note in this file asked for. This component is now just
+// the clip's identity: its source, its poster, and its half-speed rate.
+// preload="none" is inherited from SiteVideo's default and matters here: the
+// hero is hidden under 900px, so a phone never pays for the file.
 
-import { useEffect, useRef } from "react";
-import { isMotionPaused, subscribeMotion, isReducedMotionUnforced } from "@/lib/motion";
+import { SiteVideo } from "@/components/SiteVideo";
 
 const SRC = "/video/race-runners-38667751-720.mp4";
 const POSTER = "/video/race-runners-38667751-poster.jpg";
@@ -31,46 +31,13 @@ const POSTER = "/video/race-runners-38667751-poster.jpg";
 const RATE = 0.5;
 
 export function RaceHeroFilm() {
-  const ref = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    // Reduced motion wins outright: the poster stays, nothing plays, and the
-    // file is never fetched because preload is "none" until we ask for it.
-    if (isReducedMotionUnforced()) return;
-
-    el.playbackRate = RATE;
-    const apply = (paused: boolean) => {
-      // playbackRate resets on some sources after a load, so it is re-asserted
-      // on every resume rather than set once.
-      el.playbackRate = RATE;
-      if (paused) el.pause();
-      else void el.play().catch(() => {});
-    };
-    apply(isMotionPaused());
-    return subscribeMotion(apply);
-  }, []);
-
   return (
-    <video
-      ref={ref}
+    <SiteVideo
       className="cw-race-film__video"
+      src={SRC}
       poster={POSTER}
-      // muted + playsInline are what make autoplay legal on iOS and in Chrome.
-      muted
-      loop
-      playsInline
-      // "none": the hero is hidden under 900px, so a phone should never pay for
-      // this file at all. The effect below starts playback on desktop, which is
-      // what triggers the fetch.
-      preload="none"
-      aria-hidden="true"
-      tabIndex={-1}
-    >
-      <source src={SRC} type="video/mp4" />
-    </video>
+      rate={RATE}
+    />
   );
 }
 
