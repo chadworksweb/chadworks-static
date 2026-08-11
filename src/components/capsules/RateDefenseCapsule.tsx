@@ -27,21 +27,21 @@ const EYEBROW = `Yes, my rate works out to ${HOURLY_RATE}.`;
 
 // The lead, verbatim. It ends mid-sentence on purpose: the aperture finishes it.
 const LEAD =
-  "I am more than a web designer. When I make a decision, I am passing it through the mind of a:";
+  "I am more than a web designer and developer. When I make a decision, I am also passing it through the mind of a:";
 
 // The roles, in Chad's order and his words. These are NOT set as type in the
 // section -- they are the payload of the fixed layer behind the page, revealed
 // through the window. One per line, so the window shows two at a time and the
 // rest keep going behind the copy.
 const ROLES = [
-  "Designer",
-  "Developer",
+  "Product Designer",
   "Brand Manager",
+  "SEO Specialist",
   "Art Director",
   "Copywriter",
   "Marketer",
   "Business Owner",
-  "SEO/AI Specialist",
+  "AI Search Specialist",
   "Free Thinker",
   "Strategist",
   "Artist",
