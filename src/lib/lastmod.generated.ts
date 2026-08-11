@@ -32,7 +32,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/essays/rebirth-of-chadworks-wondrous-internet/": "2026-07-27",
   "/faqs/": "2026-08-01",
   "/how-much-does-a-website-cost/": "2026-08-06",
-  "/industries-served/": "2026-07-28",
+  "/industries-served/": "2026-08-11",
   "/music-industry-web-design/": "2026-07-23",
   "/privacy-policy/": "2026-07-24",
   "/rates/": "2026-08-07",

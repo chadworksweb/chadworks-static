@@ -15,8 +15,19 @@
 //
 // EVERY figure is read from the pricing hub. Nothing here is typed, which is
 // also what keeps scripts/price-audit.mjs passing.
+//
+// THE COLUMN ACCENTS ARE THE RIBBON HUES (Chad, 2026-08-11), in the same order
+// the band above renders them: high-vis, safety orange, timing blue. Both read
+// RACE_HUES from lib/race-palette.ts so the two sections cannot drift.
+//
+// Each card publishes three custom properties and the CSS decides where each
+// belongs. `--pkg-ink` exists because the vivid tones are tuned to glow on a
+// canvas, which is what makes them unreadable as small text or behind white
+// text; anything a reader has to READ takes the ink.
 
+import type { CSSProperties } from "react";
 import { SectionShell } from "@/components/capsules/SectionShell";
+import { RACE_HUES } from "@/lib/race-palette";
 import { money } from "@/lib/package-builder";
 import {
   RACE_STARTING_LINE,
@@ -140,12 +151,19 @@ export function RacePackagesCapsule() {
       </p>
 
       <div className="cw-race-packages__grid">
-        {PACKAGES.map((p) => (
+        {PACKAGES.map((p, i) => (
           <div
             className={`cw-race-pkg${
               "featured" in p && p.featured ? " cw-race-pkg--featured" : ""
             }`}
             key={p.name}
+            style={
+              {
+                "--pkg-accent": RACE_HUES[i % RACE_HUES.length].vivid,
+                "--pkg-light": RACE_HUES[i % RACE_HUES.length].light,
+                "--pkg-ink": RACE_HUES[i % RACE_HUES.length].ink,
+              } as CSSProperties
+            }
           >
             {"badge" in p && p.badge && (
               <span className="cw-race-pkg__badge">{p.badge}</span>

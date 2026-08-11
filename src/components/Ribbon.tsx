@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { isMotionPaused, subscribeMotion, prefersReducedMotion } from "@/lib/motion";
+import { RACE_HUES, hexToRgb01 } from "@/lib/race-palette";
 
 // Two intermingling 3D gradient RIBBONS (Stripe-style), on Three.js. Each is a
 // discrete lit object: a long narrow strip whose centerline flows along an
@@ -42,24 +43,29 @@ const RIBBON_C = {
 // already owns. A road race reads in high-visibility colours the brand triad
 // does not contain, so this is a second palette rather than a fourth rotation.
 //
+// THE HUES LIVE IN lib/race-palette.ts, not here. The three package columns on
+// the same page take the same three as their accents and must not drift from
+// them, so both consumers read one list. This file only converts them to the
+// 0-1 triples the shader wants.
+//
 // THE PHASES ARE IDENTICAL to the brand triad on purpose. Phase drives the
 // ribbon PATH, the mask pass reuses it, and the knockout only lines up while
 // the two passes share geometry. Change a hue freely; changing a phase here
 // desynchronises the coverage pass from the colour band.
 const RACE_A = {
   phase: 0.0,
-  dark: [0.56, 0.75, 0.0] as RGB, //  #8fbf00 high-vis yellow-green (the marshal vest)
-  light: [0.831, 0.961, 0.259] as RGB, // #d4f542 bright course-marking chartreuse
+  dark: hexToRgb01(RACE_HUES[0].vivid) as RGB,
+  light: hexToRgb01(RACE_HUES[0].light) as RGB,
 };
 const RACE_B = {
   phase: 2.2,
-  dark: [1.0, 0.384, 0.0] as RGB, //  #ff6200 safety orange -- the one hue both palettes share
-  light: [1.0, 0.671, 0.278] as RGB, // #ffab47 bright neon orange
+  dark: hexToRgb01(RACE_HUES[1].vivid) as RGB,
+  light: hexToRgb01(RACE_HUES[1].light) as RGB,
 };
 const RACE_C = {
   phase: 4.1,
-  dark: [0.0, 0.565, 0.784] as RGB, //  #0090c8 electric blue (timing-chip / finish-clock blue)
-  light: [0.31, 0.82, 0.961] as RGB, // #4fd1f5 bright cyan
+  dark: hexToRgb01(RACE_HUES[2].vivid) as RGB,
+  light: hexToRgb01(RACE_HUES[2].light) as RGB,
 };
 
 const VERT = /* glsl */ `

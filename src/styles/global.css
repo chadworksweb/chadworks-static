@@ -13746,7 +13746,9 @@ html.cw-motion-paused *::after {
   flex-direction: column;
   padding: 2rem 1.9rem;
   border: 1px solid var(--border-subtle);
-  border-bottom: 3px solid var(--accent);
+  /* The column's ribbon hue. Falls back to the brand accent if a card is ever
+     rendered without the tokens the capsule sets inline. */
+  border-bottom: 3px solid var(--pkg-accent, var(--accent));
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.4);
   -webkit-backdrop-filter: blur(6px);
@@ -13760,9 +13762,9 @@ html.cw-motion-paused *::after {
    Deliberately NOT a colour change: the section already runs two colours, and
    a third would break the 2-3 colour ceiling these tables live by. */
 .cw-race-pkg--featured {
-  border-color: var(--accent);
+  border-color: var(--pkg-accent, var(--accent));
   box-shadow: 0 22px 48px -18px rgba(36, 57, 137, 0.34),
-    0 0 24px rgba(128, 84, 188, 0.18);
+    0 0 24px color-mix(in srgb, var(--pkg-accent, var(--accent)) 26%, transparent);
 }
 .cw-race-pkg--featured::before {
   content: "";
@@ -13770,14 +13772,20 @@ html.cw-motion-paused *::after {
   inset: -1px -1px auto -1px;
   height: 4px;
   border-radius: var(--radius) var(--radius) 0 0;
-  background: linear-gradient(90deg, #6629bc, #aeb9ea);
+  background: linear-gradient(
+    90deg,
+    var(--pkg-ink, #6629bc),
+    var(--pkg-light, #aeb9ea)
+  );
 }
 .cw-race-pkg__badge {
   align-self: flex-start;
   margin-bottom: 0.6rem;
   padding: 0.24rem 0.6rem;
   border-radius: 999px;
-  background: var(--accent);
+  /* INK, not vivid: this is white text on a fill, and the vivid high-vis tone
+     cannot carry it. */
+  background: var(--pkg-ink, var(--accent));
   color: #fff;
   font-family: var(--font-mono);
   font-size: var(--text-xs);
@@ -13804,7 +13812,8 @@ html.cw-motion-paused *::after {
   justify-content: center;
   min-height: 2.75rem;
   font-weight: 600;
-  color: var(--accent);
+  /* INK again: a link is text. */
+  color: var(--pkg-ink, var(--accent));
   text-decoration: none;
 }
 .cw-race-pkg__cta::after {
@@ -13819,7 +13828,7 @@ html.cw-motion-paused *::after {
   margin-bottom: 0;
   padding: 0.8rem 1rem;
   border-radius: 999px;
-  background: var(--accent);
+  background: var(--pkg-ink, var(--accent));
   color: #fff;
 }
 .cw-race-pkg__name {
@@ -13882,8 +13891,13 @@ html.cw-motion-paused *::after {
   width: 8px;
   height: 8px;
   border-radius: 2px;
-  background: linear-gradient(135deg, #aeb9ea, #6629bc);
-  box-shadow: 0 0 10px rgba(102, 41, 188, 0.6);
+  background: linear-gradient(
+    135deg,
+    var(--pkg-light, #aeb9ea),
+    var(--pkg-accent, #6629bc)
+  );
+  box-shadow: 0 0 10px
+    color-mix(in srgb, var(--pkg-accent, #6629bc) 55%, transparent);
 }
 
 .cw-race-addons__heading {
