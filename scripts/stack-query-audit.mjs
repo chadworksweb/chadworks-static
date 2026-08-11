@@ -50,6 +50,14 @@ const CONSUMERS = [
     file: "src/components/ManifestoAmbient.tsx",
     ctx: "STACKED_Q (yields the WebGL context to the calculator's object)",
   },
+  {
+    // Joined 2026-08-11. Not the calculator page, but the same decision: the
+    // CalcCtaCapsule card stacks, drops its hover-frost and moves the button
+    // under the clip on exactly the devices this query describes. Split it from
+    // the others and a touch tablet gets a hover affordance it cannot trigger.
+    file: "src/styles/global.css",
+    ctx: "the CalcCtaCapsule stacked card (grid rows, clip ratio, frost removal)",
+  },
 ];
 
 const problems = [];

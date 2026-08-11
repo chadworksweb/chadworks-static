@@ -2569,12 +2569,16 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   --calc-cta-pad: clamp(1.5rem, 3.5vw, 2.5rem);
   padding: var(--calc-cta-pad);
 }
-@media (max-width: 900px) {
+@media (pointer: coarse), (max-width: 900px) {
   /* Words first, clip under them, button last: the copy is the point, the clip
-     is support, and the button closes it (Chad). 900 rather than 760 -- see the
-     note on the clip's media query below. Rows are placed explicitly because
-     the button's DOM position is between the two, and only the desktop layout
-     wants it there. */
+     is support, and the button closes it (Chad). Rows are placed explicitly
+     because the button's DOM position is between the two, and only the desktop
+     layout wants it there.
+     The condition is the site's canonical stacked-layout query (see
+     scripts/stack-query-audit.mjs). `pointer: coarse` earns its place here as
+     much as anywhere: a touch tablet WIDER than 900px would otherwise get the
+     two-column card and the hover-frost, on a device that has no hover to
+     reveal it with. */
   .cw-calc-cta__card {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
@@ -2705,8 +2709,10 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    1.22:1 against a 1.78:1 source, which crops 31% of the frame; at 768 it is
    0.85:1 and crops 52%, with the chadworks wordmark and the price both sliced
    off. Portrait tablets (768-834) were the worst case on the whole page.
-   Stacking at 900 hands them the full card width at a true 16:9 instead. */
-@media (max-width: 900px) {
+   Stacking at 900 hands them the full card width at a true 16:9 instead.
+   Paired with `pointer: coarse` so wide touch screens stack too; keep this
+   condition byte-identical to the one above and to stack-query-audit.mjs. */
+@media (pointer: coarse), (max-width: 900px) {
   /* Stack order: copy, then clip, then button (Chad). Placed HERE rather than
      in the earlier 900px block because these three override base rules that
      appear further up, and a media query carries no extra specificity. */
