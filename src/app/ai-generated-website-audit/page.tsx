@@ -798,6 +798,11 @@ export default function AiGeneratedWebsiteAuditPage() {
             </>,
             // Chad's copy, verbatim (2026-08-09).
             "You are looking for a free automated scan. Those exist, but this isn't one of them.",
+            // Written 2026-08-12, the sibling of the scan line above and the
+            // code-cleanup FAQ below: grants the shops their job, then draws
+            // the line at design. A fourth item here also lifts notFit off
+            // exactly three (CWS-VOICE rule 10.2).
+            "You want a code cleanup. Plenty of shops will secure your keys and tidy your files for a few hundred dollars, with the design left exactly as the model made it. The design is what this audit is for.",
           ],
         }}
       />
@@ -832,6 +837,19 @@ export default function AiGeneratedWebsiteAuditPage() {
             q: "Do you rebuild my site, or just tell me what is wrong?",
             // Chad's copy, verbatim (2026-08-09).
             a: "The audit is not a web design or building service. It is a process that delivers a checklist of what could or should be done to the site/platform. It does not include implementing the suggestions.",
+          },
+          {
+            // Written 2026-08-12, sharpening against the cheap-code-cleanup
+            // category (free audit as a sales funnel, low fixed-price code
+            // repair, design explicitly preserved). Names the practice, never
+            // a company, per CWS-VOICE section 6. "vibe code cleanup" is what
+            // the category calls itself, but "vibe" is builder vocabulary and
+            // is ruled out of this page's copy (see the FAQ below), so the
+            // question says "AI code cleanup" instead. "a few hundred
+            // dollars" is written out on purpose: price-audit only matches a
+            // dollar sign against digits.
+            q: "How is this different from a cheap AI code cleanup service?",
+            a: "Code cleanup shops repair what's under the hood: exposed keys, security holes, duplicate files, missing meta tags. That is real work, and if bad code is your only worry, hire one. But read the fine print. Many advertise, as a feature, that your design and user experience stay exactly as the model generated them, and their free audit is a sales quote for code work, not a design review. This audit takes apart the part they preserve: the thing your visitors see and judge you by.",
           },
           {
             // "vibe-coded" until 2026-08-08, when Chad tested the term on
