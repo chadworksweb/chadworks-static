@@ -40,7 +40,13 @@ const LINKS: NavLink[] = [
   {
     href: "/about/",
     label: "About",
+    // The first child repeats the parent's own page (Chad, 2026-08-12): the
+    // parent stays a link, and the dropdown still offers About explicitly for
+    // anyone who opens the menu instead of clicking the label. Good fit sits
+    // directly after it (Chad); label lifted from SiteFooter.
     children: [
+      { href: "/about/", label: "About chadworks™" },
+      { href: "/are-we-a-good-fit/", label: "Are We A Good Fit?" },
       { href: "/rates/", label: "Rates" },
       { href: "/faqs/", label: "FAQs" },
     ],
