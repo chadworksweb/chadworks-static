@@ -96,9 +96,14 @@ export function PageMotion() {
     // Cut with rootMargin, so the observer fires only on a crossing -- no scroll
     // listener, and none of this runs on a pointer device.
     if (window.matchMedia("(hover: none)").matches) {
+      // Rows-variant lanes (Platform Options) are EXCLUDED: this effect was
+      // built for the lane card grids, and the rows picked it up as a side
+      // effect -- full-width text lanes lighting themselves as they cross the
+      // line read as motion for its own sake (Chad, 2026-08-12). On touch,
+      // rows lanes now stay static (their :hover is already disabled below).
       const focusEls = Array.from(
         document.querySelectorAll<HTMLElement>(".svc-lane, .cw-lane-sub")
-      );
+      ).filter((el) => !el.closest(".svc-lanes--rows"));
       if (focusEls.length) {
         const onLine = new Set<Element>();
         let lit: HTMLElement | null = null;
