@@ -149,7 +149,9 @@ export const PROJECTS: Project[] = [
     gridBlurb:
       "Likely the world's most immersive and custom-developed artist website. Custom: ecommerce shop, content development, AI integration, API integration, email campaign manager, 3D graphics, effects, branding, CMS and much more.",
     archiveRank: 60,
-    inShowcase: true,
+    // Pulled from the curated showcase grid (Chad, 2026-08-12); stays on the
+    // reel. gridBlurb + archiveRank kept so re-listing is one flag flip.
+    inShowcase: false,
   },
   {
     key: "radiantarc",
