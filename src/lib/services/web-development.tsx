@@ -182,29 +182,30 @@ export const webDevelopment: Service = {
     },
     {
       q: "Which build option should I pick?",
-      // Chad's answer verbatim, converted to JSX so the closing line can link
-      // into the calculator. Only the final sentence is new.
+      // Chad's answer verbatim. The calculator sentence this once carried moved
+      // into the cost FAQ below (Chad, 2026-08-12), which is now this page's
+      // contextual link into the calculator.
+      a: "That depends on your project's overall technical needs. If you aren't selling anything, you wouldn't want to use Shopify. Or even if you are selling one or two items, still, Shopify might be overkill. If you aren't writing blogs regularly, you probably don't need WordPress, and a traditional, custom coded static site would be the way to go. You don't have to know before you contact me. That is part of what I help you determine.",
+    },
+    {
+      q: "How much does website development cost?",
+      // Chad's answer verbatim (2026-08-12), as JSX so "website design cost
+      // calculator" carries the page's contextual link. Figures render from
+      // pricing.ts so they move when the rates do.
       a: (
         <>
-          That depends on your project&apos;s overall technical needs. If you
-          aren&apos;t selling anything, you wouldn&apos;t want to use Shopify. Or
-          even if you are selling one or two items, still, Shopify might be
-          overkill. If you aren&apos;t writing blogs regularly, you probably
-          don&apos;t need WordPress, and a traditional, custom coded static site
-          would be the way to go. You don&apos;t have to know before you contact
-          me. That is part of what I help you determine. The{" "}
+          Web development starts at {money(BASE)} but can easily reach {LOW} and
+          higher. Use my{" "}
           <Link href="/website-design-cost-calculator/">
             website design cost calculator
           </Link>{" "}
-          also prices each option side by side, if seeing the numbers helps you
-          decide.
+          for a near-exact estimate of your project.
         </>
       ),
       // REQUIRED because `a` above is JSX: buildFaqJsonLd drops any JSX answer
       // that has no aText, so without this the question vanishes from the
       // FAQPage schema. Keep the two in sync sentence for sentence.
-      aText:
-        "That depends on your project's overall technical needs. If you aren't selling anything, you wouldn't want to use Shopify. Or even if you are selling one or two items, still, Shopify might be overkill. If you aren't writing blogs regularly, you probably don't need WordPress, and a traditional, custom coded static site would be the way to go. You don't have to know before you contact me. That is part of what I help you determine. The website design cost calculator also prices each option side by side, if seeing the numbers helps you decide.",
+      aText: `Web development starts at ${money(BASE)} but can easily reach ${LOW} and higher. Use my website design cost calculator for a near-exact estimate of your project.`,
     },
     {
       q: "How long does a build take?",
