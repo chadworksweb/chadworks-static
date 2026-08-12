@@ -44,6 +44,9 @@ export interface HubConfig {
   };
   cta: { heading: string; body: string };
   form: LeadFormConfig;
+  // Rendered after the thesis and before the contact capsule -- a hub can
+  // close with its own hand-off (e.g. /websites/ runs CalcCtaCapsule here).
+  preContact?: ReactNode;
 }
 
 export type ThesisBlock = ReactNode | { heading: string };
@@ -213,6 +216,8 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
           )}
         </section>
       )}
+
+      {hub.preContact}
 
       {/* CTA -- the global contact capsule (same as the homepage close). */}
       <MainContactCapsule />

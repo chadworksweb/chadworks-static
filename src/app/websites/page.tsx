@@ -3,8 +3,8 @@
 
 import type { Metadata } from "next";
 import type { ReactNode, CSSProperties } from "react";
-import Link from "next/link";
 import HubTemplate, { type HubConfig } from "@/components/HubTemplate";
+import { CalcCtaCapsule } from "@/components/capsules";
 import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import {
@@ -66,19 +66,6 @@ const hub: HubConfig = {
     </>
   ),
   heroArt: <WebsitesHubArt />,
-  // Intro above the lane grid. Carries the contextual link into the calculator:
-  // this hub sorts people by ROUTE, and the calculator sorts them by NUMBER,
-  // which is the other way buyers arrive at the same decision.
-  lanesIntro: (
-    <>
-      Every route below prices differently. If you would rather start from a
-      number than from a route, the{" "}
-      <Link href="/website-design-cost-calculator/">
-        website design cost calculator
-      </Link>{" "}
-      scopes a build off the published rate card.
-    </>
-  ),
   lanes: [
     {
       label: "Web Design",
@@ -125,6 +112,11 @@ const hub: HubConfig = {
       viz: <ShopifyViz />,
     },
   ],
+  // The hub's contextual link into the calculator. Was a lanesIntro sentence
+  // above the lane grid; moved into the capsule before the contact close
+  // (Chad, 2026-08-12). This hub sorts people by ROUTE, the calculator sorts
+  // them by NUMBER -- the capsule offers the other way in before the form.
+  preContact: <CalcCtaCapsule />,
   cta: {
     heading: "Know exactly what you need, or not even close?",
     body: "Both are fine starting points. Tell me about your business and I'll tell you straight which route fits, what it would take, and whether we're a match, before anyone commits to anything.",

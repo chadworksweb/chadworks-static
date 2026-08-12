@@ -1,4 +1,5 @@
-// CALC CTA CAPSULE -- the calculator hand-off, currently rendered on /rates/.
+// CALC CTA CAPSULE -- the calculator hand-off, rendered on /rates/ and on
+// /websites/ (via HubConfig.preContact, before the contact close).
 //
 // ONE bordered, shadowed card holding both halves: the words on the left, the
 // portfolio clip of the calculator on the right, with a small gap between them.

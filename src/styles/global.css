@@ -2535,6 +2535,12 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    ONE card carrying both halves: words left, portfolio clip right, small gap
    between. The card owns the border and shadow; the clip inside it carries
    neither, so the pair reads as a single object rather than two tiles. */
+/* Half the space above (Chad, 2026-08-12): the visible gap over the card is
+   the preceding section's bottom pad PLUS this section's top pad, i.e. two
+   full --section-pad-y. Dropping this section's own top pad halves the gap.
+   Assumes the capsule always follows a standard-padded section, which holds
+   on both consumers (/rates/, /websites/). */
+.cw-calc-cta { padding-block-start: 0; }
 .cw-calc-cta__card {
   display: grid;
   grid-template-columns: 1fr 1fr;
