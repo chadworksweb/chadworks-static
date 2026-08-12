@@ -42,9 +42,12 @@ const LAUNCHED = new Set<string>([
   "/web-development/", // launched 2026-07-11 (dev page: gem-reveal explainer + platform options)
   "/show-up-on-chatgpt/",
   "/advertising-on-chatgpt/",
-  "/industries-served/", // launched 2026-07-13 (industry hub -- de-orphans septic + foundation)
-  "/website-design-for-septic-services/",
-  "/website-design-for-foundation-repair/",
+  // "/industries-served/", "/website-design-for-septic-services/" and
+  // "/website-design-for-foundation-repair/" -- KILLED 2026-08-12 (Chad): not
+  // ranking, not the brand's target audience. Not sealed but REMOVED: their
+  // routes left src/app entirely, parked locally in parked/industries/ for
+  // copy harvesting. The dirs must also be hand-removed from /srv/chadworks
+  // on deploy (tar-sync is additive).
   "/privacy-policy/", // launched with the GA4 + consent suite (2026-07-06)
   "/terms-of-service/", // launched 2026-07-23 -- rewritten as SITE terms (visitor
                         // rules, scraping/AI-training limits, disclaimers, PA

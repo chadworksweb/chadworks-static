@@ -146,7 +146,8 @@ const COLUMNS: FooterGroup[][] = [
         { href: "/switch/godaddy-to-static/", label: "GoDaddy to Static" },
         { href: "/switch/gmail-to-workspace/", label: "Gmail to Workspace" },
         { href: "/switch/stop-paying-indeed/", label: "Stop Paying Indeed" },
-        { href: "/industries-served/", label: "Industries Served" },
+        // Industries Served removed 2026-08-12: route killed and parked in
+        // parked/industries/ (see launch.ts note).
       ],
     },
   ],

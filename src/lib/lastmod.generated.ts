@@ -9,7 +9,7 @@
 // it without pulling filesystem access into the Next build graph -- see the
 // header of scripts/build-lastmod.mjs for what that cost the first time.
 
-export const BUILD_DATE = "2026-08-11";
+export const BUILD_DATE = "2026-08-12";
 
 export const ROUTE_DATES: Record<string, string> = {
   "/": "2026-08-01",
@@ -32,7 +32,6 @@ export const ROUTE_DATES: Record<string, string> = {
   "/essays/rebirth-of-chadworks-wondrous-internet/": "2026-07-27",
   "/faqs/": "2026-08-11",
   "/how-much-does-a-website-cost/": "2026-08-11",
-  "/industries-served/": "2026-08-11",
   "/music-industry-web-design/": "2026-07-23",
   "/privacy-policy/": "2026-07-24",
   "/rates/": "2026-08-11",
@@ -59,17 +58,15 @@ export const ROUTE_DATES: Record<string, string> = {
   "/web-design-for-authors/": "2026-07-23",
   "/web-design-packages/": "2026-08-11",
   "/web-design/": "2026-08-11",
-  "/web-development/": "2026-08-11",
+  "/web-development/": "2026-08-12",
   "/web-hosting/": "2026-07-11",
   "/website-design-cost-calculator/": "2026-08-05",
   "/website-design-for-5k-races/": "2026-08-11",
   "/website-design-for-bands-musicians/": "2026-07-23",
   "/website-design-for-conferences/": "2026-08-11",
-  "/website-design-for-foundation-repair/": "2026-07-24",
   "/website-design-for-retreats/": "2026-08-11",
-  "/website-design-for-septic-services/": "2026-08-01",
   "/website-design-for-tree-companies/": "2026-07-23",
   "/website-redesign/": "2026-07-23",
-  "/websites/": "2026-08-11",
+  "/websites/": "2026-08-12",
   "/wordpress/": "2026-08-01",
 };
