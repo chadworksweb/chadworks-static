@@ -722,7 +722,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 /* The audit card's heading, which runs the green wave through clipped text.
    "Apply" alone has two descenders, so it needs this as much as any of the
    above. Added per this block's own instruction. */
-.cw-fix-formcard__title {
+.cw-fix-formcard__title,
+/* The cost guide's CTA heading, which runs the same wave. "packages?" carries
+   both a descender and a question mark that clips flat without this. */
+.cw-builds__more-heading {
   padding-bottom: 0.15em;
 }
 
@@ -1493,6 +1496,13 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    button in a lighter edge mid-hover. */
 .svc-btn--ghost:hover { border-color: transparent; }
 
+/* NOTE (2026-08-13): a `.svc-faq-section--dark .svc-btn--ghost` override briefly
+   lived here to make the ghost readable on the navy band. It was removed with
+   the button: a CTA on an inverted band uses the DEFAULT filled treatment (see
+   CtaCapsule and ActsCapsule, both on dark bands, both passing no variant), and
+   no ghost button sits on a dark band anywhere on the site. Restore this only
+   if one ever does. */
+
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) {
     .svc-btn::before { transition: none; }
@@ -2123,7 +2133,13 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    size reads as a lead; a whole section built from it reads as wall-to-wall
    lede. `--lead` keeps the first paragraph at lead size and drops the rest to
    plain body copy; `--plain` sets the whole block to body size. */
-.svc-prose--lead > p + p { font-size: var(--text-base); }
+/* `p:not(:first-child)`, NOT `p + p` (fixed 2026-08-13). The adjacent-sibling
+   form only demoted a paragraph whose immediately previous sibling was also a
+   paragraph, so dropping an h3 into the middle of a --lead block silently
+   promoted the paragraph after it back to lede size. Audited across all four
+   --lead consumers at the time of the change: no other block has a paragraph
+   following a non-paragraph, so this is a no-op everywhere else. */
+.svc-prose--lead > p:not(:first-child) { font-size: var(--text-base); }
 /* LEDE LEADING, matched sitewide (Chad, 2026-08-06). The hero lede runs at
    --leading-snug and every other lede ran at --leading-body, so the same
    sentence set looser the moment it left the hero. A lede is a short display
@@ -2133,6 +2149,16 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    (.svc-prose, .svc-block__body) is deliberately NOT touched -- those are
    paragraphs to read, and tightening them would restyle every page. */
 .svc-prose--lead > p:first-child { line-height: var(--leading-snug); }
+/* A --lead block whose lede runs to more than one paragraph (Chad, 2026-08-13,
+   the cost guide's overhead argument). The rule above drops every paragraph
+   after the first to body size, so a paragraph carrying this class opts back
+   in: lede size, lede leading. Deliberately a NAMED class rather than an
+   nth-child rule, so adding a paragraph later cannot silently promote it into
+   the lede. */
+.svc-prose--lead > p.svc-lede-continue {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+}
 .svc-prose--plain > * { font-size: var(--text-base); }
 
 /* --- Section kicker: the mono .eyebrow used as a per-section label. The reset
@@ -3006,6 +3032,53 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   overflow: visible;
 }
 .cw-build:first-child { border-top: none; padding-top: 0; }
+/* The "explore more" CTA under the cost guide's three-card teaser. Carries the
+   same top rule the cards carry, so the row reads as one more entry in the
+   stack rather than as loose furniture below it. */
+.cw-builds__more {
+  /* MATCHED TOP AND BOTTOM AIR (Chad, 2026-08-13), trimmed 25%.
+
+     The block owns BOTH gaps outright, and the section's own bottom padding is
+     zeroed below (see #worked-examples) so nothing is added underneath. An
+     earlier version had the bottom pay only the remainder after the section's
+     padding: it measured correctly on the page but inspected as 97px top
+     against 8px bottom, which is unreadable in devtools and impossible to edit
+     with confidence. Symmetric values that mean what they say are worth more
+     than the trick. */
+  --cta-air: calc((var(--space-lg) + var(--section-pad-y)) * 0.75);
+  padding-top: var(--cta-air);
+  /* +10px on the bottom (Chad, 2026-08-13). Deliberately unequal now: the
+     button's pill sits optically higher than its box, so a mathematically
+     equal gap reads short underneath it. */
+  padding-bottom: calc(var(--cta-air) + 10px);
+  border-top: 1px solid rgba(229, 210, 244, 0.16);
+  text-align: center;
+}
+
+/* The prompt above the button. Only ever renders on the dark worked-examples
+   band, so it takes --dark-text directly rather than carrying a light-surface
+   fallback that nothing would use.
+
+   The global reset zeroes margins, so the gap under it is set here. Centring
+   comes from the parent's text-align, which also centres the button: CtaButton
+   is inline-flex, so it is an inline-level box and text-align reaches it. */
+.cw-builds__more-heading {
+  font-family: var(--font-display);
+  /* --text-3xl was roughly double the --text-xl this started at, then trimmed a
+     quarter back off (Chad, 2026-08-13). Scaling the token rather than dropping
+     to --text-2xl keeps the clamp, so the size still tracks the viewport instead
+     of freezing at one width. Same reasoning for the leading. */
+  font-size: calc(var(--text-3xl) * 0.75);
+  /* 400 -> 600, two steps up the weights this site actually ships. */
+  font-weight: 600;
+  line-height: calc(var(--leading-snug) * 0.75);
+  letter-spacing: -0.01em;
+  color: var(--dark-text);
+  /* No reading measure. The line break is authored in the markup, and 68ch at
+     display size is wider than the block anyway, so a max-width here would only
+     fight the break it cannot see. */
+  margin: 0 auto var(--space-md);
+}
 .cw-build__body { position: relative; z-index: 2; }
 /* Every shape image is the same width with the slab in the same place, so the
    slab reads at an identical size on every row (filling the right third). The
@@ -7353,6 +7426,62 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    name stays the thing you scan and its note reads as the explanation. */
 .rates-ledger__label-note { font-weight: 300; }
 
+/* The part NAME in the cost-guide anatomy ledger ("Domain name:", "Hosting:").
+   A vertical gradient fill separates it from the sentence that follows without
+   touching weight, which Chad did not want changed.
+
+   Vertical, so it reads as a different treatment from .svc-fill, which runs at
+   90deg and is a JS-driven scroll wipe. This one is static.
+
+   inline-block is load-bearing: background-clip on a plain inline that wraps
+   splits the gradient across line boxes and the second line restarts it. These
+   labels are short enough never to wrap, and inline-block guarantees it.
+
+   padding-bottom matches the sitewide clipped-text rule near the top of this
+   file: clipping to text cuts descenders flat, and "Design and the build" has
+   one. The negative margin gives that padding back so the line rhythm in the
+   ledger is unchanged. */
+.cw-part-label {
+  display: inline-block;
+  /* GREEN, from the existing scheme (Chad, 2026-08-13), not the purple ramp.
+     The bottom stop is --win-green, the global token. The top stop is the deep
+     green the rate-defense band already runs (.cw-defense's 135deg gradient);
+     it is a literal here because that value has never been promoted to a token.
+     If a third consumer ever wants it, promote it rather than copying it again.
+
+     Contrast holds on the light band: the top of every glyph sits at the deep
+     green, and even the lightest pixel at the baseline clears 3:1 on white. */
+  background: linear-gradient(180deg, #14543a 0%, var(--win-green) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+
+/* The chadworks paragraph that CLOSES the market table on the cost guide. It is
+   a verdict on the five rows above it, not a sixth row, and set as plain prose
+   directly under the ledger it read as one more entry.
+
+   The treatment is the ledger's opposite on purpose. The ledger is open: hairline
+   rules, no fill, nothing boxed. So this fills, and takes an accent edge on the
+   left. Two different shapes on the page mean two different kinds of statement,
+   which is the whole job here.
+
+   Palest tint on the ramp, not a mid one: the point is to separate the block,
+   not to colour it. */
+.cw-market-verdict {
+  margin-top: var(--space-lg);
+  padding: var(--space-md) clamp(var(--space-sm), 3vw, var(--space-lg));
+  background: var(--tint-04);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+/* The panel supplies its own top gap, so the prose inside must not add another. */
+.cw-market-verdict > p:first-child { margin-top: 0; }
+.cw-market-verdict > p:last-child { margin-bottom: 0; }
+
 /* THE WATERMARK behind a tag: the failure mode drawn as one oversized glyph,
    sat low enough in alpha to read as texture rather than a second label.
    `-webkit-text-fill-color` has to be restated: the parent paints its text
@@ -7713,6 +7842,25 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   padding-top: calc(var(--section-pad-y) * 0.15);
 }
 
+/* The market-comparison section runs straight on from the answer lede above it,
+   so it drops its top padding entirely (Chad, 2026-08-13). Only padding-top:
+   .section sets padding-block, and zeroing the shorthand would collapse the
+   bottom gap into the section after it too.
+
+   This does NOT affect where the hero CTA lands. That jump is handled by the
+   scroll-margin-top rule below, which is what clears the fixed header. */
+#who-is-building-it {
+  padding-top: 0;
+}
+
+/* The worked-examples band ends on the CTA block, which carries its own equal
+   top and bottom air (.cw-builds__more). The section's usual bottom padding
+   would stack on top of that and make the gap below the button visibly larger
+   than the one above the heading, so it is dropped here. */
+#worked-examples {
+  padding-bottom: 0;
+}
+
 /* The hero lede's frosted panel, trimmed 100px off the shared prose measure so
    the first line breaks after "subscription." rather than carrying "However,"
    up with it (Chad, 2026-08-06). Scoped to this hero: --measure-prose is a
@@ -7724,6 +7872,7 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 /* Jump targets on this page. The header is fixed, so an anchor without
    scroll-margin lands with its heading tucked underneath it. #worked-examples
    is included because it had the same bug and is the same one-line fix. */
+#who-is-building-it,
 #what-goes-into-the-cost,
 #worked-examples {
   scroll-margin-top: calc(var(--nav-height) + var(--space-md));
@@ -13107,7 +13256,16 @@ html.cw-motion-paused *::after {
   text-transform: none;
   color: #fff;
   margin-bottom: var(--space-xs);
+}
 
+/* THE WAVE ITSELF, shared (2026-08-13). Split out of the rule above unchanged
+   so the cost guide's CTA heading can run the same effect without a second
+   copy of it (Chad: "lift the code, dont rewrite it"). The card's TYPOGRAPHY
+   stays above, since the two headings are different sizes; only the wipe is
+   shared. Every declaration below is verbatim from the original rule, so
+   .cw-fix-formcard__title computes exactly as it did before the split. */
+.cw-fix-formcard__title,
+.cw-builds__more-heading {
   /* A SLOW GREEN WAVE THROUGH THE HEADING (Chad, 2026-08-08). The greens are
      lifted from the /rates/ "in defense of the rate" band (.cw-defense):
      #9fe3bd is the brightest, limiest green in that scheme (it is the colour
@@ -13194,7 +13352,8 @@ html.cw-motion-paused *::after {
    cannot fail that way. The global `html.cw-motion-paused` rule freezes the
    animation for the motion toggle, and a frozen frame always covers the text. */
 @media (prefers-reduced-motion: reduce) {
-  html:not(.cw-force-motion) .cw-fix-formcard__title {
+  html:not(.cw-force-motion) .cw-fix-formcard__title,
+  html:not(.cw-force-motion) .cw-builds__more-heading {
     animation: none;
     background-image: none;
     -webkit-text-fill-color: #fff;

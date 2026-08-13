@@ -71,13 +71,34 @@ export function CtaButton({
   // "ghost" is the secondary/outline treatment; same pill and hover wipe.
   variant?: "solid" | "ghost";
 }) {
-  return (
-    <Link
-      href={href}
-      className={variant === "ghost" ? "svc-btn svc-btn--ghost" : "svc-btn"}
-    >
+  const cls = variant === "ghost" ? "svc-btn svc-btn--ghost" : "svc-btn";
+  const inner = (
+    <>
       <span className="svc-btn__label">{label}</span>
       <ArrowRight down={arrow === "down"} />
+    </>
+  );
+
+  // A pure hash href is an IN-PAGE JUMP, not a route change. Routing it through
+  // next/link makes it a client-side navigation, which updates the URL and does
+  // not reliably scroll in the App Router: the button appears dead. A plain <a>
+  // gets native browser hash handling instead, which also honours the target's
+  // scroll-margin-top and the document's scroll-behavior.
+  //
+  // This is already the site's convention wherever a hash button was written by
+  // hand (e.g. `<a href="#symptoms" className="svc-btn">` on the AI-gen audit
+  // page). This makes CtaButton agree with it rather than being the exception.
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} className={cls}>
+        {inner}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={cls}>
+      {inner}
     </Link>
   );
 }

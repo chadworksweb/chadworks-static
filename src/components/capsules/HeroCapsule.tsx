@@ -29,7 +29,10 @@ export type HeroCapsuleProps = {
   laneLabel?: string;
   title: string;
   titleNode?: ReactNode;
-  eyebrow: string;
+  // OPTIONAL since 2026-08-13. A hero can drop its eyebrow entirely (the cost
+  // guide does). Omitting it removes the element rather than rendering an empty
+  // <p>, which would still hold its margin and leave a gap under the breadcrumb.
+  eyebrow?: string;
   eyebrowNode?: ReactNode;
   answer?: ReactNode | Prompted;
   heroArt?: ReactNode;
@@ -92,7 +95,9 @@ export function HeroCapsule({
         )}
       </nav>
 
-      <p className="eyebrow">{eyebrowNode ?? eyebrow}</p>
+      {(eyebrowNode ?? eyebrow) ? (
+        <p className="eyebrow">{eyebrowNode ?? eyebrow}</p>
+      ) : null}
       {titleReveal ? (
         <TitleReveal artImageUrl={titleReveal}>{h1}</TitleReveal>
       ) : (

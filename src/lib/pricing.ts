@@ -168,6 +168,15 @@ export const AI_VIZ_MONTHLY = 675; // $ per month, the ongoing AI visibility cam
 export const VSR_START = 3250; // $ to start a Vision / Strategy / Roadmap engagement.
 export const REDESIGN_TYPICAL = 6200; // $ where most redesigns settle. A posture figure, like the band.
 
+// The top of the band chadworks publishes on the MARKET comparison table below
+// (Chad, 2026-08-13). A posture figure like REDESIGN_TYPICAL: it is not the
+// model's ceiling, which runs far higher on the biggest worked examples, and it
+// is not TYPICAL_HIGH either, which is where MOST builds land rather than where
+// they stop. It is the number that says how far a studio engagement realistically
+// goes. Named rather than typed into the row so it stays retunable and off the
+// price-audit allowlist.
+export const STUDIO_HIGH = 20000; // $ top of the chadworks row on the market table.
+
 // The Website Transformation Audit (/ai-generated-website-audit/): the UI/UX
 // layer sold on its own, priced as a BAND rather than a flat fee (Chad,
 // 2026-08-08), because what the audit costs tracks how many screens and flows
@@ -195,8 +204,14 @@ export const TRANSFORMATION_BAND_DASH = `${money(TRANSFORMATION_LOW)} - ${money(
 // a hosting change used to be a five-file edit. What a WordPress host charges
 // instead is a competitor figure and lives in section 3.
 // ---------------------------------------------------------------------
-export const STATIC_HOSTING = 20; // $/month, chadworks static hosting.
+export const STATIC_HOSTING = 20; // $/month, chadworks static hosting. The floor.
 export const STATIC_HOSTING_NONPROFIT = 10; // $/month, non-profits and tight-budget organizations.
+// The top of the hosting band the cost guide publishes (Chad, 2026-08-13:
+// hosting "goes up from there"). A posture figure, like REDESIGN_TYPICAL: it
+// says where ordinary hosting lands, not a ceiling anything is capped at.
+// Named rather than typed into the row so it stays off the price-audit
+// allowlist and moves with one edit.
+export const STATIC_HOSTING_HIGH = 50; // $/month, top of the published band.
 
 // Google Workspace setup. Both of these are what CHADWORKS charges to do the
 // migration; Google's own per-user subscription is a third-party service and
@@ -434,8 +449,12 @@ export const MAILCHIMP_FREE_CONTACTS = 500; // contacts included before Mailchim
 // Paid to whichever registrar holds the name, in the client's own account.
 // Read by the cost guide's prose AND by the COMPONENTS table in section 3, so
 // the anatomy row and the argument cannot quote different years.
-export const DOMAIN_YEARLY_LOW = 12;
-export const DOMAIN_YEARLY_HIGH = 20;
+// WIDENED 2026-08-13 (Chad), from 12/20 to 20/100. His new COMPONENTS note
+// quotes this band in prose, and the old ceiling was the old FLOOR of what he
+// wrote, so the row would have contradicted itself on one line. Both the note
+// and the row's range read these constants, so they cannot disagree again.
+export const DOMAIN_YEARLY_LOW = 20;
+export const DOMAIN_YEARLY_HIGH = 100;
 
 // =====================================================================
 // SECTION 3 -- WHAT OTHERS CHARGE FOR THE SAME WORK
@@ -491,9 +510,35 @@ export type MarketRow = { method: string; range: string; note: string; href: str
 export const MARKET: MarketRow[] = [
   {
     method: "Do it yourself on a builder",
-    range: "$16 to $99 a month",
-    note: "Squarespace, Wix, and the rest. Cheap until you count the year, notice the template other businesses are also using, and realize you never own it.",
+    range: "$16 - $99 a month",
+    // Chad's copy, 2026-08-13, verbatim.
+    note: "Squarespace, Wix, GoDaddy Airo and countless others. These DIY builders are dirt cheap, until you add up your time spent on researching basic web design principles and running into the platforms' limitations.",
     href: "https://www.squarespace.com/blog/how-much-does-a-website-cost",
+  },
+  {
+    // MOVED to second position and REPRICED 2026-08-13 (Chad). It used to sit
+    // last at a much higher band, sourced to a Philippines article that priced
+    // agencies in the low thousands. Chad: "we need a link that shows the dirt
+    // cheap prices of offshore agencies."
+    //
+    // RE-SOURCED the same day to NetizenWorks, a Philippine agency that
+    // publishes its whole package ladder openly, in pesos and dollars, with no
+    // form in the way. That is a better citation than the old one on two counts:
+    // it lands inside this row's band instead of above it, and it shows the
+    // row's own claim rather than describing it, since the note calls these
+    // prices fixed and cut-rate and the source is a published package ladder
+    // doing exactly that.
+    //
+    // ONE GAP, LEFT FOR CHAD. Their entry package sits somewhat above this
+    // row's floor, and the tier above the band's top is only a little over it.
+    // So the source supports the SHAPE of the row and most of its span, but not
+    // the very bottom of it. Raising the floor to their entry price would make
+    // the row fully sourced; Chad set the floor deliberately, so it stands.
+    method: "Send it offshore",
+    range: "$100 - $1,000",
+    // Chad's copy, 2026-08-13, verbatim.
+    note: "Often fixed, cut-rate prices for passable products and services. The alluring price is made up for in poor communication or language and timezone barriers, and sometimes poor development practices.",
+    href: "https://netizenworks.com/pricing/",
   },
   {
     // RE-SOURCED 2026-07-23 (Chad picked the replacement). The old href was
@@ -513,21 +558,54 @@ export const MARKET: MarketRow[] = [
     // $300-$1,500, brochure $800-$3,500, WordPress $1,200-$5,000, Shopify
     // $2,500-$8,000, custom app $10,000-$30,000.
     method: "Hire a freelancer",
-    range: "$500 to $15,000",
-    note: "One person, one invoice, and a wide range because a freelancer might mean a student on a template or a twenty year veteran writing custom code. The word covers both.",
+    range: "$500 - $15,000",
+    // Chad's copy, 2026-08-13, verbatim. Inner double quotes are escaped rather
+    // than swapped for curly ones: this string is rendered as text, so a plain
+    // ASCII quote is what reaches the reader.
+    note: "Affordable for most initiatives with a budget, but the term freelancer doesn't say much more than \"independent\" and \"solo.\" Prices might be affordable, but reliability, quality of work, communication style, candor and client experience can swing widely. Sometimes you have to go through a few to find one that you like (and likes you!)",
     href: "https://projectcostestimator.com/freelance-website-cost",
   },
   {
-    method: "Hire an agency",
-    range: "$6,500 to $30,000+",
-    note: "WebFX starts a small business site at $6,500, and a custom build from a firm like Outliant runs $25,000 to $30,000. Much of that is overhead and margin, not the website itself.",
-    href: "https://www.webfx.com/web-design/pricing/",
+    // ADDED 2026-08-13 (Chad: "we need a fifth, small studio, before agency").
+    //
+    // CHADWORKS IS THIS ROW (Chad, 2026-08-13): "we are the small studio.
+    // chadworks is the source. link to our rates page. we are a studio even if
+    // it's one human."
+    //
+    // THIS ROW IS A DIFFERENT KIND OF MONEY FROM THE OTHER FOUR. Per
+    // CWS-PRICING-HUB, the rest of this table is kind 3, what OTHERS charge:
+    // somebody else's published figure, carrying a source href and a
+    // re-verification duty, where a wrong number is chadworks' credibility. This
+    // one is kind 1, what chadworks charges. It needs no outside source and no
+    // re-check, because it is right when Chad says it is.
+    //
+    // Consequences, both deliberate:
+    //   - `href` is INTERNAL. The renderer sends internal hrefs through <Link>
+    //     with no nofollow and no target=_blank; you do not nofollow your own
+    //     page or open your own site in a new tab.
+    //   - `range` is COMPUTED from the hub, not typed, so it moves when the
+    //     model is retuned and never lands on the price-audit allowlist. It
+    //     runs from the published baseline to the top of the typical band.
+    //
+    // An earlier draft sourced this row to a small agency blog citing a Clutch
+    // survey with no sample size. Chad called it unreliable and he was right;
+    // do not reintroduce a third-party source here. The row is chadworks now.
+    method: "Hire a small studio",
+    range: `${money(BASE)} - ${money(STUDIO_HIGH)}`,
+    // Chad's copy, 2026-08-13, verbatim. The *asterisks* mark emphasis: this is
+    // a .ts file and cannot hold JSX, so the page wraps the delimited span in
+    // <em> at render (see emphasize() in the cost-guide route). Chad asked for
+    // "not" italicized; the marker is what carries that here.
+    note: "This raises the price but also the bar slightly more than a solo freelancer because you get 2-4 specialists instead of one. You're paying for payroll but also *not* paying for agency overhead. (Due to the power of AI development, it's increasingly common for one person to do the job of a small studio, like chadworks!)",
+    href: "/rates/",
   },
   {
-    method: "Send it offshore",
-    range: "$2,500 to $8,000",
-    note: "Real fixed prices, often published without a form. What the figure leaves out is the distance: the person building it works a half day out of phase with yours, and you feel that every time something needs deciding.",
-    href: "https://dixieraizpacheco.com/web-design-cost-philippines",
+    method: "Hire an agency",
+    range: "$6,500 - $30,000+",
+    // Opening sentence is Chad's copy, 2026-08-13, verbatim. The two sourced
+    // figures behind it are unchanged.
+    note: "Agencies are for big, healthy budgets. WebFX starts a small business site at $6,500, and a custom build from a firm like Outliant runs $25,000 to $30,000. Much of that is overhead and margin, not the website itself.",
+    href: "https://www.webfx.com/web-design/pricing/",
   },
 ];
 
@@ -546,28 +624,65 @@ export type ComponentRow = { part: string; range: string; note: string };
 export const COMPONENTS: ComponentRow[] = [
   {
     part: "Domain name",
-    range: `${money(DOMAIN_YEARLY_LOW)} to ${money(DOMAIN_YEARLY_HIGH)} a year`,
-    note: "The address itself, renewed yearly. On my builds it is registered in your name from day one, not held by me.",
+    range: `${money(DOMAIN_YEARLY_LOW)} - ${money(DOMAIN_YEARLY_HIGH)} a year`,
+    // Chad's copy, 2026-08-13, verbatim. He typed the band; it interpolates from
+    // the same two constants the `range` above uses, so the sentence and the
+    // number beside it move together. His one-dollar-sign form is preserved: the
+    // low end goes through money(), the high end is the bare number.
+    // (No figure is restated in this comment -- price-audit reads comments.)
+    note: `This is what you type into your browser to reach your website. Typically billed annually or on multi-year terms that work out to around ${money(DOMAIN_YEARLY_LOW)}-${DOMAIN_YEARLY_HIGH}/year for standard TLDs (.com, .net, .org, etc.) Note that some domain names are already taken and might be wholly unavailable or come at a premium one-time price to buy it from the current owner.`,
   },
   {
     part: "Hosting",
-    range: "$0 to $1,000 a month",
-    note: "The whole spread of the industry. Most of my builds are static, so hosting is often free or close to it, and the bill is yours rather than routed through me.",
+    // REPRICED 2026-08-13 (Chad): chadworks hosting is never free, it starts at
+    // the STATIC_HOSTING floor and goes up from there. The old floor was zero,
+    // which contradicted the note beside it. Both ends now read constants, so
+    // the row cannot disagree with the rest of the site.
+    range: `${money(STATIC_HOSTING)} - ${money(STATIC_HOSTING_HIGH)}+ a month`,
+    // Chad's copy, 2026-08-13, verbatim.
+    note: "Hosting is a required recurring fee for any website. Whether a monthly or annual bill from your host/webmaster or part of the monthly fee you pay DIY builders like Squarespace, if you have a website, you are paying for hosting.",
   },
   {
     part: "Design and the build",
-    range: "the variable one",
-    note: "Everything above rides on top of this. It is the piece that moves from a few thousand to six figures, and it is the piece the calculator prices to the dollar.",
+    // PRICED 2026-08-13 (Chad). This used to read "the variable one" rather than
+    // a figure. The span is the MARKET's, not chadworks': the floor sits far
+    // below BASE because anyone can be paid to build something, and the row
+    // describes the component of a website's cost generally. Typed rather than
+    // hub-read for that reason, same as the other spans in this table.
+    range: "$100 - $25,000+",
+    // Chad's copy, 2026-08-13, verbatim. The [label](/href) marker is rendered
+    // as a link by inlineMarkup() on the cost-guide route; this file is .ts and
+    // cannot hold JSX. His "(link to that page)" instruction becomes the link
+    // itself rather than surviving as parenthetical text.
+    note: "This is the fee to build the site itself. It's what most of this page is about and is, unsurprisingly, the largest single cost of having a website built by a professional. This is what my [website design cost calculator](/website-design-cost-calculator/) scopes and prices.",
   },
   {
-    part: "Content and photos",
-    range: "$0 to a few thousand",
-    note: "Free if you write and shoot it, more if you want it done for you. On my calculator, copy is a line you can turn up or leave off.",
+    part: "Content Development",
+    range: "$0 - $1,000+",
+    // Chad's copy, 2026-08-13, verbatim. Inner double quotes are escaped rather
+    // than swapped for curly ones: this renders as text, so a plain ASCII quote
+    // is what reaches the reader.
+    note: "This includes copy: the \"written\" words on your site and visual media: photos, images, videos, textures, logos, and any non-text or interface elements. Easy to mention, harder to develop and definitely not cheap if you want original and/or high quality content.",
   },
   {
     part: "Maintenance",
-    range: "$0 to $200 a month",
-    note: "A static site can sit and cost nothing. WordPress genuinely needs looking after, so it does not. With me there is no forced retainer; you pay for the minutes you actually use.",
+    range: "$0 - $200 a month",
+    // Chad's copy, 2026-08-13, verbatim.
+    note: "This word is thrown around a lot, but here it means keeping a website's moving parts healthy and updated. This is technical maintenance, which applies on a case-by-case basis. WordPress requires maintenance. Static sites usually do not.",
+  },
+  {
+    // ADDED 2026-08-13 (Chad). Sits after Maintenance because its first words
+    // define it against that row.
+    part: "Content Updates",
+    // No band: this is billed by time, not scoped as a range, which is the whole
+    // argument the note makes against monthly update packages. Reads MINUTELY so
+    // it cannot drift from /rates/ or the after-launch ledger further down the
+    // page, both of which quote the same rate.
+    range: `${money(MINUTELY)}/min`,
+    // Chad's copy, 2026-08-13, verbatim. Both of his "(link to ...)" instructions
+    // become the links themselves rather than surviving as parenthetical text;
+    // the [label](/href) marker is rendered by inlineMarkup() on the route.
+    note: "Distinct from technical maintenance, content updates covers updating the actual content on your website. Posts, pages, images and text. Most web designers and agencies offer monthly update packages, but chadworks bills updates at his [minutely rate](/rates/). [Click here](/essays/is-your-agency-ripping-you-off/) to read an essay about maintenance retainers.",
   },
 ];
 

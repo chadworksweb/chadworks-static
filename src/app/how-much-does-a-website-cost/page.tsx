@@ -37,6 +37,7 @@ import { HeroCapsule } from "@/components/capsules/HeroCapsule";
 import { CostHeroArt } from "@/components/art/CostHeroArt";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { CtaButton } from "@/components/capsules/shared";
+import { BuildCards } from "@/components/BuildCards";
 import {
   BASE,
   PARAMS,
@@ -64,9 +65,12 @@ import {
 } from "@/lib/pricing";
 
 const PAGE_URL = `${SITE_URL}/how-much-does-a-website-cost/`;
-const TITLE = "How Much Does a Website Cost in 2026? A Real Price Breakdown | chadworks";
+const TITLE = "How Much Does a Website Cost in 2026? | chadworks™";
+// Chad's copy, 2026-08-13, verbatim. Plain string, not a template: the old one
+// interpolated money(BASE) and this one quotes no figure, so there is nothing
+// left for the hub to own here.
 const DESCRIPTION =
-  `A website costs from nothing to six figures, and the number comes down to who builds it. Here is the real breakdown: builder, freelancer, and agency prices; what domain, hosting, design, and maintenance each cost; and one working studio's actual figures, starting at ${money(BASE)}.`;
+  "What a website costs depends on what the site needs to do. This page breaks down what professional web design costs in 2026.";
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -77,8 +81,9 @@ export const metadata: Metadata = {
   robots: { index: isLaunched("/how-much-does-a-website-cost/"), follow: true },
   openGraph: {
     title: "How Much Does a Website Cost in 2026? | chadworks",
-    description:
-      "The real cost of a website, broken down by who builds it and what each piece costs, with one studio's published numbers instead of an industry average.",
+    // The const, not a copy of it (Chad, 2026-08-13): meta, OG and Twitter now
+    // read one string, so the three cannot drift apart on the next copy pass.
+    description: DESCRIPTION,
     url: PAGE_URL,
     type: "article",
     images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "chadworks" }],
@@ -145,73 +150,58 @@ const breadcrumbJsonLd = {
 
 // The after-launch tasks price out at MINUTELY, computed rather than typed.
 const cost = (mins: number) => money(Math.round(mins * MINUTELY));
+// Dash, not "to" (Chad, 2026-08-13), matching the range column in the market
+// and anatomy ledgers above. Only one row here spans a range at all; the rest
+// are single figures and are unaffected.
 const costRange = (r: { min: number; max: number }) =>
-  r.min === r.max ? cost(r.min) : `${cost(r.min)} to ${cost(r.max)}`;
+  r.min === r.max ? cost(r.min) : `${cost(r.min)} - ${cost(r.max)}`;
+
+// COST BY SITE TYPE -- REMOVED 2026-08-13 (Chad). The SITE_TYPES ledger read the
+// same three scopes as the worked-example cards (BASE / SMALL_BUSINESS / STORE)
+// and showed less of each, so it was a summary of the list sitting under it. The
+// cards took its slot on the page. Its one non-duplicate row, the web
+// application, survives as prose under the cards.
 
 // ---------------------------------------------------------------------
-// COST BY SITE TYPE -- four real shapes, priced by the real model.
+// Inline markup for ledger notes. lib/pricing is a .ts file and cannot hold
+// JSX, so a note marks up what it needs and the wrapping happens here.
 //
-// Anchored to the shared example scopes so the numbers match the calculator to
-// the dollar. Four, not three, so it reads as a range rather than a set.
-// ---------------------------------------------------------------------
-const SITE_TYPES: { type: string; detail: string; figure: string }[] = [
-  {
-    type: "A landing page or one-pager",
-    detail:
-      "One page doing one job, built to sell a single thing or announce a single event. The smallest real project there is.",
-    figure: `from ${money(BASE)}`,
-  },
-  {
-    type: "A small business website",
-    detail:
-      "The everyday five page site: home, about, services, contact, and one more, with a logo already in hand and light copy help.",
-    figure: money(price(SMALL_BUSINESS)),
-  },
-  {
-    type: "An ecommerce store",
-    detail:
-      "Pages carrying a catalog, a payment path, subscriptions and a mailing list wired in, and enough custom logic that it stops being a brochure.",
-    figure: `near ${money(price(STORE))}`,
-  },
-  {
-    type: "A web application",
-    detail:
-      "A site that is really software, with user accounts and logic that has to be right every single time. This is where five figures turns into more.",
-    figure: "$20,000 and up",
-  },
-];
+// Two markers, deliberately the smallest set that does the job:
+//   *stress*                 -> <em>
+//   [label](/href)           -> <Link>
+//
+// One level, no nesting, no other syntax. A note containing neither marker
+// renders exactly as it did before this existed. Links go through next/link
+// because every href used here so far is internal; a note needing an outbound
+// link would want a plain <a> and a rel, which is a reason to extend this
+// rather than to smuggle a full URL through it.
+function inlineMarkup(text: string) {
+  return text.split(/(\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g).map((part, i) => {
+    if (part.length > 2 && part.startsWith("*") && part.endsWith("*")) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    const link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(part);
+    if (link) {
+      return (
+        <Link key={i} href={link[2]}>
+          {link[1]}
+        </Link>
+      );
+    }
+    return part;
+  });
+}
 
-// ---------------------------------------------------------------------
 // WORKED EXAMPLES -- the use-case list now lives in lib/pricing (EXAMPLES), so
 // the guide gallery and the shapecap harness render one source. Every figure is
 // computed by price() at render, never typed, so a ladder retune rewrites them
 // all in the same edit.
+//
+// The gallery markup and scopeTicks() moved to components/BuildCards.tsx on
+// 2026-08-13, when /web-design-packages/ became the second caller. This page
+// now shows the first three as a teaser and sends the reader there for the
+// rest.
 // ---------------------------------------------------------------------
-
-// The exact scope behind an example, as ticks under its timeline. Pages and
-// sections always show (the spine of any build); everything else shows only
-// when it is actually engaged, so the list reads as "what is in THIS build".
-function scopeTicks(s: Scope): { label: string; value: string }[] {
-  return PARAMS.filter((p) => {
-    const v = s[p.key] as number;
-    switch (p.key) {
-      case "pages":
-      case "sections":
-        return true;
-      case "locales":
-        return v > 1;
-      case "integrations":
-        return v !== 0;
-      case "timeline":
-        return v > 0;
-      case "brandingDone":
-      case "content":
-        return v >= 0; // a real choice was made (baseline leaves these unset)
-      default:
-        return v > 0; // ambition, mathDev, editability, motion, commerce
-    }
-  }).map((p) => ({ label: p.label, value: paramValue(p, s) }));
-}
 
 const FAQS: { q: string; a: ReactNode }[] = [
   {
@@ -351,6 +341,9 @@ export default function HowMuchDoesAWebsiteCostPage() {
           + CTA to the tool, matching /rates/ and /faqs/. The lede is the page's
           opening statement (Chad's copy, verbatim); the rest of the opener runs
           in the content section right below. */}
+      {/* NO EYEBROW (Chad, 2026-08-13). HeroCapsule now drops the element
+          entirely when none is passed, rather than rendering an empty <p> that
+          would still hold its margin under the breadcrumb. */}
       <HeroCapsule
         className="cost-guide-hero"
         heroArt={<CostHeroArt />}
@@ -359,11 +352,10 @@ export default function HowMuchDoesAWebsiteCostPage() {
           { label: "Websites", href: "/websites/" },
           { label: "How much does a website cost?" },
         ]}
-        eyebrow="Real prices, not averages"
         title="How much does a website cost?"
         lede="The cost of a website in 2026 can be literally zero dollars plus a Claude subscription. However, what you get for that might not be enough. This page outlines what it costs to have a website professionally designed and developed for you."
         cta={{
-          href: "#what-goes-into-the-cost",
+          href: "#who-is-building-it",
           buttonLabel: "Skip to the hard numbers",
           arrow: "down",
         }}
@@ -425,39 +417,65 @@ export default function HowMuchDoesAWebsiteCostPage() {
       </SectionShell>
 
       {/* Cost by build method: the biggest single lever on the number. */}
-      <SectionShell className="svc-block">
+      {/* The hero's "Skip to the hard numbers" jumps HERE (Chad, 2026-08-13).
+          The id needs a matching scroll-margin-top rule in global.css or the
+          fixed header eats the heading on arrival. */}
+      <SectionShell className="svc-block" id="who-is-building-it">
         <h2 className="svc-block__heading svc-fill">
-          What a website costs, by who builds it
+          What a website costs depends on who is building it
         </h2>
         <div className="svc-prose">
+          {/* Chad's copy, 2026-08-13, verbatim. Both figures are MARKET-side
+              (what others charge), not chadworks revenue, so they are typed here
+              rather than read from the hub, and they ride the price-audit
+              allowlist. The yearly one sits inside the builder row's monthly
+              range below; the one-time one sits inside the agency row. Stating
+              the amounts again HERE would add real hits to the audit's count,
+              because it reads comments as well as code. */}
           <p>
-            The same five page site can cost $200 a year or $20,000, and the
-            thing that moves it that far is not the pages. It is who you hire.
-            Read the ranges as four different answers to four different questions,
-            not four prices for one thing.
+            A five page website can cost $300/year or $20,000 one time plus
+            hosting. It&apos;s not about the number of pages, but what goes into
+            them. Here is some clarity on what the same site might cost when
+            created by various types of designers/developers.
           </p>
         </div>
         <dl className="rates-ledger">
           {MARKET.map((row) => (
             <div key={row.method} className="rates-ledger__row">
               <dt className="rates-ledger__label">
-                <a href={row.href} rel="nofollow noopener" target="_blank">
-                  {row.method}
-                </a>
-                . {row.note}
+                {/* An internal href means the row is chadworks' own (the small
+                    studio row points at /rates/). Send those through <Link>:
+                    nofollow would throw away internal link equity, and
+                    target=_blank would open the site inside itself. Outbound
+                    competitor citations keep both. */}
+                {row.href.startsWith("/") ? (
+                  <Link href={row.href}>{row.method}</Link>
+                ) : (
+                  <a href={row.href} rel="nofollow noopener" target="_blank">
+                    {row.method}
+                  </a>
+                )}
+                . {inlineMarkup(row.note)}
               </dt>
               <dd className="rates-ledger__num">{row.range}</dd>
             </div>
           ))}
         </dl>
-        <div className="svc-prose">
+        {/* Panelled so it stops reading as a sixth ledger row (see
+            .cw-market-verdict). It is chadworks answering the table, not another
+            entry in it. */}
+        <div className="svc-prose cw-market-verdict">
+          {/* Chad's copy, 2026-08-13, verbatim. It replaced a version that
+              interpolated the baseline and the small-business figure from the
+              hub; this one quotes no number, so there is nothing here for the
+              hub to own. The figures still appear above in the table and below
+              in the worked examples. */}
           <p>
-            I am one person who does the whole build, so I sit where a good
-            freelancer sits on price and where an agency sits on capability. My
-            baseline is {money(BASE)} and a finished small business site is{" "}
-            {money(price(SMALL_BUSINESS))}, under most agency starting points for
-            the same work. The reason that is possible, and the honest downside
-            that comes with it, is laid out just below.
+            chadworks sits between a freelancer and a small studio. Agile enough
+            to give you personal, round the clock attention, and skilled enough
+            to deliver agency quality work on agency sized scopes. The reason
+            that is possible, and the honest tradeoff that comes with it, is
+            laid out just below.
           </p>
         </div>
       </SectionShell>
@@ -474,57 +492,99 @@ export default function HowMuchDoesAWebsiteCostPage() {
         trailingClassName="svc-faq-section--dark"
       >
         <h2 className="svc-block__heading svc-fill">
-          Where the number actually comes from
+          {/* &trade; as the entity, not a literal glyph: CWS-VOICE rule 6 keeps
+              parsed files ASCII and uses entities where a page must render a
+              non-ASCII character. (The meta title is the exception, since
+              metadata strings are escaped and would print the entity itself.) */}
+          How does chadworks&trade; decide what a website project costs?
         </h2>
         <div className="cw-onep__layout">
           <div className="svc-prose svc-prose--lead">
             <p>
               When an agency quotes {AGENCY_SMALL_BUSINESS_RANGE} for a five page
               website, most of that number pays for the building it happened in.
-              An account manager answers your email, a salesperson booked a
-              commission the day you signed, a project manager relays messages
-              between them and the person doing the work, and everyone sits in an
-              office the owners expect a margin on. The build underneath might be
-              forty hours.
             </p>
+            {/* Second half of the lede, so it keeps lede size and leading
+                rather than dropping to body copy. See .svc-lede-continue. */}
+            <p className="svc-lede-continue">
+              {/* First / Then / Then is Chad's structure (2026-08-13), and it is
+                  an instructed exception to CWS-VOICE rule 2, which bans clause
+                  triplets. The steps are a real sequence, not a rhetorical set.
+                  Do not flatten it to two or pad it to four on a voice sweep. */}
+              First, an account manager answers your email. Then, a salesperson
+              booked a commission the day you signed. Then, designers and
+              developers get to work while a project manager relays messages
+              between them and an account manager synthesizes the status of the
+              project to you. Every hour the agency bills has to pay for the
+              concurrent hours of the team.
+            </p>
+            {/* --break is load-bearing: the base .svc-block__subheading carries a
+                NEGATIVE top margin to pull itself up under an h2. This one sits
+                mid-prose after the lede, so it needs a real gap instead. */}
+            <h3 className="svc-block__subheading svc-block__subheading--break">
+              Why my fees are lower than an agency&apos;s
+            </h3>
             <p>
+              {/* Three-item list, instructed by Chad 2026-08-13: he cut the
+                  fourth clause and asked for the "and" moved up. Another
+                  deliberate exception to CWS-VOICE rule 2, like the
+                  First/Then/Then sequence above. */}
               I do not have any of that. There is no investor here waiting on a
-              return, no board asking why revenue did not grow this quarter, no
-              stakeholder who has never met you holding an opinion about your
-              invoice, and nobody upstairs who needs this year to beat last year.
-              There is me. So my number gets built out of two things and nothing
-              else: what I need to earn as one person to keep doing this properly,
-              and what the finished thing is actually worth to your business. No
-              growth target is priced into your quote, because there is no growth
-              target.
+              return, no board asking why revenue did not grow this quarter, and
+              no stakeholder who has never met you holding an opinion about your
+              invoice. <strong>There is only me.</strong> Therefore, the cost of
+              my websites gets built out of two things: what I need to earn as one
+              person to keep doing this properly, and what the finished product
+              is worth to your business in the current market.
+            </p>
+            <h3 className="svc-block__subheading svc-block__subheading--break">
+              Why my fees are higher than most freelancers
+            </h3>
+            {/* Chad's copy, 2026-08-13, verbatim. It replaced the
+                "capability holds / 300 clients since 2011" paragraph, so this
+                page no longer carries that credential; it still runs elsewhere
+                on the site. */}
+            <p>
+              Even without the overhead agencies have, my capabilities rival
+              them. This includes not only the work I produce, but the planning,
+              time and project management, discernment, decision making,
+              perception, communication and overall client experience.
             </p>
             <p>
-              The capability holds even as the overhead falls away. I have
-              served over 300 clients 1:1 since launching chadworks in 2011,
-              and I do both the design and the code myself, so your idea reaches
-              the browser without a handoff that could dilute it. You get the full
-              craft, and one person who carries the whole project start to finish.
+              I wear many, many hats at once. You get the breadth of expertise an
+              agency offers in a one-person package. You can read about why my
+              rate and fees are what they are{" "}
+              {/* Deep link to the rate-defense section on /rates/, which is
+                  launched, so a plain <Link> is correct here rather than
+                  LaunchLink. The anchor id lives on RateDefenseCapsule. */}
+              <Link href="/rates/#in-defense-of-the-rate">here</Link>.
             </p>
             <p>
-              One person is one calendar. There is no bench to throw at your
-              project when it doubles in size, and no second shift picking it up
-              overnight. If I am booked, you wait or you go elsewhere. A project
-              that genuinely needs guaranteed capacity and a backup team is a
-              project for an agency, and I will say so on the call.
-            </p>
-            <p>
-              My baseline is {money(BASE)} and it holds. Below it I would be
-              cutting the parts that make a website worth building, so it stays
-              where it is. You are paying for the work, and for the twenty years
-              that make the work good and fast. That is the whole of the number.
+              {/* Chad's copy, 2026-08-13. He typed the amount; it is interpolated
+                  through money(BASE) instead, so it tracks the hub and stays off
+                  the price-audit allowlist. (Naming the amount in this comment
+                  would itself fail the audit, which reads comments.) */}
+              It costs a minimum of {money(BASE)} for chadworks to build a
+              website. Below that, I would be making personal sacrifices and
+              cutting corners that would lead to degradation of your client
+              experience and the quality of the output. You are paying for the
+              work, and in the Venn diagram of good, fast and cheap, for the
+              twenty years that make the work good and fast.
             </p>
           </div>
           {/* The portrait IS the argument: the section claims one person, so it
               shows the person rather than a logo. */}
           <figure className="cw-onep__figure">
+            {/* The _full cutout (660x1580), not the 167x400 one that was here.
+                This figure paints up to 380px wide, so the small file was
+                upscaled well past 2x on an ordinary display and further on a
+                retina one. The small file is a decorative CHIP asset: it is
+                sized 74-80px in AboutHeroArt, which is the only place it
+                belongs. WorldviewCapsule already uses _full for this same
+                portrait slot. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/about/cutouts/chad_cutout_home.webp"
+              src="/about/cutouts/chad_cutout_home_full.webp"
               alt="Chad Lewine, the one person who designs and builds every chadworks site"
               decoding="async"
               loading="lazy"
@@ -537,7 +597,7 @@ export default function HowMuchDoesAWebsiteCostPage() {
           Also the hero CTA's jump target ("Skip to the hard numbers"). */}
       <SectionShell className="svc-block" id="what-goes-into-the-cost">
         <h2 className="svc-block__heading svc-fill">
-          What actually goes into the cost
+          What goes into the cost of a website?
         </h2>
         <div className="svc-prose">
           <p>
@@ -550,62 +610,78 @@ export default function HowMuchDoesAWebsiteCostPage() {
         <dl className="rates-ledger">
           {COMPONENTS.map((row) => (
             <div key={row.part} className="rates-ledger__row">
+              {/* The part name takes a vertical gradient fill so it separates
+                  from the sentence after it without changing weight (see
+                  .cw-part-label). The colon this ledger briefly used was
+                  reverted to a period, so both ledgers punctuate alike again. */}
               <dt className="rates-ledger__label">
-                {row.part}. {row.note}
+                <span className="cw-part-label">{row.part}</span>.{" "}
+                {inlineMarkup(row.note)}
               </dt>
               <dd className="rates-ledger__num">{row.range}</dd>
             </div>
           ))}
         </dl>
-        <div className="svc-prose">
-          <p>
-            The domain and the hosting are the small, predictable costs, the ones
-            that fit on a single line and stay roughly the same whether your site
-            is plain or elaborate. The build is the one that moves. That is why a
-            cost calculator exists at all: to price the one piece that a fixed
-            range cannot. Everything else is close to a rounding error next to it.
-          </p>
-        </div>
       </SectionShell>
 
-      {/* Cost by site type: named shapes, real numbers, cross-linked to the tool. */}
+      {/* Worked examples: the ladder turned into real projects, each priced by
+          the same model to the dollar. Dark for weight, and it sits in the
+          light-light gap so the band alternation holds (rule 9). The shapes are
+          transparent renders that live on this dark band.
+
+          MOVED HERE 2026-08-13 (Chad), into the slot the "what it costs by the
+          kind of site you need" ledger used to hold. That ledger read the SAME
+          three scopes as the cards below it (BASE / SMALL_BUSINESS / STORE) and
+          rendered them with less: no timeline, no scope ticks, no shape. It was
+          a four-row summary of a three-card list directly beneath it, so it was
+          cut. The shell config is identical to the one it replaced, so the
+          light/dark band alternation is unchanged. Its one non-duplicate row,
+          the web application, survives as the closing line below.
+
+          THE FIRST THREE ONLY (Chad, 2026-08-13). The full gallery moved to
+          /web-design-packages/; this page keeps a teaser and sends the reader
+          there. The three are the floor, the everyday build and the one that
+          shows the number climbing, which is the shape of the whole argument in
+          three cards. A list of exactly three is a deliberate, instructed
+          exception to CWS-VOICE rule 10.2 -- do not "fix" it to four on a later
+          voice sweep. The slice is taken here rather than stored as its own
+          list so the teaser can never drift from the gallery it teases. */}
       <SectionShell
         full
+        id="worked-examples"
         className="svc-block svc-faq-section"
         trailingClassName="svc-faq-section--dark"
       >
         <h2 className="svc-block__heading svc-fill">
-          What it costs by the kind of site you need
+          What are some examples of website packages?
         </h2>
         <div className="svc-prose">
           <p>
-            &quot;A website&quot; covers a one page announcement and a piece of
-            custom software, and those do not cost the same. Here is where the
-            common shapes land, using my own numbers where the site is one I would
-            build, computed by the calculator so nothing here is guessed.
-          </p>
-        </div>
-        <dl className="rates-ledger">
-          {SITE_TYPES.map((row) => (
-            <div key={row.type} className="rates-ledger__row">
-              <dt className="rates-ledger__label">
-                {row.type}. {row.detail}
-              </dt>
-              <dd className="rates-ledger__num">{row.figure}</dd>
-            </div>
-          ))}
-        </dl>
-        <div className="svc-prose">
-          <p>
-            The store and the small business figures are exact, not rounded, and
-            you can reproduce them by moving the scope on the{" "}
+            Every figure here is computed at build time by the same model behind
+            the{" "}
             <Link href="/website-design-cost-calculator/">
               website design cost calculator
-            </Link>{" "}
-            until it matches your project. The web application number is the one I
-            will not pin down here, because software is priced by what it has to
-            do, and that is a conversation rather than a slider.
+            </Link>
+            . These are prices I would quote you today.
           </p>
+        </div>
+        <BuildCards items={EXAMPLES.slice(0, 3)} />
+        <div className="cw-builds__more">
+          {/* h3 to sit level with the card titles above it, which are also h3
+              under this section's h2. */}
+          <h3 className="cw-builds__more-heading">
+            Want to see more examples of <br />
+            custom website packages?
+          </h3>
+          {/* DEFAULT solid, not ghost. Every other CTA on an inverted band uses
+              the plain filled button (CtaCapsule and ActsCapsule both sit on
+              dark bands and pass no variant): the lavender fill with purple text
+              is what reads on navy. The ghost outline is a light-surface
+              treatment and went muddy here. */}
+          <CtaButton
+            href="/web-design-packages/"
+            label="Explore more website packages"
+          />
         </div>
       </SectionShell>
 
@@ -649,68 +725,6 @@ export default function HowMuchDoesAWebsiteCostPage() {
             </div>
           ))}
         </dl>
-      </SectionShell>
-
-      {/* Worked examples: the ladder turned into real projects, each priced by
-          the same model to the dollar. Dark for weight, and it sits in the
-          light-light gap so the band alternation holds (rule 9). The shapes are
-          transparent renders that live on this dark band. */}
-      <SectionShell
-        full
-        id="worked-examples"
-        className="svc-block svc-faq-section"
-        trailingClassName="svc-faq-section--dark"
-      >
-        <h2 className="svc-block__heading svc-fill">
-          Examples of What A Website Costs
-        </h2>
-        <div className="svc-prose">
-          <p>
-            Every figure here is computed at build time by the same model behind
-            the{" "}
-            <Link href="/website-design-cost-calculator/">
-              website design cost calculator
-            </Link>
-            . These are prices I would quote you today.
-          </p>
-        </div>
-        <div className="cw-builds">
-          {EXAMPLES.map((ex) => (
-            <article key={ex.slug} className="cw-build">
-              <div className="cw-build__body">
-                <h3 className="cw-build__title">
-                  {ex.name}{" "}
-                  <span className="cw-build__price">
-                    {money(price(ex.scope))}
-                  </span>
-                </h3>
-                <p className="cw-build__detail">{ex.detail}</p>
-                <p className="cw-build__meta">
-                  Roughly {weeksLabel(ex.scope)} from starting to launched.
-                </p>
-                <ul className="cw-build__scope">
-                  {scopeTicks(ex.scope).map((t) => (
-                    <li key={t.label} className="cw-build__scope-item">
-                      {t.label}: {t.value}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {/* The object at this exact scope, rendered once from the model to
-                  a transparent PNG. Decorative, so alt is empty. */}
-              {/* eslint-disable-next-line @next/next/no-img-element -- static export, unoptimized */}
-              <img
-                className="cw-build__shape"
-                src={`/shapes/${ex.slug}.webp`}
-                alt=""
-                width="860"
-                height="500"
-                loading="lazy"
-                decoding="async"
-              />
-            </article>
-          ))}
-        </div>
       </SectionShell>
 
       {/* The national framing: cost does not move with the zip code. */}
