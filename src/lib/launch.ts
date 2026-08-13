@@ -75,8 +75,14 @@ const LAUNCHED = new Set<string>([
                                   // the audit lane for sites that already exist and
                                   // were generated. Its robots line was already
                                   // isLaunched-gated, so this one edit lights it.
-  // "/how-much-does-a-website-cost/" -- SEALED 2026-07-24. Pulled back from launch
-  // (was launched 2026-07-20). robots line gates on isLaunched, so it follows.
+  "/how-much-does-a-website-cost/", // RE-LAUNCHED 2026-08-13 after the copy and
+                                   // structure rebuild and a full responsive pass.
+                                   // (First launched 2026-07-20, sealed 2026-07-24.)
+                                   // It owns the INFORMATIONAL half of the cost
+                                   // SERP; /website-design-cost-calculator/ owns the
+                                   // tool half, and the two cross-link. Its robots
+                                   // line was already isLaunched-gated, so this one
+                                   // edit lights it.
 ]);
 
 // Launched for navigation but deliberately kept OUT of search: reachable and

@@ -387,6 +387,15 @@ export type Service = {
   // `null` drops the hero button entirely (a hero that hands off to the section
   // below it rather than to a link).
   heroCta?: { href: string; buttonLabel: string; arrow?: "right" | "down" } | null;
+  // OPTIONAL: a SECOND hero button, rendered as the ghost/outline treatment
+  // beside the first. HeroCapsule has always been able to draw it (standalone
+  // pages like the cost guide pass `ctaSecondary` directly); this is the field
+  // that lets a Service-driven page ask for one too.
+  // Use it when the hero has two honest next moves -- typically the primary
+  // sends the reader DOWN this page and the secondary sends them ACROSS to a
+  // sibling page. Ignored when `heroCta` is null, since there is no first
+  // button for it to sit beside.
+  heroCtaSecondary?: { href: string; buttonLabel: string; arrow?: "right" | "down" };
   // The page's own comprehensive lead form, rendered in the RIGHT HALF of
   // the CTA section (Chad, 2026-06-11). When absent, the CTA keeps its
   // single-column button layout.

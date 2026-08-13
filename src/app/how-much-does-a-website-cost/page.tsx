@@ -32,12 +32,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
-import { PageComposer, MainContactCapsule, PathsCapsule } from "@/components/capsules";
+import {
+  PageComposer,
+  MainContactCapsule,
+  CalcCtaCapsule,
+} from "@/components/capsules";
 import { HeroCapsule } from "@/components/capsules/HeroCapsule";
 import { CostHeroArt } from "@/components/art/CostHeroArt";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { CtaButton } from "@/components/capsules/shared";
 import { BuildCards } from "@/components/BuildCards";
+import { FaqAccordion, FaqParas } from "@/components/FaqAccordion";
 import {
   BASE,
   PARAMS,
@@ -51,7 +56,6 @@ import {
   type Scope,
 } from "@/lib/package-builder";
 import {
-  AFTER_LAUNCH,
   AGENCY_SMALL_BUSINESS_RANGE,
   DOMAIN_YEARLY_HIGH,
   DOMAIN_YEARLY_LOW,
@@ -61,6 +65,7 @@ import {
   LOW,
   MARKET,
   MINUTELY,
+  POST_LAUNCH,
   WORDPRESS_CARE,
 } from "@/lib/pricing";
 
@@ -144,17 +149,14 @@ const breadcrumbJsonLd = {
   ],
 };
 
-// Market figures (by build method), the website anatomy (COMPONENTS), the
-// after-launch task ledger, MINUTELY and WORDPRESS_CARE all come from the hub
-// (lib/pricing) now, so a number changes in one place and cascades here.
+// Market figures (by build method), the website anatomy (COMPONENTS), MINUTELY
+// and WORDPRESS_CARE all come from the hub (lib/pricing) now, so a number
+// changes in one place and cascades here.
 
-// The after-launch tasks price out at MINUTELY, computed rather than typed.
-const cost = (mins: number) => money(Math.round(mins * MINUTELY));
-// Dash, not "to" (Chad, 2026-08-13), matching the range column in the market
-// and anatomy ledgers above. Only one row here spans a range at all; the rest
-// are single figures and are unaffected.
-const costRange = (r: { min: number; max: number }) =>
-  r.min === r.max ? cost(r.min) : `${cost(r.min)} - ${cost(r.max)}`;
+// THE AFTER-LAUNCH TASK LEDGER IS GONE (Chad, 2026-08-13). It listed the per-task
+// cost of ordinary post-launch jobs (text change, image swap, a new page) priced
+// off MINUTELY. Its `cost()` and `costRange()` helpers went with it; nothing else
+// used them. AFTER_LAUNCH still lives in the hub for any page that wants it.
 
 // COST BY SITE TYPE -- REMOVED 2026-08-13 (Chad). The SITE_TYPES ledger read the
 // same three scopes as the worked-example cards (BASE / SMALL_BUSINESS / STORE)
@@ -219,14 +221,27 @@ const FAQS: { q: string; a: ReactNode }[] = [
   },
   {
     q: "How much does an ecommerce website cost?",
+    // FaqParas, not a bare fragment: an inline <>...</> evaluates to a plain
+    // array, which the Answer renderer wraps in a SINGLE <p>. FaqParas is the
+    // component built for a multi-paragraph answer that also carries links.
     a: (
-      <>
-        More than a brochure site, because a store has machinery a brochure does
-        not: a catalog that has to stay true, a payment path that has to work
-        every time, and usually a system or two wired in behind it. A real store
-        on my model lands near {money(price(STORE))}. Agencies routinely quote
-        $20,000 and up for the same thing.
-      </>
+      <FaqParas
+        items={[
+          <>
+            More than a brochure site, because a store has machinery a brochure
+            does not: a catalog that has to stay true, a payment path that has to
+            work every time, and usually a system or two wired in behind it. A
+            real store on my model lands near {money(price(STORE))}. Agencies
+            routinely quote $20,000 and up for the same thing.
+          </>,
+          <>
+            Keep in mind, adding commerce functionality to your site is different
+            than building an ecommerce storefront. If you don&apos;t know, please{" "}
+            <Link href="#contact">consult with me</Link> to determine which yours
+            is.
+          </>,
+        ]}
+      />
     ),
   },
   {
@@ -409,9 +424,27 @@ export default function HowMuchDoesAWebsiteCostPage() {
           <p className="cost-guide-cta__text">
             Want to know exactly what your website will cost?
           </p>
+          {/* TWO LABELS, one per size (Chad, 2026-08-13). The full sentence is
+              the desktop label; a phone gets "Price your website", because at
+              that width the long one wraps to three lines inside the pill and
+              stops reading as a button. Both are Chad's wording, verbatim.
+
+              Swapped with display, not with `content` or a JS width check:
+              display:none takes the hidden one out of the accessibility tree
+              too, so a screen reader hears exactly one label rather than both
+              run together. */}
           <CtaButton
             href="/website-design-cost-calculator/"
-            label="Try my Website Design Cost Calculator"
+            label={
+              <>
+                <span className="cost-guide-cta__label-full">
+                  Try my Website Design Cost Calculator
+                </span>
+                <span className="cost-guide-cta__label-short">
+                  Price your website
+                </span>
+              </>
+            }
           />
         </aside>
       </SectionShell>
@@ -652,8 +685,12 @@ export default function HowMuchDoesAWebsiteCostPage() {
         className="svc-block svc-faq-section"
         trailingClassName="svc-faq-section--dark"
       >
+        {/* Chad's wording, 2026-08-13, verbatim. It replaced "What are some
+            examples of website packages?" -- the question form now matches the
+            other section headings on the page, which all ask what a thing
+            costs. */}
         <h2 className="svc-block__heading svc-fill">
-          What are some examples of website packages?
+          What do website packages cost?
         </h2>
         <div className="svc-prose">
           <p>
@@ -670,7 +707,12 @@ export default function HowMuchDoesAWebsiteCostPage() {
           {/* h3 to sit level with the card titles above it, which are also h3
               under this section's h2. */}
           <h3 className="cw-builds__more-heading">
-            Want to see more examples of <br />
+            {/* The break is authored for the two-line desktop shape. Below 480px
+                the phrase no longer fits two lines at any leading, so the break
+                stops balancing them and just forces a short orphan line
+                ("examples of") in the middle. The class lets CSS drop it at
+                that width and hand the wrapping back to the browser. */}
+            Want to see more examples of <br className="cw-builds__more-break" />
             custom website packages?
           </h3>
           {/* DEFAULT solid, not ghost. Every other CTA on an inverted band uses
@@ -688,51 +730,81 @@ export default function HowMuchDoesAWebsiteCostPage() {
       {/* Ongoing cost: the per-month / per-year question the build price hides. */}
       <SectionShell className="svc-block">
         <h2 className="svc-block__heading svc-fill">
-          What a website costs after it launches
+          What does a website cost after it launches?
         </h2>
         <div className="svc-prose">
+          {/* Chad's copy, 2026-08-13, verbatim. It replaced a paragraph that
+              quoted the builder monthly range and the domain band; both still
+              run in the anatomy ledger above, so nothing was lost. It also
+              carried "a static site hosts for little or free", one of the
+              free-hosting claims that contradicts the hosting floor in that
+              ledger. (No figure named here: price-audit reads comments.) */}
           <p>
-            The build price answers what a site costs to make. It says nothing
-            about what it costs to keep, and that second number is the one people
-            get surprised by. On a builder, the monthly fee never stops: $16 to
-            $99 a month, every month, for as long as the site is up. On a custom
-            site the ongoing cost can be almost nothing, because a domain runs
-            about {money(DOMAIN_YEARLY_LOW)} to {money(DOMAIN_YEARLY_HIGH)} a year and a static site hosts for little or free.
+            A website&apos;s cost is not limited to its initial build price.
+            There are ongoing and perpetual operational costs as well, costs
+            that escalate with scope and the technology behind it.
           </p>
+          {/* Chad's copy, 2026-08-13, verbatim. The domain band interpolates
+              from the hub rather than sitting typed, so it cannot drift from the
+              anatomy ledger above that quotes the same two constants. The
+              builder figures stay typed, matching how that MARKET row states
+              them. "Hosts for relatively little" replaces the old "little or
+              free", which contradicted the hosting floor. */}
           <p>
-            The variable is maintenance. A plain static site can sit untouched
-            and stay fine. A site on WordPress or a similar system needs regular
-            care or it drifts toward getting hacked, which most people budget for
-            at $50 to $200 a month with an agency. My version of that is a
-            WordPress care plan at {money(WORDPRESS_CARE)} every six months, and
-            for anything else I bill the minutes the work takes at{" "}
-            {money(Math.round(MINUTELY))} a minute, listed in full on the{" "}
-            <Link href="/rates/">rates page</Link>.
-            There is no retainer humming in the background that you did not ask
-            for.
+            On DIY builder platforms, the monthly fee never stops: $16 to $99 a month (or
+            more, if we&apos;re talking Shopify), every month, for as long as the
+            site is up. On a custom static site the ongoing cost can be almost
+            nothing, because a domain runs about {money(DOMAIN_YEARLY_LOW)} to{" "}
+            {money(DOMAIN_YEARLY_HIGH)} a year and a static site hosts for
+            relatively little.
           </p>
-          <p>
-            In practice, once a site of mine is live, the ordinary things you
-            will need cost about this much, every figure the same{" "}
-            {money(MINUTELY)} a minute applied to the time the job takes.
-          </p>
+          {/* Chad's copy, 2026-08-13, verbatim, replacing the old "the variable
+              is maintenance" paragraph. That one carried the WordPress care-plan
+              figure, the minutely rate, a link to /rates/ and the no-retainer
+              line; none survive here. The care plan is still quoted on /rates/
+              and /wordpress/, and the minutely rate still runs in the ledger
+              below this. */}
         </div>
         <dl className="rates-ledger">
-          {AFTER_LAUNCH.map((row) => (
-            <div key={row.task} className="rates-ledger__row">
-              <dt className="rates-ledger__label">{row.task}</dt>
-              <dd className="rates-ledger__num">{costRange(row)}</dd>
+          {POST_LAUNCH.map((row) => (
+            <div key={row.part} className="rates-ledger__row">
+              <dt className="rates-ledger__label">
+                <span className="cw-part-label">{row.part}</span>.{" "}
+                {inlineMarkup(row.note)}
+              </dt>
+              <dd className="rates-ledger__num">{row.range}</dd>
             </div>
           ))}
         </dl>
       </SectionShell>
 
-      {/* The national framing: cost does not move with the zip code. */}
-      <SectionShell className="svc-block">
+      {/* The national framing: cost does not move with the zip code.
+          INVERTED 2026-08-13 (Chad), same shell config as the page's other dark
+          bands so the treatment is identical rather than a second way of going
+          dark. */}
+      <SectionShell
+        full
+        className="svc-block svc-faq-section"
+        trailingClassName="svc-faq-section--dark"
+      >
         <h2 className="svc-block__heading svc-fill">
           How much does a website cost in the USA?
         </h2>
         <div className="svc-prose">
+          {/* Floated FIRST so the text flows around it. shape-outside reads the
+              webp's own alpha channel, so the wrap follows the monitor's
+              silhouette (including under the angled stand) rather than its
+              bounding box. Same-origin, which shape-outside requires. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            className="cost-usa__mockup"
+            src="/mockups/hyperising_mockup.webp"
+            alt="Hyperising, a chadworks build, shown on a desktop display"
+            width="771"
+            height="678"
+            loading="lazy"
+            decoding="async"
+          />
           <p>
             Anywhere from a free weekend on a builder to six figures, and the
             spread usually has more to do with who you called than with what you
@@ -755,64 +827,36 @@ export default function HowMuchDoesAWebsiteCostPage() {
         </div>
       </SectionShell>
 
+      {/* The calculator hand-off, straight after the national framing (Chad,
+          2026-08-13). Same capsule /rates/ and /websites/ run, so the hand-off
+          looks identical wherever it appears. It quotes no figure of its own:
+          every number stays in the hub and the capsule points at the tool. */}
+      <CalcCtaCapsule />
+
       {/* The FAQ. Content-first, question-shaped, no FAQPage markup (see note). */}
       <SectionShell
         full
-        className="svc-block svc-faq-section"
+        className="svc-block svc-faq-section cost-guide-faq"
         trailingClassName="svc-faq-section--dark"
       >
         <div className="svc-faq__layout">
           <div className="svc-faq__intro">
             <h2 className="svc-block__heading svc-fill">
-              The cost questions people actually ask
+              Frequently asked questions about the cost of website design
             </h2>
-            <p className="svc-faq__lead">
-              Answered the way I would answer them on the phone, with the numbers
-              left in.
-            </p>
           </div>
-          <div className="cw-rate-explainer__body">
-            {FAQS.map((f) => (
-              <div key={f.q} className="svc-prose">
-                <h3>{f.q}</h3>
-                <p>{f.a}</p>
-              </div>
-            ))}
-          </div>
+          {/* FaqAccordion, not a hand-rolled list (fixed 2026-08-13). This
+              page was rendering the questions as bare <h3>/<p> inside
+              `.cw-rate-explainer__body`, a class borrowed from the rate
+              explainer, so it got none of the accordion styling and had no
+              toggle at all -- every answer sat open, unstyled, on a band built
+              to hold panels. Every other FAQ on the site renders through this
+              component, which owns the open/closed state, the button, aria-expanded
+              and the `.svc-acc` styling the dark band already themes. */}
+          <FaqAccordion items={FAQS.map((f) => ({ q: f.q, a: f.a }))} />
         </div>
       </SectionShell>
 
-      <PathsCapsule
-        paths={{
-          heading: "Ready to price your own:",
-          items: [
-            {
-              label: "Website Design Cost Calculator",
-              detail:
-                "Move the scope and watch the number move. The same model behind every figure on this page, running one real rate card with no email gate.",
-              href: "/website-design-cost-calculator/",
-            },
-            {
-              label: "Rates",
-              detail:
-                "The full economics, including the per-minute rate for work after launch and how hourly works when a project is too open-ended to scope.",
-              href: "/rates/",
-            },
-            {
-              label: "Web Design Packages",
-              detail:
-                "The build sold as a defined scope at a defined number, written down before any money moves.",
-              href: "/web-design-packages/",
-            },
-            {
-              label: "Web Development",
-              detail:
-                "The code underneath, which is where the expensive half of any website cost actually lives.",
-              href: "/web-development/",
-            },
-          ],
-        }}
-      />
 
       <MainContactCapsule />
     </PageComposer>

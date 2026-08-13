@@ -55,11 +55,17 @@ export function DesignReveal({
   eyebrow = "Try it yourself",
   heading = "Same business, two first impressions",
   lead = "Grab the divider and drag. Everything that changes is design.",
+  className,
 }: {
   pages?: RevealPage[];
   eyebrow?: string;
   heading?: string;
   lead?: string;
+  // A modifier on the root, so a PAGE can tune the section around this demo
+  // without the component knowing which page it is on. The wrapping section
+  // reaches it with :has() -- the same hook .cw-score--split already uses to
+  // trim .svc-problem-art-section. Nothing here styles it.
+  className?: string;
 }) {
   const [active, setActive] = useState(0);
   const page = pages[active] ?? pages[0];
@@ -173,7 +179,7 @@ export function DesignReveal({
   }, []);
 
   return (
-    <div className="design-reveal">
+    <div className={"design-reveal" + (className ? ` ${className}` : "")}>
       <div className="design-reveal__header">
         <p className="eyebrow">{eyebrow}</p>
         <h2 className="design-reveal__heading">{heading}</h2>

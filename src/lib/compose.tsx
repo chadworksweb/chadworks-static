@@ -101,6 +101,10 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
             ? undefined
             : s.heroCta ?? { href: s.cta.href, buttonLabel: s.cta.buttonLabel }
         }
+        // Only meaningful alongside a first button, and HeroCapsule already
+        // renders it inside the `cta &&` block, so a page that sets this
+        // without a heroCta simply gets nothing rather than a lone ghost.
+        ctaSecondary={s.heroCtaSecondary}
       />
     ),
     // Optional demonstration slot, the FIRST thing under the hero. For a page

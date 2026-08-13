@@ -687,6 +687,46 @@ export const COMPONENTS: ComponentRow[] = [
 ];
 
 // ---------------------------------------------------------------------
+// POST-LAUNCH COSTS -- the three kinds of ongoing spend, as a ledger.
+//
+// Converted from three bold-led paragraphs on the cost guide (Chad, 2026-08-13:
+// "should we turn those into the same kind of list the other sections use").
+// The page had already taught the reader that a cost reads as label / note /
+// figure, so stating these in prose buried the numbers mid-sentence.
+//
+// COPY IS CHAD'S, restructured only where the format demanded it: each note
+// loses the opening subject (the label now carries it) and the figure it stated
+// inline (the range column now carries it). Nothing was reworded beyond that.
+//
+// Mixed units across the rows are fine -- MARKET already runs a monthly band
+// next to a per-project one -- but they are why each range names its own unit.
+// ---------------------------------------------------------------------
+export type PostLaunchRow = { part: string; range: string; note: string };
+
+export const POST_LAUNCH: PostLaunchRow[] = [
+  {
+    part: "Technical maintenance",
+    range: "$50 - $1,000+ a month",
+    note: "Usually billed as a [monthly retainer](/essays/is-your-agency-ripping-you-off/), covering the basics to keep a dynamic site (like WordPress) secure and operational.",
+  },
+  {
+    // The hourly rate is the column figure because it is the more common
+    // arrangement; the per-touchpoint alternative stays in the note rather than
+    // being averaged into a single band that would describe neither.
+    part: "Content updates",
+    // Open-ended at the top (Chad, 2026-08-13), matching how the other two rows
+    // in this ledger state their ceilings.
+    range: "$50 - $200+/hr",
+    note: "Also usually covered by a monthly retainer, sometimes bundled with hosting and/or technical maintenance, which affects the monthly fee. If no retainer, then one-time changes are billed a la carte at your designer's hourly or flat rate. Sometimes flat rates are employed per update, sometimes ranging from $10-35 per touchpoint.",
+  },
+  {
+    part: "Website upgrades",
+    range: "$1,000+ per project",
+    note: "New features, entirely new sections and/or functions, typically scoped as flat rate projects. Adding a blog, ecommerce functionality, membership, gated content and custom features like [a calculator](/website-design-cost-calculator/) all land here.",
+  },
+];
+
+// ---------------------------------------------------------------------
 // CALCULATORS -- the other cost calculators, and what each one does instead of
 // answering you. Read by the calculator page's "what makes this different"
 // section, where citing the alternatives is the point.

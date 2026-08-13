@@ -62,7 +62,15 @@ export const webDesign: Service = {
     "I've been designing websites for 20 years, long enough to know which trends will still look right in five, and which ones are already aging.",
   ],
 
-  problemArt: <DesignReveal />,
+  // Both overrides are PAGE-SCOPED on purpose (Chad, 2026-08-13). /website-redesign/
+  // renders this same demo on the bare defaults, so changing the component's
+  // defaults would have moved that page too. Passing them here leaves it alone.
+  //   eyebrow -- Chad's wording, verbatim.
+  //   --tight -- the section's top padding, trimmed 35%. The rule lives on
+  //     .svc-problem-art-section and reaches this class with :has().
+  problemArt: (
+    <DesignReveal eyebrow="BEFORE & AFTER" className="design-reveal--tight" />
+  ),
   problem: {
     heading: "Why web design actually matters",
     subheading: "Aesthetics psychologically build trust before content.",
@@ -220,6 +228,22 @@ export const webDesign: Service = {
       a: "Less than you'd think. A sense of what the site has to accomplish, plus any photos and words you already have. Real photos of your work beat stock photography every time. Logo, colors, and the rest can be designed along the way if you don't have them yet.",
     },
   ],
+
+  // TWO HERO BUTTONS (Chad, 2026-08-13). Without `heroCta` the hero mirrors the
+  // contact CTA below, so the first thing the page offered was the same ask that
+  // closes it. The primary now moves the reader DOWN into the page instead, and
+  // the ghost secondary hands off to the cost guide, which is the other question
+  // a "web design" visitor arrives with.
+  heroCta: {
+    href: "#key-facts",
+    buttonLabel: "Explore web design",
+    arrow: "down",
+  },
+  // Launched 2026-08-13, so this is a plain link rather than a sealed one.
+  heroCtaSecondary: {
+    href: "/how-much-does-a-website-cost/",
+    buttonLabel: "What a website costs",
+  },
 
   cta: {
     heading: "Have a vision, or only a hunch?",

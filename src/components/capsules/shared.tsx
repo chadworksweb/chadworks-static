@@ -6,6 +6,7 @@
 // rendered markup stays byte-stable across the refactor.
 // =====================================================================
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { type Writable, isPrompt } from "@/lib/service";
 import { Prompt } from "@/components/Prompt";
@@ -66,7 +67,14 @@ export function CtaButton({
   variant = "solid",
 }: {
   href: string;
-  label: string;
+  // ReactNode, not string (2026-08-13): the cost guide's calculator CTA carries
+  // a SHORTER label on a phone, which is two spans swapped by a media query
+  // rather than one string. Widening the type is backward compatible -- every
+  // existing caller passes a string and is untouched -- and it keeps those
+  // callers on the shared button instead of hand-rolling the markup to get one
+  // responsive label. Anything passed here still lands inside .svc-btn__label,
+  // so the pill, the hover wipe and the arrow are unchanged.
+  label: ReactNode;
   arrow?: "right" | "down";
   // "ghost" is the secondary/outline treatment; same pill and hover wipe.
   variant?: "solid" | "ghost";

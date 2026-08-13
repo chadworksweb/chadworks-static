@@ -3071,13 +3071,39 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   font-size: calc(var(--text-3xl) * 0.75);
   /* 400 -> 600, two steps up the weights this site actually ships. */
   font-weight: 600;
-  line-height: calc(var(--leading-snug) * 0.75);
+  /* LEADING NEEDS A FLOOR (2026-08-13, responsive audit). The quarter trim that
+     the size takes gives 1.3 * 0.75 = 0.975 here, and a unitless line-height
+     below 1 sets the lines closer together than the font's own ink is tall. It
+     measured as an overlap at EVERY width, and between 426px and 479px -- where
+     the heading breaks to three lines, which covers the 430px iPhone Pro Max --
+     the p of "examples" landed 1.7px inside the tittle of the i in "website".
+     Two clipped-to-text glyphs touching is not a near miss; it renders as one
+     smudged mark.
+
+     The floor is the fix rather than a flat value, so the quarter-trim intent
+     stays readable and a future retune of --leading-snug still moves this.
+     1.1 clears the worst pair (that descender under that tittle) by 2px at
+     every size in the clamp. 1.08 also clears it, but only by 1.4px, which is
+     inside the margin a fallback face with deeper descenders could eat if the
+     display font ever fails to load. Still far tighter than the 1.3 default. */
+  line-height: max(1.1, calc(var(--leading-snug) * 0.75));
   letter-spacing: -0.01em;
   color: var(--dark-text);
   /* No reading measure. The line break is authored in the markup, and 68ch at
      display size is wider than the block anyway, so a max-width here would only
      fight the break it cannot see. */
   margin: 0 auto var(--space-md);
+}
+/* THE AUTHORED BREAK, dropped once it stops earning its place. At 480px and up
+   the phrase sets as the two lines the <br> was written for. Below that it
+   cannot fit two lines at any leading, so the forced break only pins a short
+   "examples of" line in the middle of a ragged stack. Hidden here, the browser
+   wraps the whole phrase and text-wrap balances what it produces.
+   The width is one below 480 rather than 480 itself: at exactly 480 the
+   authored break is still the break the browser would pick. */
+@media (max-width: 479px) {
+  .cw-builds__more-break { display: none; }
+  .cw-builds__more-heading { text-wrap: balance; }
 }
 .cw-build__body { position: relative; z-index: 2; }
 /* Every shape image is the same width with the slab in the same place, so the
@@ -3140,7 +3166,11 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 }
 .cw-build__scope-item {
   position: relative;
-  padding-left: 1.4em;
+  /* Tightened from 1.4em (Chad, 2026-08-13) to close the gap between each check
+     and its label. The check is rotated 45deg, so its painted footprint is wider
+     than its box: (w + h) / sqrt(2), about 0.78em here. That is what the padding
+     has to clear, not the 0.39em width. */
+  padding-left: 1.25em;
   font-size: var(--text-sm);
   line-height: 1.5;
   color: rgba(229, 210, 244, 0.82);
@@ -3148,12 +3178,22 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 .cw-build__scope-item::before {
   content: "";
   position: absolute;
-  left: 0.16em;
-  top: 0.26em;
-  width: 0.34em;
-  height: 0.62em;
-  border: solid var(--accent-teal);
-  border-width: 0 2px 2px 0;
+  /* Nudged right with the size increase so the wider rotated footprint does not
+     hang off the left edge of the item. */
+  left: 0.2em;
+  /* Down 0.04em from 0.26em: the mark grew 0.09em taller, so half of that comes
+     off the top to keep it optically centred on the line. */
+  top: 0.22em;
+  /* 15% up from 0.34 x 0.62em. */
+  width: 0.39em;
+  height: 0.71em;
+  /* --accent-teal (#4a6b6e) is a muted mid-teal built for light surfaces; on
+     this navy band it read as grey. #9fe3bd is the bright green already running
+     through the CTA heading's wave on this page, so the check now matches
+     something rather than introducing a colour. Stroke thickened with the mark
+     so it does not look thinner at the larger size. */
+  border: solid #9fe3bd;
+  border-width: 0 2.5px 2.5px 0;
   transform: rotate(45deg);
 }
 
@@ -4830,6 +4870,16 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    foundation, show-up-on-chatgpt) keep the standard rhythm. */
 .svc-problem-art-section:has(.cw-score--split) {
   padding-top: calc(var(--section-pad-y) * 0.15);
+}
+/* TOP PAD on /web-design/ (Chad, 2026-08-13): trimmed 35% to 0.65 of the section
+   rhythm, then halved again in the same pass, so 0.325. Written as the two moves
+   that produced it rather than collapsed to a single number, because the second
+   was a judgement made against the first on screen.
+   Same :has() hook as the rule above rather than a page selector: the modifier is
+   passed to DesignReveal by that page alone, so /website-redesign/ renders the
+   identical demo on the bare defaults and keeps the full pad. */
+.svc-problem-art-section:has(.design-reveal--tight) {
+  padding-top: calc(var(--section-pad-y) * 0.65 / 2);
 }
 .svc-problem-art { position: relative; }
 
@@ -7861,6 +7911,224 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   padding-bottom: 0;
 }
 
+/* THE CALCULATOR CAPSULE needs its top padding back on THIS page. `.cw-calc-cta`
+   zeroes padding-block-start globally, which is right on /rates/ and /websites/
+   where it sits tight under the block above it. Here it follows a full-bleed
+   dark band, so with no padding the card starts the instant the band ends.
+
+   Scoped by the hero class rather than by editing the global rule, which is the
+   pattern this file already uses for page-specific overrides (see the
+   `main:has(.cw-calc-hero)` prose rules). CalcCtaCapsule takes no className, so
+   there is no hook on the section itself. */
+main:has(.cost-guide-hero) .cw-calc-cta {
+  padding-block-start: var(--section-pad-y);
+}
+
+/* THE LEDGERS STACK LATER ON THIS PAGE (2026-08-13, responsive audit).
+   The shared ledger drops to one column at 600px, which is right where its
+   figures are short. This page's are not: every row here carries a unit on the
+   end ("a month", "a year", "per project"), and the mono face sets wide, so the
+   widest figure measures 283px at 601px viewport against a 246px label. The
+   figure column is `white-space: nowrap`, so it never loses that argument --
+   the LABEL is what gets crushed, into a 24-character ribbon running 11 to 18
+   lines beside a figure that occupies one. The row reads as a tall thin column
+   of text next to a mostly empty one.
+
+   So the stacked treatment, which is already the right answer, extends up to
+   the width where the two-column row has room for both: at 900px the label
+   holds ~48 characters and reads normally, so the band that needed help is
+   601-780.
+
+   PAGE-SCOPED on purpose. `main:has(.cost-guide-hero)` is the hook this file
+   already uses for cost-guide overrides (see the .cw-calc-cta rule below).
+   /rates/ shares .rates-ledger but not these unit-carrying figures, and its
+   own 600px stack point is still correct for it, so nothing there moves.
+   This is NOT the audited stacked-layout query -- that one is
+   "(pointer: coarse), (max-width: 900px)" and belongs to the calculator and
+   CalcCtaCapsule (see scripts/stack-query-audit.mjs). Do not merge the two. */
+@media (min-width: 601px) and (max-width: 780px) {
+  main:has(.cost-guide-hero) .rates-ledger__row {
+    grid-template-columns: 1fr;
+    row-gap: 25px;
+    /* The same extra bottom padding the 600px block sets, and for the same
+       reason: stacked, the figure is the LAST thing in the row, so at the
+       standard 1.4rem it reads as belonging to the note that follows it. */
+    padding-bottom: 2.6rem;
+  }
+  main:has(.cost-guide-hero) .rates-ledger__num {
+    justify-self: start;
+  }
+}
+
+/* KNOCKOUT PRICE CHIPS ON THE STACK (Chad, 2026-08-13, ss6). Inverted: dark
+   ground, light type, every figure on the page.
+
+   Stacked, the figure loses the one thing that made it read as the row's
+   answer -- sitting opposite the label, alone in its own column. On its own
+   line under a long note it became just another line of purple text at the end
+   of a paragraph. A filled chip gives it back its edges, and inverting is what
+   separates it from a page of dark-on-light type.
+
+   THE QUERY IS THE WHOLE STACKED RANGE, not the 601-780 block above. Below
+   601px the shared rule stacks these rows already, so pinning the chips to that
+   block would have skipped every actual phone -- the one size ss6 was shot at.
+   780 is the width where this page's rows go back to two columns.
+
+   THE GRADIENT HAS TO BE UNDONE, not just recoloured. The base rule paints the
+   glyphs by clipping a gradient to the text and setting the fill transparent,
+   so a `background` alone would be clipped to the letterforms and never draw a
+   chip. All three of those declarations are reversed here: the clip goes back
+   to the border box, the fill goes back to a real colour, and `color` is
+   restated for anything that ignores -webkit-text-fill-color.
+
+   The base rule's descender fix (padding-bottom with an equal negative margin)
+   also goes: it exists to stop the CLIP cutting a descender flat, and with no
+   clip it would only drag the chip into the row below. The chip's own padding
+   replaces it.
+
+   --dark-bg is the page's indigo, the same ground .cost-guide-cta uses, so this
+   is the treatment the page already has rather than a new colour. */
+@media (max-width: 780px) {
+  main:has(.cost-guide-hero) .rates-ledger__num {
+    background: var(--dark-bg);
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    -webkit-text-fill-color: #fff;
+    color: #fff;
+    padding: 0.4em 0.75em;
+    margin-bottom: 0;
+    /* SQUARE, not the sitewide --radius (Chad, 2026-08-13). Hard corners read as
+       a stamped figure rather than a pill, which is what keeps it from looking
+       like the button treatment repeated down the page. */
+    border-radius: 0;
+  }
+}
+
+/* THE FAQ BAND IS GREEN, not the navy the other dark bands run (Chad,
+   2026-08-13). Same mechanism .cw-defense uses on /rates/: the section keeps
+   `.svc-faq-section--dark` for its STRUCTURE (the band, the aurora layer, the
+   on-dark type rules) and swaps the PALETTE by redefining the tokens those
+   rules already read. Nothing global moves, and no on-dark rule is duplicated.
+
+   The greens are the .cw-defense literals. Taken as literals rather than by
+   reading that section's tokens, because they are declared ON that section and
+   do not exist in this subtree -- var(--dark-muted) here would resolve to the
+   sitewide lavender instead.
+
+   Doubled class on the overrides so they beat `.svc-faq-section--dark` on
+   specificity rather than on source order. */
+.cost-guide-faq {
+  --grad-peak: #cfe9d5;
+  --dark-bg: #0e2a1e;
+  --dark-text: #e8f5ec;
+  --dark-muted: #a9d8bd;
+  --dark-border: rgba(159, 227, 189, 0.22);
+}
+.svc-faq-section--dark.cost-guide-faq {
+  background: linear-gradient(135deg, #0e2a1e 0%, #14543a 100%);
+}
+/* The aurora blooms, re-aimed. Same two-glow structure as the navy band; only
+   the hues change. */
+.svc-faq-section--dark.cost-guide-faq::before {
+  background:
+    radial-gradient(circle at 88% 20%, rgba(207, 233, 213, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 12% 80%, rgba(31, 157, 87, 0.18) 0%, transparent 50%);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-block__heading {
+  text-shadow: 0 2px 24px rgba(14, 42, 30, 0.45);
+}
+/* The heading's wipe reads --grad-peak and --dark-muted, which the block above
+   already greened. Only the UNFILLED tail needs restating: it is a hardcoded
+   lavender in the navy rule, so without this the right half of the heading
+   stays purple on green. */
+.svc-faq-section--dark.cost-guide-faq .svc-block__heading.svc-fill {
+  background-image: linear-gradient(90deg,
+    #ffffff 0%, var(--grad-peak) 30%, var(--dark-muted) 50%,
+    rgba(169, 216, 189, 0.38) 50.1%, rgba(169, 216, 189, 0.38) 100%);
+}
+
+/* AND SO IS THE ACCORDION ON IT (2026-08-13, responsive audit). Retuning the
+   tokens above greens the band, the heading and its wipe, but it cannot reach
+   the accordion: every on-dark .svc-acc rule states the navy band's lavender as
+   a LITERAL (#e5d2f4 and its rgba forms) rather than reading --dark-muted. So
+   when this page swapped its hand-rolled FAQ list for FaqAccordion, it landed a
+   lavender component on a green band -- pale lilac "+" glyphs, lavender answer
+   text, lavender hairlines. Exactly the failure the heading's unfilled tail
+   already carries a note about, one component further down.
+
+   Same doubled-class specificity trick as the rules above, so these beat
+   `.svc-faq-section--dark` on specificity rather than on source order.
+
+   Only the palette moves. Every structural rule (the toggle geometry, the
+   grid-rows disclosure, the glass) still comes from the shared component. */
+.svc-faq-section--dark.cost-guide-faq .svc-acc {
+  border-color: var(--dark-border);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__item {
+  border-color: rgba(159, 227, 189, 0.16);
+}
+/* Closed sits at the muted green; open BRIGHTENS rather than saturating. On the
+   navy band open goes to --accent, a deep purple that gains presence against
+   navy. The equivalent green (--win-green) is darker than this background, so
+   the same move would make the marker recede exactly when it should read as
+   active. --grad-peak is the band's own light green and gains the presence. */
+.svc-faq-section--dark.cost-guide-faq .svc-acc__q::after {
+  color: var(--dark-muted);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__item.is-open .svc-acc__q::after {
+  color: var(--grad-peak);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__a {
+  /* The shared value is a plum-black lifted from the navy band. Same idea in
+     this band's own deep green, so the open panel reads as a recess in the
+     gradient rather than a patch of a different hue. */
+  background: rgba(14, 42, 30, 0.35);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__a p {
+  color: rgba(232, 245, 236, 0.88);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__a-inner a {
+  color: var(--grad-peak);
+}
+.svc-faq-section--dark.cost-guide-faq .svc-acc__a-inner a:hover {
+  color: #fff;
+}
+
+/* THE USA SECTION'S MOCKUP, with the copy wrapping around it.
+   shape-outside points at the same webp the src does, so the wrap follows the
+   monitor's actual silhouette (the taper of the stand, the angled bezel) rather
+   than a rectangle. It needs three things to work, all true here: the image is
+   same-origin, it carries an alpha channel, and the element is floated --
+   shape-outside is ignored on anything that is not a float.
+
+   shape-image-threshold: 0.5 means "treat alpha above 50% as solid", which
+   keeps the soft shadow under the stand out of the shape. shape-margin holds
+   the text off the silhouette so glyphs never touch the screen edge.
+
+   The float is on a direct child of .svc-prose, whose paragraph rhythm selects
+   direct children too -- but an <img> has no margins from that rule, so the
+   float's own margin is the only spacing in play. */
+.cost-usa__mockup {
+  float: right;
+  width: clamp(200px, 34%, 380px);
+  height: auto;
+  margin: 0.25rem 0 var(--space-sm) var(--space-lg);
+  shape-outside: url("/mockups/hyperising_mockup.webp");
+  shape-image-threshold: 0.5;
+  shape-margin: 0.9rem;
+}
+/* Below the wrap point a floated image leaves slivers of text beside the stand,
+   so it stops floating and sits centred above the copy instead. */
+@media (max-width: 760px) {
+  .cost-usa__mockup {
+    float: none;
+    display: block;
+    width: min(300px, 72%);
+    margin: 0 auto var(--space-md);
+    shape-outside: none;
+  }
+}
+
 /* The hero lede's frosted panel, trimmed 100px off the shared prose measure so
    the first line breaks after "subscription." rather than carrying "However,"
    up with it (Chad, 2026-08-06). Scoped to this hero: --measure-prose is a
@@ -7909,15 +8177,24 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 
 /* Under 700px a third of the column is too narrow to read a person in, and the
    copy beside it wraps to two or three words a line. Stack instead, copy first,
-   and drop the overlap so nothing collides with the box. */
+   and centre the portrait over the box below it. */
 @media (max-width: 700px) {
   .cost-guide-answer__row {
     display: block;
   }
+  /* CENTRED, AND STANDING ON THE BOX (Chad, 2026-08-13, ss5).
+     Stacked, this was pinned to the left edge with a 40px hole under it: the
+     desktop rule cancels the CTA's margin-top with an equal negative margin so
+     the portrait's feet land ON the box, and dropping that here left the gap
+     uncancelled and the picture floating above the card.
+
+     So the same trick runs at this size, which is why the two values still have
+     to move together -- see the note on the base rule. `auto` side margins are
+     what centre it, since the element is a block with a width. */
   .cost-guide-portrait {
     display: block;
     width: min(62%, 260px);
-    margin: var(--space-md) 0 0;
+    margin: var(--space-md) auto calc(var(--space-lg) * -1);
   }
 }
 
@@ -7948,11 +8225,48 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   margin: 0;
   text-wrap: pretty;
 }
-@media (max-width: 620px) {
+/* The short label is the phone one, so the full sentence shows by default and
+   the short one is out of flow until the query below swaps them. */
+.cost-guide-cta__label-short { display: none; }
+
+/* CENTRED WHENEVER THE CARD IS ONE COLUMN (Chad, 2026-08-13, ss5 + follow-up),
+   which is a far wider range than "mobile".
+
+   This card is `display: flex` with `flex-wrap: wrap`, so it stops being two
+   columns the moment the prompt and the pill cannot share a line -- and that
+   happens while `flex-direction` is still `row`. Measured across the range: the
+   two sit side by side only at 1010px and up. From 621px to 1009px the card was
+   ALREADY stacked and still left-aligned, because the centring lived in a 620px
+   query. That 621-1009 band is most of the tablet range and the whole of a
+   narrow desktop window, which is where this was spotted.
+
+   So the breakpoint is the width where the flex line actually wraps, not a
+   device guess: text (491px) + gap (--space-lg) + pill (350px) needs 881px of
+   inner width, which the card first has at 1010px.
+
+   It is tied to THIS copy. Lengthen the prompt or the button label and the real
+   wrap point moves; re-measure rather than assuming 1009 still describes it. */
+@media (max-width: 1009px) {
+  /* Stacked, the prompt and the pill sat hard against the left edge of a box
+     whose padding is even on both sides, so the card read as though its
+     contents had slipped. The portrait above it is centred at phone widths too,
+     so they share one axis. `align-items` places the flex children;
+     `text-align` centres the prompt's own wrapped lines inside its box. */
   .cost-guide-cta {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    text-align: center;
   }
+}
+
+/* The LABEL swap stays a phone-only change (Chad: "the CTA on mobile"). It is
+   deliberately NOT merged into the query above: the card goes one-column at
+   1009px, but the long label only stops fitting the pill much lower down. */
+@media (max-width: 620px) {
+  /* See the note at the call site: display:none takes the unused one out of
+     the accessibility tree, so only one label is announced. */
+  .cost-guide-cta__label-full { display: none; }
+  .cost-guide-cta__label-short { display: inline; }
 }
 
 /* =====================================================================
