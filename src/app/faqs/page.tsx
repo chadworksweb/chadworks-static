@@ -6,7 +6,7 @@
 
 import type { Metadata } from "next";
 import { LaunchLink } from "@/components/LaunchLink";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { SITE_URL } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import {
@@ -131,7 +131,14 @@ const GROUPS: FaqGroup[] = [
           <FaqParas
             items={[
               `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}.`,
-              <>
+              // KEYED FRAGMENT, not a bare <> (fixed 2026-08-14). This array is
+              // built here and passed to FaqParas as a prop, so React validates
+              // it as a list at the point of creation and the <p key={i}> inside
+              // FaqParas does not satisfy it. One unkeyed element here was the
+              // "Each child in a list should have a unique key prop" error this
+              // page threw on every render. The string item above needs no key;
+              // only elements are validated. A bare <> cannot take a key.
+              <Fragment key="minutely">
                 If your website needs work, not a redesign, I charge by the minute
                 at {money(MINUTELY)}/min, which adds up to {HOURLY_LONG}.
                 Read more about my fees on my{" "}
@@ -140,7 +147,7 @@ const GROUPS: FaqGroup[] = [
                 <LaunchLink href="/website-design-cost-calculator/">
                   website design cost calculator
                 </LaunchLink>.
-              </>,
+              </Fragment>,
             ]}
           />
         ),

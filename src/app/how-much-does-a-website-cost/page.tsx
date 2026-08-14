@@ -27,7 +27,7 @@
 // state in this comment: the identical line on the calculator page went stale
 // the day that page launched and ended up asserting the opposite of the code.
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/service";
@@ -46,9 +46,11 @@ import { FaqAccordion, FaqParas } from "@/components/FaqAccordion";
 import {
   BASE,
   PARAMS,
-  SMALL_BUSINESS,
-  STORE,
-  ladderFor,
+  // SMALL_BUSINESS and STORE dropped from the imports 2026-08-14: the USA
+  // section and the first two FAQs were the only callers, and all three now
+  // carry Chad's typed figures instead. Re-add them here if a computed scope
+  // price comes back to this page. ladderFor went the same way when the
+  // most-expensive-part and self-update FAQs were rewritten/removed.
   money,
   paramValue,
   price,
@@ -64,9 +66,11 @@ import {
   HIGH,
   LOW,
   MARKET,
-  MINUTELY,
+  // MINUTELY and WORDPRESS_CARE dropped 2026-08-14: the per-month and
+  // maintenance FAQs were their last callers and both now carry Chad's typed
+  // ranges. Neither figure appears on this page any more; /rates/ still owns
+  // them. Re-add here if a computed rate comes back.
   POST_LAUNCH,
-  WORDPRESS_CARE,
 } from "@/lib/pricing";
 
 const PAGE_URL = `${SITE_URL}/how-much-does-a-website-cost/`;
@@ -208,14 +212,18 @@ function inlineMarkup(text: string) {
 const FAQS: { q: string; a: ReactNode }[] = [
   {
     q: "How much does a website cost for a small business?",
+    // Chad's copy, 2026-08-14, verbatim. The figures here are TYPED, not read
+    // from the package builder: the old answer quoted money(price(SMALL_BUSINESS))
+    // and this range does not, so a ladder retune will not move it.
     a: (
       <>
-        Most small business sites land between $2,000 and $10,000 when a person
-        builds them, and cheaper if you do it yourself on a builder. My own
-        number for the everyday five page version, with a logo already in hand,
-        is {money(price(SMALL_BUSINESS))}, and you can move the scope on my{" "}
-        <Link href="/website-design-cost-calculator/">cost calculator</Link> to
-        see your own.
+        Websites can cost from free to $20,000+. Typical small business websites
+        land in the $3,000-$10,000 range, but the scope and features determine
+        the price. Use my{" "}
+        <Link href="/website-design-cost-calculator/">
+          website design cost calculator
+        </Link>{" "}
+        to scope and price your website project.
       </>
     ),
   },
@@ -227,84 +235,95 @@ const FAQS: { q: string; a: ReactNode }[] = [
     a: (
       <FaqParas
         items={[
-          <>
-            More than a brochure site, because a store has machinery a brochure
-            does not: a catalog that has to stay true, a payment path that has to
-            work every time, and usually a system or two wired in behind it. A
-            real store on my model lands near {money(price(STORE))}. Agencies
-            routinely quote $20,000 and up for the same thing.
-          </>,
-          <>
+          // KEYED FRAGMENTS, not bare <>...</> (fixed 2026-08-14). This array is
+          // built here and handed to FaqParas as a prop, and React validates it
+          // as a list at the point of creation, so the <p key={i}> that FaqParas
+          // wraps each item in does not satisfy it. Two unkeyed items here were
+          // the "Each child in a list should have a unique key prop" error in
+          // the dev overlay. A bare <> cannot take a key; Fragment can.
+          // Chad's copy, 2026-08-14, verbatim. Like the small business answer,
+          // this one is TYPED rather than reading money(price(STORE)), so a
+          // ladder retune no longer moves it.
+          <Fragment key="scope">
+            Ecommerce websites with complete storefronts and catalogs typically
+            start in the high four figures and easily blow past $10,000.
+          </Fragment>,
+          <Fragment key="storefront-vs-functionality">
             Keep in mind, adding commerce functionality to your site is different
             than building an ecommerce storefront. If you don&apos;t know, please{" "}
             <Link href="#contact">consult with me</Link> to determine which yours
             is.
-          </>,
+          </Fragment>,
         ]}
       />
     ),
   },
   {
     q: "Is it cheaper to build a website yourself?",
+    // Chad's copy, 2026-08-14, verbatim. The builder's $16 to $99 a month left
+    // this answer with it; the per-month FAQ below still carries that figure,
+    // so it is still on the page once.
     a: (
       <>
-        Up front, yes. A builder runs $16 to $99 a month and you can be live this
-        weekend. The cost shows up later, when you count the yearly total, notice
-        the template is doing your brand no favors, and find out that moving off
-        it means starting over because you never owned the thing you built.
+        Yes, it is cheaper to build a website by yourself (DIY), but if you
+        don&apos;t know what you&apos;re doing, the real cost can be time,
+        frustration and an incomplete or disappointing website.
       </>
     ),
   },
   {
     q: "How much does a website cost per month?",
+    // Chad's copy, 2026-08-14, verbatim. Typed figures again: the domain,
+    // WordPress care and builder numbers that used to render here are gone from
+    // this answer. Only the domain range survives elsewhere on the page (the
+    // components ledger); the builder and care figures now appear nowhere.
     a: (
       <>
-        If you build it yourself, $16 to $99 a month covers the builder and the
-        hosting together. If someone builds you a custom site, the monthly cost
-        can be close to zero: you own a domain at about {money(DOMAIN_YEARLY_LOW)} to {money(DOMAIN_YEARLY_HIGH)} a year, and a
-        static site hosts for little or nothing. There is no monthly fee to me
-        unless you put me on a WordPress care plan, currently {money(WORDPRESS_CARE)}{" "}
-        every six months.
+        Monthly recurring costs for a website average between $0 and $100.
+        You&apos;ll need to factor in hosting, technical maintenance and any
+        content updates you anticipate needing.
       </>
     ),
   },
   {
     q: "How much does it cost to maintain a website?",
+    // Chad's copy, 2026-08-14, verbatim. This answer no longer quotes the
+    // WordPress care price, the per-minute rate, or links to /rates/.
     a: (
       <>
-        A static site can sit for a year and cost you nothing. A site running on
-        WordPress or a similar system needs regular updates or it drifts toward
-        getting hacked, which is why I offer WordPress care at {money(WORDPRESS_CARE)}{" "}
-        every six months. Any other change I make after launch is billed at the
-        minutes it takes, {money(Math.round(MINUTELY))} a minute, on the{" "}
-        <Link href="/rates/">rates page</Link>.
+        Long term cost of maintaining a website varies depending on your website
+        setup. Hard-coded (static) websites that don&apos;t need content updates
+        cost only the hosting fee. WordPress and other dynamic platforms can
+        cost more over time. This can range from a few hundred to a few thousand
+        per year.
       </>
     ),
   },
   {
     q: "Why do website quotes vary so much?",
+    // Chad's copy, 2026-08-14, verbatim. The calculator link went with the old
+    // answer; the first FAQ and the CalcCtaCapsule still point at the tool.
     a: (
       <>
-        Because most of them are not quoting the same website. One studio is
-        pricing a template with your logo dropped in, another is pricing forty
-        hours of custom design, and both are saying the word &quot;website&quot;
-        at you. The spread is not always dishonesty, but it always means nobody
-        has agreed on scope yet. That is the entire reason my{" "}
-        <Link href="/website-design-cost-calculator/">calculator</Link> makes you
-        move twelve things instead of picking a tier.
+        Website quotes vary because of two things: the scope and the person or
+        company quoting it. When getting quotes, make sure you share the exact
+        same scope so that each bidder is quoting the same project. Freelancers,
+        studios and agencies each have their own internal costs that inflate the
+        price of the very same project.
       </>
     ),
   },
   {
     q: "How much should I actually pay for a website?",
+    // Chad's copy, 2026-08-14, verbatim. The (italic) marker in his draft sets
+    // the second half of the opening sentence in <em>.
     a: (
       <>
-        Enough that the person building it can afford to do it properly, and not
-        a dollar of somebody&apos;s quarterly growth target on top. For most
-        small businesses that is a few thousand dollars for a site that is yours,
-        loads fast, and does not lock you in. If you are still testing whether the
-        business exists at all, pay almost nothing on a builder and come back when
-        the site is costing you money by being bad.
+        You should actually pay what you can afford without breaking the bank
+        and <em>what you feel the final product is worth to you</em>. If the
+        website is going to bring you a few thousand dollars a month in business,
+        expect to actually pay over $10,000. If the website is going to bring you
+        a few hundred bucks or no revenue, expect to pay a few thousand.
       </>
     ),
   },
@@ -323,30 +342,19 @@ const FAQS: { q: string; a: ReactNode }[] = [
   },
   {
     q: "What is the most expensive part of a website?",
+    // Chad's copy, 2026-08-14, verbatim. The old answer argued the opposite
+    // (design is almost never the expensive part) off three ladderFor() tops;
+    // all three computed figures are gone with it.
     a: (
       <>
-        Almost never the design. Visual ambition on my calculator tops out at{" "}
-        {money(ladderFor("ambition")?.at(-1) ?? 0)}. Custom development reaches{" "}
-        {money(ladderFor("mathDev")?.at(-1) ?? 0)} and commerce reaches{" "}
-        {money(ladderFor("commerce")?.at(-1) ?? 0)}, both far past it. The
-        expensive part is machinery: logic that has to be right every single
-        time, and systems that keep talking to each other long after I am gone.
+        The most expensive part of a website is typically the development,
+        followed closely by the design.
       </>
     ),
   },
-  {
-    q: "Can I update the site myself after launch?",
-    a: (
-      <>
-        As much as you want to pay for. Editability is a real line on the{" "}
-        <Link href="/website-design-cost-calculator/">calculator</Link>, because
-        it is something I build into the site, and how much you get is priced by
-        how much you want. Swapping text and images is close to free. Rebuilding a
-        page layout on your own is {money(ladderFor("editability")?.at(-1) ?? 0)},
-        because I have to build you something that cannot break when you use it.
-      </>
-    ),
-  },
+  // "Can I update the site myself after launch?" REMOVED 2026-08-14 (Chad). It
+  // was the last entry and the page's last ladderFor() figure (the editability
+  // top) went with it. The editability line is still priced on the calculator.
 ];
 
 export default function HowMuchDoesAWebsiteCostPage() {
@@ -778,7 +786,11 @@ export default function HowMuchDoesAWebsiteCostPage() {
         </dl>
       </SectionShell>
 
-      {/* The national framing: cost does not move with the zip code.
+      {/* The USA framing. REWRITTEN 2026-08-14 (Chad's copy, verbatim): the
+          argument is now domestic vs offshore, what the cheap offshore rate
+          actually costs you, and what the higher domestic rate buys. The old
+          zip-code framing and its {money(price(SMALL_BUSINESS))} figure are
+          gone, so this section quotes no number of its own.
           INVERTED 2026-08-13 (Chad), same shell config as the page's other dark
           bands so the treatment is identical rather than a second way of going
           dark. */}
@@ -806,23 +818,32 @@ export default function HowMuchDoesAWebsiteCostPage() {
             decoding="async"
           />
           <p>
-            Anywhere from a free weekend on a builder to six figures, and the
-            spread usually has more to do with who you called than with what you
-            asked for. A Manhattan or San Francisco shop will price a five page
-            site at a number that would cover a small company&apos;s whole year.
-            An overseas shop will quote you $500 for something you will quietly
-            pay somebody else to rebuild in eighteen months. Both of those are the
-            American website market, and neither is telling you what the work
-            costs.
+            Having a website built in the United States of America is typically
+            more expensive than hiring an offshore agency or even freelancer.
+            While many offshore providers can deliver decent enough work, their
+            cheap rates almost always come with a cost.
           </p>
           <p>
-            I build remotely for clients across the country, and the number does
-            not move with your zip code. The small business site above is{" "}
-            {money(price(SMALL_BUSINESS))} whether you are in Ohio or Oregon,
-            because it is the same work either way and I am not pricing your area
-            code. The only thing your location changes is what the shops down the
-            street from you have quoted, which is most of the reason this page
-            publishes real figures instead of a range.
+            Sometimes that cost is a difficult client experience due to language
+            barriers, time zone conflicts, virtual-only communication or simply
+            lack of professionalism. Sometimes that cost is in the design or the
+            code itself, leading to a lower quality website that you
+            won&apos;t be happy with and/or will have to pay more later to fix,
+            expand or polish.
+          </p>
+          <p>
+            Hiring a web design freelancer, studio or agency in the USA might
+            cost more dollars, but typically you will have a much better client
+            experience because they will speak English natively, their time zone
+            will be the same as yours or close to it, and they understand
+            professional cultural norms that you are used to.
+          </p>
+          <p>
+            <em>
+              I&apos;ve had a substantial number of clients find their way to me
+              after experiencing offshore faceless agencies. If you find
+              yourself in this situation, chadworks is here for you.
+            </em>
           </p>
         </div>
       </SectionShell>
