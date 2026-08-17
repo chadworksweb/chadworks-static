@@ -161,15 +161,15 @@ export const wixToStatic: Service = {
       a: "Wix loads a heavy editor framework before your page even appears, which is overhead the public never needed. A static site is just fast, hand-built files with none of that weight, so pages load quickly and both search engines and the AI assistants can read them without fighting through the overhead.",
     },
     {
-      q: "Do you only work with local businesses?",
-      a: "I'm based near Philadelphia, and a good deal of this work is local on purpose, because there's real trust in hiring someone in your own area who picks up the phone. The work itself is remote-friendly, though, so if you're further out and it's a good fit, I'm not going to turn you away over a map.",
+      q: "Does it matter where my business is?",
+      a: "Not at all. chadworks is a 100% virtual studio, so the work runs the same whether you're down the road or three timezones out. You get the same person picking up the phone either way.",
     },
   ],
 
   cta: {
     heading: "Take your site with you",
     body:
-      "Send me your Wix URL and I'll take a quick look, no pressure, and tell you whether a custom static rebuild makes sense and what it would take to get you off the platform and onto a site you own. I'm right here near Philadelphia if you'd rather work with someone local.",
+      "Send me your Wix URL and I'll take a quick look, no pressure, and tell you whether a custom static rebuild makes sense and what it would take to get you off the platform and onto a site you own.",
     buttonLabel: "See what a rebuild takes",
     href: "/contact/",
   },
@@ -177,6 +177,6 @@ export const wixToStatic: Service = {
   meta: {
     title: "Wix to Static: Own a Faster Site You Can Actually Take With You | chadworks",
     description:
-      `Stuck on Wix with no way to export your site? I rebuild Wix sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit), on a design built around your business. Serving the Philadelphia area.`,
+      `Stuck on Wix with no way to export your site? I rebuild Wix sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit), on a design built around your business. A 100% virtual studio, serving the USA.`,
   },
 };

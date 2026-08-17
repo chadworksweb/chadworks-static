@@ -94,10 +94,10 @@ const GROUPS: FaqGroup[] = [
           "I can take on 3-5 substantial projects at once. I take on clients based on the philosophy outlined in my Are We A Good Fit page, not capacity or who has the biggest budget.",
       },
       {
-        q: "Do you work with businesses outside Pennsylvania?",
-        a: "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
+        q: "Where are you located?",
+        a: "chadworks is a 100% virtual studio, so location never enters into it. I work with clients across the USA and have worked in many states and every US mainland timezone.",
         aText:
-          "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
+          "chadworks is a 100% virtual studio, so location never enters into it. I work with clients across the USA and have worked in many states and every US mainland timezone.",
       },
       {
         q: "How long does a website take to build?",

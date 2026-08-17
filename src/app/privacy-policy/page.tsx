@@ -51,9 +51,9 @@ export default function PrivacyPolicyPage() {
             <em>Last updated: {LAST_UPDATED}</em>
           </p>
           <p>
-            chadworks is a sole-proprietor web design and development studio
-            operated by Chad Lewine and based in the Greater Philadelphia area of
-            Pennsylvania. This policy explains what this site collects, how your
+            chadworks is a 100% virtual sole proprietorship, a web design and
+            development studio operated by Chad Lewine. This policy explains what
+            this site collects, how your
             consent controls analytics, and the choices you have. I keep data
             collection minimal on purpose.
           </p>

@@ -189,6 +189,6 @@ export const leaveSocialMedia: Service = {
     title:
       "Leave Social Media: Own Your Audience on Your Own Platform | chadworks",
     description:
-      "Stop pouring hours into apps that own your audience. I build small businesses their own feed and rewards layer on their own domain, starting with one affordable module and adding the rest as you grow. Serving the Philadelphia area.",
+      "Stop pouring hours into apps that own your audience. I build small businesses their own feed and rewards layer on their own domain, starting with one affordable module and adding the rest as you grow. A 100% virtual studio, serving the USA.",
   },
 };

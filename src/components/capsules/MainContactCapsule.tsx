@@ -113,7 +113,7 @@ export function MainContactCapsule({
          with no other change. Uncomment both to put it back. */
       /* phoneLabel="Call directly" */
       /* phone="(215) 872-1240" */
-      locationNote="Based in Greater Philadelphia, PA."
+      locationNote="A 100% virtual studio, working across the USA."
       availabilityNote={AVAILABILITY}
       quick={QUICK}
       detailed={DETAILED}

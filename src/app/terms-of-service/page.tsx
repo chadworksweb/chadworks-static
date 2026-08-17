@@ -80,7 +80,8 @@ const PARTS: Part[] = [
               These Terms of Service (the &quot;Terms&quot;) govern access to and
               use of the website located at chadworks.co (the &quot;Site&quot;).
               The Site is operated by Chad Lewine, a sole proprietor doing
-              business as chadworks (&quot;chadworks&quot;).
+              business as chadworks (&quot;chadworks&quot;). chadworks is a 100%
+              virtual sole proprietorship.
             </p>
             <p>
               Access to or use of the Site constitutes acceptance of these Terms.
@@ -762,8 +763,6 @@ const PARTS: Part[] = [
           chadworks
           <br />
           Chad Lewine, sole proprietor
-          <br />
-          Greater Philadelphia area, Pennsylvania
         </p>
       </>
     ),

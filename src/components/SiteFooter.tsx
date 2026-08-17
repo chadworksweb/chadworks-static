@@ -252,8 +252,10 @@ export default function SiteFooter() {
         {/* Three centred lines, in this order: where the studio is, the policy
             links, then the copyright. */}
         <div className="site-footer__legal">
-          {/* Where the studio IS, not a market it targets: chadworks runs no
-              LocalBusiness node and no metro areaServed (see ORG). */}
+          {/* Location line pulled 2026-08-17 (Chad): chadworks went 100%
+              virtual, so the studio asserts no location anywhere. Matches ORG,
+              which already runs no LocalBusiness node and no metro areaServed.
+              Uncomment to put it back. */}
           {/* <span className="site-footer__based">
             Based in Greater Philadelphia, PA, USA
           </span> */}

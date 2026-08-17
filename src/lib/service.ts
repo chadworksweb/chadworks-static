@@ -40,11 +40,17 @@ export const ORG = {
   // match visible content" rule.
   description:
     "chadworks is a one-person web studio run by Chad Lewine. It builds custom coded websites and platforms for motivated individuals and organizations that want to double down on authentic digital presence as a counter measure to social media burnout and AI saturation. Every build is written from scratch. No Squarespace, no Wix, no Divi, no Elementor, no templates, no retainers.",
-  // Both are already published in the footer and on /contact/, so the schema
-  // only restates what a visitor can see (the toolkit's "schema must match
-  // visible content" rule).
+  // The email is published in the footer and on /contact/, so the schema only
+  // restates what a visitor can see (the toolkit's "schema must match visible
+  // content" rule).
   email: "chad@chadworks.co",
-  telephone: "+1-215-872-1240",
+  // PHONE PULLED 2026-08-17 (Chad), stored value included. Every emitter was
+  // already commented out earlier the same day; this retires the last copy of
+  // the number so nothing asserts a phone the site does not show. Restoring it
+  // is uncommenting this line plus the emitters in jsonld.ts, the two in
+  // SiteFooter, the two props in MainContactCapsule, and the contact page's
+  // meta description.
+  // telephone: "+1-215-872-1240",
   // NATIONAL, deliberately. chadworks is not run as a local-search business and
   // is not targeting Greater Philadelphia as a market (Chad, 2026-07-28), so
   // there is no LocalBusiness node, no address, and no metro areaServed here.

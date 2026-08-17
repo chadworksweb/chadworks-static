@@ -72,7 +72,7 @@ export function AboutChadCapsule({
         manifesto: [
           { lead: "Clear communication.", aside: "(no fluff, no fuss)" },
           { lead: "Transparent fees and terms.", aside: "(always)" },
-          { lead: "Based in Philadelphia.", aside: "(U.S. made)" },
+          { lead: "100% virtual studio.", aside: "(U.S. made)" },
           {
             lead: "Blazing fast turnaround.",
             aside: (

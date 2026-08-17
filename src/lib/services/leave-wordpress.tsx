@@ -14,7 +14,8 @@
 //   Targeting splits WordPress vs everything-else; this page hammers WordPress.
 //   Outreach scans local businesses on divi/elementor/squarespace/WP and leads
 //   with "it looks like your site hasn't been updated since [date]".
-//   Geo: 50-mile radius of Philadelphia, PA only (local-trust angle).
+//   Geo: none. chadworks went 100% virtual (Chad, 2026-08-17); the old 50-mile
+//   Philadelphia radius and its local-trust angle are retired everywhere.
 //   LEGAL: before any "looks like WordPress / WP Engine" visual mimicry in ads,
 //   check advertising / trademark IP law first (Chad flagged this 2026-05-28).
 
@@ -29,7 +30,7 @@ export const leaveWordpress: Service = {
   eyebrow: "Switch: stop renting features you never use",
   title: "Leave WordPress",
   intent:
-    "chadworks rebuilds WordPress sites that just sit there as fast, secure static sites and hosts them for less, for businesses near Philadelphia that pay for a CMS they almost never touch.",
+    "chadworks rebuilds WordPress sites that just sit there as fast, secure static sites and hosts them for less, for businesses anywhere in the USA that pay for a CMS they almost never touch.",
 
   // Answer-first lede: names WordPress + answers why-leave / what-you-get in
   // the first 100 words (GEO), in Chad's warm first-person.
@@ -161,15 +162,15 @@ export const leaveWordpress: Service = {
       a: `Yes. Static hosting is ${money(STATIC_HOSTING_NONPROFIT)} a month for non-profits and tight-budget organizations.`,
     },
     {
-      q: "Do you only work with local businesses?",
-      a: "I'm based near Philadelphia, and a lot of this work is local on purpose. There's a real trust in hiring someone in your own area who actually picks up the phone. That said, the work itself is remote-friendly, so if you're further out and it's a good fit, I'm not going to turn you away over a map. Reach out and we'll figure it out.",
+      q: "Does it matter where my business is?",
+      a: "Not at all. chadworks is a 100% virtual studio, so the work runs the same whether you're down the road or three timezones out. You get the same person on email and on the phone either way. Reach out and we'll figure it out.",
     },
   ],
 
   cta: {
     heading: "Let your site sit there for less",
     body:
-      "Send me the address of your current WordPress site and I'll take a quick look, no pressure, and tell you whether leaving actually makes sense and what you'd save each month. I'm right here near Philadelphia if you'd rather work with someone local. And if it turns out you really do use WordPress, I'll be the first to tell you to stay put.",
+      "Send me the address of your current WordPress site and I'll take a quick look, no pressure, and tell you whether leaving actually makes sense and what you'd save each month. And if it turns out you really do use WordPress, I'll be the first to tell you to stay put.",
     buttonLabel: "See what you'd save",
     href: "/contact/",
   },
@@ -177,6 +178,6 @@ export const leaveWordpress: Service = {
   meta: {
     title: "Leave WordPress: Switch to Faster, Cheaper Static Hosting | chadworks",
     description:
-      `Paying for a WordPress site that just sits there? I rebuild WordPress sites as fast, secure static sites and host them for ${money(STATIC_HOSTING)} a month, where most WordPress hosts run around ${money(WP_HOST_TYPICAL)}. Non-profits pay ${money(STATIC_HOSTING_NONPROFIT)}. Serving the Philadelphia area.`,
+      `Paying for a WordPress site that just sits there? I rebuild WordPress sites as fast, secure static sites and host them for ${money(STATIC_HOSTING)} a month, where most WordPress hosts run around ${money(WP_HOST_TYPICAL)}. Non-profits pay ${money(STATIC_HOSTING_NONPROFIT)}. A 100% virtual studio, serving the USA.`,
   },
 };

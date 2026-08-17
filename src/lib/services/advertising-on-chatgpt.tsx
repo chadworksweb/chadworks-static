@@ -105,7 +105,7 @@ export const advertisingOnChatgpt: Service = {
     captionMain: "It's me. I run the ads.",
     captionSub: "(Not a media buying floor.)",
     sig: "Chad Lewine",
-    sigMeta: "chadworks - Greater Philadelphia",
+    sigMeta: "chadworks - 100% virtual studio",
   },
 
   price: {

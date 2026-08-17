@@ -122,7 +122,7 @@ const ERAS: { label: string; title?: string; text: string }[] = [
   },
   {
     label: "2021",
-    text: "Moved back to hometown in Greater Philadelphia, rebranded as *chadworks*.",
+    text: "Left NYC, rebranded as *chadworks*.",
   },
   {
     label: "2026",

@@ -145,7 +145,7 @@ export const showUpOnChatgpt: Service = {
     captionMain: "I do the audit myself.",
     captionSub: "(Line by line.)",
     sig: "Chad Lewine",
-    sigMeta: "chadworks - Greater Philadelphia",
+    sigMeta: "chadworks - 100% virtual studio",
   },
 
   price: {

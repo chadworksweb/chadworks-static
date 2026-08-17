@@ -162,15 +162,15 @@ export const squarespaceToStatic: Service = {
       a: "A static site is just fast, hand-built files with no platform engine to load first, so pages appear quickly and search engines and AI assistants can read them cleanly. Drag-and-drop platforms carry overhead to make the editor work, and that overhead is exactly what slows the public site down.",
     },
     {
-      q: "Do you only work with local businesses?",
-      a: "I'm based near Philadelphia, and a good deal of this work is local on purpose, because there's real trust in hiring someone in your own area who picks up the phone. The work itself is remote-friendly, though, so if you're further out and it's a good fit, I'm not going to turn you away over a map.",
+      q: "Does it matter where my business is?",
+      a: "Not at all. chadworks is a 100% virtual studio, so the work runs the same whether you're down the road or three timezones out. You get the same person picking up the phone either way.",
     },
   ],
 
   cta: {
     heading: "Own your site, stop renting it",
     body:
-      "Send me your Squarespace URL and I'll take a quick look, no pressure, and tell you whether a custom static rebuild makes sense and what it would take. I'm right here near Philadelphia if you'd rather work with someone local, and if Squarespace is genuinely serving you, I'll say so.",
+      "Send me your Squarespace URL and I'll take a quick look, no pressure, and tell you whether a custom static rebuild makes sense and what it would take. And if Squarespace is genuinely serving you, I'll say so.",
     buttonLabel: "See what a rebuild takes",
     href: "/contact/",
   },
@@ -178,6 +178,6 @@ export const squarespaceToStatic: Service = {
   meta: {
     title: "Squarespace to Static: Own a Faster Custom Site | chadworks",
     description:
-      `On Squarespace and tired of renting a template? I rebuild Squarespace sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). A design built around your business, not a shared theme. Serving the Philadelphia area.`,
+      `On Squarespace and tired of renting a template? I rebuild Squarespace sites as fast, custom-coded static sites you own outright, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). A design built around your business, not a shared theme. A 100% virtual studio, serving the USA.`,
   },
 };

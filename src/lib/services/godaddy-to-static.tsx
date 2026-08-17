@@ -161,15 +161,15 @@ export const godaddyToStatic: Service = {
       a: "A builder loads extra machinery to make its drag-and-drop work, and that machinery slows the public page. A static site is just fast, hand-built files with none of that overhead, so pages load quickly and both search engines and the AI assistants can read them without wading through it.",
     },
     {
-      q: "Do you only work with local businesses?",
-      a: "I'm based near Philadelphia, and a good deal of this work is local on purpose, because there's real trust in hiring someone in your own area who picks up the phone. The work itself is remote-friendly, though, so if you're further out and it's a good fit, I'm not going to turn you away over a map.",
+      q: "Does it matter where my business is?",
+      a: "Not at all. chadworks is a 100% virtual studio, so the work runs the same whether you're down the road or three timezones out. You get the same person picking up the phone either way.",
     },
   ],
 
   cta: {
     heading: "Outgrow the builder",
     body:
-      "Send me your GoDaddy site and I'll take a quick look, no pressure, and tell you whether a custom static rebuild is worth it and what it would take. Your domain stays yours the whole time. I'm right here near Philadelphia if you'd rather work with someone local.",
+      "Send me your GoDaddy site and I'll take a quick look, no pressure, and tell you whether a custom static rebuild is worth it and what it would take. Your domain stays yours the whole time.",
     buttonLabel: "See what a rebuild takes",
     href: "/contact/",
   },
@@ -177,6 +177,6 @@ export const godaddyToStatic: Service = {
   meta: {
     title: "GoDaddy to Static: Trade the Builder for a Real Custom Site | chadworks",
     description:
-      `Outgrown the GoDaddy website builder? I rebuild GoDaddy Builder sites as fast, custom-coded static sites designed around your business, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). Keep your domain, drop the builder fee. Serving the Philadelphia area.`,
+      `Outgrown the GoDaddy website builder? I rebuild GoDaddy Builder sites as fast, custom-coded static sites designed around your business, hosted for ${money(STATIC_HOSTING)} a month (${money(STATIC_HOSTING_NONPROFIT)} non-profit). Keep your domain, drop the builder fee. A 100% virtual studio, serving the USA.`,
   },
 };
