@@ -9,7 +9,7 @@
 // it without pulling filesystem access into the Next build graph -- see the
 // header of scripts/build-lastmod.mjs for what that cost the first time.
 
-export const BUILD_DATE = "2026-08-13";
+export const BUILD_DATE = "2026-08-14";
 
 export const ROUTE_DATES: Record<string, string> = {
   "/": "2026-08-01",
@@ -30,8 +30,8 @@ export const ROUTE_DATES: Record<string, string> = {
   "/essays/chad-lewine-worlds-combine/": "2026-07-27",
   "/essays/is-your-agency-ripping-you-off/": "2026-07-27",
   "/essays/rebirth-of-chadworks-wondrous-internet/": "2026-07-27",
-  "/faqs/": "2026-08-11",
-  "/how-much-does-a-website-cost/": "2026-08-13",
+  "/faqs/": "2026-08-14",
+  "/how-much-does-a-website-cost/": "2026-08-14",
   "/music-industry-web-design/": "2026-07-23",
   "/privacy-policy/": "2026-07-24",
   "/rates/": "2026-08-11",

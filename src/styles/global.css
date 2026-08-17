@@ -4366,6 +4366,10 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 }
 .svc-faq__lead { margin-top: var(--space-xs); color: var(--text-secondary); }
 .svc-faq-section--dark .svc-faq__lead { color: rgba(229, 210, 244, 0.82); }
+/* The "read all FAQs" CTA under the lede. A step more air than the lede takes
+   from the heading, so it reads as its own move rather than a third line of the
+   intro. The intro column is sticky, so the button travels with it. */
+.svc-faq__cta { margin-top: var(--space-md); }
 
 /* The accordion list (light base; --dark overrides below) */
 .svc-acc {
@@ -8407,6 +8411,19 @@ main:has(.cost-guide-hero) .cw-calc-cta {
   margin-bottom: 0.5rem;
 }
 .cw-contact__note { color: var(--dark-muted); line-height: var(--leading-body); }
+/* The availability posture reads at footer-link size (Chad, 2026-08-17): it is
+   the same line the footer carries, and at body size it competed with the intro
+   above it. --text-sm is what .site-footer__inner sets, so the two match. */
+.cw-contact__note--availability { font-size: var(--text-sm); }
+/* Same swap the dark FAQ band makes: the standard purple sinks into the navy,
+   and --accent-teal (#4a6b6e) is invisible against it, so the text goes lavender
+   and the hover wipe comes in white. Resting bar stays the faint purple. */
+.cw-contact__note a {
+  color: #e5d2f4;
+  background-image:
+    linear-gradient(#ffffff, #ffffff),
+    linear-gradient(rgba(128, 84, 188, 0.4), rgba(128, 84, 188, 0.4));
+}
 
 /* Reduced motion: stop the swirl + breathing, hold a calm static glow. */
 @media (prefers-reduced-motion: reduce) {

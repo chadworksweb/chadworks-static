@@ -3,11 +3,31 @@
 // lead forms. Extracted from the homepage so any page can close on the same
 // contact block instead of a page-specific CTA form.
 
+import Link from "next/link";
 import type { LeadFormConfig } from "@/lib/forms";
 import type { Scheme } from "@/lib/capsule";
 import { ContactCapsule } from "@/components/capsules/ContactCapsule";
+import { isLaunched } from "@/lib/launch";
 
 const EMAIL = "chad@chadworks.co";
+const FIT_ROOM = "/are-we-a-good-fit/";
+
+// AVAILABILITY POSTURE -- CWS-EXPANSION-PLAN-01 item K, Chad's words, 2026-08-17.
+// It is a real working ceiling, not a scarcity device: chadworks has never been
+// full, so the gate is fit rather than a waitlist, which is why the second
+// sentence points at the room that spells the philosophy out.
+const AVAILABILITY = (
+  <>
+    I can take on 3-5 substantial projects at once. I take on clients based on
+    the philosophy outlined in my{" "}
+    {isLaunched(FIT_ROOM) ? (
+      <Link href={FIT_ROOM}>Are We A Good Fit</Link>
+    ) : (
+      "Are We A Good Fit"
+    )}{" "}
+    page, not capacity or who has the biggest budget.
+  </>
+);
 
 const QUICK: LeadFormConfig = {
   source: "contact capsule (quick)",
@@ -88,9 +108,13 @@ export function MainContactCapsule({
       intro={intro}
       emailLabel="Email directly"
       email={EMAIL}
-      phoneLabel="Call directly"
-      phone="(215) 872-1240"
+      /* Phone pulled from the site 2026-08-17 (Chad). ContactCapsule already
+         guards on `phone`, so dropping these two props removes the whole block
+         with no other change. Uncomment both to put it back. */
+      /* phoneLabel="Call directly" */
+      /* phone="(215) 872-1240" */
       locationNote="Based in Greater Philadelphia, PA."
+      availabilityNote={AVAILABILITY}
       quick={QUICK}
       detailed={DETAILED}
       quickLabel="Quick message"

@@ -77,6 +77,23 @@ const GROUPS: FaqGroup[] = [
           "Me, I build your site. There is no team behind a curtain and no account manager translating your notes to someone offshore. The same person who answers the first message designs the site and writes the code, which is the whole point of hiring one experienced builder instead of an agency.",
       },
       {
+        // The availability posture (CWS-EXPANSION-PLAN-01 item K), in Chad's
+        // words. Sits directly under "who builds it" because it is the follow-up
+        // question to "there is no team": one person means a real ceiling, and
+        // the ceiling is the product rather than an apology for it.
+        q: "How many projects do you take on at once?",
+        a: (
+          <>
+            I can take on 3-5 substantial projects at once. I take on clients
+            based on the philosophy outlined in my{" "}
+            <LaunchLink href="/are-we-a-good-fit/">Are We A Good Fit</LaunchLink>{" "}
+            page, not capacity or who has the biggest budget.
+          </>
+        ),
+        aText:
+          "I can take on 3-5 substantial projects at once. I take on clients based on the philosophy outlined in my Are We A Good Fit page, not capacity or who has the biggest budget.",
+      },
+      {
         q: "Do you work with businesses outside Pennsylvania?",
         a: "Yes, I work with clients across the USA. chadworks is based in Greater Philadelphia, PA, but has worked with clients in many states, and every US mainland timezone.",
         aText:
@@ -130,7 +147,18 @@ const GROUPS: FaqGroup[] = [
         a: (
           <FaqParas
             items={[
-              `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}.`,
+              // A Fragment rather than a string because of the closing link
+              // (Chad, 2026-08-17). Same keying rule as the paragraph below.
+              <Fragment key="baseline">
+                My baseline fee for full builds, including redesigns, is{" "}
+                {money(BASE)}. Most projects end up between {LOW} and {HIGH},
+                though it is not uncommon for ambitious projects to crack{" "}
+                {HIGH}. Visit my{" "}
+                <LaunchLink href="/how-much-does-a-website-cost/">
+                  website costs page
+                </LaunchLink>{" "}
+                for a detailed breakdown.
+              </Fragment>,
               // KEYED FRAGMENT, not a bare <> (fixed 2026-08-14). This array is
               // built here and passed to FaqParas as a prop, so React validates
               // it as a list at the point of creation and the <p key={i}> inside
@@ -154,7 +182,7 @@ const GROUPS: FaqGroup[] = [
         // aText is the FAQPage JSON-LD twin of the visible answer above. Keep the
         // two in sync sentence for sentence, or an assistant quotes the old one.
         aText:
-          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${HOURLY_LONG}. Read more about my fees on my rates page, or put a number on your own scope with the website design cost calculator.`,
+          `My baseline fee for full builds, including redesigns, is ${money(BASE)}. Most projects end up between ${LOW} and ${HIGH}, though it is not uncommon for ambitious projects to crack ${HIGH}. Visit my website costs page for a detailed breakdown. If your website needs work, not a redesign, I charge by the minute at ${money(MINUTELY)}/min, which adds up to ${HOURLY_LONG}. Read more about my fees on my rates page, or put a number on your own scope with the website design cost calculator.`,
       },
       {
         q: "Do you have a lower rate for special cases?",
@@ -364,7 +392,7 @@ export default function FaqsPage() {
         crumbs={[{ label: "Home", href: "/" }, { label: "FAQs" }]}
         eyebrow="Common questions about websites and visibility"
         title="Frequently Asked Questions"
-        lede="Everything people ask before hiring chadworks, grouped so you can jump to what you came for: working together, what it costs, how the site gets built, and getting found in search and AI."
+        lede="A wide array of questions people ask while considering hiring chadworks, including questions grouped based on specific categories: general, pricing, websites and visibility."
       />
 
       {/* FOUR THEMED GROUPS -- each a full band; dark and light alternate by

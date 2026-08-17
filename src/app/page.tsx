@@ -323,10 +323,10 @@ export default function Home() {
           ))}
           <a href="#contact" className="svc-lane svc-lane--cta">
             <span className="svc-lane__content">
-              <span className="svc-lane__title">Not sure which fits?</span>
+              <span className="svc-lane__title">Not sure what you need?</span>
               <span className="svc-lane__desc">
-                Cut right to it and tell me your idea. I&apos;ll tell you what
-                I&apos;d do for you.
+                Cut right to it and tell me your idea, situation or problem.
+                I&apos;ll tell you what I&apos;d do for you.
               </span>
               <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
             </span>
@@ -487,6 +487,7 @@ export default function Home() {
         scheme="inverted"
         schemeAuto
         evenSplit
+        moreHref="/faqs/"
       />
 
       {/* 7a. "Going to bat" -- the thread itself moved to the essay; this links out. */}

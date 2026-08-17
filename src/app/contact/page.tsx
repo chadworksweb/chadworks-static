@@ -16,8 +16,12 @@ const PAGE_PATH = "/contact/";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
 const EMAIL = "chad@chadworks.co";
 const TITLE = "Contact chadworks | Inquire about websites or visibility";
+// Phone pulled from the site 2026-08-17 (Chad). This string also feeds
+// public/llms.txt (build-llms reads page metadata), so the number had to come
+// out here or it would keep shipping in the generated file. Original:
+// "Contacting chadworks is quick and easy. Fill out the form on this page or call 215-872-1240. Talk soon!"
 const DESCRIPTION =
-  "Contacting chadworks is quick and easy. Fill out the form on this page or call 215-872-1240. Talk soon!";
+  "Contacting chadworks is quick and easy. Fill out the form on this page. Talk soon!";
 
 export const metadata: Metadata = {
   title: TITLE,

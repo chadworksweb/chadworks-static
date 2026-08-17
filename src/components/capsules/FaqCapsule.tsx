@@ -7,9 +7,11 @@
 // Phase F derives "<Page> FAQs" by default (overridable) and inverts the
 // svc-fill wipe when the band is dark.
 
+import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Writable } from "@/lib/service";
 import { isPrompt } from "@/lib/service";
+import { isLaunched } from "@/lib/launch";
 import type { Scheme } from "@/lib/capsule";
 import { isDarkScheme } from "@/lib/capsule";
 import { Prompt } from "@/components/Prompt";
@@ -50,6 +52,11 @@ export type FaqCapsuleProps = {
   // Opt-in: the braille dot field (the facets section's halftone) pooled behind
   // the heading + lede. Off everywhere by default.
   halftone?: boolean;
+  // Opt-in CTA under the lede, pointing at the full FAQ room. Off by default so
+  // /faqs/ itself and the service pages are untouched; launch-gated, so a sealed
+  // target renders nothing rather than a dead button.
+  moreHref?: string;
+  moreLabel?: string;
 };
 
 export function FaqCapsule({
@@ -62,6 +69,8 @@ export function FaqCapsule({
   groups = [],
   evenSplit = false,
   halftone = false,
+  moreHref,
+  moreLabel = "Read all FAQs",
 }: FaqCapsuleProps) {
   if (variant === "groups") {
     return (
@@ -112,6 +121,25 @@ export function FaqCapsule({
           {faqLead && (
             <p className="svc-faq__lead">
               <W value={faqLead} />
+            </p>
+          )}
+          {/* The DEFAULT filled treatment, not the ghost: a CTA on an inverted
+              band uses the filled pill everywhere on this site (see the note
+              beside .svc-btn--ghost in global.css). Same label/arrow structure
+              as the rates and showroom buttons. */}
+          {moreHref && isLaunched(moreHref) && (
+            <p className="svc-faq__cta">
+              <Link href={moreHref} className="svc-btn">
+                <span className="svc-btn__label">{moreLabel}</span>
+                <svg
+                  className="svc-btn__arrow"
+                  viewBox="0 0 448 512"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="M313.941 216H12c-6.627 0-12 5.373-12 12v56c0 6.627 5.373 12 12 12h301.941v46.059c0 21.382 25.851 32.09 40.971 16.971l86.059-86.059c9.373-9.373 9.373-24.569 0-33.941l-86.059-86.059c-15.119-15.119-40.971-4.411-40.971 16.971V216z" />
+                </svg>
+              </Link>
             </p>
           )}
         </div>

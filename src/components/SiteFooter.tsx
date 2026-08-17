@@ -11,15 +11,19 @@ import {
   RedditIcon,
 } from "@/components/BrandIcons";
 
+// PHONE PULLED FROM THE SITE 2026-08-17 (Chad). Kept whole and commented rather
+// than deleted: ORG.telephone still holds the number in lib/service.ts, so
+// uncommenting these three consts and the anchor below restores the footer
+// phone exactly as it was.
 // ORG.telephone is stored schema-shaped (+1-215-872-1240). Both the visible
 // number and the dial target are derived from it, so the footer and the schema
 // cannot drift apart.
-const PHONE_DIGITS = ORG.telephone.replace(/\D/g, "").slice(-10);
-const PHONE_DISPLAY = `(${PHONE_DIGITS.slice(0, 3)}) ${PHONE_DIGITS.slice(
-  3,
-  6
-)}-${PHONE_DIGITS.slice(6)}`;
-const PHONE_HREF = `tel:${ORG.telephone.replace(/[^\d+]/g, "")}`;
+// const PHONE_DIGITS = ORG.telephone.replace(/\D/g, "").slice(-10);
+// const PHONE_DISPLAY = `(${PHONE_DIGITS.slice(0, 3)}) ${PHONE_DIGITS.slice(
+//   3,
+//   6
+// )}-${PHONE_DIGITS.slice(6)}`;
+// const PHONE_HREF = `tel:${ORG.telephone.replace(/[^\d+]/g, "")}`;
 
 // Footer sitemap: every column heading links to its hub where one exists.
 // This is load-bearing for GEO (internal links; every rankable page reachable
@@ -174,11 +178,14 @@ export default function SiteFooter() {
             <a className="site-footer__contact" href="mailto:chad@chadworks.co">
               chad@chadworks.co
             </a>
-            {/* Display and href both derive from ORG.telephone so the visible
-                number and the schema can never drift apart. */}
+            {/* Phone pulled 2026-08-17 (Chad). Uncomment with the three consts
+                at the top of this file to put it back.
+                Display and href both derive from ORG.telephone so the visible
+                number and the schema can never drift apart.
             <a className="site-footer__contact" href={PHONE_HREF}>
               {PHONE_DISPLAY}
             </a>
+            */}
             {/* Off-site profiles as brand marks, under the phone (Chad,
                 2026-07-31). These sit in the BRAND column rather than the link
                 grid on purpose: they identify the studio, they are not part of

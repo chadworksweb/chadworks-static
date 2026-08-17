@@ -68,13 +68,18 @@ export function organizationNode() {
     logo: { "@type": "ImageObject", url: ORG.logo },
     image: ORG.logo,
     email: ORG.email,
-    telephone: ORG.telephone,
+    // PHONE PULLED FROM THE SITE 2026-08-17 (Chad). The number still lives in
+    // ORG.telephone (lib/service.ts) as the single stored value; every EMITTER
+    // is commented out instead, so restoring the phone is uncommenting these
+    // lines plus the two in SiteFooter, the two props in MainContactCapsule,
+    // and the contact page's meta description.
+    // telephone: ORG.telephone,
     areaServed: ORG.areaServed,
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "sales",
       email: ORG.email,
-      telephone: ORG.telephone,
+      // telephone: ORG.telephone,
       areaServed: ORG.areaServed,
       availableLanguage: "English",
     },

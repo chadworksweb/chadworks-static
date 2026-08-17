@@ -22,6 +22,9 @@ export type ContactCapsuleProps = {
   phoneLabel?: string;
   phone?: string;
   locationNote: ReactNode;
+  // The availability posture (CWS-EXPANSION-PLAN-01 item K). Optional so a page
+  // composing this capsule for a narrower purpose can close without it.
+  availabilityNote?: ReactNode;
   quick: LeadFormConfig;
   detailed: LeadFormConfig;
   quickLabel: string;
@@ -40,6 +43,7 @@ export function ContactCapsule({
   phoneLabel,
   phone,
   locationNote,
+  availabilityNote,
   quick,
   detailed,
   quickLabel,
@@ -72,6 +76,11 @@ export function ContactCapsule({
               </div>
             )}
             <p className="cw-contact__note">{locationNote}</p>
+            {availabilityNote && (
+              <p className="cw-contact__note cw-contact__note--availability">
+                {availabilityNote}
+              </p>
+            )}
           </div>
 
           <DualForm
