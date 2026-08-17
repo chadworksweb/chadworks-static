@@ -12,6 +12,7 @@ import { ORG_ID, ref } from "@/lib/jsonld";
 import { isLaunched } from "@/lib/launch";
 import {
   PageComposer,
+  SectionShell,
   HeroCapsule,
   EraTimelineCapsule,
   ProofCapsule,
@@ -169,6 +170,61 @@ export default function AboutPage() {
       {/* THE MANIFESTO -- "who is chadworks for?", moved here from the homepage:
           the frosted panel over the Lyric-Transformer cloud, full bleed. */}
       <ManifestoSection />
+
+      {/* OWN THE TRANSITION -- CWS-EXPANSION-PLAN-01 item M (Chad, 2026-08-17).
+          Manifesto-adjacent by the plan's instruction, and placed BEFORE the era
+          timeline so the page runs thesis, then how I got here, then the
+          history, then how I work now. It is deliberately far from
+          WorldviewCapsule, which also touches AI: that one is about guaranteeing
+          original design, this one is about what changed and when.
+          Same prose-beat pattern /are-we-a-good-fit/ uses. */}
+      <SectionShell className="cw-about-transition">
+        <div className="cw-about-transition__layout">
+          {/* The cutout runs at 1/4 (Chad, 2026-08-17). It uses the FULL-res
+              source (880x1415), not the 249x400 file beside it: that one is
+              sized for the 92px hero chips in AboutHeroArt and goes soft at
+              column width. Both files stay; they serve different jobs.
+              The sticky wrapper keeps the figure with the copy as it scrolls
+              past. */}
+          <div className="cw-about-transition__stick">
+            <figure className="cw-about-transition__figure">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/about/cutouts/chad_cutout_consulting_full.webp"
+                alt="Chad Lewine holding a laptop"
+                width={880}
+                height={1415}
+                decoding="async"
+                loading="lazy"
+              />
+            </figure>
+          </div>
+          <div className="cw-about-transition__copy">
+            <h2 className="svc-block__heading svc-fill">
+              chadworks&apos; 2026 Renovation &amp; Portfolio Gap
+            </h2>
+            <p className="svc-block__body measure-prose">
+              For years I built websites for whoever came through the door.
+              Small budgets. Passion projects. Businesses that wanted a website,
+              not a strategic digital presence. The work paid the bills, but it
+              wasn&apos;t the work I wanted to dedicate my career to.
+            </p>
+            <p className="svc-block__body measure-prose">
+              Once I was equipped with AI, I could build anything. I could
+              service projects that I couldn&apos;t service before. Which then
+              exponentially changed how I look at my web design vocation. It was
+              no longer limited to my hard skills, but expanded to what I could
+              envision and describe.
+            </p>
+            <p className="svc-block__body measure-prose">
+              My design expertise paired with my durable knowledge of
+              development and tech stacks in concept pushed my work farther than
+              ever, which is why much of my portfolio is either my own projects
+              or pre-AI client work.
+            </p>
+          </div>
+        </div>
+      </SectionShell>
 
       {/* THE STORY -- era timeline on the build-time band arc. */}
       <EraTimelineCapsule heading="chadworks historical timeline" eras={ERAS} />

@@ -179,10 +179,10 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
             cards.splice(2, 0, (
               <a key="contact-cta" href="#contact" className="svc-lane svc-lane--cta">
                 <span className="svc-lane__content">
-                  <span className="svc-lane__title">Not sure which fits?</span>
+                  <span className="svc-lane__title">Not sure what you need?</span>
                   <span className="svc-lane__desc">
-                    Cut right to it and tell me your idea. I&apos;ll tell you what
-                    I&apos;d do for you.
+                    Cut right to it and tell me your idea, situation or problem.
+                    I&apos;ll tell you what I&apos;d do for you.
                   </span>
                   <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
                 </span>

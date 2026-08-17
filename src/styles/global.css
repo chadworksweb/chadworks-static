@@ -1954,6 +1954,49 @@ body.cw-nav-off .site-nav:not(.site-nav--open):focus-within { transform: none; }
    `.legal-prose > * + *`). Headings carry their own margin-bottom, which is why
    heading-to-paragraph already looks right and only body-to-body needs this. */
 .cw-fit-prose .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* The /about/ transition beat (item M) runs the same two-paragraph prose shape
+   as the fit room, so it takes the same paragraph rhythm. */
+.cw-about-transition .svc-block__body + .svc-block__body { margin-top: var(--space-sm); }
+/* Cutout at 1/3, copy at 2/3 (Chad, 2026-08-17). */
+.cw-about-transition__layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-lg);
+  /* One step off the RIGHT, then re-centred, so the pair of columns sits
+     centred in the content width instead of running to its right edge (Chad,
+     2026-08-17). This caps the two-column BLOCK, not the page: the section
+     itself is still full width. */
+  max-width: calc(100% - var(--space-lg));
+  margin-inline: auto;
+  /* START, not end: a sticky child only travels inside its grid area, and an
+     end-aligned item is sized to its content with nothing left to travel in. */
+  align-items: start;
+  position: relative;
+}
+/* The figure rides with the copy as it scrolls past. */
+.cw-about-transition__stick {
+  position: sticky;
+  top: var(--space-lg);
+}
+.cw-about-transition__figure { position: relative; }
+.cw-about-transition__figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  position: relative;
+  z-index: 0;
+}
+/* The site's one stacked-layout breakpoint (see stack-query-audit). Stacked, a
+   full-width portrait cutout would be taller than the copy it introduces, so it
+   is capped and led with. */
+@media (pointer: coarse), (max-width: 900px) {
+  .cw-about-transition__layout { grid-template-columns: 1fr; }
+  .cw-about-transition__figure { max-width: 200px; }
+  /* Nothing to stick to once the columns stack, and the centring cap only
+     narrows a single column further. */
+  .cw-about-transition__stick { position: static; }
+  .cw-about-transition__layout { max-width: none; }
+}
 /* The three builds on /are-we-a-good-fit/. Mirrors the manifesto list's marker (a
    "--" in the accent, hung in the padding) so the two read as the same voice, at
    this section's body size rather than the manifesto's. `ul` is stripped by the

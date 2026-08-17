@@ -52,7 +52,9 @@ export const webDevelopment: Service = {
   ],
 
   problem: {
-    heading: "Why web development actually matters",
+    // CWS-EXPANSION-PLAN-01 item H, Chad 2026-08-17. Replaces "Why web
+    // development actually matters". Subheading and body are untouched.
+    heading: "Does your website hold up under pressure?",
     subheading: "No one sees it, everyone feels it.",
     body:
       "You choose a website by how it looks, but it's the development underneath that decides whether it loads fast, gets found by search and AI, and wins you customers.",

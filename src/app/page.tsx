@@ -189,23 +189,21 @@ const FACTS: ReactNode[] = [
 // ---- RIBBONS (the broad beat) -- ribbons + knockout + frosted expand panel.
 // Positive, philosophical framing: why a real site matters more as AI rises. ----
 const PROBLEM = {
-  heading: "Your website is more important than ever.",
-  subheading: "Your digital home base must be authentic and distinguishable.",
+  // CWS-EXPANSION-PLAN-01 item H, Chad 2026-08-17. Replaces "Your website is
+  // more important than ever.", which the copy brief named as the seller-side
+  // opener this pass exists to retire.
+  heading: "You have a vision no website template can hold.",
+  subheading: "Distinguish your owned space on the world wide web.",
   body: "When anyone can generate a passable page in seconds, what sets you apart is a site that is unmistakably, verifiably yours.",
   more: {
     trigger: "Expand to read more",
     paragraphs: [
-      <>
-        <strong>Speed is mission-critical.</strong> A page that opens and loads
-        lightning fast will simultaneously keep the visitor you
-        worked to attract <em>and</em> please search engines and AI search bots,
-        helping with ranking.
-      </>,
-      <>
-        <strong>Visibility optimization is required.</strong> Optimizing the site
-        to show up on Google and AI assistants like ChatGPT is how people find
-        you online. All my projects include baseline visibility optimization.
-      </>,
+      /* ORDER (Chad, 2026-08-17): authenticity, then quality, then speed, then
+         visibility. Authenticity leads because it is the paragraph the new
+         heading sets up, so it reads as the argument rather than the third item
+         in a list of virtues. NOTE: this is a JS array, not JSX children, so a
+         comment here must be a plain block comment. The braced form is an
+         expression and the array has nowhere to put one. */
       <>
         <strong>Authenticity breaks the market mold.</strong> As the web fills
         with interchangeable, indistinguishable, and machine-made websites, a
@@ -216,6 +214,17 @@ const PROBLEM = {
         <strong>Quality is retained.</strong> When a website is pixel-perfect and
         details are scrutinized like a work of art, visitors feel it. They&apos;ll know you will bring the same care to the work or
         products you offer them.
+      </>,
+      <>
+        <strong>Speed is mission-critical.</strong> A page that opens and loads
+        lightning fast will simultaneously keep the visitor you
+        worked to attract <em>and</em> please search engines and AI search bots,
+        helping with ranking.
+      </>,
+      <>
+        <strong>Visibility optimization is required.</strong> Optimizing the site
+        to show up on Google and AI assistants like ChatGPT is how people find
+        you online. All my projects include baseline visibility optimization.
       </>,
     ],
   },

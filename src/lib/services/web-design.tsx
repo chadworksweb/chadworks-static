@@ -72,7 +72,10 @@ export const webDesign: Service = {
     <DesignReveal eyebrow="BEFORE & AFTER" className="design-reveal--tight" />
   ),
   problem: {
-    heading: "Why web design actually matters",
+    // CWS-EXPANSION-PLAN-01 item H, Chad 2026-08-17. Replaces "Why web design
+    // actually matters", which argued from the seller's chair. The subheading
+    // and body below were already reader-side and are untouched.
+    heading: "Does your website convey your true value and depth?",
     subheading: "Aesthetics psychologically build trust before content.",
     body:
       "Visitors decide how much to trust your business before they read a single word, and the design is what they're deciding on. Drag the line across the browser below and watch the same business make two completely different first impressions.",
