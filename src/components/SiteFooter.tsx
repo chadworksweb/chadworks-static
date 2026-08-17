@@ -254,9 +254,9 @@ export default function SiteFooter() {
         <div className="site-footer__legal">
           {/* Where the studio IS, not a market it targets: chadworks runs no
               LocalBusiness node and no metro areaServed (see ORG). */}
-          <span className="site-footer__based">
+          {/* <span className="site-footer__based">
             Based in Greater Philadelphia, PA, USA
-          </span>
+          </span> */}
           <span className="site-footer__legal-links">
             {isLaunched("/terms-of-service/") ? (
               <Link href="/terms-of-service/">Terms of Service</Link>

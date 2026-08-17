@@ -12,6 +12,7 @@ Output lands in `Dropbox/ChadWorks/portfolio videos/`.
 | `oakcourtpress.mp4` | oakcourtpress.com | 60s | homepage top to bottom, chapter index (free previews into padlocked chapters), a free chapter in the reader, text-size controls, two page turns, the paywall on a locked chapter, and the account form the paywall routes to |
 | `tomtheweatherwizard-weather-fx.mp4` | tomtheweatherwizard.com | 34s | the seven weather effects: four fired from the season lines in "Spring? Yeah Right!", the running one carried down to the shirt, then the rest from the shirt's own Weather FX row |
 | `chadlewine-cube-machine.mp4` | chadlewine.com | 42s | **has sound.** The song page's CubeVisualizer: flat cover art, then "Machine" starts and the art unfolds into a cube the track drives, six seconds in the page and the rest fullscreen |
+| `tomtheweatherwizard-map-generator.mp4` | map.tomtheweatherwizard.com | 44s | the Weather Map Generator building a forecast from an empty map: three nested snow bands drawn outward-in, a cold front, a low, a storm track, the storm named, and an export |
 
 ## Run it
 
@@ -21,7 +22,7 @@ node tools/sitecap/capture.mjs ocp --recon     # headless: prove every selector,
 node tools/sitecap/capture.mjs ocp --framing    # one still, framed as the take will be
 ```
 
-Sites: `ocp`, `ttww`, `clcube`.
+Sites: `ocp`, `ttww`, `clcube`, `wmg`.
 
 `--recon` is the one to run first, and again after the client site ships
 anything. It loads each surface the take visits, counts every selector the
@@ -128,12 +129,45 @@ ask was a video, so nothing in the client repo was touched.
   `document.querySelectorAll("audio")` returns nothing -- check
   `.cube-vis.is-playing` instead.
 
+## Notes that decided the Weather Map Generator choreography
+
+The first entry that uses a tool rather than walking a site, which is why the
+driver grew `dragIn`, `clickIn`, `type`, and `select`. Everything before this one
+could be filmed by clicking and scrolling.
+
+- **The take is one continuous build, and it never scrolls.** The app is a fixed
+  1280-wide surface with `overflow: hidden` on the root. There is no page under
+  it, so every beat is an edit to the map.
+- **Bands go on outward-in.** Each new zone paints over the last, so the light
+  outer band is drawn first and the heavier cores land on top. Drawing them the
+  other way buries the cores. This is also the order a forecaster works in, which
+  is why the take reads as someone doing the job rather than someone clicking
+  around.
+- **`dragIn` and `clickIn` take fractions of the map's box, not pixels.** Same
+  reason `scrollToEl` takes a selector. The map is 1472x899 inside a 1920x1080
+  window today; it should not have to be re-measured when that changes.
+- **The drag is deliberately coarse, one mouse move per point.** The app pushes a
+  point per `mousemove` and re-renders the whole polygon each time. A fine drag
+  with `steps` buries it in re-renders and the stroke stutters.
+- **The legend is a control, not decoration.** A `mousedown` inside its box drags
+  the legend instead of drawing. It parks bottom-right, so nothing in the
+  choreography goes past x=0.86 below y=0.72 of the map box. The dry-run script
+  checks every drag point against the legend's live box and says so.
+- **Zones land as `<path>`, not `<polygon>`.** A first probe counted polygons,
+  found none, and wrongly reported that dragging did not draw at all. Count
+  `svg path` and compare against the resting count, which is 50 on a fresh load.
+- **Export is safe and invisible.** It writes a PNG through a normal download,
+  and tab capture never sees Chrome's download UI. The frame shows a button press
+  and the finished map, which is the right ending regardless.
+- **The app is silent**, measured at -91 dB, so it ships with no audio stream.
+
 ## Adding a site
 
 Add an entry to `SITES`: `url`, `out` (filename), `target` (seconds), a `ready()`
 that waits for whatever must be on screen before the first beat, and `beats()`.
-Then extend `recon()` with that site's surfaces and selectors. The driver
-(`click`, `hover`, `scrollY`, `scrollTo`, `landed`) is shared.
+Then extend `recon()` with that site's surfaces and selectors. The driver is
+shared: `click`, `hover`, `scrollY`, `scrollTo`, and `landed` for walking a site,
+plus `dragIn`, `clickIn`, `type`, and `select` for driving a tool.
 
 Optional per site: `warm[]` (extra routes to cache before the clock starts),
 `open()` (runs after the post-capture window refit, so a site can start the take

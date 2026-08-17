@@ -405,7 +405,103 @@ const clcube = {
   ],
 };
 
-const SITES = { ocp, ttww, clcube };
+// ---------------------------------------------------------------------------
+// map.tomtheweatherwizard.com -- the Weather Map Generator
+//
+// The other entries in this folder walk a site. This one uses a tool, which is
+// the only way to show what it is: an empty map of the country turning into a
+// broadcast forecast graphic while you watch.
+//
+// The take is one continuous build, no scrolling, because the app is a single
+// fixed 1280-wide surface with no page under it. Bands go on outward-in the way
+// a forecaster actually works: the light outer band first, then heavier cores on
+// top of it, because each new zone paints over the last.
+//
+// What the app settled:
+//   - Zones are freehand drags, and land as <path> rather than <polygon>.
+//   - The legend is a live control, not decoration: mousedown inside its box
+//     drags it instead of drawing. It parks bottom-right, so nothing in the
+//     choreography goes past x=0.86 below y=0.72 of the map box.
+//   - Intensity has two controls, a range input and a swatch row. The swatches
+//     are one click instead of several arrow presses, and they show which band
+//     is armed, so the take uses those.
+//   - Export writes a file through a download. Tab capture never sees Chrome's
+//     download UI, so the click reads as a button press and the finished map
+//     stays on screen, which is the right ending anyway.
+// ---------------------------------------------------------------------------
+
+const MAP = "svg";
+const swatch = (i) => `input[type="range"] + div > div >> nth=${i}`;
+const tool = (label) => `button:has-text("${label}")`;
+
+const wmg = {
+  url: "https://map.tomtheweatherwizard.com/",
+  out: "tomtheweatherwizard-map-generator.mp4",
+  target: 44.0,
+  ready: async (page) => {
+    // The US outline is the last thing to land, and an empty white panel is a
+    // wasted opening beat.
+    await page.waitForSelector("svg", { timeout: 30000 });
+    await page.waitForFunction(() => document.querySelectorAll("svg path").length > 40, { timeout: 15000 });
+    await page.waitForTimeout(1200);
+  },
+  beats: (d) => [
+    { t: 600, label: "cursor in", do: () => d.cursorOn() },
+
+    // --- the snow field, light band first --------------------------------
+    { t: 1200, label: "arm 1-3\"", do: () => d.click(swatch(1), 560) },
+    { t: 2000, label: "draw the outer band", do: () => d.dragIn(MAP, [
+      [0.34, 0.24], [0.46, 0.17], [0.60, 0.18], [0.70, 0.27],
+      [0.72, 0.42], [0.62, 0.52], [0.46, 0.53], [0.35, 0.44],
+    ], { stepMs: 70 }) },
+
+    { t: 6000, label: "arm 3-6\"", do: () => d.click(swatch(2), 460) },
+    { t: 6800, label: "draw the middle band", do: () => d.dragIn(MAP, [
+      [0.42, 0.27], [0.52, 0.22], [0.63, 0.25], [0.66, 0.36],
+      [0.58, 0.45], [0.46, 0.44], [0.41, 0.36],
+    ], { stepMs: 70 }) },
+
+    { t: 10200, label: "arm 6-12\"", do: () => d.click(swatch(3), 460) },
+    { t: 11000, label: "drop the heavy core", do: () => d.dragIn(MAP, [
+      [0.49, 0.29], [0.57, 0.27], [0.62, 0.33], [0.58, 0.40], [0.50, 0.38],
+    ], { stepMs: 75 }) },
+
+    // --- the system driving it -------------------------------------------
+    { t: 14400, label: "cold front", do: () => d.click(tool("Cold Front"), 620) },
+    { t: 15400, label: "draw the front", do: () => d.dragIn(MAP, [
+      [0.40, 0.52], [0.47, 0.60], [0.55, 0.66], [0.64, 0.70], [0.73, 0.71],
+    ], { stepMs: 75 }) },
+
+    { t: 19000, label: "low pressure", do: () => d.click(tool("L Low"), 560) },
+    { t: 20000, label: "place the low", do: () => d.clickIn(MAP, 0.38, 0.44, 520) },
+
+    { t: 22200, label: "storm track", do: () => d.click(tool("Storm Track"), 560) },
+    { t: 23200, label: "draw the track", do: () => d.dragIn(MAP, [
+      [0.26, 0.60], [0.34, 0.52], [0.43, 0.45], [0.53, 0.39], [0.64, 0.35],
+    ], { stepMs: 75 }) },
+
+    // --- name it ----------------------------------------------------------
+    { t: 27000, label: "name the storm", do: () => d.type("input[type='text'] >> nth=0", "Winter Storm Bellamy", { glideMs: 620, delay: 60 }) },
+    { t: 31500, label: "set the dates", do: () => d.type("input[type='text'] >> nth=1", "Thursday - Friday", { glideMs: 520, delay: 55 }) },
+
+    // --- ship it ----------------------------------------------------------
+    // The download itself is invisible to a tab capture. What the frame shows is
+    // the button pressed and the finished map sitting there, which is the ending.
+    { t: 36000, label: "export", do: () => d.click(tool("Export PNG"), 640) },
+    { t: 38000, label: "cursor out", do: () => d.cursorOff() },
+  ],
+  recon: [
+    { label: "the app", sels: [
+      MAP, "input[type='range']",
+      swatch(1), swatch(2), swatch(3),
+      tool("Cold Front"), tool("L Low"), tool("Storm Track"), tool("Export PNG"),
+      "input[type='text'] >> nth=0", "input[type='text'] >> nth=1",
+      "g[data-legend='true']",
+    ] },
+  ],
+};
+
+const SITES = { ocp, ttww, clcube, wmg };
 
 // ---------------------------------------------------------------------------
 // driver
@@ -484,6 +580,68 @@ function makeDriver(page) {
     async landed(sel) {
       await page.locator(sel).first().waitFor({ state: "visible", timeout: 12000 });
       await ensureKit();
+    },
+
+    // --- verbs for a drawing tool ------------------------------------------
+    // Added for the Weather Map Generator, which is driven by dragging on a
+    // canvas rather than by clicking through a page.
+
+    // Trace a path with the button held down, inside `sel`. Points are
+    // fractions of that element's box, not viewport pixels, for the same reason
+    // scrollTo takes a selector: the client can change their layout and the
+    // shape should still land on the same part of the map.
+    //
+    // Deliberately coarse. The app pushes a point per mousemove and re-renders
+    // the whole polygon each time, so a fine-grained drag with `steps` buries it
+    // in re-renders and the stroke stutters. One move per point, paced.
+    async dragIn(sel, fracPts, { glideMs = 500, stepMs = 55, settle = 260 } = {}) {
+      await ensureKit();
+      const b = await boxOf(sel);
+      const pts = fracPts.map(([fx, fy]) => [
+        Math.round(b.x + b.width * fx),
+        Math.round(b.y + b.height * fy),
+      ]);
+      await glide(pts[0][0], pts[0][1], glideMs);
+      await page.evaluate(() => window.__sitecap.ripple());
+      await page.mouse.down();
+      for (const [x, y] of pts.slice(1)) {
+        await kit(([x, y, m]) => window.__sitecap.moveTo(x, y, m), [x, y, stepMs]);
+        await page.mouse.move(x, y);
+        await page.waitForTimeout(stepMs);
+      }
+      await page.mouse.up();
+      await page.waitForTimeout(settle);
+    },
+
+    // Click a point inside `sel`, given as a fraction of its box. For tools that
+    // place something wherever the cursor happens to be.
+    async clickIn(sel, fx, fy, glideMs = 500) {
+      await ensureKit();
+      const b = await boxOf(sel);
+      await glide(Math.round(b.x + b.width * fx), Math.round(b.y + b.height * fy), glideMs);
+      await tap();
+    },
+
+    // Clear a field and type into it at a readable speed. The text appearing is
+    // the beat, so this is slower than a paste would be.
+    async type(sel, text, { glideMs = 500, delay = 55 } = {}) {
+      await ensureKit();
+      const b = await boxOf(sel);
+      await glide(b.x + b.width / 2, b.y + b.height / 2, glideMs);
+      await tap();
+      await page.locator(sel).first().fill("");
+      await page.locator(sel).first().type(text, { delay });
+    },
+
+    // A native <select>. The dropdown itself is browser chrome and never reaches
+    // a tab capture, so the cursor rests on the control and the value changes
+    // under it. Nothing is gained by pretending to open the menu.
+    async select(sel, value, glideMs = 500) {
+      await ensureKit();
+      const b = await boxOf(sel);
+      await glide(b.x + b.width / 2, b.y + b.height / 2, glideMs);
+      await page.evaluate(() => window.__sitecap.ripple());
+      await page.locator(sel).first().selectOption(value);
     },
   };
   return d;
