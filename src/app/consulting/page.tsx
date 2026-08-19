@@ -315,7 +315,7 @@ export default function ConsultingPage() {
                 pull a subheading up toward the heading above it, so the pair
                 reads as one unit rather than as two stacked headings. */}
             <h2 className="svc-block__subheading">
-              Need A Second Opinion On Your Digital Presence?
+              Need help sorting out your website(s) or digital presence?
             </h2>
             <div className="svc-prose svc-prose--lead">
               <p>
