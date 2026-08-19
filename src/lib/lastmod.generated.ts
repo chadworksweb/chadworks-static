@@ -12,11 +12,11 @@
 export const BUILD_DATE = "2026-08-19";
 
 export const ROUTE_DATES: Record<string, string> = {
-  "/": "2026-08-17",
+  "/": "2026-08-19",
   "/about/": "2026-08-17",
   "/advertising-on-chatgpt/": "2026-08-17",
-  "/ai-generated-website-audit/": "2026-08-12",
-  "/ai-search-visibility/": "2026-07-29",
+  "/ai-generated-website-audit/": "2026-08-19",
+  "/ai-search-visibility/": "2026-08-19",
   "/ai-visibility-audit/": "2026-08-01",
   "/are-we-a-good-fit/": "2026-08-11",
   "/build-your-vision/": "2026-07-23",
@@ -35,7 +35,7 @@ export const ROUTE_DATES: Record<string, string> = {
   "/how-much-does-a-website-cost/": "2026-08-14",
   "/music-industry-web-design/": "2026-07-23",
   "/privacy-policy/": "2026-08-17",
-  "/rates/": "2026-08-11",
+  "/rates/": "2026-08-19",
   "/seo/": "2026-08-01",
   "/shapecap/": "2026-07-20",
   "/shopify/": "2026-08-01",
