@@ -9,10 +9,24 @@
 # le-nginx proxy (conf.d/chadworks.conf + chadworks-staging.conf). What is public
 # is controlled by src/lib/launch.ts (the LAUNCHED set) -- no sealed branch.
 #
-# Rollback (prod): the WordPress site is still intact -- chadworks-wordpress +
-# chadworks-mysql containers stay running, and the pre-cutover vhost is saved as
-# /root/proxy/nginx/conf.d/chadworks.conf.bak-before-static-*. To revert, restore
-# that .bak over chadworks.conf and reload le-nginx.
+# ROLLBACK (prod): git checkout the previous commit and re-run this script.
+# The build is deterministic and the tar-sync overwrites, so the previous export
+# lands back over /srv/chadworks. That is the whole procedure.
+#
+# WHAT USED TO BE WRITTEN HERE WAS WRONG, and it was wrong in the direction that
+# costs you the site (verified 2026-08-19). It said the WordPress cutover was
+# still reversible: that chadworks-wordpress + chadworks-mysql "stay running",
+# so reverting meant restoring the pre-cutover vhost
+# /root/proxy/nginx/conf.d/chadworks.conf.bak-before-static-* over
+# chadworks.conf and reloading le-nginx.
+#
+# The .bak file is still there. THE CONTAINERS ARE NOT -- `docker ps -a` on
+# le-projects-01 matches zero of 19 containers against chadworks/cw, running or
+# stopped. They were removed at some point after the 2026-07-02 cutover and the
+# note was never updated. Restoring that vhost now would point nginx at
+# containers that do not exist, which takes chadworks.co DOWN rather than
+# rolling it back. Do not do it. The WordPress path is gone; static is the only
+# thing serving this domain.
 set -euo pipefail
 
 SERVER="deploy@138.197.111.66"
