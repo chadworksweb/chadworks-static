@@ -170,7 +170,7 @@ export default function RatesPage() {
             {
               label: "Websites",
               detail:
-                "The one piece of your business you fully own on the internet: the look, the code, the hosting, all custom built and all in your name.",
+                "Website design and development services. A website is the one place you own on the internet. Make it yours.",
               href: "/websites/",
             },
             {

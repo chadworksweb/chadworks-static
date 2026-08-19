@@ -30,6 +30,10 @@ export function PageMotion() {
     // Hence the `:not()` below: without it both observers would watch the same
     // element and the -8% one would fight the whole point of the +14% one.
     const observers: IntersectionObserver[] = [];
+    // Listener teardown, alongside the observer list. The tap-focus handlers
+    // below are the only listeners here attached per ELEMENT rather than to
+    // window, so they need somewhere to hand their removers back.
+    const cleanups: (() => void)[] = [];
 
     // The trigger expressed in PIXELS: roughly 12% of one screen. For any element
     // shorter than the viewport this works out to the same 0.12 ratio the reveal
@@ -101,8 +105,13 @@ export function PageMotion() {
       // effect -- full-width text lanes lighting themselves as they cross the
       // line read as motion for its own sake (Chad, 2026-08-12). On touch,
       // rows lanes now stay static (their :hover is already disabled below).
+      // `.svc-lane` IS NO LONGER IN THIS SET (Chad, 2026-08-19: "the lane wipes
+      // need to NOT be activated by the viewport positioning or dragging, only
+      // stopped-tapping"). Scroll-driven lighting on the lane CARDS read as the
+      // page reacting to a drag rather than to the reader, so the cards moved to
+      // the tap handler below and only `.cw-lane-sub` is still positional.
       const focusEls = Array.from(
-        document.querySelectorAll<HTMLElement>(".svc-lane, .cw-lane-sub")
+        document.querySelectorAll<HTMLElement>(".cw-lane-sub")
       ).filter((el) => !el.closest(".svc-lanes--rows"));
       if (focusEls.length) {
         const onLine = new Set<Element>();
@@ -137,6 +146,66 @@ export function PageMotion() {
         focusEls.forEach((el) => lineObs.observe(el));
         observers.push(lineObs);
       }
+
+      // --- tap focus: the lane cards light for a STOPPED TAP, never a drag ---
+      //
+      // The same `.is-touch-focus` class the observer used to park, so not one
+      // line of the lane CSS changes; only what decides to put it there does.
+      //
+      // A touch that MOVES is a scroll, and a scroll must leave the cards alone.
+      // So the class goes on at touchstart and comes straight back off the
+      // moment the finger travels past a few pixels of slop, which is what makes
+      // dragging across a grid inert while a deliberate press still answers.
+      // TAP_SLOP is deliberately small: anything generous enough to feel
+      // forgiving is also generous enough to light a card during a slow scroll,
+      // which is the behaviour being removed.
+      //
+      // Rows-variant lanes stay out, matching the observer's exclusion. There
+      // are no `.svc-lane.is-touch-focus` mirrors for the rows chrome, so the
+      // class would hand a full-width text lane the card grid's lift and wipe.
+      //
+      // All four listeners are passive: none of them calls preventDefault, and
+      // marking them so keeps the scroll off the main thread.
+      const TAP_SLOP = 6;
+      const tapEls = Array.from(
+        document.querySelectorAll<HTMLElement>(".svc-lane")
+      ).filter((el) => !el.closest(".svc-lanes--rows"));
+      if (tapEls.length) {
+        let pressed: HTMLElement | null = null;
+        let sx = 0;
+        let sy = 0;
+        const release = () => {
+          pressed?.classList.remove("is-touch-focus");
+          pressed = null;
+        };
+        tapEls.forEach((el) => {
+          const onStart = (e: TouchEvent) => {
+            const t = e.touches[0];
+            if (!t) return;
+            release();
+            sx = t.clientX;
+            sy = t.clientY;
+            pressed = el;
+            el.classList.add("is-touch-focus");
+          };
+          const onMove = (e: TouchEvent) => {
+            if (pressed !== el) return;
+            const t = e.touches[0];
+            if (!t) return;
+            if (Math.hypot(t.clientX - sx, t.clientY - sy) > TAP_SLOP) release();
+          };
+          el.addEventListener("touchstart", onStart, { passive: true });
+          el.addEventListener("touchmove", onMove, { passive: true });
+          el.addEventListener("touchend", release, { passive: true });
+          el.addEventListener("touchcancel", release, { passive: true });
+          cleanups.push(() => {
+            el.removeEventListener("touchstart", onStart);
+            el.removeEventListener("touchmove", onMove);
+            el.removeEventListener("touchend", release);
+            el.removeEventListener("touchcancel", release);
+          });
+        });
+      }
     }
 
     // --- scroll-fill headings ---
@@ -170,6 +239,7 @@ export function PageMotion() {
 
     return () => {
       observers.forEach((o) => o.disconnect());
+      cleanups.forEach((fn) => fn());
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);

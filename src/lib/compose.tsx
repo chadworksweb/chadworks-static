@@ -131,6 +131,23 @@ export function composeService(s: Service, overrides: ServiceOverrides = {}) {
     // Optional interstitial section between the approach and the build-options
     // funnel. No Service field feeds it; a page opts in via `overrides.explainer`.
     explainer: null,
+    // FULL RHYTHM, decided by looking (Chad, 2026-08-19). This was pinned to
+    // `topPad="tuck"` for one build so the capsule's default flip could not move
+    // anything unreviewed. Measured on /seo/ at 1440: the lanes heading sat 20px
+    // under the hard edge of the dark process band above it, against 100px of
+    // air below the cards. Lopsided, and it is the same complaint the three
+    // deleted page-local overrides were each written to answer.
+    //
+    // Every ServiceTemplate page puts this funnel under a FULL-BLEED DARK BAND,
+    // whose bottom padding is inside its own dark surface and so contributes no
+    // visible air. The 15% tuck was written for a funnel tucked under a block on
+    // the SAME surface, which is not what happens here. Two placements still do
+    // that and both keep the tuck: the audit page (its lanes follow a light
+    // svc-made block) and the two hubs via HubTemplate (their lanes follow a
+    // hero that already pads 80px below itself).
+    //
+    // Nothing launched moved: every compose-driven page carrying a lane funnel
+    // is currently sealed.
     paths: s.paths ? <PathsCapsule paths={s.paths} /> : null,
     tiers: s.tiers ? <TiersCapsule tiers={s.tiers} /> : null,
     // "Proof, not promises" is OFF SITEWIDE (Chad, 2026-08-01). Killed at the

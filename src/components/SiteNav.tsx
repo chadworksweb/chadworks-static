@@ -33,7 +33,24 @@ const LINKS: NavLink[] = [
       { href: "/website-design-cost-calculator/", label: "Website Design Cost Calculator" },
     ],
   },
-  { href: "/visibility/", label: "Visibility" },
+  {
+    href: "/visibility/",
+    label: "Visibility",
+    // The two LAUNCHED services in the lane (Chad, 2026-08-19). Labels are
+    // lifted from SiteFooter, same as the Websites children, so the same route
+    // is never called two things depending on where a reader met it, and the
+    // order matches the footer's.
+    //
+    // The lane's other five routes are deliberately absent rather than listed
+    // and greyed. Both renderers gate children on isLaunched and fall back to a
+    // dimmed `site-nav__soon` span, so adding /seo/, /digital-marketing/,
+    // /email-marketing/ and the two ChatGPT explainers would put five dead
+    // entries in a dropdown of seven. They belong here the day they launch.
+    children: [
+      { href: "/ai-search-visibility/", label: "AI Search Visibility" },
+      { href: "/ai-visibility-audit/", label: "AI Visibility Audit" },
+    ],
+  },
   { href: "/consulting/", label: "Consulting" },
   { href: "/essays/", label: "Essays" },
   { href: "/showroom/", label: "Showroom" },

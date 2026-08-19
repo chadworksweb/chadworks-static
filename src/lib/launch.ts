@@ -75,6 +75,18 @@ const LAUNCHED = new Set<string>([
                                   // the audit lane for sites that already exist and
                                   // were generated. Its robots line was already
                                   // isLaunched-gated, so this one edit lights it.
+  "/consulting/", // launched 2026-08-19 -- the Lane 03 consulting hub. Three
+                  // sections: the audit-shaped hero with its lead form, the clay
+                  // aperture band, and the lane grid out to the rest of the site.
+                  // This one line also lights the SiteNav "Consulting" link,
+                  // greyed since 2026-07-16 waiting on this page to exist. Its
+                  // robots line was already isLaunched-gated.
+  "/consulting/", // launched 2026-08-19 -- the Lane 03 consulting hub. Three
+                  // sections: the audit-shaped hero with its lead form, the clay
+                  // aperture band, and the lane grid out to the rest of the site.
+                  // This one line also lights the SiteNav "Consulting" link,
+                  // greyed since 2026-07-16 waiting on this page to exist. Its
+                  // robots line was already isLaunched-gated.
   "/how-much-does-a-website-cost/", // RE-LAUNCHED 2026-08-13 after the copy and
                                    // structure rebuild and a full responsive pass.
                                    // (First launched 2026-07-20, sealed 2026-07-24.)

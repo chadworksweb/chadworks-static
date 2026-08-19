@@ -907,8 +907,12 @@ export default function AiGeneratedWebsiteAuditPage() {
         captionSub="(One person, looking at your site.)"
       />
 
+      {/* topPad="tuck" is what this page has always rendered; it became a prop
+          rather than a blanket CSS rule on 2026-08-19 (see .cw-lanes--tuck in
+          global.css). Pinned so that flip moved nothing here. */}
       <PathsCapsule
         className="cw-fix-paths"
+        topPad="tuck"
         paths={{
           heading: "Explore chadworks™",
           items: [

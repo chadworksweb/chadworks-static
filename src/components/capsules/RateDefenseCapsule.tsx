@@ -10,14 +10,19 @@
 // the role list are Chad's own wording, verbatim; only the heading, the kicker
 // label and the closing paragraph are written copy.
 //
+// THIS FILE IS NOW COPY ONLY (2026-08-19). The band, the aurora, the photograph,
+// the aperture and the marquee moved to ApertureBandCapsule so /consulting/ can
+// cut the same window with a different payload. Nothing about how /rates/
+// renders changed: the markup this produces is the markup it always produced,
+// with `.cw-defense__*` renamed to the shared `.cw-aband__*` and the green
+// palette, the photo and the eyebrow tint moved behind `.cw-aband--rate`.
+//
 // TREATMENT: the /about/ APERTURE, reused. Same mechanism, different payload --
 // there the fixed layer repeats one governing line, here it stacks the roles, so
 // the window reads as a list running past the hole rather than one sentence
-// sliding through it. The aperture and marquee CSS is shared with cw-worldview
-// (see the WORLDVIEW block in global.css); this file only supplies the content
-// and the cw-defense modifiers.
+// sliding through it.
 
-import { SectionShell } from "@/components/capsules/SectionShell";
+import { ApertureBandCapsule } from "@/components/capsules/ApertureBandCapsule";
 import { HOURLY_RATE } from "@/lib/pricing";
 
 // The eyebrow says the number out loud before the reader can. HOURLY_RATE is
@@ -58,48 +63,24 @@ const PASSES = 3;
 
 export function RateDefenseCapsule() {
   return (
-    // reveal={false} is REQUIRED, not a preference. `.reveal` keeps a filter on
-    // the section at rest, and any filter other than `none` makes the section a
-    // containing block for the fixed layer the window looks through, which pins
-    // the layer to the section and kills the effect. Same reason as /about/.
-    <SectionShell
-      full
-      reveal={false}
-      className="svc-block svc-dark cw-defense"
+    <ApertureBandCapsule
+      variant="rate"
       id="in-defense-of-the-rate"
-    >
-      <div className="cw-defense__copy">
-        <p className="eyebrow">{EYEBROW}</p>
-        <h2 className="svc-block__heading">Why my rate is what it is</h2>
-
-        <p className="cw-defense__lead">{LEAD}</p>
-
-        <h3 className="sr-only">{SPOKEN}</h3>
-        <div className="cw-defense__aperture" aria-hidden="true">
-          <div className="cw-defense__marquee">
-            {Array.from({ length: PASSES }, (_, pass) =>
-              ROLES.map((role, i) => <span key={`${pass}-${i}`}>{role}</span>)
-            )}
-          </div>
-        </div>
-
-        <div className="cw-defense__close">
-          <p className="cw-defense__label">What my rate buys you</p>
-          {/* Chad's wording, verbatim. Split across two paragraphs only for
-              rhythm -- the ask stands on its own line rather than trailing the
-              comparison. Nothing is reworded, merged or cut. */}
-          <p className="cw-defense__closeline">
-            Eleven specialists in a single package, all cross-examining every
-            decision from their unique domains. An agency splits those roles
-            across eleven people and bills you accordingly.
-          </p>
-          <p className="cw-defense__closeline">
-            Hire chadworks. Experience a one-of-a-kind package of speed,
-            precision and perception applied to your initiative.
-          </p>
-        </div>
-      </div>
-    </SectionShell>
+      eyebrow={EYEBROW}
+      heading="Why my rate is what it is"
+      lead={LEAD}
+      payload={ROLES}
+      spoken={SPOKEN}
+      passes={PASSES}
+      closeLabel="What my rate buys you"
+      /* Chad's wording, verbatim. Split across two paragraphs only for rhythm --
+         the ask stands on its own line rather than trailing the comparison.
+         Nothing is reworded, merged or cut. */
+      close={[
+        "Eleven specialists in a single package, all cross-examining every decision from their unique domains. An agency splits those roles across eleven people and bills you accordingly.",
+        "Hire chadworks. Experience a one-of-a-kind package of speed, precision and perception applied to your initiative.",
+      ]}
+    />
   );
 }
 

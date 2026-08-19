@@ -12,7 +12,7 @@ import { isValidElement, type ReactNode } from "react";
 import { HeroArtStage } from "@/components/HeroArtStage";
 import { PageMotion } from "@/components/PageMotion";
 import type { LeadFormConfig } from "@/lib/forms";
-import { MainContactCapsule } from "@/components/capsules";
+import { MainContactCapsule, PathsCapsule } from "@/components/capsules";
 import { SITE_URL, ORG } from "@/lib/service";
 import { isLaunched } from "@/lib/launch";
 import { ORG_ID, ref } from "@/lib/jsonld";
@@ -113,85 +113,48 @@ export default function HubTemplate({ hub }: { hub: HubConfig }) {
       </section>
 
       {/* LANES -- every service in the lane as an asymmetric hover lane.
-          Sits directly under the hero on both hubs; the thesis follows it. */}
-      <section className="section svc-block reveal">
-        {hub.lanesHeading && (
-          <h2 className="svc-block__heading">{hub.lanesHeading}</h2>
-        )}
-        {hub.lanesIntro && (
-          <p className="svc-block__body measure-prose">{hub.lanesIntro}</p>
-        )}
-        <div className="svc-lanes">
-          {(() => {
-            const cards = hub.lanes.map((l, i) => {
-              const style = {
-                "--lane-color": LANE_COLORS[i % LANE_COLORS.length],
-              } as React.CSSProperties;
-              // A lane is locked when its TARGET IS NOT LAUNCHED, read from launch.ts.
-              //
-              // This was `i >= 2` -- "lanes 01 + 02 stay live, 03-08 are locked" -- which
-              // was true of /websites/ when it was written and drifted the moment another
-              // hub had a different number of live lanes. On /visibility/ it linked lane
-              // 02 to /ai-visibility-audit/, which is sealed, while locking 06 and 07
-              // whose pages have been launched and live for weeks (Chad, 2026-07-29:
-              // "disable link / tooltip 02 03 04 and 05").
-              //
-              // Deriving it means a lane lights up the moment its page launches, can
-              // never link to a sealed route, and no hub has to know its own position in
-              // someone else's ordering. /websites/ is unaffected: its first two lanes
-              // are the launched ones either way.
-              const locked = !isLaunched(l.href);
-              const inner = (
-                <>
-                  <span className="svc-lane__num" aria-hidden="true">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <span className="svc-lane__content">
-                    <span className="svc-lane__title">{l.label}</span>
-                    <span className="svc-lane__desc">{l.detail}</span>
-                    {locked ? (
-                      <span
-                        className="svc-lane__arrow svc-lane__arrow--soon"
-                        tabIndex={0}
-                        aria-disabled="true"
-                      >
-                        Explore -&gt;
-                        <span className="svc-lane__tip" role="tooltip">coming soon</span>
-                      </span>
-                    ) : (
-                      <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
-                    )}
-                  </span>
-                  {/* lane viz kept in each hub's config but no longer rendered */}
-                </>
-              );
-              return locked ? (
-                <div key={l.href} className="svc-lane svc-lane--soon" style={style}>
-                  {inner}
-                </div>
-              ) : (
-                <Link key={l.href} href={l.href} className="svc-lane" style={style}>
-                  {inner}
-                </Link>
-              );
-            });
-            // Box 3: an inverted contact CTA that jumps to the contact form below.
-            cards.splice(2, 0, (
-              <a key="contact-cta" href="#contact" className="svc-lane svc-lane--cta">
-                <span className="svc-lane__content">
-                  <span className="svc-lane__title">Not sure what you need?</span>
-                  <span className="svc-lane__desc">
-                    Cut right to it and tell me your idea, situation or problem.
-                    I&apos;ll tell you what I&apos;d do for you.
-                  </span>
-                  <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
-                </span>
-              </a>
-            ));
-            return cards;
-          })()}
-        </div>
-      </section>
+          Sits directly under the hero on both hubs; the thesis follows it.
+
+          CAPSULIZED 2026-08-19 (Chad). This was ~70 lines of hand-rolled
+          svc-lanes markup, the third copy of the same chrome on the site.
+          Absorbing it surfaced three things this copy did that the others did
+          not, all of which are now props rather than divergences:
+
+            - the cta card is SPLICED AT INDEX 2, so contact is the third box
+              rather than the last of seven or eight. That is `ctaAt`.
+            - `locked = !isLaunched(l.href)` per lane, which is exactly what
+              `autoSeal` does. Same behaviour, one implementation.
+            - lane `viz` is deliberately NOT rendered here, though both hubs
+              still carry viz entries in their config. The capsule renders viz
+              when it is present, so the lanes are passed through with it
+              stripped. Delete the strip to turn the illustrations back on.
+
+          cw-lanes--tuck is the 15% top rhythm, kept so both hubs render exactly
+          as they did before that stopped being a blanket rule (see the
+          .cw-lanes--tuck note in global.css). Under a hero the tuck has an
+          argument the other placements do not: the hero already pads 80px below
+          itself. Drop it to take the full rhythm. */}
+      <PathsCapsule
+        topPad="tuck"
+        autoSeal
+        ctaAt={2}
+        paths={{
+          heading: hub.lanesHeading,
+          intro: hub.lanesIntro,
+          items: hub.lanes.map(({ viz: _viz, ...lane }) => lane),
+        }}
+        cta={{
+          title: "Not sure what you need?",
+          body: (
+            <>
+              Cut right to it and tell me your idea, situation or problem.
+              I&apos;ll tell you what I&apos;d do for you.
+            </>
+          ),
+          label: "Contact me",
+          href: "#contact",
+        }}
+      />
 
       {/* THESIS (optional) -- the lane's argument, after the routes. */}
       {hub.thesis && (

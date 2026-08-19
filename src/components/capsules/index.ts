@@ -51,8 +51,14 @@ export { DeliverableCapsule } from "./DeliverableCapsule";
 // so /about/ imports from one place with the rest of its capsules.
 export { WorldviewCapsule } from "./WorldviewCapsule";
 
-// The /rates/ "in defense of the rate" block. Reuses the worldview aperture,
-// owns its own copy, page-specific by intent.
+// The APERTURE BAND: dark band, aurora, a photo out of the right edge, and a
+// hole cut through to a viewport-fixed marquee. Extracted from the /rates/
+// defense block 2026-08-19 so more than one page can cut the same window.
+// Structure is shared; colour and photo live behind a `--variant` class.
+export { ApertureBandCapsule } from "./ApertureBandCapsule";
+
+// The /rates/ "in defense of the rate" block. Copy only now: it calls
+// ApertureBandCapsule with variant="rate".
 export { RateDefenseCapsule } from "./RateDefenseCapsule";
 
 // The calculator hand-off: PackageAssemble beside the pitch + button. On

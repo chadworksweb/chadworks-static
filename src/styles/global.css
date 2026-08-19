@@ -3614,26 +3614,53 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
    surface, oversized faded numeral, 3px accent left border, staggered
    indents, baked-in lift + tinted glow) with the CF marketing-site lane
    hover (the accent wipes from the left border to a full-width glow). */
-/* Lanes section: cut the section's top padding by 85% (15% of the base) to
-   pull the routes up under whatever precedes them. */
-.section.svc-block.reveal:has(.svc-lanes) {
+/* THE LANES SECTION'S TOP RHYTHM IS AN OPT-IN NOW, not a blanket (Chad,
+   2026-08-19: "shouldn't it just be a capsule we can modify per instance").
+
+   What used to be here:
+
+     .section.svc-block.reveal:has(.svc-lanes) {
+       padding-top: calc(var(--section-pad-y) * 0.15);
+     }
+
+   cutting the top padding to 15% on EVERY section containing lanes, "to pull
+   the routes up under whatever precedes them". That was written 2026-07-13 for
+   a funnel tucked under a block on the SAME SURFACE, where pulling the routes up
+   makes the two read as one unit.
+
+   Surveyed at the flip (2026-08-19), 27 placements sort into three cases and
+   only one of them is the case the rule was written for:
+
+     23 follow a full-bleed band, almost always dark. That band's bottom padding
+        is inside its own surface and contributes NO visible air, so all the
+        reader sees above the heading is the 15%. Measured on /seo/ at 1440:
+        20px above the heading against 100px below the cards. These take the
+        full rhythm, and it is the default.
+      3 genuinely want the tuck. /ai-generated-website-audit/ is the original
+        case, a funnel under a light svc-made block on the same surface. Both
+        lane hubs are the other, under a hero that already pads 80px below
+        itself (Chad: "some of them are tucked into the hero").
+      1 is the homepage, which wants neither: .cw-home-paths zeroes the padding
+        and pulls -45px so the cards cross the hero's bottom edge.
+
+   Three pages found the bad default independently and each wrote its own
+   override (.cw-visibility-paths, .cw-rate-explainer ~, #difference ~). All
+   three are deleted with this change; those pages take the default instead.
+
+   So the default is the full section rhythm, inherited from `.section`, and an
+   instance that genuinely wants the tuck asks for it: PathsCapsule's
+   `topPad="tuck"`, or this class directly on a hand-rolled lanes section.
+   Two classes, so it beats `.section` regardless of source order. */
+.section.cw-lanes--tuck {
   padding-top: calc(var(--section-pad-y) * 0.15);
 }
-/* ...except the ROWS variant, which is a section in its own right rather than a
-   funnel tucked under the block above it, so it keeps the standard rhythm top
-   AND bottom (Chad, 2026-07-17). Same specificity as the rule above, so this
-   must stay after it to win. */
+/* The ROWS variant is a section in its own right rather than a funnel tucked
+   under the block above it, so it keeps the standard rhythm top AND bottom
+   (Chad, 2026-07-17). Kept as a guard: it now also overrules a `tuck` that
+   arrives on a rows instance by mistake. */
 .section.svc-block.reveal:has(.svc-lanes--rows) {
   padding-top: var(--section-pad-y);
   padding-bottom: var(--section-pad-y);
-}
-/* ...and except on /ai-search-visibility/, where the lanes follow the full-bleed
-   dark timeline band rather than sitting under a block on the same surface. At
-   15% the heading landed hard against that band's edge. Standard top rhythm
-   here (Chad, 2026-07-29). Four classes, the same weight as the :has() rule
-   above, so this has to stay after it. */
-.section.svc-block.reveal.cw-visibility-paths {
-  padding-top: var(--section-pad-y);
 }
 /* HOME ONLY -- the three-up lane module crosses the hero's bottom edge by 20px
    instead of clearing it. Written as intent rather than one negative margin:
@@ -3849,10 +3876,26 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 }
 .svc-lane:hover .svc-lane__arrow { transform: translateX(0.4rem); }
 
-/* TOUCH FOCUS -- the hover look, driven by SCROLL POSITION instead of a pointer.
-   A touch screen has nothing to hover with, and iOS latches :hover on tap and
-   never clears it, so the lit card is decided by where it sits: PageMotion parks
-   .is-touch-focus on whichever card is in the top third of the screen.
+/* TOUCH FOCUS -- the hover look on a device with nothing to hover with. A touch
+   screen has no pointer, and iOS latches :hover on tap and never clears it, so
+   .is-touch-focus is what lights a card and the :hover half is switched off
+   below.
+
+   WHAT PUTS THE CLASS THERE DEPENDS ON WHICH CARD IT IS, and that split is
+   Chad's (2026-08-19: "the lane wipes need to NOT be activated by the viewport
+   positioning or dragging, only stopped-tapping"):
+
+     .svc-lane   -- a STOPPED TAP. PageMotion adds the class on touchstart and
+                    takes it straight back off if the finger travels more than a
+                    few pixels, so dragging across a grid leaves it alone and
+                    only a deliberate press lights a card.
+     .cw-lane-sub -- still SCROLL POSITION, parked on whichever sub-lane crosses
+                    a line a quarter down the screen.
+
+   The declarations below serve both and do not care which. They MIRROR the
+   :hover rules above rather than joining their selector lists, because the hover
+   half is switched off on touch just below and a shared selector list cannot be
+   half-disabled. Keep the two in step.
    These declarations MIRROR the :hover rules above rather than joining their
    selector lists, because the hover half is switched off on touch just below and
    a shared selector list cannot be half-disabled. Keep the two in step. */
@@ -7542,7 +7585,7 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
   display: inline-block;
   /* GREEN, from the existing scheme (Chad, 2026-08-13), not the purple ramp.
      The bottom stop is --win-green, the global token. The top stop is the deep
-     green the rate-defense band already runs (.cw-defense's 135deg gradient);
+     green the rate-defense band already runs (.cw-aband--rate's 135deg gradient);
      it is a literal here because that value has never been promoted to a token.
      If a third consumer ever wants it, promote it rather than copying it again.
 
@@ -7857,21 +7900,12 @@ main:has(.cw-calc-hero) #other-calculators { padding-top: 0; }
 .cw-rate-explainer ~ .svc-block:has(.svc-lanes) .svc-block__heading {
   text-align: center;
 }
-/* Give the lane funnel real top padding: after the dark explainer band the
-   default lanes rule (line ~1618) collapses the top to 15% of the rhythm, which
-   crowds it against the band. Restore the full section rhythm. Specificity here
-   must beat .section.svc-block.reveal:has(.svc-lanes). */
-.cw-rate-explainer ~ .section.svc-block.reveal:has(.svc-lanes) {
-  padding-top: var(--section-pad-y);
-}
+/* The top-padding override that used to live here is gone: the blanket 15%
+   lanes rule it fought was removed 2026-08-19 (see .cw-lanes--tuck), so this
+   page simply takes the default full rhythm. */
 
-/* The calculator's lane funnel has the same problem for the same reason: it
-   follows the dark difference band, and the 15% top rule crowds it against
-   that band's edge. Full rhythm back, heading centered, matching the treatment
-   above. The ID beats the four-class rule it has to override. */
-#difference ~ .section.svc-block.reveal:has(.svc-lanes) {
-  padding-top: var(--section-pad-y);
-}
+/* The calculator's lane funnel keeps its centered heading. Its top-padding
+   override is gone for the same reason /rates/ lost one directly above. */
 #difference ~ .svc-block:has(.svc-lanes) .svc-block__heading {
   text-align: center;
 }
@@ -8052,12 +8086,12 @@ main:has(.cost-guide-hero) .cw-calc-cta {
 }
 
 /* THE FAQ BAND IS GREEN, not the navy the other dark bands run (Chad,
-   2026-08-13). Same mechanism .cw-defense uses on /rates/: the section keeps
+   2026-08-13). Same mechanism .cw-aband--rate uses on /rates/: the section keeps
    `.svc-faq-section--dark` for its STRUCTURE (the band, the aurora layer, the
    on-dark type rules) and swaps the PALETTE by redefining the tokens those
    rules already read. Nothing global moves, and no on-dark rule is duplicated.
 
-   The greens are the .cw-defense literals. Taken as literals rather than by
+   The greens are the .cw-aband--rate literals. Taken as literals rather than by
    reading that section's tokens, because they are declared ON that section and
    do not exist in this subtree -- var(--dark-muted) here would resolve to the
    sitewide lavender instead.
@@ -11797,9 +11831,25 @@ html.cw-motion-paused *::after {
    on the same rail as the body copy. */
 /* SHARED WITH /rates/ (Chad, 2026-08-07): the "in defense of the rate" block
    cuts the same window, so the aperture and the layer inside it are one set of
-   rules with two payloads. cw-defense adds only its own sizing below. */
+   rules with two payloads. cw-aband adds only its own sizing below. */
+/* THE OVERHANG ABOVE THE CUT IS INTENDED (Chad, 2026-08-19: "that's a feature
+   not a bug"). Do not fix it.
+
+   When a repeat straddles the aperture's top edge, the part above the edge
+   paints on the BAND rather than being clipped away, so the line reads as
+   carrying on past the hole instead of stopping at it. Left, right and bottom
+   clip normally; only the top overhangs. It is scroll-dependent, since the
+   window travels across a layer that is holding still, and on /rates/ it is
+   nearly the band's own colour, so it registers as depth rather than as type.
+
+   This was investigated as a defect and it is not one. If a future pass tries
+   to "contain" it, note that every containment property that would clip it
+   (contain: paint, filter, transform) also makes the aperture a containing
+   block for the fixed layer, which pins the layer to the section and kills the
+   parallax outright. There is no fix that keeps the effect, and none is
+   wanted. */
 .cw-worldview__aperture,
-.cw-defense__aperture {
+.cw-aband__aperture {
   position: relative;
   clip-path: inset(0);
   /* EXACTLY the box the h3 filled: TWO lines of --text-2xl at --leading-tight,
@@ -11833,7 +11883,7 @@ html.cw-motion-paused *::after {
    go straight under the type and never be seen. This overlay sits above the
    layer instead, and is clipped by the same clip-path. */
 .cw-worldview__aperture::after,
-.cw-defense__aperture::after {
+.cw-aband__aperture::after {
   content: "";
   position: absolute;
   /* OVERSIZED ON PURPOSE, and this is the whole fix for the Chrome seam.
@@ -11873,7 +11923,7 @@ html.cw-motion-paused *::after {
    layer is light ground with dark type, and the window reads as a punched hole
    onto something behind the page rather than a tinted panel on top of it. */
 .cw-worldview__marquee,
-.cw-defense__marquee {
+.cw-aband__marquee {
   /* Fixed VERTICALLY only. `top`/`height` pin it to the viewport, but `left`
      and `right` are deliberately left at `auto` so the layer keeps its STATIC
      horizontal position, which is the aperture's own content box. Setting
@@ -11926,11 +11976,28 @@ html.cw-motion-paused *::after {
      used to provide moves here, onto the layer. */
   padding-left: calc(var(--space-md) + 3px);
 }
+/* SPEECH, not a list. The quoted variant slants the payload so the window reads
+   as somebody talking rather than as a column of labels.
+
+   SYNTHESIZED, and knowingly so: --font-display is Lexend, loaded weight-only
+   because Lexend ships no italic face at all, so the browser slants the roman.
+   On a geometric sans that is an acceptable oblique, and loading a second
+   family for one decorative layer would cost a font request to fix something
+   nobody reads as wrong. If a drawn italic is ever wanted here, the answer is a
+   different face for this layer, not an italic axis on Lexend.
+
+   The slant costs horizontal room on a layer that is `white-space: nowrap`, and
+   the quotes cost two more characters, so a payload written for the roman needs
+   re-measuring against the cut after turning this on. */
+.cw-aband__marquee--quoted {
+  font-style: italic;
+}
+
 /* No parallax when the reader has asked for less motion: the window stops being
    a window and the line simply sits in it, which is the same information. */
 @media (prefers-reduced-motion: reduce) {
   html:not(.cw-force-motion) .cw-worldview__marquee,
-  html:not(.cw-force-motion) .cw-defense__marquee {
+  html:not(.cw-force-motion) .cw-aband__marquee {
     position: absolute;
     inset: 0;
     justify-content: flex-start;
@@ -11943,7 +12010,8 @@ html.cw-motion-paused *::after {
    claim (one head, one pair of hands), so it holds a real column rather than
    floating as decoration, and it drops beneath the copy once a second column
    would squeeze the declarations into two words a line. */
-.cw-worldview__layout {
+.cw-worldview__layout,
+.cw-aband__layout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: var(--space-xl);
@@ -11959,8 +12027,10 @@ html.cw-motion-paused *::after {
      pure extra space stacked on top of the section's own padding, which is what
      made the top read 40px deeper than the bottom. */
 }
-.cw-worldview__figure { margin: 0; }
-.cw-worldview__figure img {
+.cw-worldview__figure,
+.cw-aband__figure { margin: 0; }
+.cw-worldview__figure img,
+.cw-aband__figure img {
   display: block;
   width: 100%;
   max-width: 340px;
@@ -11969,8 +12039,10 @@ html.cw-motion-paused *::after {
   filter: drop-shadow(0 18px 40px rgba(31, 23, 39, 0.45));
 }
 @media (max-width: 900px) {
-  .cw-worldview__layout { grid-template-columns: 1fr; gap: var(--space-lg); }
-  .cw-worldview__figure img { max-width: 240px; }
+  .cw-worldview__layout,
+  .cw-aband__layout { grid-template-columns: 1fr; gap: var(--space-lg); }
+  .cw-worldview__figure img,
+  .cw-aband__figure img { max-width: 240px; }
 }
 
 .cw-worldview__beats { max-width: var(--measure-prose); }
@@ -12044,7 +12116,20 @@ html.cw-motion-paused *::after {
    The green is the point: this section follows the navy FAQ band, and the block
    arguing that the work does not come out of the same head as everyone else's
    should not come out of the same colour as the section above it either. */
-.cw-defense {
+/* RENAMED 2026-08-19: this was `.cw-defense`, page-private to /rates/. The
+   shape (dark band, aurora blooms, a photo emerging from the right edge, the
+   aperture cut through to a viewport-fixed marquee, and a close block under it)
+   is now the reusable ApertureBandCapsule, so the STRUCTURE lives on
+   `.cw-aband__*` above and only what is genuinely the rate band's own is left
+   here under the `--rate` variant: the green token set, the aurora hues, the
+   photograph and its two responsive restatements, the eyebrow colour the token
+   swap cannot reach, and the aperture's green inner shadow.
+
+   Adding a variant means adding a block like this one and nothing else. Do NOT
+   put a colour, a photo or an eyebrow override on the base `.cw-aband__*`
+   rules: everything there is shared, and a hue that lands in it paints every
+   band on the site. */
+.cw-aband--rate {
   --grad-peak: #cfe9d5;                        /* the layer ground + the kicker */
   --dark-bg: #0e2a1e;                          /* the type ON the layer         */
   --dark-text: #e8f5ec;                        /* body copy on the band         */
@@ -12054,7 +12139,7 @@ html.cw-motion-paused *::after {
 }
 /* The aurora blooms, re-aimed. Same three-glow structure and the same drift
    animation as .svc-dark; only the hues change. */
-.cw-defense::before {
+.cw-aband--rate::before {
   background:
     radial-gradient(45% 55% at 12% 8%, rgba(31, 157, 87, 0.42), transparent 62%),
     radial-gradient(50% 60% at 92% 88%, rgba(207, 233, 213, 0.20), transparent 60%),
@@ -12070,7 +12155,7 @@ html.cw-motion-paused *::after {
    words. `.svc-dark` is `overflow: hidden`, which trims it to the band.
    z-index 0 puts it above the aurora (::before, same level, painted earlier)
    and below the copy (`.svc-dark > *` is z-index 1). */
-.cw-defense::after {
+.cw-aband--rate::after {
   content: "";
   position: absolute;
   inset: 0 0 0 auto;
@@ -12123,7 +12208,7 @@ html.cw-motion-paused *::after {
    run of clear space it has at desktop. Dimming alone would have left it under
    the type, just fainter. */
 @media (max-width: 1100px) {
-  .cw-defense::after {
+  .cw-aband--rate::after {
     width: 40%;
     opacity: 0.9;
     /* Re-aim the crop with the layer. At `center right` the strip is narrow
@@ -12171,7 +12256,7 @@ html.cw-motion-paused *::after {
    The masks swap axis with the layout: the sides run full strength now and the
    fade is at the TOP, where the photo meets the green. */
 @media (max-width: 900px) {
-  .cw-defense {
+  .cw-aband--rate {
     --cw-photo-h: min(58vw, 340px);
     padding-bottom: calc(var(--section-pad-y) + var(--cw-photo-h));
     /* `.svc-dark` puts a hairline on both edges of the band. At the bottom the
@@ -12182,7 +12267,7 @@ html.cw-motion-paused *::after {
        Only removing the border outright closes it. */
     border-bottom-width: 0;
   }
-  .cw-defense::after {
+  .cw-aband--rate::after {
     /* OVERSHOOT THE BOTTOM by 2px, clipped back by the section's own
        `overflow: hidden` (Chad, 2026-08-07). Pinned flush at `bottom: 0` the
        layer's edge lands on a fractional device pixel -- the section's height is
@@ -12218,12 +12303,12 @@ html.cw-motion-paused *::after {
 
 /* The eyebrow colour is hardcoded lavender on .svc-dark, so it is the one thing
    the token swap cannot reach. Same specificity, later in the file. */
-.cw-defense .eyebrow { color: #9fe3bd; }
+.cw-aband--rate .eyebrow { color: #9fe3bd; }
 /* The hole's inner shadow is the page edge casting onto the surface behind it,
    so it has to be the band's own dark green rather than the plum the /about/
    window uses. Structure identical -- see the shared rule for why it is an
    oversized overlay and not `box-shadow: inset`. */
-.cw-defense__aperture::after {
+.cw-aband--rate .cw-aband__aperture::after {
   box-shadow:
     inset 0 5px 7px rgba(6, 24, 15, 0.62),
     inset 0 -4px 6px rgba(6, 24, 15, 0.48),
@@ -12231,26 +12316,180 @@ html.cw-motion-paused *::after {
     inset -5px 0 7px rgba(6, 24, 15, 0.52);
 }
 
-.cw-defense__copy { max-width: var(--measure-narrow); }
+/* =====================================================================
+   THE CONSULTING BAND -- .cw-aband--consult, the second variant (Chad,
+   2026-08-19). Sits second on /consulting/, between the hero and the lanes.
+
+   CLAY, and the reason is the same one that made /rates/ green: this band
+   follows the hero's pale manifesto cloud, and a section about a conversation
+   should not come out the colour of the two bands that argue about systems.
+   Nothing warm exists anywhere else on the site, so the register is audibly
+   different the moment it comes up the page. It is also deliberately NOT
+   indigo, which was the other candidate: the hero's lead-form card directly
+   above is already navy, and a navy band under a navy card reads as one long
+   smear rather than two surfaces.
+   ===================================================================== */
+.cw-aband--consult {
+  --grad-peak: #f0d9c9;                        /* the layer ground + the kicker */
+  --dark-bg: #331508;                          /* the type ON the layer         */
+  --dark-text: #f7e9df;                        /* body copy on the band         */
+  --dark-muted: #dbb49a;
+  --dark-border: rgba(232, 180, 148, 0.22);
+  background: linear-gradient(135deg, #331508 0%, #8f4425 100%);
+  /* NO BOTTOM HAIRLINE (Chad, 2026-08-19: the 1px seam under the portrait).
+     `.svc-dark` sets `border-block: 1px solid var(--dark-border)`, which is
+     right on a band that meets the next section along a flat edge. It is wrong
+     here, because the portrait IS the bottom edge now: the rule draws a pale
+     warm line straight across his feet.
+
+     REMOVING IT IS THE ONLY FIX, and this is worth stating because the obvious
+     alternative does not work. `overflow: hidden` clips at the PADDING box
+     while the section's background paints out to the BORDER box, so pushing him
+     further down only clips him ABOVE the border and the line survives
+     underneath. A transparent border leaves the same strip. The width has to go
+     to zero. /rates/ learned this on its phone layout, where the photograph
+     becomes the band's bottom edge for the same reason. */
+  border-bottom-width: 0;
+}
+/* The aurora blooms, re-aimed. Same three-glow structure, same drift animation
+   and the same stop percentages as the other two bands; only the hues change. */
+.cw-aband--consult::before {
+  background:
+    radial-gradient(45% 55% at 12% 8%, rgba(198, 87, 38, 0.42), transparent 62%),
+    radial-gradient(50% 60% at 92% 88%, rgba(240, 217, 201, 0.20), transparent 60%),
+    radial-gradient(40% 45% at 70% 20%, rgba(140, 74, 60, 0.34), transparent 65%);
+}
+
+/* THE CUTOUT IS A REAL COLUMN HERE, NOT A BACKGROUND LAYER (Chad, 2026-08-19:
+   "move my photo into the right column, out of the background").
+
+   /rates/ keeps its photo in `::after`, and that is right for what it is: a
+   2260x1480 landscape photograph with no alpha, atmosphere for the argument
+   rather than evidence in it, so it emerges out of the green at the right edge
+   and is gone before it reaches the copy.
+
+   This is a 880x1415 PORTRAIT cutout with alpha, and a cutout of a person is
+   not atmosphere. It is the person the conversation is with, so it holds a real
+   column: `.cw-aband__layout` is the same 2:1 grid /about/ hangs its portrait
+   in, shared rather than cloned, and the figure is a real <img> that a crawler
+   and a screen reader can both see.
+
+   Consequences, all of them deliberate:
+     - no mask and no tint. Both existed to dissolve a rectangle into a band,
+       and there is no rectangle in a column.
+     - no `overflow: hidden` crop. He is whole, sized by the column.
+     - the copy rail's max-widths below stop applying to this variant, because
+       the grid is what constrains the copy now. See the override further down.
+   ===================================================================== */
+/* HE STANDS ON THE SEAM (Chad, 2026-08-19: "stick my portrait to the bottom of
+   the section on the seam").
+
+   The shared layout is `align-items: start`, which is right for /about/ where
+   the portrait hangs beside four short declarations. Here the column runs the
+   full height of a lead, a window and a two-paragraph close, and a figure
+   floating at the top of that leaves him standing on nothing.
+
+   TWO PROPERTIES, and the second is the one that matters. `align-self: end`
+   drops him to the bottom of the grid row, but that is the bottom of the
+   CONTENT box, so he would still float one --section-pad-y above the band's
+   edge. The negative margin gives back exactly what the section's bottom
+   padding takes, so his feet land on the border edge itself.
+
+   Done as a margin rather than `position: absolute` on purpose: absolute would
+   take him out of flow, the grid would collapse to one column, and the copy
+   would run underneath him. In flow, his column is still reserved and the text
+   still stops where it always did.
+
+   `.svc-dark` is `overflow: hidden`, so the drop shadow below him is clipped at
+   the seam. That is the intended read: a shadow meeting the ground, not a
+   shadow hanging in space under a floating cutout. */
+.cw-aband--consult .cw-aband__figure {
+  align-self: end;
+  /* PLUS 2px, and the overshoot is a rounding fix rather than a nudge. The
+     margin is a calc off a clamp, so his bottom edge lands on a FRACTIONAL
+     device pixel while the band's own edge rounds to a whole one. Where the two
+     disagree, a sub-pixel strip of band survives under him and reads as a
+     hairline. Overshooting past the edge puts the disagreement off-screen, and
+     `.svc-dark`'s `overflow: hidden` trims the excess flush. Same technique,
+     and the same reason, as the /rates/ photo's `bottom: -2px` on phones. */
+  margin-bottom: calc((var(--section-pad-y) + 2px) * -1);
+}
+.cw-aband--consult .cw-aband__figure img {
+  /* Larger than the /about/ portrait's 340px: that one sits beside four short
+     declarations, where this column runs the full height of a lead, a window
+     and a two-paragraph close, and a 340px figure against that reads as a
+     thumbnail pinned to a wall of type. */
+  max-width: 420px;
+  /* The drop shadow is the clay's own darkest value rather than /about/'s plum,
+     so the figure sits on this band instead of looking pasted onto it. */
+  filter: drop-shadow(0 18px 40px rgba(26, 9, 3, 0.5));
+}
+/* THE PHONE CAP HAS TO BE RESTATED HERE, and forgetting it is why the portrait
+   measured 358px wide on a 390px handset. The shared stack rule caps the figure
+   at 240px below 900px, but it is written as `.cw-aband__figure img` -- one
+   class and an element. The rule above is `.cw-aband--consult .cw-aband__figure
+   img`, two classes and an element, so it outranks the cap at EVERY width and
+   the phone value never applied. Restated at the same weight so it can win.
+
+   260 rather than the shared 240: below 900px this figure is no longer beside
+   the copy, it is under it and standing on the section's bottom edge, so it
+   reads as the close of the band rather than as a thumbnail beside a column. */
+@media (max-width: 900px) {
+  .cw-aband--consult .cw-aband__figure img { max-width: 260px; }
+}
+/* THE COPY RAIL, unconstrained on this variant. `.cw-aband__copy` caps itself
+   at --measure-narrow and drops to 60% in the tablet band, both of which exist
+   to hold the /rates/ text clear of a photograph painted behind it. In a two
+   column layout there is nothing behind the text, and those caps only strand
+   the copy in the left third of its own column. Two classes, so this beats the
+   one-class base rules regardless of source order. */
+.cw-aband--consult .cw-aband__copy { max-width: none; }
+@media (max-width: 1100px) and (min-width: 901px) {
+  .cw-aband--consult .cw-aband__copy { max-width: none; }
+}
+/* The eyebrow colour is hardcoded lavender on .svc-dark, so it is the one thing
+   the token swap cannot reach. Warm apricot: the one hue on this band that has
+   to survive against the clay at small type. */
+.cw-aband--consult .eyebrow { color: #f0a878; }
+/* The hole's inner shadow is the page edge casting onto the surface behind it,
+   so it takes this band's own darkest clay rather than the green /rates/ uses
+   or the plum on /about/. Structure identical -- see the shared rule for why it
+   is an oversized overlay and not `box-shadow: inset`. */
+.cw-aband--consult .cw-aband__aperture::after {
+  box-shadow:
+    inset 0 5px 7px rgba(26, 9, 3, 0.62),
+    inset 0 -4px 6px rgba(26, 9, 3, 0.48),
+    inset 5px 0 7px rgba(26, 9, 3, 0.52),
+    inset -5px 0 7px rgba(26, 9, 3, 0.52);
+}
+
+/* Any band carrying an id is a jump target, and the nav is sticky and opaque at
+   72px, so a bare anchor jump parks the section's first 72px underneath it.
+   Same value the hero, the essays and the calculator anchors already use. On the
+   base class rather than a variant: every band takes an `id`, so every band
+   needs this the moment something links to it. */
+.cw-aband { scroll-margin-top: var(--nav-height); }
+
+.cw-aband__copy { max-width: var(--measure-narrow); }
 /* The copy stops short of the photo instead of running under it, which is what
    the 720px rail does for free on a wide screen. ONLY in the tablet band: below
    900 the photo stacks under the copy and the text takes the full width again.
    It lives here, after the base rule, because both are one class deep -- inside
    the earlier media block it lost to the unqualified declaration below it. */
 @media (max-width: 1100px) and (min-width: 901px) {
-  .cw-defense__copy { max-width: 60%; }
+  .cw-aband__copy { max-width: 60%; }
 }
 /* The lead ends mid-sentence and the window finishes it, so it sets like the
    worldview declarations: a spoken line, not body prose. No bottom margin worth
    speaking of -- the aperture's own margin carries the gap. */
-.cw-defense__lead {
+.cw-aband__lead {
   max-width: var(--measure-prose);
   font-size: var(--text-lg);
   line-height: var(--leading-snug, 1.4);
   color: var(--dark-text);
   font-weight: 500;
 }
-.cw-defense__aperture {
+.cw-aband__aperture {
   /* One step down from the /about/ window. The layer is `white-space: nowrap`
      and never wraps, so the longest role has to clear the cut on its own at
      every width; at --text-2xl the longer titles ran past the right edge and
@@ -12261,8 +12500,8 @@ html.cw-motion-paused *::after {
      ones and the edge of the next. */
   height: calc(var(--cw-quote-size) * var(--leading-tight, 1.15) * 3 + 15px);
 }
-.cw-defense__close { max-width: var(--measure-prose); }
-.cw-defense__label {
+.cw-aband__close { max-width: var(--measure-prose); }
+.cw-aband__label {
   font-size: var(--text-sm);
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -12272,25 +12511,25 @@ html.cw-motion-paused *::after {
 /* Same weight as the lead above the window: the two halves are one argument
    split by the aperture, and dropping the second half to muted body size would
    read as a footnote to the first. */
-.cw-defense__closeline {
+.cw-aband__closeline {
   font-size: var(--text-lg);
   line-height: var(--leading-snug, 1.4);
   color: var(--dark-text);
   font-weight: 500;
 }
-.cw-defense__closeline + .cw-defense__closeline { margin-top: var(--space-sm); }
+.cw-aband__closeline + .cw-aband__closeline { margin-top: var(--space-sm); }
 @media (max-width: 700px) {
-  .cw-defense__lead,
-  .cw-defense__closeline { font-size: var(--text-base); }
+  .cw-aband__lead,
+  .cw-aband__closeline { font-size: var(--text-base); }
   /* PHONES. --text-xl clamps at 1.5rem and stops shrinking, but a longer role
      needs roughly 8 times the font size in width, so on the narrowest handsets
      it runs out of the cut. Driving the variable off the viewport keeps the type
      inside the window, and because the height is a calc off the same value the
      box follows it down instead of leaving a gap around smaller type. */
-  .cw-defense__aperture {
+  .cw-aband__aperture {
     --cw-quote-size: min(var(--text-xl), calc(5.4vw + 2px));
   }
-  .cw-defense__marquee { padding-left: var(--space-sm); }
+  .cw-aband__marquee { padding-left: var(--space-sm); }
 }
 
 /* ---- VERBATIM -- real client sentences, quoted exactly ---------------- */
@@ -13641,7 +13880,7 @@ html.cw-motion-paused *::after {
 .cw-fix-formcard__title,
 .cw-builds__more-heading {
   /* A SLOW GREEN WAVE THROUGH THE HEADING (Chad, 2026-08-08). The greens are
-     lifted from the /rates/ "in defense of the rate" band (.cw-defense):
+     lifted from the /rates/ "in defense of the rate" band (.cw-aband--rate):
      #9fe3bd is the brightest, limiest green in that scheme (it is the colour
      behind its --dark-border). Taken as a literal rather than by reading that
      section's tokens, because they are declared ON that section and do not
@@ -14116,7 +14355,7 @@ html.cw-motion-paused *::after {
    arrow and the white-on-hover text all keep working untouched, which is what
    makes this a scheme rather than a second button.
 
-   The greens are the /rates/ "in defense of the rate" band's (.cw-defense),
+   The greens are the /rates/ "in defense of the rate" band's (.cw-aband--rate),
    taken as literals for the reason that section's own note gives: its tokens
    are declared ON it and do not exist in this subtree. Pale ground with deep
    ink, mirroring the lavender-on-purple default, so the green pill is the same
@@ -14825,4 +15064,98 @@ html.cw-motion-paused *::after {
 @media (max-width: 900px) {
   .cw-race-intro { grid-template-columns: 1fr; }
   .cw-race-film { display: none; }
+}
+
+/* =====================================================================
+   /consulting/ HERO -- the /ai-generated-website-audit/ hero shape (eyebrow,
+   gradient h1 over a short lede and a glow-bullet list, argument left, dark
+   lead-form panel right) on the Lane 03 hub.
+
+   NOT built by reusing .cw-fix-hero / .cw-fix-intro, for the reason the 5K race
+   hero above gives: those carry a block of page-local overrides scoped as
+   `main:has(.cw-fix-hero)` (the 768-1024 band), and one of them retargets
+   .cw-contact__layout, which MainContactCapsule renders on THIS page too.
+   Borrowing the class would have silently restyled the consulting contact band
+   on a portrait tablet. The three rules actually needed are copied here with
+   their reasons rather than inherited with six that were measured elsewhere.
+
+   .cw-fix-formcard IS reused, in the markup. That block is not scoped to the
+   audit page: every rule in it reads `.cw-fix-formcard ...` standalone, and no
+   `main:has(.cw-fix-hero)` override touches it. Cloning ~380 lines of form
+   chrome to rename a class would be the wrong trade.
+   ===================================================================== */
+.cw-consult-hero {
+  padding-block: var(--hero-pad-y);
+  /* The nav is sticky and opaque at 72px, so a bare anchor jump to #consult-form
+     parks the section's first 72px underneath it. This is the top of the
+     section as the reader actually sees it. */
+  scroll-margin-top: var(--nav-height);
+}
+/* THE FULL-BLEED FIX, copied from .cw-fix-hero. An absolutely positioned child
+   of a grid container takes its GRID AREA as the containing block, so `inset: 0`
+   on the bg layer resolves against the content rail rather than the section box.
+   The bleed has to be granted on the grid axis, not the position axis. */
+.cw-consult-hero > .cw-shell__bg { grid-column: full; }
+/* Give back exactly what .text-gradient's 0.15em descender padding takes, so the
+   visible gap under the h1 matches the one under the lede. The padding stays:
+   background-clip:text paints only inside the line box, and without it the tail
+   of the g in "Digital" gets sliced off. Both resolve against the same
+   font-size, so the cancellation is exact at every clamp step. */
+.cw-consult-hero h1.text-gradient {
+  margin-bottom: calc(var(--space-md) - 0.15em);
+}
+/* Closer to even than the calculator's 1.6fr 1fr: a form needs real width for
+   its two-up name/email row to stay legible, where a table of contents is happy
+   narrow. Below the shared 820px stack point .cw-calc-intro takes over at a
+   single column and this override stops applying. */
+/* THE HERO H2 NEEDS AN EXPLICIT ORDER, and leaving it out is not a cosmetic
+   miss. `.cw-calc-intro__lead` becomes a flex column on touch and under 900px,
+   and that rule orders the eyebrow (1), the h1 (2), the CTA (3) and the prose
+   (4). A flex item with no `order` defaults to 0, so an unordered h2 sorts
+   BEFORE all of them and the subheading would render above the eyebrow on every
+   phone. Same value as the h1: equal orders fall back to DOM order, which
+   already has the h1 first, so the pair stays together and in sequence.
+
+   Scoped to this hero rather than added to the shared rule. The calculator has
+   no h2 in that block today, so a global line would be inert there now and a
+   surprise the day one is added. */
+@media (pointer: coarse), (max-width: 900px) {
+  .cw-consult-hero .cw-calc-intro__lead > h2 { order: 2; }
+}
+
+.cw-consult-intro { grid-template-columns: 1.15fr 1fr; }
+@media (max-width: 820px) { .cw-consult-intro { grid-template-columns: 1fr; } }
+/* THE HERO BUTTON INVERTS IN THE 1/1 LAYOUT (Chad, 2026-08-19). Stacked, the
+   button is the only ask on a tall pale screen and the default lavender pill
+   sits too quietly under the headline. Dark navy with white type gives it the
+   weight the two-column layout gets for free from the form card beside it.
+
+   THE BREAKPOINT IS DERIVED, NOT PICKED. This hero is single column only below
+   768: the `max-width: 820px` rule stacks it, and the `768-1024` portrait-tablet
+   rule below turns it back into two columns for that band. 767 is the complement
+   of the two, so the invert appears exactly when the layout is 1/1 and never
+   while the form is still beside the copy. If either breakpoint moves, so does
+   this one.
+
+   ONLY THE FOUR TOKENS ARE RESTATED, which is the idiom .cw-price-card__cta
+   already uses for the same job. The diagonal clip-path wipe, its easing and
+   its reduced-motion guard all read these vars, so they keep working untouched;
+   overriding `background` and `color` directly would have left the wipe
+   painting lavender over navy. .svc-btn:hover already takes the label white, so
+   the hover end state needs nothing. */
+@media (max-width: 767px) {
+  .cw-consult-hero .svc-btn {
+    --btn-bg: var(--dark-bg);
+    --btn-text: #fff;
+    --btn-hover-from: var(--grad-mid);
+    --btn-hover-to: var(--accent);
+  }
+}
+
+/* PORTRAIT TABLET KEEPS THE TWO COLUMNS, the same call the audit hero makes at
+   this band. Restated here rather than shared, so the consulting page picks up
+   the hero fix without also inheriting that page's contact, pricing and process
+   overrides. */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .cw-consult-intro { grid-template-columns: 1.15fr 1fr; }
 }

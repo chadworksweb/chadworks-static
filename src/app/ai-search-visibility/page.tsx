@@ -92,10 +92,14 @@ export default function AiSearchVisibilityPage() {
         // itself against launch.ts (`autoSeal`), so the four routes that are not
         // live yet carry the "coming soon" tooltip instead of linking into a
         // noindex page, and the grid closes on the hubs' inverted contact lane.
+        // `className="cw-visibility-paths"` used to be on this instance purely
+        // to hand it its standard top padding back, fighting the blanket 15%
+        // lanes rule. Both are gone as of 2026-08-19: the capsule defaults to
+        // the full rhythm now (see .cw-lanes--tuck in global.css), so this
+        // renders identically without either.
         paths: (
           <PathsCapsule
             paths={service.paths!}
-            className="cw-visibility-paths"
             autoSeal
             cta={{
               title: "Not sure which piece you need?",

@@ -28,6 +28,7 @@ import {
   AboutChadCapsule,
   RatesCapsule,
   FitCapsule,
+  PathsCapsule,
 } from "@/components/capsules";
 import { SectionShell } from "@/components/capsules/SectionShell";
 import { LANE_COLORS } from "@/lib/capsule";
@@ -132,7 +133,7 @@ const HOME_PATHS = [
   {
     label: "Websites",
     detail:
-      "The one piece of your business you fully own on the internet: the look, the code, the hosting, all custom built and all in your name.",
+      "Website design and development services. A website is the one place you own on the internet. Make it yours.",
     href: "#lane-websites",
   },
   {
@@ -310,38 +311,36 @@ export default function Home() {
       {/* 1a. The three-up lane module: the two service lanes jump down to their
           blocks below the manifesto, the third is the inverted contact CTA card
           used on the /websites/ and /visibility/ hubs, pointing at the footer
-          form. Same svc-lanes chrome as those hubs. */}
-      <SectionShell className="svc-block cw-home-paths">
-        <div className="svc-lanes">
-          {HOME_PATHS.map((p, i) => (
-            <a
-              key={p.href}
-              href={p.href}
-              className="svc-lane"
-              style={{ "--lane-color": LANE_COLORS[i] } as React.CSSProperties}
-            >
-              <span className="svc-lane__num" aria-hidden="true">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="svc-lane__content">
-                <span className="svc-lane__title">{p.label}</span>
-                <span className="svc-lane__desc">{p.detail}</span>
-                <span className="svc-lane__arrow" aria-hidden="true">Explore -&gt;</span>
-              </span>
-            </a>
-          ))}
-          <a href="#contact" className="svc-lane svc-lane--cta">
-            <span className="svc-lane__content">
-              <span className="svc-lane__title">Not sure what you need?</span>
-              <span className="svc-lane__desc">
-                Cut right to it and tell me your idea, situation or problem.
-                I&apos;ll tell you what I&apos;d do for you.
-              </span>
-              <span className="svc-lane__arrow" aria-hidden="true">Contact me -&gt;</span>
-            </span>
-          </a>
-        </div>
-      </SectionShell>
+          form. Same svc-lanes chrome as those hubs.
+
+          CAPSULIZED 2026-08-19 (Chad). The lane chrome now has one
+          implementation instead of three. Two things about THIS instance that
+          the capsule had to learn:
+
+            - no heading. This module has never had an h2, so `paths.heading` is
+              optional now rather than always printed.
+            - no autoSeal. Both hrefs are same-page fragments, and isLaunched()
+              normalises "#lane-websites" to "/lane-websites/", which is not a
+              route and would lock both lanes behind a "coming soon" tooltip.
+
+          cw-home-paths keeps its own top spacing: `padding-top: 0` plus the
+          -45px pull that crosses the hero's bottom edge. Four classes, so it
+          beats the capsule's default rhythm without needing topPad. */}
+      <PathsCapsule
+        className="cw-home-paths"
+        paths={{ items: HOME_PATHS }}
+        cta={{
+          title: "Not sure what you need?",
+          body: (
+            <>
+              Cut right to it and tell me your idea, situation or problem.
+              I&apos;ll tell you what I&apos;d do for you.
+            </>
+          ),
+          label: "Contact me",
+          href: "#contact",
+        }}
+      />
 
       {/* 2 + 2.5. The CW gemstone and the manifesto share ONE ambient field: the
           Lyric-Transformer fbm cloud (<ManifestoAmbient />) is a full-bleed layer
